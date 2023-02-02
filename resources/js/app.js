@@ -1,0 +1,40 @@
+import './bootstrap';
+import '../css/app.css';
+
+
+import { createApp, h } from 'vue';
+import { createInertiaApp } from '@inertiajs/inertia-vue3';
+import { InertiaProgress } from '@inertiajs/progress';
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/vue.m';
+
+import PrimeVue from 'primevue/config';
+import 'primevue/resources/themes/lara-light-indigo/theme.css';
+import 'primevue/resources/primevue.min.css';
+import 'primeicons/primeicons.css';
+import MultiSelect from 'primevue/multiselect';
+import Toolbar from 'primevue/toolbar';
+import Button from 'primevue/button';
+import Pagination from '@/Components/Pagination.vue'
+import InputText from 'primevue/inputtext'
+
+const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'PickAndPack';
+
+createInertiaApp({
+    title: (title) => `${title} - ${appName}`,
+    resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
+    setup({ el, app, props, plugin }) {
+        return createApp({ render: () => h(app, props) })
+            .use(plugin)
+            .use(ZiggyVue, Ziggy)
+            .use(PrimeVue)
+            .component('ToolBar',Toolbar)
+            .component('Button',Button)
+            .component('InputText',InputText)
+            .component('MultiSelect',MultiSelect)
+            .component('Pagination',Pagination)
+            .mount(el);
+    },
+});
+
+InertiaProgress.init({ color: '#4B5563' });
