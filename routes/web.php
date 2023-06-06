@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Http\Resources\OrderResource;
+use App\Models\Order;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,27 +30,51 @@ use Inertia\Inertia;
 //     ]);
 // });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+
 
 
 
 Route::middleware('auth')->group(function () {
 
     //Order Controller functions
+        Route::get('/dashboard',[OrderController::class,'dashboard'] )->name('dashboard');
+        Route::get('/refresh',[OrderController::class,'refresh'] )->name('refresh');
         Route::get('/scanner',[OrderController::class,'scan'])->name('scanner');
+        Route::get('orders/download/', [OrderController::class, 'export'])->name('orders.export');
+        // Route::get('orders/assemble/{part?}/{sector?}/{sp_code?}',[OrderController::class, 'assemble'])->name('orders.assemble');
+        Route::get('orders/assemble/{part?}/{sector?}/{sp_code?}',[OrderController::class, 'assemble'])->name('orders.lines');
+        Route::post('orders/prepack',[OrderController::class,'prepack'])->name('orders.prepack');
+        // Route::get('orders/assemble',[OrderController::class, 'assemble'])->name('orders.lines');
+
         // Route::get('/order/{id}', [OrderController::class, 'show'])->name('order.show');
         Route::get('/order/{id}/{part}', [OrderController::class, 'show'])->name('order.show');
+        Route::get('/all', [OrderController::class, 'index'])->name('order.list');
+        Route::post('/all', [OrderController::class, 'index'])->name('order.list');
+
+
         Route::get('/total',fn()=>inertia('Orders/List'))->name('total');
         Route::post('/execute',[OrderController::class,'execute'])->name('order.execute');
         Route::get('parts/{id}',[OrderController::class,'selectOrderPart'])->name('order.parts');
-        Route::get('/confirm/{id}',[OrderController::class,'confirm'])->name('order.confirm');
+        // Route::get('/confirm/{id}',[OrderController::class,'confirm'])->name('order.confirm');
         // Route::post('/getOrder', fn(Request $request)=>dd($request->all()));
         // Route::get('/sound/beep-07a.mp3');
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+
+        //updating that a part has been printed
+        Route::post('/updatePart',[OrderController::class ,'updatePart'])->name('order.updatepart');
+        Route::post('/order/confirm',[OrderController::class ,'confirmation'])->name('order.confirm');
+        Route::post('/order/filter',[OrderController::class ,'filter'])->name('order.filter');
+
+       //API
+       //API
+       Route::get('/orders',fn()=>OrderResource::collection(Order::select('order_no','customer_name','shp_name','shp_date')
+                                                                 ->paginate(15)->withQuerystring()
+                                                            )
+                  )->name('orders.get');
+
+    });
+
 
 require __DIR__.'/auth.php';

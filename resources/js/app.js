@@ -7,7 +7,7 @@ import { createInertiaApp } from '@inertiajs/inertia-vue3';
 import { InertiaProgress } from '@inertiajs/progress';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/vue.m';
-
+import {createPinia} from 'pinia';
 import PrimeVue from 'primevue/config';
 import 'primevue/resources/themes/lara-light-indigo/theme.css';
 import 'primevue/resources/primevue.min.css';
@@ -17,9 +17,12 @@ import Toolbar from 'primevue/toolbar';
 import Button from 'primevue/button';
 import Pagination from '@/Components/Pagination.vue'
 import InputText from 'primevue/inputtext'
+import Tooltip from 'primevue/tooltip';
+import Checkbox from 'primevue/checkbox';
+
+import Dropdown from 'primevue/dropdown';
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'PickAndPack';
-
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
@@ -28,10 +31,14 @@ createInertiaApp({
             .use(plugin)
             .use(ZiggyVue, Ziggy)
             .use(PrimeVue)
+            .use(createPinia())
             .component('ToolBar',Toolbar)
+            .component('Checkbox',Checkbox)
             .component('Button',Button)
             .component('InputText',InputText)
+            .directive('Tooltip',Tooltip)
             .component('MultiSelect',MultiSelect)
+            .component('Dropdown',Dropdown)
             .component('Pagination',Pagination)
             .mount(el);
     },
