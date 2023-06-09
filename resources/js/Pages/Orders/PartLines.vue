@@ -89,7 +89,7 @@ const submitForm=()=>{form.get(route('orders.lines'))}
 
 const prepack=()=>{ form.post(route('orders.prepack'))}
 
-const pp= ()=>{ showModal=!showModal;}
+// const pp= ()=>{ showModal=!showModal;}
 </script>
 
 <template>
@@ -101,7 +101,7 @@ const pp= ()=>{ showModal=!showModal;}
         </template>
 
         <div class="py-6">
-            <Modal :show="true" > Hi there </Modal>
+            <!-- <Modal :show="true" > Hi there </Modal> -->
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
@@ -147,7 +147,7 @@ const pp= ()=>{ showModal=!showModal;}
     <TabPanel header="Order Lines">
 
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-  <div class=" flex flex-row">
+  <div class=" flex flex-row w-full">
     <form @submit.prevent="submitForm()">
         <Dropdown v-model="form.part" :options="parts" optionLabel="name" editable="" optionValue="code" placeholder="Select Part" class="w-28" />
         <Dropdown v-model="form.sector" :options="sectors" optionLabel="name" editable="" optionValue="code" placeholder="Select Sector" class="w-28" />
@@ -162,9 +162,9 @@ const pp= ()=>{ showModal=!showModal;}
                                         </a> -->
 
   <!-- <Button type="button" rounded  label="Pre-pack" outlined @click="prepack()"  /> -->
-  <Button type="button" rounded  label="Pre-pack" outlined @click="pp()"  />
+  <!-- <Button type="button" rounded  label="Pre-pack" outlined @click="pp()"  /> -->
 
-  <Button type="button" rounded disabled label="Total Lines"  :badge=props.orderLines.meta.total badgeClass="p-badge-danger" outlined  />
+  <Button type="button" rounded disabled label="Total Lines"  :badge=props.orderLines.meta.total badgeClass="p-badge-danger" outlined class="justify-end" />
     </div>
 
 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">

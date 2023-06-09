@@ -13,6 +13,7 @@ import Pagination from '@/Components/Pagination.vue'
 import Swal from 'sweetalert2'
 import FilterPane from '@/Components/FilterPane.vue'
 import Modal from '@/Components/Modal.vue'
+import { useStorage } from '@/Composables/useStorage';
 
 const form = useForm({
     search: null,
@@ -126,8 +127,14 @@ function transformObjects(inputObj) {
   return transformedObj;
 }
 
+const postForm=(dynamicObject,dateDynamicObject)=>{
 
-console.log(dateDynamicObject);
+    // showModal=false
+    Inertia.post(route('order.filter',{...removeNullAndBlankKeys(dynamicObject),...removeNullAndBlankKeys(transformObjects(dateDynamicObject))}))
+        //    .onSuccess(showModal=false)
+}
+
+// console.log(dateDynamicObject);
  // Output: ['column3', 'column4']
 </script>
 
@@ -331,7 +338,7 @@ console.log(dateDynamicObject);
 
       <div class="p-2 m-4 place-items-center grid">
          <heading class="underline bg-slate-200 text-black tracking-wide p-4 w-full align-center">Filter Pane</heading>
-         <form class="" @submit.prevent="Inertia.post(route('order.filter',{...removeNullAndBlankKeys(dynamicObject),...removeNullAndBlankKeys(transformObjects(dateDynamicObject))}))">
+         <form class="" @submit.prevent="postForm(dynamicObject,dateDynamicObject)">
             <div v-for="item in columnListing" :key="item.name">
 
                 <div v-if="item.type==='string' && item.default_values.length==0" class="p-3">
@@ -352,20 +359,6 @@ console.log(dateDynamicObject);
 
 
              </div>
-
-
-                <!-- <div v-else-if="item.type ==='date'" >
-                    <span class="grid place-items-center grid-cols-1">
-                        <small :for="item.name" class="capitalize">{{ item.name }}</small>
-                        <Calendar v-model="dynamicObject[item.name]" selectionMode="range"  :manualInput="true" />
-                        <input type="date" class="rounded" v-model="dynamicObject[item.name]" selectionMode="range"  :manualInput="true" />
-
-                    </span>
-
-                </div> -->
-
-
-
             </div>
             <div v-for="dateData in dateDynamicObject" :key="dateData.id">
                     <label :for="dateData.id">{{ dateData.id }}</label>
@@ -374,7 +367,7 @@ console.log(dateDynamicObject);
                     <!-- <Calendar v-model="dateData.from" selectionMode="range"  :manualInput="true" /> -->
                 </div>
         <div class="text-center p-2">
-                    <Button type="Submit" label="Search"/>
+                    <Button type="Submit" label="Search" />
                 </div>
                 </form>
       </div>

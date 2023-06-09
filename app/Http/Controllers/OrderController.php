@@ -133,8 +133,51 @@ class OrderController extends Controller
 
     function filter(Request $request)
     {
-     dd($request->all());
-    }
+     //dd($request->all());
+
+         //create a dynamic query
+
+     $searchParams =$request->all();
+      $query = Order::query();
+
+      foreach ($searchParams as $key => $value) {
+        if ($value !== null) {
+            if (is_array($value))
+            {
+
+                foreach($value as $k=>$val)
+                {
+                    if ($k==='from'){
+                        $query->where($key,'>=',$val);
+
+                    }
+                    else //meaning to
+                      $query->where($key,'<=',$val);
+                }
+
+            }
+            else
+            {
+               $query->where($key,'like','%'.$value.'%');
+            }
+          // Add more `when` clauses for other search parameters
+        }
+      }
+
+     $orders= OrderResource::collection($query->current()
+                                               ->orderByDesc('ending_date')
+                                               ->orderByDesc('ending_time')
+                                               ->with('confirmations')
+                                               ->paginate(10)
+                                               ->withQuerystring()
+
+                                            );
+        $listing=collect((new ColumnListing('orders'))->getColumns())->only('customer_name','shp_name','order_no','shp_date','sp_code','ending_date');
+       return inertia('Orders/List',['orders'=>$orders,'refreshError'=>null,'columnListing'=>$listing]);
+
+     }
+
+
 
 
       public function assemble(Request $request,$part=null,$sector=null,$spcode=null,$item=null)
@@ -170,11 +213,59 @@ class OrderController extends Controller
 * @return \Illuminate\Http\Response
 */
 
+public function pack(Request $request)
+{
+    //this will be the view to select the order
+    //give a list of all orders ready for packing
+    $orders= OrderResource::collection(Order::query()
+                                            ->when($request->has('search'),fn($q)=>
+                                                        $q->where('order_no','like','%'.$request->search)
+                                                        // ->orWhere('customer_name','like','%'.$request->search.'%')
+                                                    )
+                                            ->current()
+                                               ->orderByDesc('ending_date')
+                                               ->orderByDesc('ending_time')
+                                               ->with('confirmations')
+                                               ->paginate(10)
+                                               ->withQuerystring()
+
+                                            );
+        $listing=collect((new ColumnListing('orders'))->getColumns())->only('customer_name','shp_name','order_no','shp_date','sp_code','ending_date');
+       return inertia('Orders/Pack',['orders'=>$orders,'refreshError'=>null,'columnListing'=>$listing]);
+
+
+
+}
+
+ public function scanItems(Request $request)
+ {
+    //get the items that belong to that order and part, send them back to vue
+    $orderLines=LineResource::collection(Line::query()
+                                            ->where('order_no',$request->order_no)
+                                            ->where('part',$request->part_no)
+                                            ->orderBy('item_description')
+                                            ->paginate(15)
+                                            ->appends([$request->all()])
+                                            ->withQueryString()
+                                        );
+
+                                        //  $previousInput=$request->all();
+
+
+                                        return inertia('Orders/PartPackLines',
+                                        ['orderLines'=>$orderLines ,
+                                        'previousInput'=>$request->all(),
+
+                                    ]);
+}
+
+
+
+
 public function prepack(Request $request)
 {
      dd($request->all());
-     //create prepack lines and document  for undertaking
-     //
+
 }
 
 

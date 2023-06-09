@@ -37,12 +37,18 @@ const showingNavigationDropdown = ref(false);
                                     Order Confirmations
                                 </NavLink>
 
-                                <!-- <NavLink :href="route('scanner')" :active="route().current('scanner')">
-                                    Scan Order
-                                </NavLink> -->
+
                                 <NavLink :href="route('orders.lines')" :active="route().current('orders.lines')">
                                     Assembly
                                 </NavLink>
+
+                                 <NavLink :href="route('order.pack')" :active="route().current('order.pack')">
+                                    Packing
+                                </NavLink>
+
+
+
+
 
 
 

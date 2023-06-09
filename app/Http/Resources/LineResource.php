@@ -28,6 +28,7 @@ class LineResource extends JsonResource
                  'item_description'=>$this->item_description,
                  'customer_spec'=>$this->customer_spec,
                  'part'=>$this->part,
+                 'barcode'=>$this->barcode,
                  'order_qty'=>$this->order_qty,
                  'ass_qty'=>$this->ass_qty,
                  'exec_qty'=>$this->exec_qty,

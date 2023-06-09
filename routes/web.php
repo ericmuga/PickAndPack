@@ -66,6 +66,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/updatePart',[OrderController::class ,'updatePart'])->name('order.updatepart');
         Route::post('/order/confirm',[OrderController::class ,'confirmation'])->name('order.confirm');
         Route::post('/order/filter',[OrderController::class ,'filter'])->name('order.filter');
+        Route::get('/order/filter',[OrderController::class ,'filter'])->name('order.filters');
+        Route::get('/order/pack',[OrderController::class ,'pack'])->name('order.pack');
+        Route::post('/order/all', [OrderController::class, 'pack'])->name('order.listing');
+        Route::post('/order/scanItems', [OrderController::class, 'scanItems'])->name('order.scanItems');
+        Route::get('/order/scanItems', [OrderController::class, 'scanItems'])->name('order.scanItemsGET');
 
        //API
        //API
