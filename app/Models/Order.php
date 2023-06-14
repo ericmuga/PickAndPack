@@ -45,12 +45,13 @@ class Order extends Model
 
     public function scopeCurrent(Builder $query) :void
     {
-      $query->where('ending_date','=',Carbon::today()->toDateString());
+    //   $query->where('ending_date','=',Carbon::today()->toDateString());
     //   $query->where('ending_date','=',Carbon::yesterday()->toDateString());
+      $query->where('ending_date','=','2023-06-09');
     }
 
     public function scopeSector(Builder $query,$sector)
-        {
+    {
          $query->where('sector','=',$sector);
     }
 

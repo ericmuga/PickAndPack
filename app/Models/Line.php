@@ -26,6 +26,11 @@ class Line extends Model
         $query->where('part',$part);
     }
 
+    public function prepacks()
+    {
+       return $this->belongsToMany(Prepack::class,'line_prepack_pivot','line_id','prepack_name');
+    }
+
 
 
 }

@@ -14,6 +14,10 @@ import Swal from 'sweetalert2'
 import FilterPane from '@/Components/FilterPane.vue'
 import Modal from '@/Components/Modal.vue'
 import { useStorage } from '@/Composables/useStorage';
+import { useDates } from '@/Composables/useDates';
+
+
+const todaysDate=useDates.getCurrentDate();
 
 const form = useForm({
     search: null,
@@ -143,7 +147,7 @@ const postForm=(dynamicObject,dateDynamicObject)=>{
 
     <AuthenticatedLayout @add="showModal=true">
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">Orders</h2>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">Orders {{ todaysDate }}</h2>
         </template>
 
         <div class="py-6">
@@ -177,7 +181,7 @@ const postForm=(dynamicObject,dateDynamicObject)=>{
                                         <a href="/orders/download" class="">
                                             <Button icon="pi pi-download" severity="primary" text raised rounded label="confirmations"/>
                                         </a>
-                                         <!-- <Link :href="route('refresh')" class=" mx-auto h-20 w-20 text-center m-5">
+                                         <!-- <Link :href="route('refresh')" class="w-20 h-20 m-5 mx-auto text-center ">
                                             <img src="/img/refresh.png" />
                                             <Button icon="pi pi-heart" severity="help" rounded aria-label="Favorite" />
                                             <Button icon="pi pi-refresh" severity="primary" rounded />
@@ -185,7 +189,7 @@ const postForm=(dynamicObject,dateDynamicObject)=>{
                                         </Link>
                                          -->
                                     <Button
-                                      label="Filters"
+                                         label="Filters"
                                          @click="showModal=true"
                                          rounded
                                     ></Button>
@@ -250,7 +254,7 @@ const postForm=(dynamicObject,dateDynamicObject)=>{
                                                     <td class="px-3 py-2 text-xs">
                                                         {{ order.order_no }}
                                                     </td>
-                                                    <td class="px-3 py-2 text-xs text-center flex flex-col">
+                                                    <td class="flex flex-col px-3 py-2 text-xs text-center">
                                                         <span class="text-xs font-bold">{{order.sp_code}}</span>
                                                         <span class="text-xs font-thin">{{order.sp_name}}</span>
                                                     </td>
@@ -336,8 +340,8 @@ const postForm=(dynamicObject,dateDynamicObject)=>{
 
    <Modal :show="showModal" @close="showModal=false" >
 
-      <div class="p-2 m-4 place-items-center grid">
-         <heading class="underline bg-slate-200 text-black tracking-wide p-4 w-full align-center">Filter Pane</heading>
+      <div class="grid p-2 m-4 place-items-center">
+         <heading class="w-full p-4 tracking-wide text-black underline bg-slate-200 align-center">Filter Pane</heading>
          <form class="" @submit.prevent="postForm(dynamicObject,dateDynamicObject)">
             <div v-for="item in columnListing" :key="item.name">
 
@@ -366,7 +370,7 @@ const postForm=(dynamicObject,dateDynamicObject)=>{
                     <input type="date" v-model="dateData.to"/>
                     <!-- <Calendar v-model="dateData.from" selectionMode="range"  :manualInput="true" /> -->
                 </div>
-        <div class="text-center p-2">
+        <div class="p-2 text-center">
                     <Button type="Submit" label="Search" />
                 </div>
                 </form>

@@ -24,6 +24,22 @@ import { useOrderStore } from '@/service/OrderStore'
 
 // const confirm = useConfirm();
 
+const form2= useForm({
+                      'prepack_name':'',
+                      'quantity':0,
+                      'order_no':'',
+                      'line_no':0
+                    //   'totalQuantity':0
+
+                    });
+
+let currentPrepacks=ref([]);
+let prepacksAvailable=ref('');
+let currentLineNo=ref('');
+let currentOrderNo=ref('');
+
+
+
 const products = ref(null);
 // const orders=ref(null);
 onMounted(() => {
@@ -38,6 +54,30 @@ onMounted(() => {
 
 });
 
+let dynamicModalContent=ref('No Prepacks for this line');
+
+const generateModalContent=(order)=>
+{
+    // alert(showModal.value)
+    // console.log(order)
+     prepacksAvailable=order.prepacks_available
+     currentPrepacks=order.prepacks
+     currentOrderNo=order.order_no
+     currentLineNo=order.line_no
+
+     showModal.value=true
+   // Inertia.get('line/prepacks',{'line_no':line_no})
+
+
+
+}
+const add=()=>{
+    form2.line_no=currentLineNo
+    form2.order_no=currentOrderNo
+    console.log(form2)
+    form2.post(route('prepacks.add'))
+    showModal.value=false
+}
 // const part =ref();
 let showModal=ref(false);
 const parts= ref([
@@ -59,12 +99,12 @@ const sectors= ref([
                 {'name':'All','code':'All'},
 ])
 
-const items= ref([
-                {'name':'Beef Smokies Labless 1Kg','code':'J31031702'},
-                {'name':'Beef Sausage Catering 1Kg','code':'J31015501'},
-                {'name':'All','code':'All'},
+// const items= ref([
+//                     {'name':'Beef Smokies Labless 1Kg','code':'J31031702'},
+//                     {'name':'Beef Sausage Catering 1Kg','code':'J31015501'},
+//                     {'name':'All','code':'All'},
 
-])
+//                 ])
 
 // watch(part, debounce(()=>{ Inertia.get('', {preserveScroll: true})}, 500));
 // watch(sector, debounce(()=>{ Inertia.get(route('orders.assemble'),{part:part.value,sector:sector.value}, {preserveScroll: true})}, 500));
@@ -82,12 +122,13 @@ const props= defineProps({
     orderLines:Object,
     selectedPart:Object,
     previousInput:Object,
+    items:Object
     // printed:Object
 })
 
-const submitForm=()=>{form.get(route('orders.lines'))}
+// const =()=>{form.get(route('orders.lines'))}
 
-const prepack=()=>{ form.post(route('orders.prepack'))}
+const submitForm=()=>{ form.post(route('orders.prepack'))}
 
 // const pp= ()=>{ showModal=!showModal;}
 </script>
@@ -95,7 +136,7 @@ const prepack=()=>{ form.post(route('orders.prepack'))}
 <template>
     <Head title="Orders"/>
 
-    <AuthenticatedLayout>
+    <AuthenticatedLayout @add="showModal=true">
         <template #header>
             <h2 class="text-xl font-semibold leading-tight text-gray-800">Parts</h2>
         </template>
@@ -123,7 +164,7 @@ const prepack=()=>{ form.post(route('orders.prepack'))}
 
                                     <template #end>
 
-                                         <!-- <Link :href="route('refresh')" class=" mx-auto h-20 w-20 text-center m-5"> -->
+                                         <!-- <Link :href="route('refresh')" class="w-20 h-20 m-5 mx-auto text-center "> -->
                                             <!-- <img src="/img/refresh.png" /> -->
                                             <!-- <Button icon="pi pi-heart" severity="help" rounded aria-label="Favorite" /> -->
                                             <!-- <Button icon="pi pi-refresh" severity="primary" rounded /> -->
@@ -147,15 +188,7 @@ const prepack=()=>{ form.post(route('orders.prepack'))}
     <TabPanel header="Order Lines">
 
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-  <div class=" flex flex-row w-full">
-    <form @submit.prevent="submitForm()">
-        <Dropdown v-model="form.part" :options="parts" optionLabel="name" editable="" optionValue="code" placeholder="Select Part" class="w-28" />
-        <Dropdown v-model="form.sector" :options="sectors" optionLabel="name" editable="" optionValue="code" placeholder="Select Sector" class="w-28" />
-        <Dropdown v-model="form.item" :options="items" optionLabel="name" editable="" optionValue="code" placeholder="Prepack Item" class="" />
-        <InputText v-model="form.spcode" placeholder="Salesperson Code"></InputText>
-        <Button icon="pi pi-search" severity="success"  type="submit" :disabled="form.processing" />
-
-    </form>
+  <div class="flex flex-row w-full ">
 
         <!-- <a href="/orders/download" class="">
                                             <Button icon="pi pi-download" severity="primary" text raised rounded label="confirmations"/>
@@ -163,6 +196,12 @@ const prepack=()=>{ form.post(route('orders.prepack'))}
 
   <!-- <Button type="button" rounded  label="Pre-pack" outlined @click="prepack()"  /> -->
   <!-- <Button type="button" rounded  label="Pre-pack" outlined @click="pp()"  /> -->
+
+   <Button
+
+                      label="Prepack"
+                      @click="showModal=true"
+                    />
 
   <Button type="button" rounded disabled label="Total Lines"  :badge=props.orderLines.meta.total badgeClass="p-badge-danger" outlined class="justify-end" />
     </div>
@@ -179,6 +218,7 @@ const prepack=()=>{ form.post(route('orders.prepack'))}
             <th  scope="col" class="px-6 py-3">Item</th>
             <th  scope="col" class="px-6 py-3">Description</th>
             <th  scope="col" class="px-6 py-3">Ordered qty</th>
+            <th  scope="col" class="px-6 py-3"> Prepack</th>
             <th  scope="col" class="px-6 py-3">Assembled qty</th>
             <th  scope="col" class="px-6 py-3">Customer Spec</th>
         </tr>
@@ -212,6 +252,11 @@ const prepack=()=>{ form.post(route('orders.prepack'))}
                 <td class="px-3 py-2 text-xs text-center">
                     {{ order.order_qty }}
                 </td>
+
+                <!-- <td class="px-3 py-2 text-xs text-center">
+
+                </td> -->
+
                 <td class="px-3 py-2 text-xs text-center">
                 {{ order.ass_qty }}
                 </td>
@@ -236,12 +281,12 @@ const prepack=()=>{ form.post(route('orders.prepack'))}
             <template #sourceheader> Available </template>
             <template #targetheader> Selected </template>
             <template #item="slotProps">
-                <div class="flex flex-wrap p-2 align-items-center gap-3">
-                    <!-- <img class="w-4rem shadow-2 flex-shrink-0 border-round" :src="'https://primefaces.org/cdn/primevue/images/product/' + slotProps.item.image" :alt="slotProps.item.name" /> -->
-                    <div class="flex-1 flex flex-column gap-2">
+                <div class="flex flex-wrap gap-3 p-2 align-items-center">
+                    <!-- <img class="flex-shrink-0 w-4rem shadow-2 border-round" :src="'https://primefaces.org/cdn/primevue/images/product/' + slotProps.item.image" :alt="slotProps.item.name" /> -->
+                    <div class="flex flex-1 gap-2 flex-column">
                         <span class="font-bold">{{ slotProps.item.order_no }}</span>
-                        <div class="flex align-items-center gap-2">
-                            <i class="pi pi-tag text-sm"></i>
+                        <div class="flex gap-2 align-items-center">
+                            <i class="text-sm pi pi-tag"></i>
                             <span>{{ slotProps.item.customer_name }}</span>
                         </div>
                     </div>
@@ -268,6 +313,64 @@ const prepack=()=>{ form.post(route('orders.prepack'))}
     </div>
 </div>
 </AuthenticatedLayout>
+
+<Modal :show="showModal" @close="showModal=false" :errors="errors">
+     <!-- {{ dynamicModalContent  }} -->
+
+     <div class="w-full p-4 font-bold text-center text-white bg-slate-600"> Make Prepack</div>
+       <div >
+
+
+        <form @submit.prevent="submitForm()" class="flex flex-col justify-center gap-2 p-5">
+            <Dropdown v-model="form.part" :options="parts" optionLabel="name" editable="" optionValue="code" placeholder="Select Part" class="" />
+            <Dropdown v-model="form.sector" :options="sectors" optionLabel="name" editable="" optionValue="code" placeholder="Select Sector"  />
+            <Dropdown v-model="form.item" :options="props.items" optionLabel="description" editable="" optionValue="item_no" placeholder="Prepack Item" class="" />
+            <InputText v-model="form.spcode" placeholder="Salesperson Code"></InputText>
+            <Button  label="Create" severity="success"  type="submit" :disabled="form.processing" />
+
+        </form>
+
+
+
+       <!-- <form @submit.prevent="add()">
+
+          <Dropdown
+              v-model="form2.prepack_name"
+              :options="prepacksAvailable"
+              optionLabel="name"
+              optionValue="name"
+              filter
+              placeholder="Select a Prepack Size"
+              class="w-full md:w-14rem"
+           />
+
+           <InputNumber
+             v-model="form2.quantity"
+             placeholder="No. of Prepacks"
+           />
+
+
+           <Button
+             type="submit"
+             label="Add"
+           />
+
+
+
+           <table v-show="currentPrepacks.length!=0">
+               <tr v-for="prepackLine in currentPrepacks" id="prepackLine.id" >
+                <td>{{ prepackLine.prepack_name }}</td>
+                <td>{{ prepackLine.prepack_count }}</td>
+
+               </tr>
+           </table>
+
+       </form> -->
+     </div>
+
+
+  </Modal>
+
 </template>
 <style>
 button:hover {

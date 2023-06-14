@@ -2,33 +2,41 @@
 
 namespace App\Exports;
 
-use App\Models\{Confirmation,Orders};
+use App\Models\{Confirmation, Order, Orders};
 use illuminate\Support\Facades\DB;
-
+use App\Http\Resources\OrderResource;
 use Maatwebsite\Excel\Concerns\FromCollection;
+// use Illuminate\Support\Arr;
 
 class ConfirmationExport implements FromCollection
 {
     /**
     * @return \Illuminate\Support\Collection
     */
-    public function collection()
-    {
-        return DB::table('confirmations')
-          ->select('confirmations.order_no',
-                   'confirmations.part_no',
-                   'user_id',
-                   'orders.customer_no',
-                   'orders.customer_name',
-                   'orders.sp_code',
-                   'orders.sp_name',
-                   'orders.route_code',
-                   'orders.shp_name',
-                   'orders.shp_date',
-                   'confirmations.created_at')
-          ->join('orders','orders.order_no','=','confirmations.order_no')
-          ->get();
 
-        // return Confirmation::all();
+     public $dates=[];
+      public function __construct($dates)
+      {
+        $this->dates=$dates;
+
+      }
+
+      public function collection()
+       {
+             return  OrderResource::collection(Order::query()
+                                            ->whereBetween('ending_date',[$this->dates[0],$this->dates[1]])
+                                            ->get()
+                                       );
+
+      }
+
+    private function check($part, $confirm)
+    {
+       if ($part>0)
+       {
+        if($confirm) return 'Confirmed';
+        else return 'Pending';
+       }
+       else return 'N/A';
     }
 }

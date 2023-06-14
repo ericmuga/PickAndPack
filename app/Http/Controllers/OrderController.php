@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\Order;
+use App\Models\{Order,Item};
 use App\Http\Resources\{OrderResource,LineResource};
 use App\Models\Confirmation;
 use App\Models\Line;
@@ -28,9 +28,10 @@ class OrderController extends Controller
     */
 
 
-    public function export()
+    public function export(Request $request)
     {
-        return Excel::download(new ConfirmationExport, 'confirmations.xlsx');
+        // return Excel::download(new ConfirmationExport([$request->from,$request->to]), 'confirmations.xlsx');
+        return Excel::download(new ConfirmationExport(['2023-06-09','2023-06-09']), 'confirmations.xlsx');
     }
 
      public function refresh(Request $request)
@@ -107,8 +108,9 @@ class OrderController extends Controller
                                             );
         $listing=collect((new ColumnListing('orders'))->getColumns())->only('customer_name','shp_name','order_no','shp_date','sp_code','ending_date');
 
+         $prepackItems=Item::select('description','item_no')->whereHas('prepacks',fn($q)=>$q->where('isActive',true))->get();
 
-        return inertia('Orders/List',['orders'=>$orders,'refreshError'=>$e,'columnListing'=>$listing]);
+        return inertia('Orders/List',['orders'=>$orders,'refreshError'=>$e,'columnListing'=>$listing ,'items'=>$prepackItems]);
     }
 
     public function confirmation(Request $request)
@@ -182,7 +184,7 @@ class OrderController extends Controller
 
       public function assemble(Request $request,$part=null,$sector=null,$spcode=null,$item=null)
       {
-
+          $prepackItems=Item::select('description','item_no')->whereHas('prepacks',fn($q)=>$q->where('isActive',true))->get();
           $orderLines=LineResource::collection(Line::query()
                                                 ->when($request->has('part')&&$request->part!='All',fn($q)=>$q->OfPart($request->part))
                                                 ->when($request->has('item')&&$request->item!='All',fn($q)=>$q->where('item_no',$request->item))
@@ -192,17 +194,19 @@ class OrderController extends Controller
                                                                              ->when($request->has('spcode')&&$request->spcode!='',fn($q)=>$q->where('sp_code',$request->spcode))
                                                           )
                                                 ->orderBy('order_no')
+                                                // ->with('prepacks')
                                                 ->paginate(15)
                                                 ->appends([$request->all()])
                                                 ->withQueryString()
                                             );
 
-    //  $previousInput=$request->all();
+
 
 
     return inertia('Orders/PartLines',
      ['orderLines'=>$orderLines ,
        'previousInput'=>$request->all(),
+       'items'=>$prepackItems
 
      ]);
 }
@@ -264,7 +268,29 @@ public function pack(Request $request)
 
 public function prepack(Request $request)
 {
-     dd($request->all());
+     //group by order, then by part, then by item
+
+    //  dd($request->all());
+
+    $lines= Line::query()
+                ->when($request->has('part')&&$request->part!='All',fn($q)=>$q->OfPart($request->part))
+                ->when($request->has('item')&&$request->item!='All',fn($q)=>$q->where('item_no',$request->item))
+                ->whereHas('prepacks', fn($q)=>$q->where('isActive',true))
+                ->whereHas('order',fn($q)=>$q->execute()
+                                             ->current()
+                                             ->when($request->has('sector')&&$request->sector!='All',fn($q)=>$q->sector($request->sector))
+                                             ->when($request->has('spcode')&&$request->spcode!='',fn($q)=>$q->where('sp_code',$request->spcode))
+                            )
+                ->orderBy('order_no')
+                ->get()
+                ->groupBy(['order_no','part'])->dd();
+
+    foreach($lines as $line)
+    {}
+
+        //  dd($lines);
+
+
 
 }
 

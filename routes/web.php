@@ -1,13 +1,15 @@
 <?php
 
-use App\Http\Controllers\{ProfileController,OrderController};
+use App\Http\Controllers\{LineController, ProfileController,OrderController, PrepackController};
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Resources\OrderResource;
+use App\Models\Line;
 use App\Models\Order;
+use App\Models\Prepack;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,6 +52,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/order/{id}/{part}', [OrderController::class, 'show'])->name('order.show');
         Route::get('/all', [OrderController::class, 'index'])->name('order.list');
         Route::post('/all', [OrderController::class, 'index'])->name('order.list');
+
+        Route::get('line/prepacks',fn(Request $request)=>Line::where('line_no')->prepacks()->get());
+        Route::post('line/add',[LineController::class, 'add'])->name('prepacks.add');
+
+
+        Route::resource('prepacks',PrepackController::class);
 
 
         Route::get('/total',fn()=>inertia('Orders/List'))->name('total');

@@ -17,9 +17,11 @@ import Toolbar from 'primevue/toolbar';
 import Button from 'primevue/button';
 import Pagination from '@/Components/Pagination.vue'
 import InputText from 'primevue/inputtext'
+import InputNumber from 'primevue/inputnumber'
 import Tooltip from 'primevue/tooltip';
 import Checkbox from 'primevue/checkbox';
-
+import ConfirmPopup from 'primevue/confirmpopup';
+import ConfirmationService from 'primevue/confirmationservice';
 import Dropdown from 'primevue/dropdown';
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'PickAndPack';
@@ -31,11 +33,13 @@ createInertiaApp({
             .use(plugin)
             .use(ZiggyVue, Ziggy)
             .use(PrimeVue)
+            .use(ConfirmationService)
             .use(createPinia())
             .component('ToolBar',Toolbar)
             .component('Checkbox',Checkbox)
             .component('Button',Button)
             .component('InputText',InputText)
+            .component('InputNumber',InputNumber)
             .directive('Tooltip',Tooltip)
             .component('MultiSelect',MultiSelect)
             .component('Dropdown',Dropdown)

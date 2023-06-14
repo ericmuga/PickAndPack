@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Line;
 use App\Http\Requests\StoreLineRequest;
 use App\Http\Requests\UpdateLineRequest;
-
+use Illuminate\Http\Request;
 class LineController extends Controller
 {
     /**
@@ -13,7 +13,12 @@ class LineController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+
+    public function add(Request $request)
+    {
+        dd($request->all());
+    }
+     public function index()
     {
         //
     }
