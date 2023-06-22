@@ -26,6 +26,7 @@ import { useOrderStore } from '@/service/OrderStore'
 
 // const confirm = useConfirm();
 
+const logOrderLines=()=>{console.log(props.orderLines)}
 const products = ref(null);
 // const orders=ref(null);
 const inputField=ref(null);
@@ -53,34 +54,29 @@ let currentOrderQty=ref('');
 
 const isActive = ref(false);
 
-const getSelected=(id)=>(id=currentItem)?'bg-slate-400 text-white':'bg-white border-b dark:bg-gray-900 dark:border-gray-700'
+// const getSelected=(id)=>(id=currentItem)?'bg-slate-400 text-white':'bg-white border-b dark:bg-gray-900 dark:border-gray-700'
 
 
 
 watch( newItem,
 debounce(
 function () {
-
+ scanError.value = '';
     //compute upper limit for that item
-    const upperLimit=getOrderDetail(newItem,'order_qty')
+    const upperLimit=parseInt(getOrderDetail(newItem,'order_qty'))-parseInt(getOrderDetail(newItem,'prepack_qty'))
     const assembledQty=getOrderDetail(newItem,'ass_qty')
+    // console.log(assembledQty);
 
-    if (upperLimit.value==0) { scanError.value='Item not found!'; return;}
     // console.log(upperLimit)
+    if (upperLimit==0||upperLimit==assembledQty) {
 
-    if (assembledQty > upperLimit) {
-        scanError.value = `Maximum limit (${upperLimit}) reached.`;
-        return;
+    newItem.value = '';
+
+     scanError.value=`Maximum limit (${upperLimit}) reached.`;
+
     }
-
-    if (newItem.value.trim() === '') {
-        // error.value = 'Input field is empty.';
-        return;
-    }
-
-    // items.push(newItem.value);
-
-    updateAssembled(newItem);
+   else{
+   updateAssembled(newItem);
     count.value = assembledQty;
     scanError.value = '';
 
@@ -91,7 +87,7 @@ function () {
     // after the item is appended
     // Note: Import 'nextTick' from 'vue' if using a separate script block
 
-}
+}}
 ,300));
 
 
@@ -111,6 +107,7 @@ const extractedData = ref(Object.entries(props.orderLines.data).map(([key, value
         'order_no':value.order_no,
         'item_no': value.item_no, // Use the key as the label
         'order_qty': value.order_qty ,// Use the value with ref/ Extract 'age' key as value with ref
+        'prepack_qty': value.prepacks_total_quantity ,// Use the value with ref/ Extract 'age' key as value with ref
         'ass_qty': value.ass_qty,
         'barcode':value.barcode,
         'part':value.part,
@@ -126,22 +123,27 @@ const extractedData = ref(Object.entries(props.orderLines.data).map(([key, value
 
 const getOrderDetail=(id,detail)=>{
 
-
+ let returnValue=0
     if (id.value!='')
-    {
+        {
+
             for (let i = 0; i < extractedData.value.length; i++)
             {
-
+            //    console.log(id.value)
+                //  console.log(parseInt(extractedData.value[i].barcode)==parseInt(id.value))
+                //  console.log(parseInt(extractedData.value[i].barcode))
+// console.log(extractedData.value[i].ass_qty);
                 if (parseInt(extractedData.value[i].barcode)==parseInt(id.value))
                 {
 
-                    //console.log(extractedData.value[i].order_qty);
 
-                    switch (detail.value) {
-                        case 'order_qty':return extractedData.value[i].order_qty;
+
+                    switch (detail) {
+                        case 'order_qty':returnValue= extractedData.value[i].order_qty;
                             break;
-                    case 'ass_qty':return extractedData.value[i].ass_qty;
+                    case 'ass_qty':returnValue= extractedData.value[i].ass_qty;
                             break;
+                    case 'prepack_qty':returnValue= extractedData.value[i].prepack_qty; break;
 
                         default:
                             break;
@@ -149,9 +151,9 @@ const getOrderDetail=(id,detail)=>{
 
 
                 }
-               else return 0
+            //    else r returnValue;
             }
-            // Retrieve the order_qty value from the matching object
+     return returnValue;       // Retrieve the order_qty value from the matching object
     }
 
 
@@ -164,8 +166,10 @@ const updateAssembled=(id)=>{
             for (let i = 0; i < extractedData.value.length; i++)
             {
 
+                // console.log(parseInt(extractedData.value[i].barcode)==parseInt(id.value))
+
             if (parseInt(extractedData.value[i].barcode)==parseInt(id.value))
-            {
+             {
 
                if (extractedData.value[i].order_qty>extractedData.value[i].ass_qty)
                 {
@@ -198,7 +202,28 @@ const form=useForm({
 });
 
 
+const closeAssembly=()=>{
 
+     Swal.fire({
+                                        title: 'Are you sure?',
+                                        text: "Assembled orders may not be undone!",
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#3085d6',
+                                        cancelButtonColor: '#d33',
+                                        confirmButtonText: 'Close Assembly!'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                                           Inertia.post(route('orders.close'),{'extractedData':extractedData.value});
+
+                                                            }
+                        })
+
+
+
+
+
+}
 
 // const submitForm=()=>{form.get(route('orders.lines'))}
 
@@ -223,6 +248,11 @@ const form=useForm({
 
                         <!--stats bar -->
 
+                        <!-- <Button
+                          label="test"
+                         @click="logOrderLines()"
+                        ></Button> -->
+
                         <div>
                             <Toolbar>
                                 <template #start>
@@ -231,8 +261,14 @@ const form=useForm({
                                 <template #center>
                                     <div flex flex-row>
                                         <Pagination :links="orderLines.meta.links" />
-
                                                 <Button type="button" rounded disabled label="Total Lines"  :badge=props.orderLines.meta.total badgeClass="p-badge-danger" outlined  />
+                                                <Button
+                                                    class="justify-end"
+                                                   label="Close Assembly"
+                                                   @click="closeAssembly()"
+
+
+                                                />
                                     </div>
 
 
@@ -241,16 +277,7 @@ const form=useForm({
 
                                 <template #end>
 
-                                    <!-- <Link :href="route('refresh')" class="w-20 h-20 m-5 mx-auto text-center "> -->
-                                        <!-- <img src="/img/refresh.png" /> -->
-                                        <!-- <Button icon="pi pi-heart" severity="help" rounded aria-label="Favorite" /> -->
-                                        <!-- <Button icon="pi pi-refresh" severity="primary" rounded /> -->
-                                        <!-- <img src="/img/scanner.jpg" /> -->
-                                        <!-- </Link> -->
 
-
-
-                                        <!-- <InputText v-model="search" aria-placeholder="search"/> -->
 
                                     </template>
                                 </Toolbar>
@@ -273,8 +300,13 @@ const form=useForm({
                                             <div class="w-full m-2 text-center " v-if="currentItem!=''">
                                                 <Button type="button" rounded disabled :label="currentItem"   outlined  />
                                                 <Button type="button" rounded disabled label="Ordered"  :badge=currentOrderQty badgeClass="p-badge-info" outlined  />
+                                                 <!-- <input class="p-5 text-center text-white bg-teal-600 rounded" v-model="currentCount"/> -->
                                                 <Button type="button" rounded disabled label="Assembled"  :badge=currentCount badgeClass="p-badge-success" outlined  />
+
+
+
                                             </div>
+
 
 
                                             <div class="grid-cols-2 gap-3 ">
@@ -290,6 +322,7 @@ const form=useForm({
                                                                 <th  scope="col" class="px-6 py-3">Description</th>
                                                                 <th  scope="col" class="px-6 py-3">Customer Spec</th>
                                                                 <th  scope="col" class="px-6 py-3">Ordered qty</th>
+                                                                <th  scope="col" class="px-6 py-3">Prepack qty</th>
                                                                 <th  scope="col" class="px-6 py-3">Assembled qty</th>
                                                             </tr>
 
@@ -319,8 +352,16 @@ const form=useForm({
                                                                 <td class="px-3 py-2 text-xs text-center">
                                                                     {{ order.order_qty }}
                                                                 </td>
+                                                                <td class="px-3 py-2 text-xs text-center">
+                                                                    {{ order.prepack_qty }}
+                                                                </td>
+
                                                                 <td class="px-3 py-2 text-xs text-center text-black bg-yellow-300 rounded-sm">
-                                                                    <input class="text-center text-white bg-teal-600 rounded" v-model="order.ass_qty"/>
+                                                                    <input
+                                                                      class="text-center rounded"
+                                                                      v-model="order.ass_qty"
+                                                                      :disabled="order.prepack_qty==order.order_qty"
+                                                                    />
                                                                 </td>
                                                             </tr>
 

@@ -15,7 +15,7 @@ import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 import PickList from 'primevue/picklist';
 import Modal from '@/Components/Modal.vue';
-
+import SearchBox from '@/Components/SearchBox.vue'
 
 // import { ref, onMounted } from 'vue';
 import { ProductService } from '@/service/ProductService'
@@ -25,13 +25,13 @@ import { useOrderStore } from '@/service/OrderStore'
 // const confirm = useConfirm();
 
 const form2= useForm({
-                      'prepack_name':'',
-                      'quantity':0,
-                      'order_no':'',
-                      'line_no':0
-                    //   'totalQuantity':0
+    'prepack_name':'',
+    'quantity':0,
+    'order_no':'',
+    'line_no':0
+    //   'totalQuantity':0
 
-                    });
+});
 
 let currentPrepacks=ref([]);
 let prepacksAvailable=ref('');
@@ -60,13 +60,13 @@ const generateModalContent=(order)=>
 {
     // alert(showModal.value)
     // console.log(order)
-     prepacksAvailable=order.prepacks_available
-     currentPrepacks=order.prepacks
-     currentOrderNo=order.order_no
-     currentLineNo=order.line_no
+    prepacksAvailable=order.prepacks_available
+    currentPrepacks=order.prepacks
+    currentOrderNo=order.order_no
+    currentLineNo=order.line_no
 
-     showModal.value=true
-   // Inertia.get('line/prepacks',{'line_no':line_no})
+    showModal.value=true
+    // Inertia.get('line/prepacks',{'line_no':line_no})
 
 
 
@@ -80,23 +80,23 @@ const add=()=>{
 }
 // const part =ref();
 let showModal=ref(false);
-const parts= ref([
-                {'name':'A','code':'A'},
-                {'name':'B','code':'B'},
-                {'name':'C','code':'C'},
-                {'name':'D','code':'D'},
-                {'name':'All','code':'All'},
-])
+// const parts= ref([
+//                 {'name':'A','code':'A'},
+//                 {'name':'B','code':'B'},
+//                 {'name':'C','code':'C'},
+//                 {'name':'D','code':'D'},
+//                 {'name':'All','code':'All'},
+// ])
 
 // const sector =ref();
 
 const sectors= ref([
-                {'name':'RETAIL','code':'RETAIL'},
-                {'name':'FAST FOOD','code':'FAST FOOD'},
-                {'name':'HORECA','code':'HORECA'},
-                {'name':'STAFF','code':'STAFF'},
-                {'name':'BLANK','code':'BLANK'},
-                {'name':'All','code':'All'},
+{'name':'RETAIL','code':'RETAIL'},
+{'name':'FAST FOOD','code':'FAST FOOD'},
+{'name':'HORECA','code':'HORECA'},
+{'name':'STAFF','code':'STAFF'},
+{'name':'BLANK','code':'BLANK'},
+{'name':'All','code':'All'},
 ])
 
 // const items= ref([
@@ -111,10 +111,13 @@ const sectors= ref([
 
 
 const form=useForm({
-    sector:props.previousInput.sector,
-    part:props.previousInput.part,
-    spcode:props.previousInput.spcode,
-    item:props.previousInput.item
+    // sector:props.previousInput.sector,
+    // part:props.previousInput.part,
+    sp_code:props.previousInput.sp_code,
+    item:props.previousInput.item,
+    order_no:props.previousInput.item,
+    shp_date:props.previousInput.shp_date,
+    // shp_date:previousInput.shp_date,
 })
 
 
@@ -128,7 +131,13 @@ const props= defineProps({
 
 // const =()=>{form.get(route('orders.lines'))}
 
-const submitForm=()=>{ form.post(route('orders.prepack'))}
+const submitForm=()=>{
+    form.post(route('orders.prepack'))
+
+    showModal.value=false;
+    Swal.fire(`Prepack created Successfully!`,'','success');
+
+}
 
 // const pp= ()=>{ showModal=!showModal;}
 </script>
@@ -152,224 +161,166 @@ const submitForm=()=>{ form.post(route('orders.prepack'))}
                         <div>
                             <Toolbar>
                                 <template #start>
+                                    <Button
 
+                                    label=" Make Prepack"
+                                    severity="success"
+                                    @click="showModal=true"
+                                    />
                                 </template>
                                 <template #center>
-                                    <div>
+                                    <div class="flex flex-row">
                                         <Pagination :links="orderLines.meta.links" />
                                     </div>
 
 
+
                                 </template>
 
-                                    <template #end>
+                                <template #end>
 
-                                         <!-- <Link :href="route('refresh')" class="w-20 h-20 m-5 mx-auto text-center "> -->
-                                            <!-- <img src="/img/refresh.png" /> -->
-                                            <!-- <Button icon="pi pi-heart" severity="help" rounded aria-label="Favorite" /> -->
-                                            <!-- <Button icon="pi pi-refresh" severity="primary" rounded /> -->
-                                            <!-- <img src="/img/scanner.jpg" /> -->
-                                        <!-- </Link> -->
+                                    <Button type="button" rounded disabled label="Total Lines"  :badge=props.orderLines.meta.total badgeClass="p-badge-danger" outlined class="justify-end" />
+                                    <SearchBox model="orders.lines"/>
 
+                                </template>
+                            </Toolbar>
 
-
-                                            <!-- <InputText v-model="search" aria-placeholder="search"/> -->
-
-                                            </template>
-                                        </Toolbar>
-
-                                        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+                            <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
 
 
-                    </div>
+                            </div>
 
 
-                    <TabView>
-    <TabPanel header="Order Lines">
-
-    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-  <div class="flex flex-row w-full ">
-
-        <!-- <a href="/orders/download" class="">
-                                            <Button icon="pi pi-download" severity="primary" text raised rounded label="confirmations"/>
-                                        </a> -->
-
-  <!-- <Button type="button" rounded  label="Pre-pack" outlined @click="prepack()"  /> -->
-  <!-- <Button type="button" rounded  label="Pre-pack" outlined @click="pp()"  /> -->
-
-   <Button
-
-                      label="Prepack"
-                      @click="showModal=true"
-                    />
-
-  <Button type="button" rounded disabled label="Total Lines"  :badge=props.orderLines.meta.total badgeClass="p-badge-danger" outlined class="justify-end" />
-    </div>
-
-<table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-
-        <tr class="bg-slate-300">
-            <th  scope="col" class="px-6 py-3">Part</th>
-            <th  scope="col" class="px-6 py-3">Order No.</th>
-            <th  scope="col" class="px-6 py-3">Customer</th>
-            <th  scope="col" class="px-6 py-3">Ship-to</th>
-            <th  scope="col" class="px-6 py-3">Saleperson</th>
-            <th  scope="col" class="px-6 py-3">Item</th>
-            <th  scope="col" class="px-6 py-3">Description</th>
-            <th  scope="col" class="px-6 py-3">Ordered qty</th>
-            <th  scope="col" class="px-6 py-3"> Prepack</th>
-            <th  scope="col" class="px-6 py-3">Assembled qty</th>
-            <th  scope="col" class="px-6 py-3">Customer Spec</th>
-        </tr>
-
-        </thead>
 
 
-         <tbody>
-            <tr v-for="order in orderLines.data" :key="order.line_no" class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
-                <td class="px-3 py-2 text-xs">
-                    {{ order.part }}
-                </td>
-                <td class="px-3 py-2 text-xs">
-                    {{ order.order_no }}
-                </td>
-                <td class="px-3 py-2 text-xs">
-                    {{ order.customer_name }}
-                </td>
-                <td class="px-3 py-2 text-xs">
-                    {{ order.shp_name }}
-                </td>
-                <td class="px-3 py-2 text-xs text-center">
-                    {{ order.sp_code }}
-                </td>
-                <td class="px-3 py-2 text-xs">
-                    {{ order.item_no }}
-                </td>
-                <td class="px-3 py-2 text-xs">
-                    {{ order.item_description }}
-                </td>
-                <td class="px-3 py-2 text-xs text-center">
-                    {{ order.order_qty }}
-                </td>
 
-                <!-- <td class="px-3 py-2 text-xs text-center">
+                            <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+                                <div class="flex flex-row w-full ">
+                                    <div class="justify-center">
 
-                </td> -->
-
-                <td class="px-3 py-2 text-xs text-center">
-                {{ order.ass_qty }}
-                </td>
-            </tr>
-
-         </tbody>
-       </table>
-
-       <Toolbar>
-            <template #center>
-                <Pagination :links="orderLines.meta.links" />
-
-            </template>
-        </Toolbar>
-       </div>
-    </TabPanel>
+                                    </div>
 
 
-    <TabPanel header="Consolidate">
-        <div>
-           <PickList v-model="orders" listStyle="height:342px" dataKey="id">
-            <template #sourceheader> Available </template>
-            <template #targetheader> Selected </template>
-            <template #item="slotProps">
-                <div class="flex flex-wrap gap-3 p-2 align-items-center">
-                    <!-- <img class="flex-shrink-0 w-4rem shadow-2 border-round" :src="'https://primefaces.org/cdn/primevue/images/product/' + slotProps.item.image" :alt="slotProps.item.name" /> -->
-                    <div class="flex flex-1 gap-2 flex-column">
-                        <span class="font-bold">{{ slotProps.item.order_no }}</span>
-                        <div class="flex gap-2 align-items-center">
-                            <i class="text-sm pi pi-tag"></i>
-                            <span>{{ slotProps.item.customer_name }}</span>
+                                </div>
+
+                                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+
+                                        <tr class="bg-slate-300">
+                                            <!-- <th  scope="col" class="px-6 py-3">Part</th> -->
+                                            <th  scope="col" class="px-6 py-3">Order No.</th>
+                                            <th  scope="col" class="px-6 py-3">Customer/Ship-to</th>
+                                            <th  scope="col" class="px-6 py-3">Saleperson</th>
+                                            <th  scope="col" class="px-6 py-3">Item</th>
+                                            <th  scope="col" class="px-6 py-3">Description</th>
+                                            <th  scope="col" class="px-6 py-3">Ordered qty</th>
+                                            <th  scope="col" class="px-6 py-3"> Prepacked Qty</th>
+                                            <th  scope="col" class="px-6 py-3">Assembled qty</th>
+                                            <th  scope="col" class="px-6 py-3">Customer Spec</th>
+                                        </tr>
+
+                                    </thead>
+
+
+                                    <tbody>
+                                        <tr v-for="order in orderLines.data" :key="order.line_no"
+                                        class="bg-white border-b dark:bg-gray-900 dark:border-gray-700 hover:text-white hover:bg-slate-400">
+
+                                        <td class="px-3 py-2 text-xs text-center">
+                                            {{ order.order_no }}
+                                            <span class="p-1 text-xs text-center">{{ order.order.shp_date }}</span>
+                                        </td>
+
+
+                                        <td v-if="order.order.shp_name=='' " class="px-3 py-2 text-xs">
+                                            {{ order.order.customer_name }}
+                                            <!-- <span class="p-1 m-1 text-xs bg-orange-200 rounded">{{order.order.sector}}</span> -->
+                                        </td>
+                                        <td v-else class="px-3 py-2 text-xs">
+                                            {{ order.order.shp_name }}
+                                             <!-- <span class="p-1 m-1 text-xs bg-orange-200 rounded">{{order.order.sector}}</span> -->
+                                        </td>
+                                        <td class="px-3 py-2 text-xs text-center bg-orange-300 rounded-md">
+                                            <p>
+                                                {{ order.order.sp_code }}
+                                            </p>
+                                            <p>
+                                                {{ order.order.sp_name }}
+                                            </p>
+                                        </td>
+                                        <td class="px-3 py-2 text-xs">
+                                            {{ order.item_no }}
+                                        </td>
+                                        <td class="px-3 py-2 text-xs">
+                                            {{ order.item_description }}
+                                        </td>
+                                        <td class="px-3 py-2 text-xs text-center">
+                                            {{ order.order_qty }}
+                                        </td>
+
+                                        <!-- <td class="px-3 py-2 text-xs text-center">
+
+                                        </td> -->
+
+
+                                        <td class="px-3 py-2 text-xs text-center">
+                                            {{ order.ass_qty }}
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+
+                            <Toolbar>
+                                <template #center>
+                                    <Pagination :links="orderLines.meta.links" />
+
+                                </template>
+                            </Toolbar>
                         </div>
+
+
+
+
+
+
+
                     </div>
-                    <span class="font-bold text-900">$ {{ slotProps.item.shp_name }}</span>
-                </div>
-            </template>
-        </PickList>
-        </div>
-    </TabPanel>
-</TabView>
+
+
 
 
 
 
                 </div>
-
-
-
-
-                <!--end of stats bar-->
-
             </div>
         </div>
     </div>
-</div>
 </AuthenticatedLayout>
 
 <Modal :show="showModal" @close="showModal=false" :errors="errors">
-     <!-- {{ dynamicModalContent  }} -->
+    <!-- {{ dynamicModalContent  }} -->
 
-     <div class="w-full p-4 font-bold text-center text-white bg-slate-600"> Make Prepack</div>
-       <div >
+    <div class="w-full p-4 font-bold text-center text-white bg-slate-600"> Make Prepack</div>
+    <div >
 
 
         <form @submit.prevent="submitForm()" class="flex flex-col justify-center gap-2 p-5">
-            <Dropdown v-model="form.part" :options="parts" optionLabel="name" editable="" optionValue="code" placeholder="Select Part" class="" />
-            <Dropdown v-model="form.sector" :options="sectors" optionLabel="name" editable="" optionValue="code" placeholder="Select Sector"  />
+            <!-- <Dropdown v-model="form.part" :options="parts" optionLabel="name" editable="" optionValue="code" placeholder="Select Part" class="" /> -->
+            <!-- <Dropdown v-model="form.sector" :options="sectors" optionLabel="name" editable="" optionValue="code" placeholder="Select Sector"  /> -->
             <Dropdown v-model="form.item" :options="props.items" optionLabel="description" editable="" optionValue="item_no" placeholder="Prepack Item" class="" />
-            <InputText v-model="form.spcode" placeholder="Salesperson Code"></InputText>
-            <Button  label="Create" severity="success"  type="submit" :disabled="form.processing" />
-
+            <InputText v-model="form.sp_code" placeholder="Salesperson Code"></InputText>
+            <InputText v-model="form.order_no" placeholder="Order No."></InputText>
+            <input type=date v-model="form.shp_date" placeholder="Shipment Date"/>
+            <Button  label="Create" severity="primary"  type="submit" :disabled="form.processing" />
+            <Button label="Cancel" severity="warning" icon="pi pi-cancel" @click="showModal=false"/>
         </form>
 
 
-
-       <!-- <form @submit.prevent="add()">
-
-          <Dropdown
-              v-model="form2.prepack_name"
-              :options="prepacksAvailable"
-              optionLabel="name"
-              optionValue="name"
-              filter
-              placeholder="Select a Prepack Size"
-              class="w-full md:w-14rem"
-           />
-
-           <InputNumber
-             v-model="form2.quantity"
-             placeholder="No. of Prepacks"
-           />
+    </div>
 
 
-           <Button
-             type="submit"
-             label="Add"
-           />
-
-
-
-           <table v-show="currentPrepacks.length!=0">
-               <tr v-for="prepackLine in currentPrepacks" id="prepackLine.id" >
-                <td>{{ prepackLine.prepack_name }}</td>
-                <td>{{ prepackLine.prepack_count }}</td>
-
-               </tr>
-           </table>
-
-       </form> -->
-     </div>
-
-
-  </Modal>
+</Modal>
 
 </template>
 <style>

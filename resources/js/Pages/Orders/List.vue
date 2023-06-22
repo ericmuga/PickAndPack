@@ -2,22 +2,22 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
-import Button from 'primevue/button';
-import MultiSelect from 'primevue/multiselect';
-import InputText from 'primevue/inputtext';
+// import Button from 'primevue/button';
+// import MultiSelect from 'primevue/multiselect';
+// import InputText from 'primevue/inputtext';
 import { useForm } from '@inertiajs/inertia-vue3'
 import { Inertia } from '@inertiajs/inertia';
 import debounce from 'lodash/debounce';
 import {watch, ref} from 'vue';
 import Pagination from '@/Components/Pagination.vue'
-import Swal from 'sweetalert2'
-import FilterPane from '@/Components/FilterPane.vue'
+// import Swal from 'sweetalert2'
+// import FilterPane from '@/Components/FilterPane.vue'
 import Modal from '@/Components/Modal.vue'
 import { useStorage } from '@/Composables/useStorage';
 import { useDates } from '@/Composables/useDates';
 
 
-const todaysDate=useDates.getCurrentDate();
+// const todaysDate=useDates.getCurrentDate();
 
 const form = useForm({
     search: null,
@@ -29,7 +29,7 @@ let showModal=ref(false);
 const showFilterPane=()=>{showModal=true;}
 
 const search=ref()
-watch(search, debounce(()=>{console.log(search),Inertia.post('/all',{search:search.value}, {preserveScroll: true})}, 500));
+watch(search, debounce(()=>{Inertia.get('/all',{search:search.value}, {preserveScroll: true})}, 500));
 // watch(form.searchKey, debounce(form.post('all',{preserveScroll:true}),600))
 
 const form2 =useForm({
@@ -147,7 +147,7 @@ const postForm=(dynamicObject,dateDynamicObject)=>{
 
     <AuthenticatedLayout @add="showModal=true">
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">Orders {{ todaysDate }}</h2>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">Orders {{ }}</h2>
         </template>
 
         <div class="py-6">

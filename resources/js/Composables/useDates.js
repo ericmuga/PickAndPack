@@ -1,6 +1,8 @@
 
 
-export function getCurrentDate() {
+export function useDates(){
+
+function getCurrentDate() {
     const today = new Date();
 
     const year = today.getFullYear();
@@ -9,3 +11,4 @@ export function getCurrentDate() {
 
     return `${year}-${month}-${day}`;
   }
+}

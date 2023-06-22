@@ -16,6 +16,7 @@ import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 import PickList from 'primevue/picklist';
 import Modal from '@/Components/Modal.vue';
+import SearchBox from '@/Components/SearchBox.vue'
 
 const search=ref()
 watch(search, debounce(()=>{Inertia.post('/order/all',{search:search.value}, {preserveScroll: true})}, 500));
@@ -24,16 +25,22 @@ const prop=defineProps({
     orders:Object})
 
 const confirmPack=(order_no,part)=>{
-    if (confirm('Are you sure you want to pack this order?'))
-    {
-        //
-        //get the confirmer
-        //list the items to be packed and their quantitie
-
-        Inertia.get(route('order.scanItemsGET',{'order_no':order_no,'part_no':part}))
 
 
-    }
+    Swal.fire({
+                                        title: 'Are you sure?',
+                                        text: "Assembled orders may not be undone!",
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#3085d6',
+                                        cancelButtonColor: '#d33',
+                                        confirmButtonText: 'Confirm Assembly!'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                                           Inertia.get(route('order.scanItemsGET',{'order_no':order_no,'part_no':part}))
+
+                                                            }
+                        })
 }
 </script>
 
@@ -62,6 +69,9 @@ const confirmPack=(order_no,part)=>{
                                 <template #center>
                                     <div>
                                         <!-- <Pagination :links="orderLines.meta.links" /> -->
+                                    <div>
+                                        <!-- <Pagination :links="orders.meta.links" /> -->
+                                    </div>
                                     </div>
 
 
@@ -72,7 +82,8 @@ const confirmPack=(order_no,part)=>{
 
 
 
-                                            <InputText v-model="search" aria-placeholder="search"/>
+                                            <!-- <InputText v-model="search" aria-placeholder="search"/> -->
+                                            <SearchBox model="order.pack" />
 
                                             </template>
                                         </Toolbar>
@@ -131,7 +142,7 @@ const confirmPack=(order_no,part)=>{
         <td class="px-3 py-2 text-xs">
             {{ order.order_no }}
         </td>
-        <td class="px-3 py-2 text-xs text-center flex flex-col">
+        <td class="flex flex-col px-3 py-2 text-xs text-center">
             <span class="text-xs font-bold">{{order.sp_code}}</span>
             <span class="text-xs font-thin">{{order.sp_name}}</span>
         </td>

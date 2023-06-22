@@ -36,17 +36,26 @@ const showingNavigationDropdown = ref(false);
                                 <NavLink :href="route('order.list')" :active="route().current('order.list')">
                                     Order Confirmations
                                 </NavLink>
-                                <NavLink :href="route('prepacks.index')" :active="route().current('prepacks.index')">
-                                    Prepacks
-                                </NavLink>
+
 
 
                                 <NavLink :href="route('orders.lines')" :active="route().current('orders.lines')">
-                                    Assembly
+                                    Make Prepacks
                                 </NavLink>
+
+                                <NavLink :href="route('orders.prepacks')" :active="route().current('orders.prepacks')">
+                                    Prepacked Orders
+                                </NavLink>
+
 
                                  <NavLink :href="route('order.pack')" :active="route().current('order.pack')">
                                     Packing
+                                </NavLink>
+                                <NavLink :href="route('items.index')" :active="route().current('items.index')">
+                                    Items
+                                </NavLink>
+                                <NavLink :href="route('prepacks.index')" :active="route().current('prepacks.index')">
+                                    Prepacks
                                 </NavLink>
 
 
@@ -142,17 +151,32 @@ const showingNavigationDropdown = ref(false);
                         <NavLink :href="route('order.list')" :active="route().current('order.list')">
                                     Order Confirmations
                         </NavLink>
-                        <NavLink :href="route('prepacks.index')" :active="route().current('prepacks.index')">
-                                    Prepacks
-                                </NavLink>
+
 
                                 <NavLink :href="route('orders.lines')" :active="route().current('orders.lines')">
-                                    Assembly
+                                    Make Prepacks
+                                </NavLink>
+                                <NavLink :href="route('orders.prepacks')" :active="route().current('orders.prepacks')">
+                                    Prepacked Orders
                                 </NavLink>
 
                                  <NavLink :href="route('order.pack')" :active="route().current('order.pack')">
                                     Packing
                                 </NavLink>
+
+                                <NavLink :href="route('items.index')" :active="route().current('items.index')">
+                                    Items
+                                </NavLink>
+
+
+                                <NavLink :href="route('prepacks.index')" :active="route().current('prepacks.index')">
+                                    Prepacks
+                                </NavLink>
+
+
+
+
+
                     </div>
 
                     <!-- Responsive Settings Options -->

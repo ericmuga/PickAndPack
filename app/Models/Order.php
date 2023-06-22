@@ -10,8 +10,13 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Confirmation;
 
 
+
+
 class Order extends Model
 {
+
+
+
     use HasFactory;
 
     protected $casts = [
@@ -20,10 +25,7 @@ class Order extends Model
     ];
 
 
-    // public function parts()
-    // {
-    //     return $this->hasMany(Part::class,'order_no','order_no');
-    // }
+
 
     public function lines()
     {
@@ -45,9 +47,9 @@ class Order extends Model
 
     public function scopeCurrent(Builder $query) :void
     {
-    //   $query->where('ending_date','=',Carbon::today()->toDateString());
+      $query->where('ending_date','=',Carbon::today()->toDateString());
     //   $query->where('ending_date','=',Carbon::yesterday()->toDateString());
-      $query->where('ending_date','=','2023-06-09');
+    //   $query->where('ending_date','>=','2023-06-09');
     }
 
     public function scopeSector(Builder $query,$sector)

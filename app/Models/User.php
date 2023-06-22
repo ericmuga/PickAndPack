@@ -41,4 +41,16 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+
+     public function linePrepacks()
+     {
+        return $this->hasMany(LinePrepack::class);
+     }
+
+     public function assemblyLines()
+     {
+        return $this->hasMany(AssemblyLine::class);
+     }
+
 }

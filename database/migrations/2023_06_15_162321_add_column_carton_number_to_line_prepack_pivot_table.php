@@ -14,7 +14,8 @@ return new class extends Migration
     public function up()
     {
         Schema::table('line_prepack_pivot', function (Blueprint $table) {
-            $table->unsignedBigInteger('line_id');
+            //
+            $table->string('carton_no');
         });
     }
 
@@ -25,8 +26,9 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('line_prepack_pivot', function (Blueprint $table) {
-            $table->dropColumn('line_id');
+        Schema::table('line_prepack', function (Blueprint $table) {
+            //
+            $table->dropColumn('carton_no');
         });
     }
 };

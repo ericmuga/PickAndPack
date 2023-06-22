@@ -4,18 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+// use  Awobaz\Compoships\Compoships;
 class Prepack extends Model
 {
     use HasFactory;
+    //  use Compoships;
 
-    protected $fillable=['name','pack_size','item_no','isActive'];
+
+    protected $fillable=['prepack_name','pack_size','item_no','isActive'];
 
 
-    public function lines()
-    {
-        return $this->belongsToMany(Line::class,'line_prepack_pivot','prepack_name','line_id');
-    }
+    protected $primaryKey = 'prepack_name';
+
+
+
+     public function linePrepacks()
+     {
+        return $this->hasMany(LinePrepack::class,'prepack_name','prepack_name');
+     }
 
 
 

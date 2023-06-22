@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\LinePrepack;
 use App\Models\Prepack;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,11 +21,6 @@ class LineResource extends JsonResource
         return [
                  'order_no'=>$this->order_no,
 
-                //  'id'=>$this->order_no+'|',$this->line_no,
-                 'customer_name'=>$this->order->customer_name,
-                 'shp_name'=>$this->order->shp_name,
-                 'sector'=>$this->order->sector,
-                 'sp_code'=>$this->order->sp_code,
                  'line_no'=>$this->line_no,
                  'item_no'=>$this->item_no,
                  'item_description'=>$this->item_description,
@@ -36,9 +32,12 @@ class LineResource extends JsonResource
                  'exec_qty'=>$this->exec_qty,
                  'assembler'=>$this->assembler,
                  'checker'=>$this->checker,
+                 'order'=>OrderResource::make($this->whenLoaded('order')),
+                //  'prepacks'=>OrderResource::collection($this->whenLoaded('prepacks')),
                  'prepack_able'=>Prepack::where('item_no',$this->item_no)->exists(),
                  'prepacks_available'=>Prepack::where('item_no',$this->item_no)->get(),
-                 'prepacks'=>$this->prepacks(),
+                 'prepacks_total_quantity' => $this->prepacks()->sum('total_quantity'),
+
 
         ];
     }

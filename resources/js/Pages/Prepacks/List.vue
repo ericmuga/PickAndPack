@@ -6,28 +6,86 @@ import Toolbar from 'primevue/toolbar';
 import Modal from '@/Components/Modal.vue'
 import Button from 'primevue/button';
 import { useForm } from '@inertiajs/inertia-vue3';
-
-import {watch, ref} from 'vue';
-
-
+import Swal from 'sweetalert2'
+import Drop from '@/Components/Drop.vue'
+import InputSwitch from 'primevue/inputswitch';
+import {watch, ref,onMounted} from 'vue';
+import SearchBox from '@/Components/SearchBox.vue'
 
 const form= useForm({
-     'name':'',
+     'prepack_name':'',
      'item_no':'',
      'pack_size':'',
      'isActive':false,
 })
 
-const createPrepack=()=>{
-    form.post(route('prepacks.store'))
-// close modal
-// showModal=false;
+
+
+let mode= { state: 'Create' };
+
+
+onMounted( ()=>{
+ console.log(props)
+    if (props.errors?.hasOwnProperty('success'))
+     {
+        if (props.errors.success!='')
+         Swal.fire('Success!',props.errors.success,'')
+        props.errors.success=''
+     }
+})
+
+
+
+
+const createOrUpdatePrepack=()=>{
+    form.prepack_name=form.item_no+'|'+form.pack_size
+    if (mode.state=='Create')
+          form.post(route('prepacks.store'))
+        else
+     form.patch(route('prepacks.update',form.item_no))
+      showModal.value=false;
+    Swal.fire(`Prepack ${mode.state}ed Successfully!`,'','success');
 
 }
+
+
+const showCreateModal=()=>{
+
+    mode.state='Create'
+    form.prepack_name=''
+    form.item_no=''
+    form.pack_size=''
+    form.isActive=''
+    showModal.value=true
+
+}
+
+const showUpdateModal=(item)=>{
+
+    mode.state='Update'
+    // alert(mode.state)
+
+    form.prepack_name=item.prepack_name
+    form.item_no=item.item_no
+    form.pack_size=item.pack_size
+    form.isActive=item.isActive
+    showModal.value=true
+}
+
+
+// const logObject=()=>{console.log(props.prepacks)}
+
+
+
+
+
+
 const props= defineProps({
     prepacks:Object,
     items:Object,
 })
+
+
 let showModal=ref(false);
 
 </script>
@@ -47,43 +105,45 @@ let showModal=ref(false);
                         <div>
                             <Toolbar>
                                 <template #start>
-                                        <Button label="New" icon="pi pi-plus" class="mr-2"  @click="showModal=true" />
-                                        <!-- <Button label="Upload" icon="pi pi-upload" class="p-button-success" /> -->
-                                        <!-- <i class="mr-2 pi pi-bars p-toolbar-separator" /> -->
-                                    <!-- <SplitButton label="Save" icon="pi pi-check" :model="items" class="p-button-warning"></SplitButton> -->
+                                  <Button
+                                         label="Add"
+                                         icon="pi pi-plus"
+                                         severity="success"
+                                         @click="showCreateModal()"
+                                         rounded
+                                    ></Button>
+
+                                    <!-- <Button
+                                         label="Log"
+                                         icon="pi pi-plus"
+                                         severity="success"
+                                         @click="logObject()"
+                                         rounded
+                                    ></Button> -->
                                 </template>
                                 <template #center>
 
-
+                                     <Pagination :links="prepacks.meta.links" />
                                 </template>
 
-
-                                    <!-- <Button
-                                         icon="pi pi-plus"
-                                         label="Add"
-
-                                         rounded
-                                    ></Button> -->
-
-
-
-                                        </Toolbar>
+                                <template #end>
+                                    <SearchBox model="prepacks.index" />
+                                </template>
+                                </Toolbar>
 
                                         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
 
                                             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
-                                                    <tr class="bg-slate-300">
-                                                        <!-- <th scope="col" class="px-6 py-3">
-                                                            Barcode
-                                                        </th> -->
+                                                    <tr class="text-center bg-slate-300">
+
                                                         <th scope="col" class="px-6 py-3">
                                                             Prepack Name
                                                         </th>
-                                                        <th scope="col" class="px-6 py-3 ">
+                                                        <!-- <th scope="col" class="px-6 py-3 ">
                                                             Item No
-                                                        </th>
+                                                        </th> -->
                                                         <th scope="col" class="px-6 py-3">
                                                             Item Description
                                                         </th>
@@ -92,7 +152,15 @@ let showModal=ref(false);
                                                         </th>
 
                                                         <th scope="col" class="px-6 py-3">
+                                                            Order Lines
+                                                        </th>
+
+                                                        <th scope="col" class="px-6 py-3">
                                                             Active
+                                                        </th>
+
+                                                        <th class="text-left">
+                                                            Actions
                                                         </th>
 
 
@@ -101,24 +169,47 @@ let showModal=ref(false);
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr v-for="item in prepacks" :key="item.prepack_name"
-                                                    class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
+                                                    <tr v-for="item in prepacks.data" :key="item.prepack_name"
+                                                    class="text-center bg-white border-b dark:bg-gray-900 dark:border-gray-700">
 
                                                     <td class="px-3 py-2 text-xs">
-                                                        {{ item.name }}
+                                                        {{ item.prepack_name }}
                                                     </td>
 
-                                                    <td class="px-3 py-2 text-xs">
+                                                    <!-- <td class="px-3 py-2 text-xs">
                                                         {{ item.item_no }}
-                                                    </td>
+                                                    </td> -->
                                                     <td class="px-3 py-2 text-xs font-bold">
-                                                        {{ item.description}}
+                                                        {{ item.item.description}}
                                                     </td>
                                                     <td class="px-3 py-2 text-xs font-bold">
                                                         {{ item.pack_size}}
                                                     </td>
                                                     <td class="px-3 py-2 text-xs font-bold">
-                                                        <Checkbox v-model="checked" :binary="true" :checked="item.isActive" disabled="true" />
+                                                        {{ item.linePrepack_count}}
+                                                    </td>
+                                                    <td class="px-3 py-2 text-xs font-bold">
+
+                                                        <!-- <InputSwitch v-model="checked" disabled /> -->
+                                                        <div v-if="item.isActive==1" >
+                                                           <p>Yes</p>
+                                                        </div>
+                                                        <div v-else>
+                                                            <p>No</p>
+                                                            <!-- <Button icon="pi pi-times" disabled severity="danger" text rounded aria-label="Cancel" /> -->
+                                                        </div>
+
+                                                    </td>
+                                                    <td>
+                                                        <div class="flex flex-row" v-if="item.linePrepack_count==0">
+                                                          <Drop  :drop-route="route('prepacks.destroy',{'prepack':item.prepack_name})"/>
+                                                            <Button
+                                                                      icon="pi pi-pencil"
+                                                                      severity="info"
+                                                                      text
+                                                                      @click="showUpdateModal(item)"
+                                                                      />
+                                                       </div>
                                                     </td>
 
 
@@ -128,6 +219,12 @@ let showModal=ref(false);
                             </tbody>
                         </table>
                     </div>
+                    <toolbar>
+                    <template #center>
+                        <Pagination :links="prepacks.meta.links" />
+                        <!-- <SearchBox model="prepacks.index" /> -->
+                    </template>
+                    </Toolbar>
 
 
 
@@ -144,19 +241,21 @@ let showModal=ref(false);
 </div>
 
    <Modal :show="showModal" @close="showModal=false" :errors="errors">
-    <form @submit.prevent="createPrepack()" >
+    <form @submit.prevent="createOrUpdatePrepack()" >
         <!-- <div v-if="errors=0"> -->
           <ul class="text-xs text-red-500">
             <li v-for="error in errors">{{ error.message  }}</li>
           </ul>
     <!-- </div> -->
-       <div class="w-full p-4 font-bold text-center text-white bg-slate-600"> Create Prepack</div>
+       <div class="w-full p-4 font-bold text-center text-white bg-slate-600">{{ mode.state }} Prepack</div>
        <div class="flex flex-col justify-center gap-2 p-5">
 
 
         <InputText
-           v-model="form.name"
+           v-model="form.prepack_name"
            placeholder="Prepack Name"
+           :disabled="mode.state=='Update'"
+           hidden
         />
 
 
@@ -181,9 +280,8 @@ let showModal=ref(false);
             <span class="text-xs"> Active</span>
                     <input type="checkbox" v-model="form.isActive"/>
         </div>
-
-
-        <Button type="submit" label="Add" icon="pi pi_plus" class="icon-left" />
+        <Button type="submit" :label="mode.state" severity="info" class="icon-left w-sm" />
+        <Button label="Cancel" severity="warning" icon="pi pi-cancel" @click="showModal=false"/>
 </div>
 
     </form>

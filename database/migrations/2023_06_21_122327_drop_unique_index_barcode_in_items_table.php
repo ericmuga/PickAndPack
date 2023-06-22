@@ -13,20 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('line_prepack_pivot', function (Blueprint $table) {
-            $table->unsignedBigInteger('line_id');
+        Schema::table('items', function (Blueprint $table) {
+              $table->dropUnique('items_barcode_unique');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::table('line_prepack_pivot', function (Blueprint $table) {
-            $table->dropColumn('line_id');
+        Schema::table('items', function (Blueprint $table) {
+            $table->unique('barcode');
         });
     }
 };

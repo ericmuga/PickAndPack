@@ -9,8 +9,16 @@ class Item extends Model
 {
     use HasFactory;
 
-    public function prepacks()
-    {
+
+    protected $fillable=['item_no','barcode','description','posting_group'];
+   public function prepacks()
+   {
+
         return $this->hasMany(Prepack::class ,'item_no','item_no');
+    }
+
+    public function lines()
+    {
+        return $this->hasMany(Line::class,'item_no','item_no');
     }
 }

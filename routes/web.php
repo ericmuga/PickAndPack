@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\{LineController, ProfileController,OrderController, PrepackController};
+use App\Http\Controllers\{ItemController, LineController, ProfileController,OrderController, PrepackController};
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -44,14 +44,17 @@ Route::middleware('auth')->group(function () {
         Route::get('/scanner',[OrderController::class,'scan'])->name('scanner');
         Route::get('orders/download/', [OrderController::class, 'export'])->name('orders.export');
         // Route::get('orders/assemble/{part?}/{sector?}/{sp_code?}',[OrderController::class, 'assemble'])->name('orders.assemble');
-        Route::get('orders/assemble/{part?}/{sector?}/{sp_code?}',[OrderController::class, 'assemble'])->name('orders.lines');
+        Route::get('orders/assemble/',[OrderController::class, 'assemble'])->name('orders.lines');
         Route::post('orders/prepack',[OrderController::class,'prepack'])->name('orders.prepack');
+        Route::post('orders/closeAssembly',[OrderController::class,'closeAssembly'])->name('orders.close');
+        Route::get('orders/prepacked',[OrderController::class,'orderPrepacks'])->name('orders.prepacks');
+        Route::post('orders/downloadPrepacks',[OrderController::class,'exportPrepacks'])->name('orders.downloadPrepacks');
         // Route::get('orders/assemble',[OrderController::class, 'assemble'])->name('orders.lines');
 
         // Route::get('/order/{id}', [OrderController::class, 'show'])->name('order.show');
         Route::get('/order/{id}/{part}', [OrderController::class, 'show'])->name('order.show');
         Route::get('/all', [OrderController::class, 'index'])->name('order.list');
-        Route::post('/all', [OrderController::class, 'index'])->name('order.list');
+        // Route::post('/all', [OrderController::class, 'index'])->name('order.list');
 
         Route::get('line/prepacks',fn(Request $request)=>Line::where('line_no')->prepacks()->get());
         Route::post('line/add',[LineController::class, 'add'])->name('prepacks.add');
@@ -82,6 +85,14 @@ Route::middleware('auth')->group(function () {
 
        //API
        //API
+
+       //---------------Items ------------------------//
+       Route::get('items/download',[ItemController::class,'download'])->name('items.download');
+
+       Route::resource('items',ItemController::class);
+
+
+
        Route::get('/orders',fn()=>OrderResource::collection(Order::select('order_no','customer_name','shp_name','shp_date')
                                                                  ->paginate(15)->withQuerystring()
                                                             )
