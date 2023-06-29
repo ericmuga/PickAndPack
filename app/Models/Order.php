@@ -49,7 +49,7 @@ class Order extends Model
     {
       $query->where('ending_date','=',Carbon::today()->toDateString());
     //   $query->where('ending_date','=',Carbon::yesterday()->toDateString());
-    //   $query->where('ending_date','>=','2023-06-09');
+    //   $query->where('ending_date','>=','2023-06-21');
     }
 
     public function scopeSector(Builder $query,$sector)

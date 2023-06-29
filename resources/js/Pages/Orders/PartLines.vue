@@ -123,9 +123,12 @@ const form=useForm({
 
 const props= defineProps({
     orderLines:Object,
+    salesPersons:Object,
+
     selectedPart:Object,
     previousInput:Object,
-    items:Object
+    items:Object,
+    sp_codes:Object,
     // printed:Object
 })
 
@@ -308,8 +311,33 @@ const submitForm=()=>{
         <form @submit.prevent="submitForm()" class="flex flex-col justify-center gap-2 p-5">
             <!-- <Dropdown v-model="form.part" :options="parts" optionLabel="name" editable="" optionValue="code" placeholder="Select Part" class="" /> -->
             <!-- <Dropdown v-model="form.sector" :options="sectors" optionLabel="name" editable="" optionValue="code" placeholder="Select Sector"  /> -->
-            <Dropdown v-model="form.item" :options="props.items" optionLabel="description" editable="" optionValue="item_no" placeholder="Prepack Item" class="" />
-            <InputText v-model="form.sp_code" placeholder="Salesperson Code"></InputText>
+            <!-- <Dropdown v-model="form.item"
+                       :options="props.items"
+                     optionLabel="description"
+                     editable=""
+                     optionValue="item_no"
+                     placeholder="Prepack Item"
+                     class="" /> -->
+
+
+            <MultiSelect v-model="form.item"
+                        :options="props.items"
+                        optionLabel="description"
+                        optionValue="item_no"
+                        placeholder="Select Items"
+                        :maxSelectedLabels="3"
+                        class="w-full md:w-20rem"
+            />
+
+             <MultiSelect v-model="form.sp_code"
+                        :options="props.sp_codes"
+                        optionLabel="sp_name"
+                        optionValue="sp_code"
+                        placeholder="Select Salespersons"
+                        :maxSelectedLabels="3"
+                        class="w-full md:w-20rem"
+            />
+            <!-- <InputText v-model="form.sp_code" placeholder="Salesperson Code"></InputText> -->
             <InputText v-model="form.order_no" placeholder="Order No."></InputText>
             <input type=date v-model="form.shp_date" placeholder="Shipment Date"/>
             <Button  label="Create" severity="primary"  type="submit" :disabled="form.processing" />
