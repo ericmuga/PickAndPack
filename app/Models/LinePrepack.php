@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Models;
-
+use  Awobaz\Compoships\Compoships;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use  Awobaz\Compoships\Compoships;
 
+use App\Models\Scopes\OrderByScope;
 class LinePrepack extends Pivot
 {
     use HasFactory;
@@ -16,6 +16,11 @@ class LinePrepack extends Pivot
 
     protected $primary_key =['order_no','line_no','prepack_name'];
 
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new OrderByScope());
+    }
 
     public function line()
     {
@@ -31,7 +36,7 @@ class LinePrepack extends Pivot
     public function order()
     {
         return $this->belongsTo(Order::class,'order_no','order_no');
-        // return Order::select($property)->where('order_no',$this->order_no)->first();
+
     }
 
      public function user()

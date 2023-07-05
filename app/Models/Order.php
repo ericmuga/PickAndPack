@@ -47,7 +47,7 @@ class Order extends Model
 
     public function scopeCurrent(Builder $query) :void
     {
-      $query->where('ending_date','=',Carbon::today()->toDateString());
+      $query->where('ending_date','>=',Carbon::today()->toDateString());
     //   $query->where('ending_date','=',Carbon::yesterday()->toDateString());
     //   $query->where('ending_date','>=','2023-06-21');
     }
@@ -68,6 +68,14 @@ class Order extends Model
         return Confirmation::where('order_no',$order_no)
                         ->where('part_no',$part_no)
                         ->exists();
+    }
+
+    public function linePrepacks()
+    {
+    //   return $this->hasMany(LinePrepack::class,'order_no','order_no');
+    $query = $this->hasMany(LinePrepack::class, 'order_no', 'order_no');
+    $query->getQuery()->withoutGlobalScope(OrderByScope::class);
+    return $query;
     }
 
 }

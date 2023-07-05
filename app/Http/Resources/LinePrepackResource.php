@@ -25,11 +25,16 @@ class LinePrepackResource extends JsonResource
                 'batch_no'=>$this->batch_no,
                 'order_no'=>$this->order_no,
                 'carton_no'=>$this->carton_no,
-                'prepack_time'=>Carbon::parse($this->created_at)->diffForHumans(),
+                'prepack_time'=>Carbon::parse($this->created_at)->toDateTimeString(),
+                'created_at'=>$this->created_at,
+                'prepared_by'=>$this->user->name,
+                'customer_no'=>$this->order->customer_name,
+                'shp_name'=>$this->order->shp_name,
+                'sales_person'=>$this->order->sp_code.'|'.$this->order->sp_name,
                 'line'=>LineResource::make($this->whenLoaded('line')),
                 'order'=>OrderResource::make($this->whenLoaded('order')),
                 'user'=>UserResource::make($this->whenLoaded('user')),
-        ];
+              ];
 
     }
 

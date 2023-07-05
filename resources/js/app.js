@@ -22,8 +22,10 @@ import Tooltip from 'primevue/tooltip';
 import Checkbox from 'primevue/checkbox';
 import ConfirmPopup from 'primevue/confirmpopup';
 import ConfirmationService from 'primevue/confirmationservice';
+import Calendar from 'primevue/calendar';
 import Dropdown from 'primevue/dropdown';
 
+import SearchBox from '@/Components/SearchBox.vue'
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'PickAndPack';
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -44,6 +46,8 @@ createInertiaApp({
             .component('MultiSelect',MultiSelect)
             .component('Dropdown',Dropdown)
             .component('Pagination',Pagination)
+            .component('SearchBox',SearchBox)
+            .component('Calendar',Calendar)
             .mount(el);
     },
 });

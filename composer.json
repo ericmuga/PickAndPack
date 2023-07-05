@@ -15,6 +15,7 @@
         "laravel/sanctum": "^2.8",
         "laravel/tinker": "^2.7",
         "maatwebsite/excel": "^3.1",
+        "mpdf/mpdf": "^8.1",
         "staudenmeir/eloquent-has-many-deep": "^1.7",
         "tightenco/ziggy": "^1.0"
     },

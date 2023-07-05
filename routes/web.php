@@ -1,15 +1,17 @@
 <?php
 
-use App\Http\Controllers\{ItemController, LineController, ProfileController,OrderController, PrepackController};
+use App\Http\Controllers\{ItemController,
+                          LineController,
+                          LinePrepackController,
+                          ProfileController,
+                          OrderController,
+                          PrepackController};
 use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\{Route,Auth};
 use illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Http\Resources\OrderResource;
-use App\Models\Line;
-use App\Models\Order;
-use App\Models\Prepack;
+use App\Http\Resources\{OrderResource};
+use App\Models\{Line,LinePrepack,Order,Prepack};
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +40,12 @@ use App\Models\Prepack;
 
 Route::middleware('auth')->group(function () {
 
+        Route::post('download/linePrepacks',[LinePrepackController::class,'export'])->name('linePrepacks.download');
+        Route::resource('linePrepacks',LinePrepackController::class);
+
+
+
+        // Route::get('linePrepacks',[LinePrepackController::class,'index'])->name('slinePrepacks.index');
     //Order Controller functions
         Route::get('/dashboard',[OrderController::class,'dashboard'] )->name('dashboard');
         Route::get('/refresh',[OrderController::class,'refresh'] )->name('refresh');
@@ -47,8 +55,12 @@ Route::middleware('auth')->group(function () {
         Route::get('orders/assemble/',[OrderController::class, 'assemble'])->name('orders.lines');
         Route::post('orders/prepack',[OrderController::class,'prepack'])->name('orders.prepack');
         Route::post('orders/closeAssembly',[OrderController::class,'closeAssembly'])->name('orders.close');
-        Route::get('orders/prepacked',[OrderController::class,'orderPrepacks'])->name('orders.prepacks');
-        Route::post('orders/downloadPrepacks',[OrderController::class,'exportPrepacks'])->name('orders.downloadPrepacks');
+        // Route::get('orders/prepacked',[OrderController::class,'orderPrepacks'])->name('orders.prepacks');
+
+        //Prepacked Orders
+
+
+
         // Route::get('orders/assemble',[OrderController::class, 'assemble'])->name('orders.lines');
 
         // Route::get('/order/{id}', [OrderController::class, 'show'])->name('order.show');
@@ -61,7 +73,6 @@ Route::middleware('auth')->group(function () {
 
 
         Route::resource('prepacks',PrepackController::class);
-
 
         Route::get('/total',fn()=>inertia('Orders/List'))->name('total');
         Route::post('/execute',[OrderController::class,'execute'])->name('order.execute');

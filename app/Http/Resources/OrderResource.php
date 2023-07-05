@@ -29,6 +29,7 @@ class OrderResource extends JsonResource
             'shp_name'=>$this->shp_name,
             'sp_name'=>$this->sp_name,
             'sp_code'=>$this->sp_code,
+            'sp_search_name'=>$this->sp_code.'|'.$this->sp_name,
             'shp_date'=>Carbon::parse($this->shp_date)->toDateString(),
             'part_a'=>$this->lines()->OfPart('A')->count(),
             'part_b'=>$this->lines()->OfPart('B')->count(),

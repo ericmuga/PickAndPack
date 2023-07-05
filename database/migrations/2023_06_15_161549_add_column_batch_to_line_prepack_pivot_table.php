@@ -28,7 +28,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('line_prepack_pivot', function (Blueprint $table) {
-            //
+            $table->dropColumn('batch_no');
         });
     }
 };

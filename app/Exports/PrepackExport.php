@@ -1,44 +1,128 @@
 <?php
-
 namespace App\Exports;
 
 use App\Models\LinePrepack;
+use App\Http\Resources\LinePrepackResource;
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Illuminate\Http\Request;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Illuminate\Support\Facades\Schema;
+use Maatwebsite\Excel\Concerns\WithEvents;
+// use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use Maatwebsite\Excel\Events\AfterSheet;
+use Maatwebsite\Excel\Events\BeforeSheet;
 
-class PrepackExport implements FromCollection
+class PrepackExport implements FromCollection, WithHeadings, WithMapping,WithEvents
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
+    // ...
 
-    public $shp_date='';
-    public $sector='';
-    public $sp_code='';
-    public $item_no='';
-    public $order_no='';
-    public $batch_no='';
+    private $parameters;
 
-    public function __construct(Request $request)
+    public function __construct($parameters)
     {
-        dd($request->batch_no);
-        if ($request->has('item_no')){$this->item_no=$request->item_no;}
-        if ($request->has('batch_no')){$this->item_no=$request->batch_no;}
-        if ($request->has('order_no')){$this->item_no=$request->order_no;}
-        if ($request->has('sp_code')){$this->item_no=$request->sp_code;}
-        if ($request->has('shp_date')){$this->item_no=$request->shp_date;}
-        if ($request->has('sector')){$this->item_no=$request->sector;}
-
+        $this->parameters = $parameters;
     }
 
     public function collection()
     {
-        return LinePrepack::query()
-                            ->when($this->order_no<>'',fn($q)=>$q->where('order_no',$this->order_no))
-                            ->when($this->batch_no<>'',fn($q)=>$q->where('batch_no',$this->batch_no))
-                            //    ->when($this->batch_no<>'',fn($q)=>$q->where('batch_no',$this->batch_no))
-                        ->get();
+        $model = new LinePrepack();
+        $query = $model->newQuery();
+        $tableName = $model->getTable();
 
-        // return LinePrepack::all();
+        if (!empty($this->parameters)) {
+            foreach ($this->parameters['requestData'] as $column => $value) {
+                if ($value != '') {
+                    if (Schema::hasColumn($tableName, $column)) {
+                        if (is_array($value)) {
+                            if (Schema::getColumnType($tableName, $column) == 'datetime') {
+                                $query->whereBetween($column, $value);
+                            } else {
+                                $query->whereIn($column, $value);
+                            }
+                        } else {
+                            $query->where($column, $value);
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        return $query->with('user','order','line')->get();
+    }
+
+    public function headings(): array
+    {
+        // Define the column headings for the Excel export
+        return [
+            'id',
+            'prepack_name',
+            'item_description',
+            'total_quantity',
+            'prepack_count',
+            'batch_no',
+            'order_no',
+            'carton_no',
+            'prepack_time',
+            'prepared_by',
+            'customer',
+            'shp_name',
+            'sales_person',
+
+
+            ];
+    }
+
+    public function map($row): array
+    {
+        // Map each row of the collection to the desired format
+        return [
+            $row->id,
+            $row->prepack_name,
+            $row->line->toArray()['item_description'],
+            $row->total_quantity,
+            $row->prepack_count,
+            $row->batch_no,
+            $row->order_no,
+            $row->carton_no,
+            $row->created_at,
+            $row->user->toArray()['name'],
+            $row->order->toArray()['customer_no'].'|'.$row->order->toArray()['customer_name'],
+            $row->order->toArray()['shp_name'],
+            $row->order->toArray()['sp_code'].'|'.$row->order->toArray()['sp_name']
+
+
+            // $row->line->toArray(), // Assuming LineResource also has a toArray() method
+            , // Assuming OrderResource also has a toArray() method
+            // $row->user->toArray()->name
+            // Map additional columns based on your resource class
+        ];
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            BeforeSheet::class => function (BeforeSheet $event) {
+                 // Replace 'FF0000' with your desired color code
+            },
+            AfterSheet::class => function (AfterSheet $event) {
+                $event->sheet->getStyle('A1:M1')->applyFromArray([
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'startColor' => [
+                            'rgb' => 'F0F0F0' // Replace 'FF0000' with your desired color code
+                        ]
+                    ],
+                    'borders' => [
+                        'outline' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['rgb' => '000000'] // Replace '000000' with your desired border color code
+                        ]
+                    ],
+                ]);
+            },
+        ];
     }
 }

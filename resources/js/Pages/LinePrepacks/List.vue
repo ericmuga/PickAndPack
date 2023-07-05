@@ -4,22 +4,21 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
 import Modal from '@/Components/Modal.vue'
-// import Button from 'primevue/button';
-import { useForm } from '@inertiajs/inertia-vue3';
-
-import {watch, ref} from 'vue';
-// import Route from 'vendor/tightenco/ziggy/src/js/Route';
+import {ref,onMounted} from 'vue';
+import{pickBy} from 'lodash'
+import useFileDownload from '@/Composables/useFileDownload.js'
+// import useDistinctValues from '@/Composables/useDistinctValues.js'
+import { useSubObjectExtractor } from '@/Composables/useSubObjectExtractor';
 
 
 const props= defineProps({
    prepackLines:Object,
-   prepackItems:Object
+   prepackItems:Object,
+   prepackBatches:Object,
+   orders:Object,
+   sp_codes:Object,
 })
-
-
-let showModal=ref(false);
-
-const form= useForm({
+const form= ref({
        'batch_no':'',
        'order_no':'',
        'item_no':'',
@@ -28,11 +27,21 @@ const form= useForm({
        'shp_date':'',
 
 })
+const { downloadFile } = useFileDownload();
 
-const submitForm=()=>{
-   //download
-   form.post(route('orders.downloadPrepacks'))
-}
+
+
+
+
+
+const submitForm=()=> { downloadFile(pickBy(form.value, value => value !== null && value !== ''),
+                                       route('linePrepacks.download')
+                                     );
+                        showModal.value=false;
+                      }
+let showModal=ref(false);
+
+
 
 </script>
 
@@ -51,30 +60,17 @@ const submitForm=()=>{
                         <div>
                             <Toolbar>
                                 <template #start>
-                                        <!-- <Button label="New" icon="pi pi-plus" class="mr-2"  @click="showModal=true" /> -->
-                                        <!-- <Button label="Download" icon="pi pi-download" class="p-button-success"
-                                         @click="showModal=true"
-                                        /> -->
-                                        <!-- <i class="mr-2 pi pi-bars p-toolbar-separator" /> -->
-                                    <!-- <SplitButton label="Save" icon="pi pi-check" :model="items" class="p-button-warning"></SplitButton> -->
+
                                 </template>
                                 <template #center>
                                     <Pagination :links="prepackLines.meta.links" />
                                 </template>
                                 <template #end>
-                                    <Button label="Download Prepacks" icon="pi pi-download" class="p-button-success"
-                                         @click="showModal=true"
-                                        />
-                                    <!-- <SearchBox model="prepackLines.index" /> -->
+                                        <Button icon="pi pi-download" @click="showModal=true;" severity="help" text raised rounded aria-label="Favorite" />
+                                    <SearchBox model="linePrepacks.index" />
 
                                 </template>
-
-
-
-
-
-
-                               </Toolbar>
+                            </Toolbar>
 
                                         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
 
@@ -85,9 +81,9 @@ const submitForm=()=>{
                                                         <!-- <th scope="col" class="px-4 py-3">
                                                             Barcode
                                                         </th> -->
-                                                        <!-- <th scope="col" class="px-4 py-3">
+                                                        <th scope="col" class="px-4 py-3">
                                                             Batch No.
-                                                        </th> -->
+                                                        </th>
 
                                                         <th scope="col" class="px-4 py-2">
                                                             Order No.
@@ -136,9 +132,9 @@ const submitForm=()=>{
                                                     <tr v-for="item in prepackLines.data" :key="item.id"
                                                     class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
 
-                                                    <!-- <td class="px-3 py-2 text-xs font-thin">
+                                                    <td class="px-3 py-2 text-xs font-thin">
                                                         {{ item.batch_no}}
-                                                    </td> -->
+                                                    </td>
 
                                                     <td class="px-3 py-1 text-xs">
                                                         {{ item.order_no}}
@@ -210,22 +206,52 @@ const submitForm=()=>{
 <Modal :show="showModal" @close="showModal=false" :errors="errors">
      <!-- {{ dynamicModalContent  }} -->
 
-     <div class="w-full p-4 font-bold text-center text-white bg-slate-600"> Filters</div>
+     <div class="p-4 font-bold text-center text-white bg-slate-600"> Filters</div>
        <div >
 
 
-        <form @submit.prevent="submitForm()" class="flex flex-col justify-center gap-2 p-5">
-            <!-- <Dropdown v-model="form.part" :options="parts" optionLabel="name" editable="" optionValue="code" placeholder="Select Part" class="" /> -->
-            <!-- <Dropdown v-model="form.sector" :options="sectors" optionLabel="name" editable="" optionValue="code" placeholder="Select Sector"  /> -->
-            <InputText v-model="form.batch_no" placeholder=" Batch No"></InputText>
-            <!-- <InputText v-model="form.item_no" placeholder=" Batch No"></InputText> -->
-            <Dropdown v-model="form.item_no" :options="props.prepackItems" optionLabel="description" editable="" optionValue="item_no" placeholder="Prepack Item" class="" />
-            <InputText v-model="form.sector" placeholder=" Sector"></InputText>
-            <InputText v-model="form.order_no" placeholder=" Order No"></InputText>
-            <InputText v-model="form.sp_code" placeholder="Salesperson Code"/>
-            <label>Shipment Date</label>
-            <input v-model="form.shp_date" placeholder="Shipment Date" type="date"/>
-            <Button  label="Download" severity="primary"  type="submit" :disabled="form.processing" />
+        <form @submit.prevent="submitForm()"
+
+        class="flex flex-col justify-center gap-2 p-5">
+          <MultiSelect v-model="form.batch_no" :options="props.prepackBatches"
+                        optionLabel="created_at"
+                        optionValue="batch_no"
+                        placeholder="Select Batch Times"
+                        filter
+            :maxSelectedLabels="3" class="w-full md:w-20rem" />
+
+            <MultiSelect v-model="form.item_no" :options="props.prepackItems"
+                        optionLabel="description" optionValue="item_no"
+                        placeholder="Prepack Item"
+                        filter
+            :maxSelectedLabels="3" class="w-full md:w-20rem" />
+
+            <MultiSelect v-model="form.order_no" :options="props.orders.data"
+                        optionLabel="search_name" optionValue="order_no"
+                        placeholder="Select Orders"
+                        filter
+
+            :maxSelectedLabels="3" class="w-full md:w-20rem" />
+
+            <!-- <InputText v-model="form.sector" placeholder=" Sector"></InputText> -->
+            <!-- <InputText v-model="form.order_no" placeholder=" Order No"></InputText> -->
+            <MultiSelect v-model="form.sp_code" :options="props.sp_codes.data"
+                        optionLabel="sp_search_name" optionValue="sp_code"
+                        placeholder="Select Salesperson"
+                        filter
+
+            :maxSelectedLabels="3" class="w-full md:w-20rem" />
+            <div class="flex flex-row w-full space-x-4">
+                <div class="w-1/2">
+                    <label >Shipment Date</label>
+                </div>
+            <Calendar v-model="form.shp_date" selectionMode="range" :manualInput="false"  class="w-1/2"/>
+            </div>
+
+            <!-- <input v-model="form.shp_date" placeholder="Shipment Date" type="date"/> -->
+            <Button  label="Download" icon="pi pi-download" class="w-sm" severity="primary"  type="submit" :disabled="form.processing" />
+            <Button label="Cancel" severity="danger" icon="pi pi-cancel" @click="showModal=false"/>
+
 
         </form>
 
