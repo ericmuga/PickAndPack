@@ -47,9 +47,9 @@ class PrepackExport implements FromCollection, WithHeadings, WithMapping,WithEve
                     }
                     else{
                         if ($value=='sp_code')
-                           $query->orWhereHas('order', fn($q)=>$q->whereIn('sp_code',$value));
+                           $query->whereHas('order', fn($q)=>$q->whereIn('sp_code',$value));
                         if ($value=='shp_date')
-                           $query->orWhereHas('order', fn($q)=>$q->whereBetween('shp_date',$value));
+                           $query->whereHas('order', fn($q)=>$q->whereBetween('shp_date',$value));
                     }
                 }
             }
