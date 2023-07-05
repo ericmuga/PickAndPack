@@ -32,11 +32,12 @@ class PrepackExport implements FromCollection, WithHeadings, WithMapping,WithEve
 
         if (!empty($this->parameters)) {
             foreach ($this->parameters['requestData'] as $column => $value) {
-                if ($value != '') {
+
                     if (Schema::hasColumn($tableName, $column))
                     {
                         if (is_array($value)) {
-                            if (Schema::getColumnType($tableName, $column) == 'datetime') {
+                            if (Schema::getColumnType($tableName, $column) == 'datetime')
+                             {
                                 $query->whereBetween($column, $value);
                             } else {
                                 $query->whereIn($column, $value);
@@ -46,12 +47,12 @@ class PrepackExport implements FromCollection, WithHeadings, WithMapping,WithEve
                         }
                     }
                     else{
-                        if ($value=='sp_code')
+                        if ($column=='sp_code')
                            $query->whereHas('order', fn($q)=>$q->whereIn('sp_code',$value));
-                        if ($value=='shp_date')
+                        if ($column=='shp_date')
                            $query->whereHas('order', fn($q)=>$q->whereBetween('shp_date',$value));
                     }
-                }
+
             }
         }
 
