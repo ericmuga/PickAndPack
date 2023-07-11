@@ -12,9 +12,9 @@ class LinePrepack extends Pivot
     use HasFactory;
     use Compoships;
 
-    protected $table='line_prepack_pivot';
+    protected $table='line_prepacks';
 
-    protected $primary_key =['order_no','line_no','prepack_name'];
+    protected $primaryKey =['order_no','line_no','prepack_name'];
 
 
     protected static function booted()
