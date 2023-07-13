@@ -99,7 +99,7 @@ class SearchService
         }
     }
 
-    return $query->latest()->paginate(15)
+    return $query->orderByDesc('id')->paginate(15)
                  ->withQueryString()
                  ->appends($request->all());
 }
