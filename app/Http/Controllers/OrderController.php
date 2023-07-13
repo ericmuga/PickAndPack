@@ -419,7 +419,7 @@ return inertia('Orders/Pack',['orders'=>$orders,'refreshError'=>null,'columnList
 
         //return inertia('Prepacks/OrderPrepacks',['prepackLines'=>LinePrepackResource::collection(LinePrepack::paginate(15))]);
         //    $this->orderPrepacks($request);
-        return redirect(route('orders.prepacks'));
+        return redirect(route('prepacks.index'));
 
     }
 
