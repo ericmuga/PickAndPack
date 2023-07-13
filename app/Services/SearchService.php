@@ -58,7 +58,7 @@ class SearchService
 
             // Search in related models' string columns
             $relations = $this->model->getRelations();
-            dd($this->model->getRelations());
+            // dd($this->model->getRelations());
 
            //lineprepacks
            if ($this->model->getTable()=='line_prepack_pivot'){
@@ -99,7 +99,8 @@ class SearchService
         }
     }
 
-    return $query->orderByDesc('id')->paginate(15)
+    return $query->orderByDesc('id')
+                 ->paginate(15)
                  ->withQueryString()
                  ->appends($request->all());
 }

@@ -28,13 +28,13 @@ class LineController extends Controller
     {
         //prepack all the lines
         /**
-         * 
-         * for each line get the prepackable quantity, 
+         *
+         * for each line get the prepackable quantity,
          */
-        
-         Lines::query()
-              ->when($request->has('sales_person'))
-         
+
+        //  Lines::query()
+        //       ->when($request->has('sales_person'));
+
 
 
 

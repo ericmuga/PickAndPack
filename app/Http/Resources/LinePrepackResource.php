@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Models\{User,Line};
+use App\Models\{User,Line,Order};
 
 class LinePrepackResource extends JsonResource
 {
@@ -27,10 +27,10 @@ class LinePrepackResource extends JsonResource
                 'carton_no'=>$this->carton_no,
                 'prepack_time'=>Carbon::parse($this->created_at)->toDateTimeString(),
                 'created_at'=>$this->created_at,
-                'prepared_by'=>$this->user->name,
-                'customer_no'=>$this->order->customer_name,
-                'shp_name'=>$this->order->shp_name,
-                'sales_person'=>$this->order->sp_code.'|'.$this->order->sp_name,
+                'prepared_by'=>User::select('name')->where('id',$this->user_id)->get(),
+                'customer_no'=>Order::select('customer_no')->where('order_no',$this->order_no)->get(),
+                'shp_name'=>Order::select('shp_name')->where('order_no',$this->order_no)->get(),
+                'sales_person'=>Order::select('sp_code')->where('order_no',$this->order_no)->get().'|'.Order::select('sp_code')->where('order_no',$this->order_no)->get(),
                 'line'=>LineResource::make($this->whenLoaded('line')),
                 'order'=>OrderResource::make($this->whenLoaded('order')),
                 'user'=>UserResource::make($this->whenLoaded('user')),
