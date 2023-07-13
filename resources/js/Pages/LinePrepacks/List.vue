@@ -66,7 +66,14 @@ let showModal=ref(false);
                                     <Pagination :links="prepackLines.meta.links" />
                                 </template>
                                 <template #end>
-                                        <Button icon="pi pi-download" @click="showModal=true;" severity="help" text raised rounded aria-label="Favorite" />
+                                    <div class="mr-2">
+                                         <Button icon="pi pi-download"
+                                         @click="showModal=true;
+                                         " severity="success"
+                                         label="download"
+                                          aria-label="Favorite" />
+                                    </div>
+
                                     <SearchBox model="linePrepacks.index" />
 
                                 </template>
