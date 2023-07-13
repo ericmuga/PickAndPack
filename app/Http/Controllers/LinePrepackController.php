@@ -30,7 +30,7 @@ class LinePrepackController extends Controller
          $orders=OrderResource::collection($prepackLines->pluck('order')->unique('order_no'));
          $sp_codes=OrderResource::collection($prepackLines->pluck('order')->unique('sp_code'));
 
-       $prepackBatches=LinePrepackResource::collection(LinePrepack::select('created_at','batch_no')->get());
+       $prepackBatches=LinePrepackResource::collection(LinePrepack::select('created_at','batch_no')->orderByDesc('id')->get());
 
 
       return inertia('LinePrepacks/List', compact('prepackItems','previousInput','prepackLines','prepackBatches','orders','sp_codes'));

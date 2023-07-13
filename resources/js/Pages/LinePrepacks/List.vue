@@ -213,7 +213,7 @@ let showModal=ref(false);
         <form @submit.prevent="submitForm()"
 
         class="flex flex-col justify-center gap-2 p-5">
-          <MultiSelect v-model="form.batch_no" :options="props.prepackBatches"
+          <MultiSelect v-model="form.batch_no" :options="props.prepackBatches.data"
                         optionLabel="created_at"
                         optionValue="batch_no"
                         placeholder="Select Batch Times"
