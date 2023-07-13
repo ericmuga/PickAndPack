@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Line;
 use App\Http\Requests\StoreLineRequest;
 use App\Http\Requests\UpdateLineRequest;
+use App\Http\Resources\LineResource;
 use Illuminate\Http\Request;
+use App\Services\SearchService;
 class LineController extends Controller
 {
     /**
@@ -18,9 +20,21 @@ class LineController extends Controller
     {
         dd($request->all());
     }
-     public function index()
+
+
+
+
+     public function index(Request $request)
     {
-        //
+
+         // Load all the lines with their prepack and assmblies
+
+         $lines=LineResource::collection((new SearchService(new Line()))
+         ->with(['prepacks','assemblies'])
+         ->search($request));
+
+         return inertia('Line\List',compact('lines'));
+
     }
 
     public function prepack(Request $request)

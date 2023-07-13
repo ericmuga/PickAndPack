@@ -94,6 +94,8 @@ public function getPending()
 
 
 
+
+
 public function index(Request $request,$e=null)
 {
     //  dd('here');
@@ -359,7 +361,7 @@ return inertia('Orders/Pack',['orders'=>$orders,'refreshError'=>null,'columnList
                 //initializing Carton count for the part
                 $cartonCount=0;
                 foreach ($part as $item)
-                {           DB::table('line_prepack_pivot')
+                {           DB::table('line_prepacks')
                     ->where('order_no',$item->order_no)
                     ->delete();
                     // dd($item);
@@ -384,7 +386,7 @@ return inertia('Orders/Pack',['orders'=>$orders,'refreshError'=>null,'columnList
                             $total_qty=$prepack_count*$prepack->pack_size;
 
 
-                            DB::table('line_prepack_pivot')
+                            DB::table('line_prepacks')
                             ->insert([
                                 'order_no'=>$item->order_no,
                                 'line_no'=>$item->line_no,

@@ -70,6 +70,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('line/prepacks',fn(Request $request)=>Line::where('line_no')->prepacks()->get());
         Route::post('line/add',[LineController::class, 'add'])->name('prepacks.add');
+        Route::resource('lines',LineController::class);
 
 
         Route::resource('prepacks',PrepackController::class);
