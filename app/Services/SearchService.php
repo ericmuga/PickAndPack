@@ -58,7 +58,7 @@ class SearchService
 
             // Search in related models' string columns
             $relations = $this->model->getRelations();
-            // dd($this->model->getRelations());
+            dd($this->model->getRelations());
 
            //lineprepacks
            if ($this->model->getTable()=='line_prepack_pivot'){
@@ -99,49 +99,11 @@ class SearchService
         }
     }
 
-    return $query->paginate(15)
+    return $query->latest()->paginate(15)
                  ->withQueryString()
                  ->appends($request->all());
 }
 
-    // public function search($request)
-    // {
-    //     $query = $this->model->newQuery();
-
-    //     if ($request->has('search')) {
-    //         $searchValue = $request->input('search');
-
-    //         $table = $this->model->getTable();
-    //         $columns = $this->getStringColumns($table);
-
-    //         $query->where(function ($query) use ($columns, $searchValue) {
-    //             foreach ($columns as $column) {
-    //                 $query->orWhere($column, 'LIKE', '%' . $searchValue . '%');
-    //             }
-
-
-
-    //         });
-    //     }
-
-    //     if (!empty($this->with)) {
-    //         $query->with($this->with);
-    //     }
-
-    //     if (!empty($this->counts)) {
-    //         $query->withCount($this->counts);
-    //     }
-
-    //     if (!empty($this->sums)) {
-    //         foreach ($this->sums as $relation => $column) {
-    //             $query->withSum($relation, $column);
-    //         }
-    //     }
-
-    //     return $query->paginate(15)
-    //                  ->withQueryString()
-    //                  ->appends($request->all());
-    // }
 
     protected function getStringColumns($table)
     {

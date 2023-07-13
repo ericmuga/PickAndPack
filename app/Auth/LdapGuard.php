@@ -1,3 +1,5 @@
+<?php 
+
 namespace App\Auth;
 
 use Illuminate\Auth\GuardHelpers;
@@ -10,6 +12,11 @@ class LdapGuard implements Guard
 
     protected $provider;
     protected $ldap;
+
+    public function user()
+    {
+        return Auth::user();
+    }
 
     public function __construct(UserProvider $provider, LdapConnection $ldap)
     {

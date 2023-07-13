@@ -25,7 +25,7 @@ return new class extends Migration
      * @return void
      */
     public function down()
-    {
+    
         Schema::table('line_prepack', function (Blueprint $table) {
             //
             $table->dropColumn('carton_no');

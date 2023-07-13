@@ -138,9 +138,7 @@ let showModal=ref(false);
 
                                                     <tr class="text-center bg-slate-300">
 
-                                                        <th scope="col" class="px-6 py-3">
-                                                            Prepack Name
-                                                        </th>
+                                                        
                                                         <!-- <th scope="col" class="px-6 py-3 ">
                                                             Item No
                                                         </th> -->

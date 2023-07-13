@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->string('sector',20)->nullable()->index();
+            $table->string('sector',20)->nullable()->index('sector');
         });
     }
 
@@ -26,7 +26,8 @@ return new class extends Migration
     public function down()
     {
         Schema::table('orders', function (Blueprint $table) {
-            //
+            $table->dropIndex('sector');
+            $table->dropColumn('sector');
         });
     }
 };

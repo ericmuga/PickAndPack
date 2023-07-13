@@ -23,6 +23,23 @@ class LineController extends Controller
         //
     }
 
+    public function prepack(Request $request)
+
+    {
+        //prepack all the lines
+        /**
+         * 
+         * for each line get the prepackable quantity, 
+         */
+        
+         Lines::query()
+              ->when($request->has('sales_person'))
+         
+
+
+
+    }
+
     /**
      * Show the form for creating a new resource.
      *

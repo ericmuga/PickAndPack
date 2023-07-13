@@ -11,7 +11,7 @@ export function useSubObjectExtractor(mainObjects, subObjectKey) {
 
   // Extract subobjects from mainObjects
   function extractSubObjects() {
-    extractedSubObjects.value = mainObjects.map(mainObj => mainObj[subObjectKey]);
+    extractedSubObjects.value = mainObjects.value.map(mainObj => mainObj[subObjectKey]);
   }
 
   // Return the extracted subobjects as a computed property

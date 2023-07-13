@@ -5,23 +5,7 @@ import StatsTile from '@/Components/StatsTile.vue';
 import { Link } from '@inertiajs/inertia-vue3'
 import SpacedRule from '@/Components/SpacedRule.vue';
 
-// let Todays={
-//     title:"Todays",
-//     number:200,
 
-// }
-
-// let Completed={
-//     title:"Completed",
-//     number:170,
-
-// }
-
-// let PendingExecution={
-//     title:"Pending Execution",
-//     number:30,
-
-// }
 
 defineProps({
                todays:Number,

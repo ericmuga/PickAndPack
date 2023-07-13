@@ -11,6 +11,8 @@ class Item extends Model
 
 
     protected $fillable=['item_no','barcode','description','posting_group'];
+   
+   
    public function prepacks()
    {
 
