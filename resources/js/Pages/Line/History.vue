@@ -120,7 +120,7 @@ const props= defineProps({
 
                                         <td class="px-3 py-2 text-xs text-center">
                                             {{ order.order_no }}
-                                            <span class="p-1 text-xs text-center">{{ order.order.shp_date }}</span>
+                                            <!-- <span class="p-1 text-xs text-center">{{ order.order.shp_date }}</span> -->
                                         </td>
 
 
