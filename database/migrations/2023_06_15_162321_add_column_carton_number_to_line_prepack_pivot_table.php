@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('line_prepack_pivot', function (Blueprint $table) {
+        Schema::table('line_prepack', function (Blueprint $table) {
             //
             $table->string('carton_no');
         });
@@ -25,8 +25,8 @@ return new class extends Migration
      * @return void
      */
     public function down()
-    
-        Schema::table('line_prepack', function (Blueprint $table) {
+
+       { Schema::table('line_prepack', function (Blueprint $table) {
             //
             $table->dropColumn('carton_no');
         });

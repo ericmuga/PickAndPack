@@ -3,21 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\Confirmation;
-use App\Http\Requests\StoreConfirmationRequest;
-use App\Http\Requests\UpdateConfirmationRequest;
+use App\Http\Resources\ConfirmationResource;
+use App\Traits\ExcelExportTrait;
+use Illuminate\Http\Client\Request;
+
 
 class ConfirmationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
+    use ExcelExportTrait;
 
+    public function export()
+    {
+        $data = Confirmation::first()->toArray(); // Replace with your actual Model
+
+        $filename = 'data_export_' . date('Ymd_His') . '.xlsx';
+
+        return $this->exportExcel($data, ConfirmationResource::class, $filename);
+
+
+    }
     /**
      * Show the form for creating a new resource.
      *

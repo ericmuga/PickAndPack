@@ -129,6 +129,7 @@ const props= defineProps({
     previousInput:Object,
     items:Object,
     sp_codes:Object,
+    orders:Object
     // printed:Object
 })
 
@@ -309,16 +310,6 @@ const submitForm=()=>{
 
 
         <form @submit.prevent="submitForm()" class="flex flex-col justify-center gap-2 p-5">
-            <!-- <Dropdown v-model="form.part" :options="parts" optionLabel="name" editable="" optionValue="code" placeholder="Select Part" class="" /> -->
-            <!-- <Dropdown v-model="form.sector" :options="sectors" optionLabel="name" editable="" optionValue="code" placeholder="Select Sector"  /> -->
-            <!-- <Dropdown v-model="form.item"
-                       :options="props.items"
-                     optionLabel="description"
-                     editable=""
-                     optionValue="item_no"
-                     placeholder="Prepack Item"
-                     class="" /> -->
-
 
             <MultiSelect v-model="form.item"
                         :options="props.items"
@@ -337,8 +328,17 @@ const submitForm=()=>{
                         :maxSelectedLabels="3"
                         class="w-full md:w-20rem"
             />
+
+             <MultiSelect v-model="form.order_no"
+                        :options="props.orders"
+                       optionLabel="Orders"
+                        optionValue="order_no"
+                        placeholder="Select Orders"
+                        :maxSelectedLabels="3"
+                        class="w-full md:w-20rem"
+            />
             <!-- <InputText v-model="form.sp_code" placeholder="Salesperson Code"></InputText> -->
-            <InputText v-model="form.order_no" placeholder="Order No."></InputText>
+            <!-- <InputText v-model="form.order_no" placeholder="Order No."></InputText> -->
             <input type=date v-model="form.shp_date" placeholder="Shipment Date"/>
             <Button  label="Create" severity="primary"  type="submit" :disabled="form.processing" />
             <Button label="Cancel" severity="warning" icon="pi pi-cancel" @click="showModal=false"/>

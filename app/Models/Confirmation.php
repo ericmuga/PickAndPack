@@ -14,6 +14,10 @@ class Confirmation extends Model
     return $this->belongsTo(Order::class,'order_no','order_no');
   }
 
+  public function user()
+  {
+    return $this->belongsTo(User::class);
+  }
 //   public function checkPart($order_no,$part_no)
 //   {
 //     return $this->where('order_no')

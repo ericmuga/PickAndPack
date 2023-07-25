@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\{ItemController,
+use App\Http\Controllers\{ConfirmationController, ItemController,
                           LineController,
                           LinePrepackController,
                           ProfileController,
@@ -95,6 +95,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/order/scanItems', [OrderController::class, 'scanItems'])->name('order.scanItems');
         Route::get('/order/scanItems', [OrderController::class, 'scanItems'])->name('order.scanItemsGET');
 
+        //confirmations
+        Route::resource('confirmations',ConfirmationController::class);
+        Route::get('exportConfirmations',[ConfirmationController::class,'export'])->name('export.confirmations');
        //API
        //API
 

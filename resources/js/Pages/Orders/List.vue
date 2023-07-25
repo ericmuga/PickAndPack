@@ -15,6 +15,7 @@ import Pagination from '@/Components/Pagination.vue'
 import Modal from '@/Components/Modal.vue'
 import { useStorage } from '@/Composables/useStorage';
 import { useDates } from '@/Composables/useDates';
+import DownloadButton from '@/Components/DownloadButton.vue';
 
 
 // const todaysDate=useDates.getCurrentDate();
@@ -181,6 +182,9 @@ const postForm=(dynamicObject,dateDynamicObject)=>{
                                         <a href="/orders/download" class="">
                                             <Button icon="pi pi-download" severity="primary" text raised rounded label="confirmations"/>
                                         </a>
+                                    <!-- <DownloadButton :link="route('export.confirmations')" />    -->
+
+
                                          <!-- <Link :href="route('refresh')" class="w-20 h-20 m-5 mx-auto text-center ">
                                             <img src="/img/refresh.png" />
                                             <Button icon="pi pi-heart" severity="help" rounded aria-label="Favorite" />

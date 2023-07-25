@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\LinePrepackResource;
 use App\Models\{LinePrepack,Item, Order};
 use Illuminate\Http\Request;
-use App\Services\SearchService;
+use App\Services\{SearchService,SearchQueryService};
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\{PrepackExport};
@@ -23,9 +23,16 @@ class LinePrepackController extends Controller
                           ->get();
 
         $previousInput=$request->all();
+
+    // $prepackLines= LinePrepack::whereHas('order',fn($q)=>$q->current()
+        //                                                        ->where('confirmed',true)
+        //                                     );
+
+
         $prepackLines=LinePrepackResource::collection((new SearchService(new LinePrepack()))
                                                      ->with(['line','order','user'])
-                                                     ->search($request));
+                                                     ->search($request)
+                                                    );
 
          $orders=OrderResource::collection($prepackLines->pluck('order')->unique('order_no'));
          $sp_codes=OrderResource::collection($prepackLines->pluck('order')->unique('sp_code'));
