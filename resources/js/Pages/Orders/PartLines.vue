@@ -167,8 +167,8 @@ const submitForm=()=>{
                                 <template #start>
                                     <Button
 
-                                    label=" Make Prepack"
-                                    severity="success"
+                                    label=" Allocate"
+                                    severity="warning"
                                     @click="showModal=true"
                                     />
                                 </template>

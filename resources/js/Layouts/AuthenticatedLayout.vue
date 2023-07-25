@@ -49,7 +49,7 @@ const showingNavigationDropdown = ref(false);
 
 
                                  <NavLink :href="route('order.pack')" :active="route().current('order.pack')">
-                                    Packing
+                                    Assembly
                                 </NavLink>
                                 <NavLink :href="route('items.index')" :active="route().current('items.index')">
                                     Items
@@ -163,7 +163,7 @@ const showingNavigationDropdown = ref(false);
                                     Prepacked Orders
                                 </NavLink> -->
                                  <NavLink :href="route('order.pack')" :active="route().current('order.pack')">
-                                    Packing
+                                    Assembly
                                 </NavLink>
 
                                 <NavLink :href="route('items.index')" :active="route().current('items.index')">
