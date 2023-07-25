@@ -329,7 +329,7 @@ return inertia('Orders/Pack',['orders'=>$orders,'refreshError'=>null,'columnList
         *     for each part,
         *
         */
-dd($request->all());
+// dd($request->all());
 
         $orderedList=   DB::table('lines')
                             ->select('lines.item_no',
@@ -356,6 +356,7 @@ dd($request->all());
                             ->join('prepacks',fn($q)=>$q->on('prepacks.item_no','=','lines.item_no')
                             ->where('isActive',true))
                             ->get()->groupBy(['order_no','part']);
+                    dd($orderedList);
 
         foreach($orderedList as $order)
         {
