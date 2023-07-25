@@ -57,6 +57,9 @@ const showingNavigationDropdown = ref(false);
                                 <NavLink :href="route('prepacks.index')" :active="route().current('prepacks.index')">
                                     Prepacks
                                 </NavLink>
+                                <NavLink :href="route('lines.history')" :active="route().current('lines.history')">
+                                    History
+                                </NavLink>
 
 
 
@@ -173,6 +176,9 @@ const showingNavigationDropdown = ref(false);
 
                                 <NavLink :href="route('prepacks.index')" :active="route().current('prepacks.index')">
                                     Prepacks
+                                </NavLink>
+                                 <NavLink :href="route('lines.history')" :active="route().current('lines.history')">
+                                    History
                                 </NavLink>
 
 

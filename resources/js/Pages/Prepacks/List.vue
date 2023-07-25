@@ -16,7 +16,7 @@ const form= useForm({
      'prepack_name':'',
      'item_no':'',
      'pack_size':'',
-     'isActive':false,
+     'isActive':true,
 })
 
 
@@ -68,7 +68,7 @@ const showUpdateModal=(item)=>{
     form.prepack_name=item.prepack_name
     form.item_no=item.item_no
     form.pack_size=item.pack_size
-    form.isActive=item.isActive
+    form.isActive=item.isActive.value
     showModal.value=true
 }
 

@@ -37,6 +37,8 @@ class LineController extends Controller
 
     }
 
+
+
     public function prepack(Request $request)
 
     {
@@ -52,6 +54,36 @@ class LineController extends Controller
 
 
 
+    }
+
+    public function history (Request $request)
+    {
+
+        // dd('here');
+            $query = Line::query()->with('order')
+                                  ->withSum('assemblies','ass_qty')
+                                  ->withSum('prepacks','total_qty')
+
+
+            ->when($request->has('search'), function ($q) use ($request) {
+                        $q->where(function ($q) use ($request) {
+                        $q->where('item_no', 'like', '%' . $request->search . '%')
+                        ->orWhere('order_no', 'like', '%' . $request->search . '%')
+                        ->orWhere('item_description', 'like', '%' . $request->search . '%')
+                        ->orWhereHas('order', function ($q) use ($request) {
+                        $q->where('customer_name', 'like', '%' . $request->search . '%')
+                            ->orWhere('shp_name', 'like', '%' . $request->search . '%')
+                            ->orWhere('sp_name', 'like', '%' . $request->search . '%');
+                        });
+                        });
+                        })
+
+            ->orderBy('order_no');
+
+            $orderLines = LineResource::collection($query->paginate(15)->appends($request->all())->withQueryString());
+
+
+            return inertia('Line/History',compact('orderLines'));
     }
 
     /**
