@@ -318,6 +318,7 @@ const submitForm=()=>{
                         placeholder="Select Items"
                         :maxSelectedLabels="3"
                         class="w-full md:w-20rem"
+                        filter
             />
 
              <MultiSelect v-model="form.sp_code"
@@ -327,6 +328,7 @@ const submitForm=()=>{
                         placeholder="Select Salespersons"
                         :maxSelectedLabels="3"
                         class="w-full md:w-20rem"
+                        filter
             />
 
              <MultiSelect v-model="form.order_no"
@@ -336,6 +338,7 @@ const submitForm=()=>{
                         placeholder="Select Orders"
                         :maxSelectedLabels="3"
                         class="w-full md:w-20rem"
+                        filter
             />
             <!-- <InputText v-model="form.sp_code" placeholder="Salesperson Code"></InputText> -->
             <!-- <InputText v-model="form.order_no" placeholder="Order No."></InputText> -->
