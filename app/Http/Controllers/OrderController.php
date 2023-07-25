@@ -243,10 +243,11 @@ $orderLines = LineResource::collection($query->paginate(15)->appends($request->a
 
 
 
-$sp_codes=Order::whereIn('order_no',$orderLines->pluck('order_no')->toArray())
-               ->distinct()
-               ->current()
-               ->get(['sp_code','sp_name']);
+$sp_codes=Order::whereIn('order_no', $orderLines->pluck('order_no')->toArray())
+                ->distinct()
+                ->where('shp_date', '>=', Carbon::today()->toDateString())
+                ->selectRaw('sp_code, CONCAT(sp_code, " | ", sp_name) as sp_code_and_name')
+                ->get();
 
     $orders = Order::query()
                     ->select('order_no', DB::raw("CONCAT(order_no, '|', customer_name, '|', shp_name) as order_customer_ship"))
