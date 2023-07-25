@@ -305,7 +305,7 @@ const submitForm=()=>{
 <Modal :show="showModal" @close="showModal=false" :errors="errors">
     <!-- {{ dynamicModalContent  }} -->
 
-    <div class="w-full p-4 font-bold text-center text-white bg-slate-600"> Make Prepack</div>
+    <div class="w-full p-4 font-bold text-center text-white bg-slate-600"> Allocate Prepack</div>
     <div >
 
 

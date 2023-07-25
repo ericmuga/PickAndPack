@@ -207,33 +207,67 @@ public function assemble(Request $request)
                       ->get();
 
 
-    $orderLines=LineResource::collection(Line::query()
-                                            ->when(Prepack::exists(),fn($q)=>$q->where('order_qty','>=',Prepack::orderByDesc('pack_size')->select('pack_size')->first()->pack_size))
-                                            ->whereHas('order',fn($q)=>$q->execute()
-                                                                         ->where('shp_date','>=',Carbon::today()->toDateString())
-                                                                         ->confirmed()
-                                                      )
-                                            ->when($request->has('search'),fn($q)=>$q->whereHas('prepackItems',fn($q)=>$q->where('isActive',true))
-                                                    ->whereDoesntHave('prepacks')
-                                                    ->where(fn($q)=>$q->where('item_no','like','%'.$request->search.'%')
-                                                                        ->orWhere('order_no','like','%'.$request->search.'%')
-                                                                        ->orWhere('item_description','like','%'.$request->search.'%')
-                                                                        ->orWhereHas('order',fn($q)=>$q->where('customer_name','like','%'.$request->search.'%')
-                                                                                    ->orWhere('shp_name','like','%'.$request->search.'%')
-                                                                                    ->orWhere('sp_name','like','%'.$request->search.'%')
 
-                                                                                    )
-                                                            )
-                                                    )
 
-                                            ->whereHas('prepackItems',fn($q)=>$q->where('isActive',true))
-                                            ->whereDoesntHave('prepacks')
-                                            ->with('order')
-                                            ->orderBy('order_no')
-                                            ->paginate(15)
-                                            ->appends([$request->all()])
-                                            ->withQueryString()
-                                        );
+// Step 1: Separate the query builder for better readability
+$query = Line::query()->with('order')
+    ->when(Prepack::exists(), function ($q) {
+        $q->where('order_qty', '>=', Prepack::orderByDesc('pack_size')->select('pack_size')->first()->pack_size);
+    })
+    ->whereHas('order', function ($q) {
+        $q->execute()
+            ->where('shp_date', '>=', Carbon::today()->toDateString())
+            ->confirmed();
+    })
+    ->when($request->has('search'), function ($q) use ($request) {
+        $q->where(function ($q) use ($request) {
+            $q->where('item_no', 'like', '%' . $request->search . '%')
+                ->orWhere('order_no', 'like', '%' . $request->search . '%')
+                ->orWhere('item_description', 'like', '%' . $request->search . '%')
+                ->orWhereHas('order', function ($q) use ($request) {
+                    $q->where('customer_name', 'like', '%' . $request->search . '%')
+                        ->orWhere('shp_name', 'like', '%' . $request->search . '%')
+                        ->orWhere('sp_name', 'like', '%' . $request->search . '%');
+                });
+        });
+    })
+    ->whereHas('prepackItems', function ($q) {
+        $q->where('isActive', true);
+    })
+    ->whereDoesntHave('prepacks')
+    ->orderBy('order_no');
+
+// Step 2: Optimize eager loading to reduce database queries
+$orderLines = LineResource::collection($query->paginate(15)->appends($request->all())->withQueryString());
+
+
+    // $orderLines=LineResource::collection(Line::query()
+    //                                         ->when(Prepack::exists(),fn($q)=>$q->where('order_qty','>=',Prepack::orderByDesc('pack_size')->select('pack_size')->first()->pack_size))
+    //                                         ->whereHas('order',fn($q)=>$q->execute()
+    //                                                                      ->where('shp_date','>=',Carbon::today()->toDateString())
+    //                                                                      ->confirmed()
+    //                                                   )
+    //                                         ->when($request->has('search'),fn($q)=>$q->whereHas('prepackItems',fn($q)=>$q->where('isActive',true))
+    //                                                 ->whereDoesntHave('prepacks')
+    //                                                 ->where(fn($q)=>$q->where('item_no','like','%'.$request->search.'%')
+    //                                                                     ->orWhere('order_no','like','%'.$request->search.'%')
+    //                                                                     ->orWhere('item_description','like','%'.$request->search.'%')
+    //                                                                     ->orWhereHas('order',fn($q)=>$q->where('customer_name','like','%'.$request->search.'%')
+    //                                                                                 ->orWhere('shp_name','like','%'.$request->search.'%')
+    //                                                                                 ->orWhere('sp_name','like','%'.$request->search.'%')
+
+    //                                                                                 )
+    //                                                         )
+    //                                                 )
+
+    //                                         ->whereHas('prepackItems',fn($q)=>$q->where('isActive',true))
+    //                                         ->whereDoesntHave('prepacks')
+    //                                         ->with('order')
+    //                                         ->orderBy('order_no')
+    //                                         ->paginate(15)
+    //                                         ->appends([$request->all()])
+    //                                         ->withQueryString()
+    //                                     );
 
 $sp_codes=Order::whereIn('order_no',$orderLines->pluck('order_no')->toArray())
                ->distinct()
