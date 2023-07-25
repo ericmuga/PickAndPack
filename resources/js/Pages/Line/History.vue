@@ -124,13 +124,13 @@ const props= defineProps({
                                         </td>
 
 
-                                        <td v-if="order.order.shp_name=='' " class="px-3 py-2 text-xs">
+                                        <!-- <td v-if="order.order.shp_name=='' " class="px-3 py-2 text-xs">
                                             {{ order.order.customer_name }}
-                                            <!-- <span class="p-1 m-1 text-xs bg-orange-200 rounded">{{order.order.sector}}</span> -->
+                                            <span class="p-1 m-1 text-xs bg-orange-200 rounded">{{order.order.sector}}</span>
                                         </td>
                                         <td v-else class="px-3 py-2 text-xs">
                                             {{ order.order.shp_name }}
-                                             <!-- <span class="p-1 m-1 text-xs bg-orange-200 rounded">{{order.order.sector}}</span> -->
+                                             <span class="p-1 m-1 text-xs bg-orange-200 rounded">{{order.order.sector}}</span>
                                         </td>
                                         <td class="px-3 py-2 text-xs text-center bg-orange-300 rounded-md">
                                             <p>
@@ -139,7 +139,7 @@ const props= defineProps({
                                             <p>
                                                 {{ order.order.sp_name }}
                                             </p>
-                                        </td>
+                                        </td> -->
                                         <td class="px-3 py-2 text-xs">
                                             {{ order.item_no }}
                                         </td>
