@@ -77,7 +77,7 @@ class PrepackController extends Controller
          /* return redirect(route('prepacks.index'))->withErrors(['success'=>'Item Deleted!']);
         else
          return back()->withErrors(['message'=>'An error occurred during the deletion']);*/
-    }
+
 }
 
 }
