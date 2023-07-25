@@ -62,7 +62,7 @@ class LineController extends Controller
         // dd('here');
             $query = Line::query()->with('order')
                                   ->withSum('assemblies','ass_qty')
-                                  ->withSum('prepacks','total_qty')
+                                  ->withSum('prepacks','total_quantity')
 
 
             ->when($request->has('search'), function ($q) use ($request) {
