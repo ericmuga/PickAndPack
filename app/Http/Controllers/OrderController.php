@@ -356,7 +356,7 @@ return inertia('Orders/Pack',['orders'=>$orders,'refreshError'=>null,'columnList
                             ->join('prepacks',fn($q)=>$q->on('prepacks.item_no','=','lines.item_no')
                             ->where('isActive',true))
                             ->get()->groupBy(['order_no','part']);
-                    dd($orderedList);
+                    // dd($orderedList);
 
         foreach($orderedList as $order)
         {
