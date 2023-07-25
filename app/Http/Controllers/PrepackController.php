@@ -67,16 +67,16 @@ class PrepackController extends Controller
 
     public function destroy($prepack)
     {
-        $prepack=Prepack::where('prepack_name',$prepack)
+       /* $prepack=Prepack::where('prepack_name',$prepack)
                         ->doesntHave('linePrepacks')
                         ->first();
-
-    if($prepack->count()>0)
-    {
-        if ($prepack->delete())
-          return redirect(route('prepacks.index'))->withErrors(['success'=>'Item Deleted!']);
+*/
+    //if($prepack->count()>0)
+    //{
+        $prepack->delete();
+         /* return redirect(route('prepacks.index'))->withErrors(['success'=>'Item Deleted!']);
         else
-         return back()->withErrors(['message'=>'An error occurred during the deletion']);
+         return back()->withErrors(['message'=>'An error occurred during the deletion']);*/
     }
 }
 
