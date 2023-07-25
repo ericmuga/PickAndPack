@@ -331,7 +331,7 @@ const submitForm=()=>{
 
              <MultiSelect v-model="form.order_no"
                         :options="props.orders"
-                       optionLabel="Orders"
+                       optionLabel="order_customer_ship"
                         optionValue="order_no"
                         placeholder="Select Orders"
                         :maxSelectedLabels="3"

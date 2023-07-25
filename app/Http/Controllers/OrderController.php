@@ -240,11 +240,13 @@ $sp_codes=Order::whereIn('order_no',$orderLines->pluck('order_no')->toArray())
                ->current()
                ->get(['sp_code','sp_name']);
 
-$orders=Order::query()
-             ->select('order_no','customer_name','shp_name')
-             ->confirmed()
-             ->where('status','order')
-             ->get();
+    $orders = Order::query()
+                    ->select('order_no', DB::raw("CONCAT(order_no, '|', customer_name, '|', shp_name) as order_customer_ship"))
+                    ->confirmed()
+                    ->where('shp_date','>=',Carbon::today()->toDateString())
+                    ->where('status', 'order')
+                    ->get();
+
 
 
   return inertia('Orders/PartLines',
