@@ -60,7 +60,8 @@ class PrepackController extends Controller
     public function update(Request $request)
     {
        $prepack=Prepack::firstWhere('prepack_name',$request->prepack_name);
-       if (!$prepack->lines()->exists()) $prepack->update($request->all());
+       if ($prepack->has('linePrepacks')) $prepack->update($request->only('isActive'));
+       else $prepack->update($request->all());
        return redirect(route('prepacks.index'));
     }
 
