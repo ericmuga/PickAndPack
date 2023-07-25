@@ -65,7 +65,7 @@ class PrepackController extends Controller
        return redirect(route('prepacks.index'));
     }
 
-    public function destroy($prepack)
+    public function destroy(Prepack $prepack)
     {
        /* $prepack=Prepack::where('prepack_name',$prepack)
                         ->doesntHave('linePrepacks')
