@@ -138,10 +138,10 @@ let showModal=ref(false);
 
                                                     <tr class="text-center bg-slate-300">
 
-                                                        
-                                                        <!-- <th scope="col" class="px-6 py-3 ">
-                                                            Item No
-                                                        </th> -->
+
+                                                        <th scope="col" class="px-6 py-3 ">
+                                                          Prepack No.
+                                                        </th>
                                                         <th scope="col" class="px-6 py-3">
                                                             Item Description
                                                         </th>
@@ -183,9 +183,11 @@ let showModal=ref(false);
                                                     <td class="px-3 py-2 text-xs font-bold">
                                                         {{ item.pack_size}}
                                                     </td>
+
                                                     <td class="px-3 py-2 text-xs font-bold">
                                                         {{ item.linePrepack_count}}
                                                     </td>
+
                                                     <td class="px-3 py-2 text-xs font-bold">
 
                                                         <!-- <InputSwitch v-model="checked" disabled /> -->
@@ -199,7 +201,7 @@ let showModal=ref(false);
 
                                                     </td>
                                                     <td>
-                                                        <div class="flex flex-row" v-if="item.linePrepack_count==0">
+                                                        <div class="flex flex-row" >
                                                           <Drop  :drop-route="route('prepacks.destroy',{'prepack':item.prepack_name})"/>
                                                             <Button
                                                                       icon="pi pi-pencil"
