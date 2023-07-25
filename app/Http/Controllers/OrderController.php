@@ -250,6 +250,7 @@ $sp_codes=Order::whereIn('order_no',$orderLines->pluck('order_no')->toArray())
 
     $orders = Order::query()
                     ->select('order_no', DB::raw("CONCAT(order_no, '|', customer_name, '|', shp_name) as order_customer_ship"))
+                    ->whereIn('order_no',$orderLines->pluck('order_no')->toArray())
                     ->confirmed()
                     ->where('shp_date','>=',Carbon::today()->toDateString())
                     ->where('status', 'Execute')
