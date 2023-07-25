@@ -329,7 +329,7 @@ return inertia('Orders/Pack',['orders'=>$orders,'refreshError'=>null,'columnList
         *     for each part,
         *
         */
-
+dd($request->all());
 
         $orderedList=   DB::table('lines')
                             ->select('lines.item_no',
