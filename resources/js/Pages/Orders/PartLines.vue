@@ -339,7 +339,11 @@ const submitForm=()=>{
             />
             <!-- <InputText v-model="form.sp_code" placeholder="Salesperson Code"></InputText> -->
             <!-- <InputText v-model="form.order_no" placeholder="Order No."></InputText> -->
-            <input type=date v-model="form.shp_date" placeholder="Shipment Date"/>
+            <div class="flex justify-between">
+              <label>Posting Date</label>
+              <Calendar v-model="form.shp_date" showIcon />
+            </div>
+            <!-- <input type=date v-model="form.shp_date" placeholder="Shipment Date"/> -->
             <Button  label="Create" severity="primary"  type="submit" :disabled="form.processing" />
             <Button label="Cancel" severity="warning" icon="pi pi-cancel" @click="showModal=false"/>
         </form>

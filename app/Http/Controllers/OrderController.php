@@ -240,7 +240,7 @@ $sp_codes=Order::whereIn('order_no',$orderLines->pluck('order_no')->toArray())
                ->current()
                ->get(['sp_code','sp_name']);
 
-$orders=Order::current()
+$orders=Order::query()
              ->select('order_no','customer_name','shp_name')
              ->confirmed()
              ->where('status','order')
