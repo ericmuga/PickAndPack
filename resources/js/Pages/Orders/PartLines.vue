@@ -183,7 +183,7 @@ const submitForm=()=>{
                                     <!-- <Button type="button" rounded disabled label="Total Lines"  :badge=props.orderLines.meta.total badgeClass="p-badge-danger" outlined class="justify-end" /> -->
                                     <SearchBox model="orders.lines"/>
 
-                                   <MultiSelect v-model="form3.sp_codes"
+                                   <!-- <MultiSelect v-model="form3.sp_codes"
                                             :options="props.sp_codes"
                                         optionLabel="sp_code_and_name"
                                             optionValue="sp_code"
@@ -191,7 +191,7 @@ const submitForm=()=>{
                                             :maxSelectedLabels="3"
                                             class="w-full md:w-20rem"
                                             filter
-                                />
+                                /> -->
 
                                 </template>
                             </Toolbar>
