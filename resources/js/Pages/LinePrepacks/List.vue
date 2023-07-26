@@ -20,10 +20,10 @@ const props= defineProps({
    sp_codes:Object,
 })
 
-let batches= props.prepackBatches.forEach(item => {
-                const formattedDate = moment(item.created_at).format('MMMM Do YYYY, h:mm:ss a');
-                item.created_at = formattedDate;
-                });
+// let batches= props.prepackBatches.forEach(item => {
+//                 const formattedDate = moment(item.created_at).format('MMMM Do YYYY, h:mm:ss a');
+//                 item.created_at = formattedDate;
+//                 });
 const form= ref({
        'batch_no':'',
        'order_no':'',
@@ -226,7 +226,7 @@ let showModal=ref(false);
         <form @submit.prevent="submitForm()"
 
         class="flex flex-col justify-center gap-2 p-5">
-          <MultiSelect v-model="form.batch_no" :options="batches"
+          <MultiSelect v-model="form.batch_no" :options="props.prepackBatches"
                         :optionLabel="created_at"
                         optionValue="batch_no"
                         placeholder="Select Batch Times"
