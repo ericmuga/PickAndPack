@@ -43,12 +43,12 @@ let currentOrderNo=ref('');
 const products = ref(null);
 
 
-const form3=ref({ sp_codes:props.sp_codes
+const form3= useForm({ sp_codes:''
 
                   })
 watch(form3,()=>{
 
-    alert('changed')
+        form3.post('lines.filtered')
 },{deep:true})
 
 let dynamicModalContent=ref('No Prepacks for this line');
