@@ -244,6 +244,7 @@ $orderLines = LineResource::collection($query->paginate(15)->appends($request->a
 $sp_codes = DB::table('orders')
               ->where('shp_date', '>=', Carbon::today()->toDateString())
               ->select('sp_code', DB::raw("CONCAT(sp_code,'|', sp_name) as sp_code_and_name"))
+              ->where('status', 'Execute')
               ->distinct()
               ->get();
 
