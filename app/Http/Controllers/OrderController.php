@@ -209,24 +209,24 @@ public function assemble(Request $request)
 
 
 // Step 1: Separate the query builder for better readability
+// Fetch the pack size in advance
+$packSize = Prepack::exists() ? Prepack::orderByDesc('pack_size')->select('pack_size')->first()->pack_size : 0;
+
 $query = Line::query()->with('order')
-    ->when(Prepack::exists(), function ($q) {
-        $q->where('order_qty', '>=', Prepack::orderByDesc('pack_size')->select('pack_size')->first()->pack_size);
-    })
-    ->whereHas('order', function ($q) {
-        $q->execute()
-            ->where('shp_date', '>=', Carbon::today()->toDateString())
+    ->whereHas('order', function ($q) use ($packSize) {
+        $q->where('shp_date', '>=', Carbon::today()->toDateString())
             ->confirmed();
     })
     ->when($request->has('search'), function ($q) use ($request) {
         $q->where(function ($q) use ($request) {
-            $q->where('item_no', 'like', '%' . $request->search . '%')
-                ->orWhere('order_no', 'like', '%' . $request->search . '%')
-                ->orWhere('item_description', 'like', '%' . $request->search . '%')
-                ->orWhereHas('order', function ($q) use ($request) {
-                    $q->where('customer_name', 'like', '%' . $request->search . '%')
-                        ->orWhere('shp_name', 'like', '%' . $request->search . '%')
-                        ->orWhere('sp_name', 'like', '%' . $request->search . '%');
+            $searchTerm = '%' . $request->search . '%';
+            $q->where('item_no', 'like', $searchTerm)
+                ->orWhere('order_no', 'like', $searchTerm)
+                ->orWhere('item_description', 'like', $searchTerm)
+                ->orWhereHas('order', function ($q) use ($searchTerm) {
+                    $q->where('customer_name', 'like', $searchTerm)
+                        ->orWhere('shp_name', 'like', $searchTerm)
+                        ->orWhere('sp_name', 'like', $searchTerm);
                 });
         });
     })
@@ -234,7 +234,11 @@ $query = Line::query()->with('order')
         $q->where('isActive', true);
     })
     ->whereDoesntHave('prepacks')
-    ->orderBy('order_no');
+    ->orderBy('order_no')
+    ->when($packSize > 0, function ($q) use ($packSize) {
+        $q->where('order_qty', '>=', $packSize);
+    });
+
 
 // Step 2: Optimize eager loading to reduce database queries
 $orderLines = LineResource::collection($query->paginate(15)->appends($request->all())->withQueryString());
