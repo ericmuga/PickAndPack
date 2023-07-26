@@ -227,7 +227,7 @@ let showModal=ref(false);
 
         class="flex flex-col justify-center gap-2 p-5">
           <MultiSelect v-model="form.batch_no" :options="props.prepackBatches"
-                        :optionLabel="created_at"
+                        optionLabel="created_at"
                         optionValue="batch_no"
                         placeholder="Select Batch Times"
                         filter
