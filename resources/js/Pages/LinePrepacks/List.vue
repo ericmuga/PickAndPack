@@ -7,7 +7,6 @@ import Modal from '@/Components/Modal.vue'
 import {ref,onMounted} from 'vue';
 import{pickBy} from 'lodash'
 import useFileDownload from '@/Composables/useFileDownload.js'
-import moment from 'moment';
 // import useDistinctValues from '@/Composables/useDistinctValues.js'
 import { useSubObjectExtractor } from '@/Composables/useSubObjectExtractor';
 
@@ -19,11 +18,6 @@ const props= defineProps({
    orders:Object,
    sp_codes:Object,
 })
-
-// let batches= props.prepackBatches.forEach(item => {
-//                 const formattedDate = moment(item.created_at).format('MMMM Do YYYY, h:mm:ss a');
-//                 item.created_at = formattedDate;
-//                 });
 const form= ref({
        'batch_no':'',
        'order_no':'',
@@ -226,7 +220,7 @@ let showModal=ref(false);
         <form @submit.prevent="submitForm()"
 
         class="flex flex-col justify-center gap-2 p-5">
-          <MultiSelect v-model="form.batch_no" :options="props.prepackBatches"
+          <MultiSelect v-model="form.batch_no" :options="props.prepackBatches.data"
                         optionLabel="created_at"
                         optionValue="batch_no"
                         placeholder="Select Batch Times"
