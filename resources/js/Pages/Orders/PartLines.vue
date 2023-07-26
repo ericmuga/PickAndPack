@@ -41,18 +41,15 @@ let currentOrderNo=ref('');
 
 
 const products = ref(null);
-// const orders=ref(null);
-onMounted(() => {
-
-    // ProductService.getProductsSmall().then((data) => (products.value = [data, []]));
-    // let orderStore= useOrderStore();
-
-    // orderStore.getOrders();
-    // orders.value =orderStore.orders;
 
 
+const form3=ref({ sp_codes:props.sp_codes
 
-});
+                  })
+watch(form3,()=>{
+
+    alert('changed')
+},{deep:true})
 
 let dynamicModalContent=ref('No Prepacks for this line');
 
@@ -183,8 +180,18 @@ const submitForm=()=>{
 
                                 <template #end>
 
-                                    <Button type="button" rounded disabled label="Total Lines"  :badge=props.orderLines.meta.total badgeClass="p-badge-danger" outlined class="justify-end" />
+                                    <!-- <Button type="button" rounded disabled label="Total Lines"  :badge=props.orderLines.meta.total badgeClass="p-badge-danger" outlined class="justify-end" /> -->
                                     <SearchBox model="orders.lines"/>
+
+                                   <MultiSelect v-model="form3.sp_codes"
+                                            :options="props.sp_codes"
+                                        optionLabel="sp_code_and_name"
+                                            optionValue="sp_code"
+                                            placeholder="Search Salespersons"
+                                            :maxSelectedLabels="3"
+                                            class="w-full md:w-20rem"
+                                            filter
+                                />
 
                                 </template>
                             </Toolbar>
