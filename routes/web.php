@@ -72,6 +72,7 @@ Route::middleware('auth')->group(function () {
         Route::post('line/add',[LineController::class, 'add'])->name('prepacks.add');
         Route::resource('lines',LineController::class);
         Route::get('history/lines',[LineController::class, 'history'])->name('lines.history');
+        Route::post('filter/lines',[LineController::class,'filterd'])->name('lines.filtered');
 
 
         Route::resource('prepacks',PrepackController::class);

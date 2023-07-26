@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Line;
+use App\Models\{Line,Item,Prepack,Order,LinePrepack};
 use App\Http\Requests\StoreLineRequest;
 use App\Http\Requests\UpdateLineRequest;
 use App\Http\Resources\LineResource;
 use Illuminate\Http\Request;
 use App\Services\SearchService;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 class LineController extends Controller
 {
     /**
@@ -36,6 +38,67 @@ class LineController extends Controller
          return inertia('Line\List',compact('lines'));
 
     }
+
+
+
+
+public function filtered(Request $request)
+{
+    $prepackItems=Item::select('description','item_no')
+                      ->whereHas('prepacks',fn($q)=>$q->where('isActive',true))
+                      ->get();
+
+
+      $packSize = Prepack::exists() ? Prepack::orderByDesc('pack_size')->select('pack_size')->first()->pack_size : 0;
+
+$query = Line::query()->with('order')
+                      ->whereHas('order', function ($q) use ($request) {
+                          $q->where('shp_date', '>=', Carbon::today()->toDateString())
+                          ->whereIn('sp_code',$request->sp_codes)
+                              ->confirmed();
+                      })
+                      ->whereHas('prepackItems', function ($q) {
+                                    $q->where('isActive', true);
+                                })
+                        ->whereDoesntHave('prepacks')
+                        ->orderBy('order_no')
+                        ->when($packSize > 0, function ($q) use ($packSize) {
+                            $q->where('order_qty', '>=', $packSize);
+                        });
+
+
+// Step 2: Optimize eager loading to reduce database queries
+$orderLines = LineResource::collection($query->paginate(15)->appends($request->all())->withQueryString());
+
+
+
+$sp_codes = DB::table('orders')
+              ->where('shp_date', '>=', Carbon::today()->toDateString())
+              ->select('sp_code', DB::raw("CONCAT(sp_code,'|', sp_name) as sp_code_and_name"))
+              ->where('status', 'Execute')
+              ->distinct()
+              ->get();
+
+
+    $orders = Order::query()
+                    ->select('order_no', DB::raw("CONCAT(order_no, '|', customer_name, '|', shp_name) as order_customer_ship"))
+                    ->whereIn('order_no',$orderLines->pluck('order_no')->toArray())
+                    ->confirmed()
+                    ->where('shp_date','>=',Carbon::today()->toDateString())
+                    ->where('status', 'Execute')
+                    ->get();
+
+
+
+  return inertia('Orders/PartLines',
+                                    ['orderLines'=>$orderLines ,
+                                    'previousInput'=>$request->all(),
+                                    'items'=>$prepackItems,
+                                    'sp_codes'=>$sp_codes,
+                                    'orders'=>$orders
+
+                                    ]);
+}
 
 
 
