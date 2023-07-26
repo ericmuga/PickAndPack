@@ -11,7 +11,6 @@ use App\Models\{AssemblyLine, Order,Item, LinePrepack, Prepack};
 use App\Http\Resources\{LinePrepackResource, OrderResource,LineResource};
 use App\Models\Confirmation;
 use App\Models\Line;
-use stdClass;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Cache;
 use App\Exports\{ConfirmationExport,PrepackExport};
@@ -242,12 +241,12 @@ $orderLines = LineResource::collection($query->paginate(15)->appends($request->a
 
 
 
+$sp_codes = DB::table('orders')
+              ->where('shp_date', '>=', Carbon::today()->toDateString())
+              ->select('sp_code', DB::raw("CONCAT(sp_code,'|', sp_name) as sp_code_and_name"))
+              ->distinct()
+              ->get();
 
-$sp_codes=Order::whereIn('order_no', $orderLines->pluck('order_no')->toArray())
-                ->distinct()
-                ->where('shp_date', '>=', Carbon::today()->toDateString())
-                ->select('sp_code', DB::raw("CONCAT(sp_code,'|', sp_name) as sp_code_and_name"))
-                ->get();
 
     $orders = Order::query()
                     ->select('order_no', DB::raw("CONCAT(order_no, '|', customer_name, '|', shp_name) as order_customer_ship"))
