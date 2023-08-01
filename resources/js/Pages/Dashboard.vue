@@ -4,16 +4,16 @@ import { Head } from '@inertiajs/inertia-vue3';
 import StatsTile from '@/Components/StatsTile.vue';
 import { Link } from '@inertiajs/inertia-vue3'
 import SpacedRule from '@/Components/SpacedRule.vue';
-
+import DataTable from '@/Components/DataTable.vue';
 
 
 defineProps({
                todays:Number,
                pending:Number,
-               refreshError:String
-
-
-})
+               refreshError:String,
+               stocks:Object,
+               headers:Object,
+          })
 
 </script>
 
@@ -34,14 +34,14 @@ defineProps({
                         <div v-if="refreshError!=null">
                             {{ refreshError }}
                         </div>
-                        <div class=" md:grid md:grid-cols-3 md:space-x-1 w-full items-center justify-between md:gap-1  sm:space-y-2 md:flex-row">
+                        <div class="items-center justify-between w-full md:grid md:grid-cols-3 md:space-x-1 md:gap-1 sm:space-y-2 md:flex-row">
 
                             <Link :href="route('order.list')" :active="route().current('order.list')">
 
-                               <StatsTile :Qty=todays tile="Todays" class=" bg-cyan-100 text-black" />
+                               <StatsTile :Qty=todays tile="Todays" class="text-black bg-cyan-100" />
                             </Link>
-                            <StatsTile tile="Confirmed" :Qty=todays-pending  class="bg-teal-600 text-white  " />
-                            <StatsTile :Qty=pending tile="Pending"  class=" bg-rose-700 text-white md:mt-2" />
+                            <StatsTile tile="Confirmed" :Qty=todays-pending  class="text-white bg-teal-600 " />
+                            <StatsTile :Qty=pending tile="Pending"  class="text-white bg-rose-700 md:mt-2" />
 
 
 
@@ -53,19 +53,34 @@ defineProps({
 
                     </div>
 
-                        <div class="flex items-center text-center w-full">
-                                     <SpacedRule class=" text-center"/>
+                        <div class="flex items-center w-full text-center">
+                                     <SpacedRule class="text-center "/>
 
-                                      <!-- <Link :href="route('scanner')" class=" mx-auto h-20 w-20 text-center m-5">
+                                      <!-- <Link :href="route('scanner')" class="w-20 h-20 m-5 mx-auto text-center ">
                                         <img src="/img/scan.png" />
                                         <img src="/img/scanner.jpg" />
                                     </Link> -->
 
-                                    <Link :href="route('refresh')" class=" mx-auto h-20 w-20 text-center m-5">
+                                    <Link :href="route('refresh')" class="w-20 h-20 m-5 mx-auto text-center ">
                                         <img src="/img/refresh.png" />
                                         <!-- <img src="/img/scanner.jpg" /> -->
                                     </Link>
 
+
+                        </div>
+
+                        <div class="grid grid-cols-3 ">
+
+                            <div class="col-span-2 mx-2 my-2">
+                                <DataTable
+                                  class="text-xs"
+                                  :searchUrl="route('dashboard')"
+                                  :items="stocks"
+                                  :headers="headers"
+
+                                />
+
+                            </div>
 
                         </div>
                 </div>

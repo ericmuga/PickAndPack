@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Query\JoinClause;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\{AssemblyLine, Order,Item, LinePrepack, Prepack};
@@ -12,12 +11,12 @@ use App\Http\Resources\{LinePrepackResource, OrderResource,LineResource};
 use App\Models\Confirmation;
 use App\Models\Line;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Cache;
+
 use App\Exports\{ConfirmationExport,PrepackExport};
 use App\Helpers\ColumnListing;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Services\{SearchQueryService};
-use Mpdf\Tag\Tr;
+
 
 class OrderController extends Controller
 {
@@ -62,15 +61,19 @@ class OrderController extends Controller
     public function dashboard()
     {
 
-       $orders=Order::current()->select('confirmed')->get();
+      //delegated to dashboard controller
 
-    //    dd($orders);
-        $data=['todays'=>$orders->count(),
-               'pending'=>$orders->where('confirmed',true)->count()
-    ];
-    //return dashboard
+      DashboardController::dashboard();
 
-    return inertia('Dashboard',$data);
+    //    $orders=Order::current()->select('confirmed')->get();
+
+    // //    dd($orders);
+    //     $data=['todays'=>$orders->count(),
+    //            'pending'=>$orders->where('confirmed',false)->count()
+    // ];
+    // //return dashboard
+
+    // return inertia('Dashboard',$data);
 
 }
 

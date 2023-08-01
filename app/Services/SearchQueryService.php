@@ -79,9 +79,7 @@ class SearchQueryService
             }
         }
 
-        return $this->queryBuilder->orderByDesc('id')
-                                ->paginate(15)
-                                ->withQueryString();
+        return $this->queryBuilder;
 
 
     }

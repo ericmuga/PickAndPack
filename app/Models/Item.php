@@ -11,12 +11,17 @@ class Item extends Model
 
 
     protected $fillable=['item_no','barcode','description','posting_group'];
-   
-   
+
+
    public function prepacks()
    {
 
         return $this->hasMany(Prepack::class ,'item_no','item_no');
+    }
+
+    public function transfers()
+    {
+        return $this->hasMany(Transfer::class,'item_no','item_no');
     }
 
     public function lines()
