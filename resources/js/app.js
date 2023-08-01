@@ -24,6 +24,7 @@ import ConfirmPopup from 'primevue/confirmpopup';
 import ConfirmationService from 'primevue/confirmationservice';
 import Calendar from 'primevue/calendar';
 import Dropdown from 'primevue/dropdown';
+import ProgressBar from 'primevue/progressbar';
 
 import SearchBox from '@/Components/SearchBox.vue'
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'PickAndPack';
@@ -48,6 +49,7 @@ createInertiaApp({
             .component('Pagination',Pagination)
             .component('SearchBox',SearchBox)
             .component('Calendar',Calendar)
+            .component('ProgressBar',ProgressBar)
             .mount(el);
     },
 });

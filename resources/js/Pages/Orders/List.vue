@@ -16,7 +16,7 @@ import Modal from '@/Components/Modal.vue'
 import { useStorage } from '@/Composables/useStorage';
 import { useDates } from '@/Composables/useDates';
 import DownloadButton from '@/Components/DownloadButton.vue';
-
+import SearchBox from '@/Components/SearchBox.vue';
 
 // const todaysDate=useDates.getCurrentDate();
 
@@ -30,7 +30,7 @@ let showModal=ref(false);
 const showFilterPane=()=>{showModal=true;}
 
 const search=ref()
-watch(search, debounce(()=>{Inertia.get('/all',{search:search.value}, {preserveScroll: true})}, 500));
+watch(search, debounce(()=>{Inertia.get(route('confirmations.index'),{search:search.value}, {preserveScroll: true})}, 500));
 // watch(form.searchKey, debounce(form.post('all',{preserveScroll:true}),600))
 
 const form2 =useForm({
@@ -199,8 +199,9 @@ const postForm=(dynamicObject,dateDynamicObject)=>{
                                     ></Button>
 
 
-                                            <InputText v-model="search" aria-placeholder="search"/>
-
+                                            <!-- <InputText v-model="search" aria-placeholder="search"/>
+                                             -->
+                                            <SearchBox :model="route('confirmations.index')" />
                                             </template>
                                         </Toolbar>
 

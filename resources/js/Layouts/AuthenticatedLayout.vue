@@ -33,7 +33,7 @@ const showingNavigationDropdown = ref(false);
                                     Dashboard
                                 </NavLink>
 
-                                <NavLink :href="route('order.list')" :active="route().current('order.list')">
+                                <NavLink :href="route('confirmations.index')" :active="route().current('confirmations.index')">
                                     Order Confirmations
                                 </NavLink>
 
@@ -151,9 +151,9 @@ const showingNavigationDropdown = ref(false);
                         <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
                             Dashboard
                         </ResponsiveNavLink>
-                        <NavLink :href="route('order.list')" :active="route().current('order.list')">
+                        <NavLink :href="route('confirmations.index')" :active="route().current('confirmations.index')">
                                     Order Confirmations
-                        </NavLink>
+                                </NavLink>
 
 
                                 <NavLink :href="route('orders.lines')" :active="route().current('orders.lines')">

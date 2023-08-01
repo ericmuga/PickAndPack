@@ -38,6 +38,12 @@ class Order extends Model
 
     }
 
+
+    public function scopeInvoice(Builder $query) :void
+    {
+      $query->where('status','Invoice');
+
+    }
     public function getParts()
     {
         return $this->lines()
@@ -48,6 +54,11 @@ class Order extends Model
     public function scopeCurrent(Builder $query) :void
     {
       $query->where('ending_date','>=',Carbon::today()->toDateString());
+    }
+
+     public function scopeShipCurrent(Builder $query) :void
+    {
+      $query->where('shp_date','>=',Carbon::today());
     }
 
      public function scopeConfirmed(Builder $query) :void

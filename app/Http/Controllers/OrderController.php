@@ -58,32 +58,6 @@ class OrderController extends Controller
 
     }
 
-    public function dashboard()
-    {
-
-      //delegated to dashboard controller
-
-      DashboardController::dashboard();
-
-    //    $orders=Order::current()->select('confirmed')->get();
-
-    // //    dd($orders);
-    //     $data=['todays'=>$orders->count(),
-    //            'pending'=>$orders->where('confirmed',false)->count()
-    // ];
-    // //return dashboard
-
-    // return inertia('Dashboard',$data);
-
-}
-
-
-
-
-
-
-
-
 
 public function index(Request $request, $e = null)
 {
@@ -283,18 +257,18 @@ public function pack(Request $request)
     //this will be the view to select the order
     //give a list of all orders ready for packing
     $orders= OrderResource::collection(Order::query()
-    ->when($request->has('search'),fn($q)=>
-    $q->where('order_no','like','%'.$request->search)
-    // ->orWhere('customer_name','like','%'.$request->search.'%')
-    )
-    ->where('shp_date','>=',Carbon::now()->toDateString())
-    ->orderByDesc('ending_date')
-    ->orderByDesc('ending_time')
-    ->with('confirmations')
-    ->paginate(10)
-    ->withQuerystring()
+                                            ->when($request->has('search'),fn($q)=>
+                                            $q->where('order_no','like','%'.$request->search)
+                                            // ->orWhere('customer_name','like','%'.$request->search.'%')
+                                            )
+                                            ->where('shp_date','>=',Carbon::now()->toDateString())
+                                            ->orderByDesc('ending_date')
+                                            ->orderByDesc('ending_time')
+                                            ->with('confirmations')
+                                            ->paginate(10)
+                                            ->withQuerystring()
 
-);
+                                        );
 $listing=collect((new ColumnListing('orders'))->getColumns())->only('customer_name','shp_name','order_no','shp_date','sp_code','ending_date');
 return inertia('Orders/Pack',['orders'=>$orders,'refreshError'=>null,'columnListing'=>$listing]);
 

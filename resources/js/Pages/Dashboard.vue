@@ -51,12 +51,30 @@ const cdata = ref({
                         </div>
                         <div class="items-center justify-between w-full md:grid md:grid-cols-3 md:space-x-1 md:gap-1 sm:space-y-2 md:flex-row">
 
-                            <Link :href="route('order.list')" :active="route().current('order.list')">
+                            <!-- <Link :href="route('order.list')" :active="route().current('order.list')">
 
                                <StatsTile :Qty=todays tile="Todays" class="text-black bg-cyan-100" />
                             </Link>
                             <StatsTile tile="Confirmed" :Qty=todays-pending  class="text-white bg-teal-600 " />
-                            <StatsTile :Qty=pending tile="Pending"  class="text-white bg-rose-700 md:mt-2" />
+                            <StatsTile :Qty=pending tile="Pending"  class="text-white bg-rose-700 md:mt-2" /> -->
+
+
+                                <div class="card">
+                                    <span class="text-xs">Pending Confirmation</span>
+                                    <ProgressBar :value="todays"
+                                     :pt="{
+                                                value: { style: { background: 'linear-gradient(to right, #8e2de2, #4a00e0)' } }
+                                            }"
+                                    > {{ pending}}/{{ todays }} </ProgressBar>
+
+
+                                </div>
+                                <Link :href="route('refresh')" class="w-5 h-10 m-10 mx-auto text-center ">
+                                        <!-- <span class="text-xs">Refresh</span> -->
+                                       <!-- <img src="/img/refresh.png" /> -->
+                                       <Button icon="pi pi-refresh" severity="warning" aria-label="Filter" />
+
+                                    </Link>
 
 
 
@@ -76,10 +94,7 @@ const cdata = ref({
                                         <img src="/img/scanner.jpg" />
                                     </Link> -->
 
-                                    <Link :href="route('refresh')" class="w-20 h-20 m-5 mx-auto text-center ">
-                                        <img src="/img/refresh.png" />
-                                        <!-- <img src="/img/scanner.jpg" /> -->
-                                    </Link>
+
 
 
                         </div>
@@ -98,9 +113,7 @@ const cdata = ref({
                             </div>
 
                             <div class="col-span-1">
-                                <!-- <div class="w-full p-3 mx-3 font-bold tracking-wide text-center text-black bg-teal-300">
-                                    Top 5 Stocks
-                                </div> -->
+
                                 <PieChart
                                 :top5Labels="top5Labels"
                                 :top5Weights="top5Weights"

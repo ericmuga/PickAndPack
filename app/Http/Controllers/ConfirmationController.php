@@ -2,15 +2,57 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Confirmation;
-use App\Http\Resources\ConfirmationResource;
+use App\Models\{Confirmation,Order,Item};
+use App\Http\Resources\{ConfirmationResource,OrderResource};
 use App\Traits\ExcelExportTrait;
-use Illuminate\Http\Client\Request;
+use Illuminate\Http\Request;
+use App\Services\SearchQueryService;
 
 
 class ConfirmationController extends Controller
 {
     use ExcelExportTrait;
+
+
+public function index(Request $request)
+{
+    // Define the columns to select in the query
+    $columns = ['customer_name', 'shp_name', 'order_no', 'shp_date', 'sp_code', 'ending_date','ended_by'];
+
+    $queryBuilder = Order::current()->select($columns); // You can also use `Order::firstWhere('no', 2)` here
+    $searchParameter = $request->has('search')?$request->search:'';
+    $searchColumns = ['customer_name', 'shp_name','order_no'];
+    $strictColumns = [];
+    $relatedModels = [
+        'relatedModel1' => ['related_column1', 'related_column2'],
+        'relatedModel2' => ['related_column3'],
+    ];
+
+    $searchService = new SearchQueryService($queryBuilder, $searchParameter, $searchColumns, [], []);
+    $orders = $searchService
+                ->with(['confirmations']) // Example of eager loading related models
+                ->search()
+                ->orderByDesc('ending_date')
+                ->paginate(15)
+                ->withQueryString();
+
+
+    // Get the list of prepack items
+    $prepackItems = Item::select('description', 'item_no')
+                        ->whereHas('prepacks', function ($q) {
+                                        $q->where('isActive',true);
+                                    })
+                        ->get();
+
+
+
+    // Return the view with data
+    return inertia('Orders/List', [
+        'orders' => OrderResource::collection($orders),
+        'columnListing' => $columns,
+        'items' => $prepackItems,
+    ]);
+}
 
     public function export()
     {

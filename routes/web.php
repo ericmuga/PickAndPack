@@ -68,8 +68,7 @@ Route::middleware('auth')->group(function () {
 
         // Route::get('/order/{id}', [OrderController::class, 'show'])->name('order.show');
         Route::get('/order/{id}/{part}', [OrderController::class, 'show'])->name('order.show');
-        Route::get('/all', [OrderController::class, 'index'])->name('order.list');
-        // Route::post('/all', [OrderController::class, 'index'])->name('order.list');
+        Route::get('/confirmations', [OrderController::class, 'index'])->name('order.list');
 
         Route::get('line/prepacks',fn(Request $request)=>Line::where('line_no')->prepacks()->get());
         Route::post('line/add',[LineController::class, 'add'])->name('prepacks.add');
