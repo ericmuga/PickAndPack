@@ -45,12 +45,15 @@ class DashboardController extends Controller
             $orders=Order::current()->select('confirmed')->get();
 
 
+        //   dd($stocks->take(5)->pluck('description'));
 
                 $data=[
                        'todays'=>$orders->count(),
                        'pending'=>$orders->where('confirmed',false)->count(),
                        'stocks'=>$stocks,
-                       'headers'=>array_keys($stocks->first()->toArray())
+                        'top5Labels'=>$stocks->take(5)->pluck('description'),
+                        'top5Weights'=>$stocks->take(5)->pluck('total_weight'),
+                        'headers'=>array_keys($stocks->first()->toArray())
                       ];
          return  inertia('Dashboard',$data);
 

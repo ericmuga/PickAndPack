@@ -48,6 +48,9 @@ Route::middleware('auth')->group(function () {
         // Route::get('linePrepacks',[LinePrepackController::class,'index'])->name('slinePrepacks.index');
     //Order Controller functions
         Route::get('/dashboard',[DashboardController::class,'dashboard'] )->name('dashboard');
+        Route::get('/searchStocks',[DashboardController::class,'dashboard'] )->name('searchStocks');
+
+
         Route::get('/refresh',[OrderController::class,'refresh'] )->name('refresh');
         Route::get('/scanner',[OrderController::class,'scan'])->name('scanner');
         Route::get('orders/download/', [OrderController::class, 'export'])->name('orders.export');

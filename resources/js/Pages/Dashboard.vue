@@ -5,6 +5,8 @@ import StatsTile from '@/Components/StatsTile.vue';
 import { Link } from '@inertiajs/inertia-vue3'
 import SpacedRule from '@/Components/SpacedRule.vue';
 import DataTable from '@/Components/DataTable.vue';
+import PieChart from '@/Components/PieChart.vue';
+import {ref} from 'vue'
 
 
 defineProps({
@@ -13,7 +15,20 @@ defineProps({
                refreshError:String,
                stocks:Object,
                headers:Object,
+               top5Labels:Object,
+               top5Weights:Object,
           })
+
+const cdata = ref({
+                    labels: ['Red', 'Blue', 'Yellow'],
+                    datasets: [
+                        {
+                        label: 'My Dataset',
+                        data: [10, 20, 30],
+                        backgroundColor: ['red', 'blue', 'yellow'],
+                        },
+                    ],
+                });
 
 </script>
 
@@ -21,9 +36,9 @@ defineProps({
     <Head title="Dashboard" />
 
     <AuthenticatedLayout>
-        <template #header>
+        <!-- <template #header>
             <h2 class="text-xl font-semibold leading-tight text-gray-800">Dashboard</h2>
-        </template>
+        </template> -->
 
         <div class="py-6">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -74,12 +89,23 @@ defineProps({
                             <div class="col-span-2 mx-2 my-2">
                                 <DataTable
                                   class="text-xs"
-                                  :searchUrl="route('dashboard')"
+                                  :searchUrl="route('searchStocks')"
                                   :items="stocks"
                                   :headers="headers"
 
                                 />
 
+                            </div>
+
+                            <div class="col-span-1">
+                                <!-- <div class="w-full p-3 mx-3 font-bold tracking-wide text-center text-black bg-teal-300">
+                                    Top 5 Stocks
+                                </div> -->
+                                <PieChart
+                                :top5Labels="top5Labels"
+                                :top5Weights="top5Weights"
+
+                                />
                             </div>
 
                         </div>

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\JoinClause;
 
 class Transfer extends Model
 {
@@ -42,11 +43,18 @@ class Transfer extends Model
                 ->finished()
                 ->when($date, fn($q)=>$q->where('updated_at','<=',$date))
                 ->join('items','items.item_no','Transfers.item_no')
-                ->selectRaw('Transfers.item_no,items.description,SUM(receiver_total_pieces) total_pieces,SUM(receiver_total_weight) total_weight')
+                ->leftJoin('lines', function (JoinClause $join) {
+                            $join->on('lines.item_no', '=', 'Transfers.item_no')
+                                 ->join('orders','lines.order_no','orders.order_no')
+                                 ->where('orders.shp_date','>=',today());
+                        })
+                ->selectRaw('Transfers.item_no,items.description,SUM(receiver_total_weight) total_weight, SUM(lines.order_qty) as order_qty,SUM(lines.ass_qty) as ass_qty')
                 ->groupBy('Transfers.item_no','items.description');
 
 
      }
+
+
 
 
 }
