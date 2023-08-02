@@ -60,7 +60,7 @@ const cdata = ref({
 
 
                                 <div class="card">
-                                    <span class="text-xs">Pending Confirmation</span>
+                                    <span class="text-xs">Pending Confirmation {{ pending}}/{{ todays }}</span>
                                     <ProgressBar :value="todays"
                                      :pt="{
                                                 value: { style: { background: 'linear-gradient(to right, #8e2de2, #4a00e0)' } }
