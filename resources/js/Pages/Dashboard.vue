@@ -66,15 +66,13 @@ const cdata = ref({
                                                 value: { style: { background: 'linear-gradient(to right, #8e2de2, #4a00e0)' } }
                                             }"
                                     > </ProgressBar> -->
-
-
-                                    <template>
-                                        <div class="card">
+<div class="card">
                                             <ProgressBar :value="pending"
 
                                             >{{ pending}}/{{ todays }} </ProgressBar>
                                         </div>
-                                    </template>
+
+
 
 
                                 </div>
