@@ -6,12 +6,13 @@ use App\Models\{Confirmation,Order,Item};
 use App\Http\Resources\{ConfirmationResource,OrderResource};
 use App\Traits\ExcelExportTrait;
 use Illuminate\Http\Request;
-use App\Services\SearchQueryService;
+use App\Services\{SearchQueryService,ExcelExportService};
+use Carbon\Carbon;
 
 
 class ConfirmationController extends Controller
 {
-    use ExcelExportTrait;
+    // use ExcelExportTrait;
 
 
 public function index(Request $request)
@@ -54,35 +55,54 @@ public function index(Request $request)
     ]);
 }
 
-    public function export()
+public function export()
+{
+    $collection =
+                 Confirmation::join('orders','orders.order_no','confirmations.order_no')
+                             ->select('confirmations.id',
+                                     'confirmations.created_at',
+                                     'confirmations.user_id',
+                                     'confirmations.order_no',
+                                     'confirmations.part_no',
+                                     'orders.shp_name',
+                                     'orders.customer_name',
+                                     'sp_code',
+                                     'sp_name')
+                             -> where('confirmations.created_at', '>=', today())->get()
+                             ->map(function ($confirmation) {
+                                $confirmation->created_at = Carbon::parse($confirmation->created_at)->toDateTimeString();
+                                return $confirmation;
+                            });
+
+    $headings = $collection->count() > 0 ? array_keys($collection->first()->toArray()) : [];
+
+    $exportService = new ExcelExportService($collection, collect($headings));
+    return $exportService->export('confirmations');
+}
+
+
+    public function store(Request $request)
     {
-        $data = Confirmation::first()->toArray(); // Replace with your actual Model
+        if ($request->has('order_no','part_no')){
 
-        $filename = 'data_export_' . date('Ymd_His') . '.xlsx';
+            if (!Order::checkConfirmation($request->order_no,$request->part_no))
+            {
+                Confirmation::insert(['order_no'=>$request->order_no,
+                'part_no'=>$request->part_no,
+                'user_id'=>$request->user()->name,
+                'created_at'=>Carbon::now(),
+                'updated_at'=>Carbon::now()
+            ]);
+            $this->index($request);
+           }
+           $order=Order::firstWhere('order_no',$request->order_no);
+           if ($order->getParts()==$order->confirmations()->count())
+           {
+            $order->confirmed=true;
+            $order->save();
+           }
 
-        return $this->exportExcel($data, ConfirmationResource::class, $filename);
-
-
-    }
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreConfirmationRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreConfirmationRequest $request)
-    {
-        //
+      }
     }
 
     /**

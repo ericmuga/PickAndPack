@@ -58,7 +58,7 @@ class Order extends Model
 
      public function scopeShipCurrent(Builder $query) :void
     {
-      $query->where('shp_date','>=',Carbon::today());
+      $query->where('shp_date','>=',Carbon::today()->toDateString());
     }
 
      public function scopeConfirmed(Builder $query) :void

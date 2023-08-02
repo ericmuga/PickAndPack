@@ -24,7 +24,7 @@ class DashboardController extends Controller
 
         $queryBuilder = (new Transfer())->stockSummary(); // You can also use `Order::firstWhere('no', 2)` here
         $searchParameter = $request->has('search')?$request->search:'';
-        $searchColumns = ['customer_name', 'shp_name','order_no'];
+        $searchColumns = ['Transfers.item_no'];
         $strictColumns = [];
         $relatedModels = [
             'item' => ['description'],
@@ -53,7 +53,8 @@ class DashboardController extends Controller
                        'stocks'=>$stocks,
                         'top5Labels'=>$stocks->take(5)->pluck('description'),
                         'top5Weights'=>$stocks->take(5)->pluck('Inventory_Kgs'),
-                        'headers'=>array_keys($stocks->first()->toArray())
+                        'headers'=>$stocks->count()>0?array_keys($stocks->first()->toArray()):[],
+                        // $headings = $collection->count() > 0 ? array_keys($collection->first()->toArray()) : [];
                       ];
          return  inertia('Dashboard',$data);
 

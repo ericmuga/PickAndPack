@@ -35,4 +35,9 @@ class Prepack extends Model
         return $this->belongsTo(Item::class,'item_no','item_no');
     }
 
+    // public function scopeActive(Builder $query)
+    // {
+    //     $query->where('isActive',true);
+    // }
+
 }

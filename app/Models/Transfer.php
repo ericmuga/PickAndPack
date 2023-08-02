@@ -38,20 +38,31 @@ class Transfer extends Model
 
     public  function stockSummary($date=null)
      {
-       $salesSubQuery= Line::whereHas('order',fn($q)=>$q->invoice()->current())
-                           ->select('item_no','ass_qty')
-                           ->addSelect(['prepacked_qty' => LinePrepack::selectRaw('sum(line_prepacks.total_quantity) as prepacked_qty')
-                                                                      ->whereColumn('order_no','lines.order_no')
-                                                                      ->whereColumn('line_no','lines.line_no')]);
+    //    $salesSubQuery= Line::whereHas('order',fn($q)=>$q->invoice()->current())
+    //                        ->select('item_no','ass_qty')
+    //                        ->addSelect(['prepacked_qty' => LinePrepack::selectRaw('sum(line_prepacks.total_quantity) as prepacked_qty')
+    //                                                                   ->whereColumn('line_prepacks.order_no','lines.order_no')
+    //                                                                   ->whereColumn('line_prepacks.line_no','lines.line_no')]);
 
 
                     //assembly line is anything under execute with a shipment date later than today
 
-       $assemblySubQuery= Line::whereHas('order',fn($q)=>$q->execute()->shipCurrent())
-                              ->select('item_no','ass_qty','order_qty')
-                              ->addSelect(['prepacked_qty' => LinePrepack::selectRaw('sum(line_prepacks.total_quantity) as prepacked_qty')
-                                                                      ->whereColumn('order_no','lines.order_no')
-                                                                      ->whereColumn('line_no','lines.line_no')]);
+    //    $assemblySubQuery= Line::whereHas('order',fn($q)=>$q->shipCurrent())
+    //                           ->selectRaw('item_no,order_qty,
+    //                              (select sum(line_prepacks.total_quantity)
+    //                               from line_prepacks
+    //                               inner join lines as a  on a.line_no=line_prepacks.line_no
+    //                               inner join orders as b on a.order_no=b.order_no and b.shp_date>=DATEADD(d,0,DATEDIFF(d,0,GETDATE()))
+    //                               where
+    //                                 line_prepacks.line_no=lines.line_no
+    //                                 and line_prepacks.order_no=lines.order_no
+    //                             ) as prepacked_qty
+    //                           ');
+                            //   ->addSelect(['prepacked_qty' => LinePrepack::selectRaw('sum(line_prepacks.total_quantity) as prepacked_qty')
+                            //                                           ->whereColumn('line_prepacks.order_no','lines.order_no')
+                            //                                           ->whereColumn('line_prepacks.line_no','lines.line_no')])
+                            //                                           ->havingRaw('sum(line_prepacks.total_quantity)>0');
+    //    dd($assemblySubQuery->orderByDesc('prepacked_qty')->first());
 
         return $this->query()
                 ->dispatch()
@@ -59,15 +70,37 @@ class Transfer extends Model
                 ->finished()
                 ->when($date, fn($q)=>$q->where('updated_at','<=',$date))
                 ->join('items','items.item_no','Transfers.item_no')
-                ->leftJoinSub($salesSubQuery,'sales',fn(JoinClause $join)=>$join->on('sales.item_no','Transfers.item_no'))
-                ->leftJoinSub($assemblySubQuery,'assembly',fn(JoinClause $join)=>$join->on('assembly.item_no','Transfers.item_no'))
+                // ->leftJoinSub($salesSubQuery,'sales',fn(JoinClause $join)=>$join->on('sales.item_no','Transfers.item_no'))
+                // ->leftJoinSub($assemblySubQuery,'assembly',fn(JoinClause $join)=>$join->on('assembly.item_no','Transfers.item_no'))
                 ->selectRaw('Transfers.item_no,
                              items.description,
                              SUM(receiver_total_weight) as Inventory_Kgs,
-                             SUM(assembly.order_qty) as ordered_qty,
-                             SUM(assembly.ass_qty)+SUM(assembly.prepacked_qty)+SUM(sales.ass_qty)+SUM(sales.prepacked_qty) as assembled_qty'
 
-                           )
+                             (select sum(a.order_qty) from lines as a
+                             inner join orders as b on a.order_no=b.order_no and b.shp_date>=DATEADD(d,0,DATEDIFF(d,0,GETDATE()))
+                             where a.item_no=Transfers.item_no
+                             )ordered_qty,
+
+                             (select sum(line_prepacks.total_quantity)
+                                  from line_prepacks
+                                  inner join lines as a  on a.line_no=line_prepacks.line_no
+                                  inner join orders as b on a.order_no=b.order_no and b.shp_date>=DATEADD(d,0,DATEDIFF(d,0,GETDATE()))
+                                  where
+                                    line_prepacks.line_no=a.line_no
+                                    and line_prepacks.order_no=a.order_no
+                                    and a.item_no=Transfers.item_no
+                                ) as prepacked_qty,
+
+                              (select sum(assembly_lines.ass_qty)
+                                  from assembly_lines
+                                  inner join lines as a  on a.line_no=assembly_lines.line_no
+                                  inner join orders as b on a.order_no=b.order_no and b.shp_date>=DATEADD(d,0,DATEDIFF(d,0,GETDATE()))
+                                  where
+                                  assembly_lines.line_no=a.line_no
+                                    and assembly_lines.order_no=a.order_no
+                                    and a.item_no=Transfers.item_no
+                                ) as assembled_qty
+                           ')
                 ->groupBy('Transfers.item_no','items.description');
 
 

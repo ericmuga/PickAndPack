@@ -108,20 +108,19 @@ const sectors= ref([
 
 
 const form=useForm({
-    // sector:props.previousInput.sector,
-    // part:props.previousInput.part,
+
     sp_code:props.previousInput.sp_code,
-    item:props.previousInput.item,
+    prepack_ids:props.previousInput.prepack_ids,
     order_no:props.previousInput.item,
     shp_date:props.previousInput.shp_date,
-    // shp_date:previousInput.shp_date,
+
 })
 
 
 const props= defineProps({
     orderLines:Object,
     salesPersons:Object,
-
+    prepacks:Object,
     selectedPart:Object,
     previousInput:Object,
     items:Object,
@@ -133,7 +132,7 @@ const props= defineProps({
 // const =()=>{form.get(route('orders.lines'))}
 
 const submitForm=()=>{
-    form.post(route('orders.prepack'))
+    form.post(route('linePrepacks.store'))
 
     showModal.value=false;
     Swal.fire(`Prepack created Successfully!`,'','success');
@@ -181,7 +180,7 @@ const submitForm=()=>{
                                 <template #end>
 
                                     <!-- <Button type="button" rounded disabled label="Total Lines"  :badge=props.orderLines.meta.total badgeClass="p-badge-danger" outlined class="justify-end" /> -->
-                                    <SearchBox model="orders.lines"/>
+                                    <SearchBox :model="route('orders.lines')"/>
 
                                    <!-- <MultiSelect v-model="form3.sp_codes"
                                             :options="props.sp_codes"
@@ -225,9 +224,9 @@ const submitForm=()=>{
                                             <th  scope="col" class="px-6 py-3">Item</th>
                                             <th  scope="col" class="px-6 py-3">Description</th>
                                             <th  scope="col" class="px-6 py-3">Ordered qty</th>
-                                            <th  scope="col" class="px-6 py-3"> Prepacked Qty</th>
+                                            <!-- <th  scope="col" class="px-6 py-3"> Prepacked Qty</th>
                                             <th  scope="col" class="px-6 py-3">Assembled qty</th>
-                                            <th  scope="col" class="px-6 py-3">Customer Spec</th>
+                                            <th  scope="col" class="px-6 py-3">Customer Spec</th> -->
                                         </tr>
 
                                     </thead>
@@ -274,9 +273,9 @@ const submitForm=()=>{
                                         </td> -->
 
 
-                                        <td class="px-3 py-2 text-xs text-center">
+                                        <!-- <td class="px-3 py-2 text-xs text-center">
                                             {{ order.ass_qty }}
-                                        </td>
+                                        </td> -->
                                     </tr>
 
                                 </tbody>
@@ -318,11 +317,11 @@ const submitForm=()=>{
 
         <form @submit.prevent="submitForm()" class="flex flex-col justify-center gap-2 p-5">
 
-            <MultiSelect v-model="form.item"
-                        :options="props.items"
+            <MultiSelect v-model="form.prepack_ids"
+                        :options="props.prepacks"
                         optionLabel="description"
-                        optionValue="item_no"
-                        placeholder="Select Items"
+                        optionValue="id"
+                        placeholder="Select Prepack"
                         :maxSelectedLabels="3"
                         class="w-full md:w-20rem"
                         filter
@@ -351,9 +350,10 @@ const submitForm=()=>{
             <!-- <InputText v-model="form.order_no" placeholder="Order No."></InputText> -->
             <div class="flex justify-between">
               <label>Posting Date</label>
-              <Calendar v-model="form.shp_date" showIcon />
+              <!-- <Calendar v-model="form.shp_date" showIcon /> -->
+              <input type=date v-model="form.shp_date" placeholder="Shipment Date"/>
             </div>
-            <!-- <input type=date v-model="form.shp_date" placeholder="Shipment Date"/> -->
+            <!--  -->
             <Button  label="Create" severity="primary"  type="submit" :disabled="form.processing" />
             <Button label="Cancel" severity="warning" icon="pi pi-cancel" @click="showModal=false"/>
         </form>

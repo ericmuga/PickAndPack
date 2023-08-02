@@ -104,7 +104,7 @@ const cdata = ref({
                             <div class="col-span-2 mx-2 my-2">
                                 <DataTable
                                   class="text-xs"
-                                  :searchUrl="route('searchStocks')"
+                                  :searchUrl="route('dashboard')"
                                   :items="stocks"
                                   :headers="headers"
 

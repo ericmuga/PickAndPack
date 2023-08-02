@@ -48,14 +48,14 @@ Route::middleware('auth')->group(function () {
         // Route::get('linePrepacks',[LinePrepackController::class,'index'])->name('slinePrepacks.index');
     //Order Controller functions
         Route::get('/dashboard',[DashboardController::class,'dashboard'] )->name('dashboard');
-        Route::get('/searchStocks',[DashboardController::class,'dashboard'] )->name('searchStocks');
+        // Route::get('/searchStocks',[DashboardController::class,'dashboard'] )->name('searchStocks');
 
 
         Route::get('/refresh',[OrderController::class,'refresh'] )->name('refresh');
         Route::get('/scanner',[OrderController::class,'scan'])->name('scanner');
         Route::get('orders/download/', [OrderController::class, 'export'])->name('orders.export');
         // Route::get('orders/assemble/{part?}/{sector?}/{sp_code?}',[OrderController::class, 'assemble'])->name('orders.assemble');
-        Route::get('orders/assemble/',[OrderController::class, 'assemble'])->name('orders.lines');
+        Route::get('allocate/orders',[OrderController::class, 'assemble'])->name('orders.lines');
         Route::post('orders/prepack',[OrderController::class,'prepack'])->name('orders.prepack');
         Route::post('orders/closeAssembly',[OrderController::class,'closeAssembly'])->name('orders.close');
         // Route::get('orders/prepacked',[OrderController::class,'orderPrepacks'])->name('orders.prepacks');

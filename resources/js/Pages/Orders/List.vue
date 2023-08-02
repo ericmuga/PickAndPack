@@ -71,7 +71,7 @@ const CheckPrinted=(Order,Part)=>{
 }
 
 const ConfirmPrint=(order_no,part_no)=>{
-    Inertia.post(route('order.confirm'),{order_no,part_no},{preserveScroll:true});
+    Inertia.post(route('confirmations.store'),{order_no,part_no},{preserveScroll:true});
 }
 
 const dynamicObject=ref({});
@@ -179,10 +179,10 @@ const postForm=(dynamicObject,dateDynamicObject)=>{
                                 </template>
 
                                     <template #end>
-                                        <a href="/orders/download" class="">
+                                        <!-- <a href="/orders/download" class="">
                                             <Button icon="pi pi-download" severity="primary" text raised rounded label="confirmations"/>
-                                        </a>
-                                    <!-- <DownloadButton :link="route('export.confirmations')" />    -->
+                                        </a> -->
+                                        <DownloadButton :link="route('export.confirmations')" />
 
 
                                          <!-- <Link :href="route('refresh')" class="w-20 h-20 m-5 mx-auto text-center ">
@@ -192,15 +192,17 @@ const postForm=(dynamicObject,dateDynamicObject)=>{
                                             <img src="/img/scanner.jpg" />
                                         </Link>
                                          -->
-                                    <Button
+                                    <!-- <Button
                                          label="Filters"
                                          @click="showModal=true"
                                          rounded
-                                    ></Button>
+                                    ></Button> -->
 
 
                                             <!-- <InputText v-model="search" aria-placeholder="search"/>
                                              -->
+
+
                                             <SearchBox :model="route('confirmations.index')" />
                                             </template>
                                         </Toolbar>

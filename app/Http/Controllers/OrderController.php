@@ -7,7 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\{AssemblyLine, Order,Item, LinePrepack, Prepack};
-use App\Http\Resources\{LinePrepackResource, OrderResource,LineResource};
+use App\Http\Resources\{LinePrepackResource, OrderResource,LineResource, PrepackResource};
 use App\Models\Confirmation;
 use App\Models\Line;
 use Illuminate\Database\QueryException;
@@ -182,43 +182,48 @@ public function assemble(Request $request)
                       ->whereHas('prepacks',fn($q)=>$q->where('isActive',true))
                       ->get();
 
-
-
+   // send through the prepacks for selection in the modal
+    $prepacks= Prepack::join('items','items.item_no','prepacks.item_no')
+                      ->select('prepacks.id',DB::raw("CONCAT(items.description,'|', prepacks.pack_size) as description"))
+                      ->where('isActive',true)
+                      ->orderBy('items.description')
+                      ->get();
+//    dd($prepacks);
 
 // Step 1: Separate the query builder for better readability
 // Fetch the pack size in advance
 $packSize = Prepack::exists() ? Prepack::orderByDesc('pack_size')->select('pack_size')->first()->pack_size : 0;
 
-$query = Line::query()->with('order')
-    ->whereHas('order', function ($q) use ($packSize) {
-        $q->where('shp_date', '>=', Carbon::today()->toDateString())
-            ->confirmed();
-    })
-    ->when($request->has('search'), function ($q) use ($request) {
-        $q->where(function ($q) use ($request) {
-            $searchTerm = '%' . $request->search . '%';
-            $q->where('item_no', 'like', $searchTerm)
-                ->orWhere('order_no', 'like', $searchTerm)
-                ->orWhere('item_description', 'like', $searchTerm)
-                ->orWhereHas('order', function ($q) use ($searchTerm) {
-                    $q->where('customer_name', 'like', $searchTerm)
-                        ->orWhere('shp_name', 'like', $searchTerm)
-                        ->orWhere('sp_name', 'like', $searchTerm);
-                });
-        });
-    })
-    ->whereHas('prepackItems', function ($q) {
-        $q->where('isActive', true);
-    })
-    ->whereDoesntHave('prepacks')
-    ->orderBy('order_no')
-    ->when($packSize > 0, function ($q) use ($packSize) {
-        $q->where('order_qty', '>=', $packSize);
-    });
+$query = Line::query()
+            ->whereHas('order', function ($q) use ($packSize) {
+                                            $q->where('shp_date', '>=', Carbon::today()->toDateString())
+                                                ->confirmed();
+                                        })
+             ->whereHas('prepackItems', function ($q) {
+                        $q->where('isActive', true);
+                    })
+            ->whereDoesntHave('prepacks')
+            ->when($packSize > 0, function ($q) use ($packSize) {
+                $q->where('order_qty', '>=', $packSize);
+            });
+    /////////////////////////////////////////////
 
+    $queryBuilder = $query; // You can also use `Order::firstWhere('no', 2)` here
+    $searchParameter = $request->has('search')?$request->search:'';
+    $searchColumns = ['item_no','order_no','item_description'];
+    $strictColumns = [];
+    $relatedModels = [
+                        'order' => ['customer_name', 'shp_name','sp_name'],
+                        // 'relatedModel2' => ['related_column3'],
+                     ];
 
-// Step 2: Optimize eager loading to reduce database queries
-$orderLines = LineResource::collection($query->paginate(15)->appends($request->all())->withQueryString());
+    $searchService = new SearchQueryService($queryBuilder, $searchParameter, $searchColumns, $strictColumns, $relatedModels);
+    $lines = $searchService
+                ->search()
+                ->with(['order'])
+                ->orderByDesc('order_no');
+
+$orderLines = LineResource::collection($lines->paginate(15)->appends($request->all())->withQueryString());
 
 
 
@@ -245,7 +250,8 @@ $sp_codes = DB::table('orders')
                                     'previousInput'=>$request->all(),
                                     'items'=>$prepackItems,
                                     'sp_codes'=>$sp_codes,
-                                    'orders'=>$orders
+                                    'orders'=>$orders,
+                                    'prepacks'=>$prepacks,
 
                                     ]);
 }
@@ -258,19 +264,22 @@ public function pack(Request $request)
     //give a list of all orders ready for packing
     $orders= OrderResource::collection(Order::query()
                                             ->when($request->has('search'),fn($q)=>
-                                            $q->where('order_no','like','%'.$request->search)
-                                            // ->orWhere('customer_name','like','%'.$request->search.'%')
-                                            )
+                                                    $q->where('order_no','like','%'.$request->search)
+                                                    // ->orWhere('customer_name','like','%'.$request->search.'%')
+                                                    )
+                                            ->whereHas('confirmations')
                                             ->where('shp_date','>=',Carbon::now()->toDateString())
                                             ->orderByDesc('ending_date')
                                             ->orderByDesc('ending_time')
                                             ->with('confirmations')
-                                            ->paginate(10)
+                                            ->paginate(5)
                                             ->withQuerystring()
 
                                         );
-$listing=collect((new ColumnListing('orders'))->getColumns())->only('customer_name','shp_name','order_no','shp_date','sp_code','ending_date');
-return inertia('Orders/Pack',['orders'=>$orders,'refreshError'=>null,'columnListing'=>$listing]);
+
+
+ $listing=collect((new ColumnListing('orders'))->getColumns())->only('customer_name','shp_name','order_no','shp_date','sp_code','ending_date');
+ return inertia('Orders/Pack',['orders'=>$orders,'refreshError'=>null,'columnListing'=>$listing]);
 
 
 
@@ -298,116 +307,7 @@ return inertia('Orders/Pack',['orders'=>$orders,'refreshError'=>null,'columnList
 
 
 
-    public function prepack(Request $request)
-    {
-        //group by order, then by part, then by item
 
-        //  dd($request->all());
-
-        /**
-        * get all the lines that are in the filter and have preOrderpacks.
-        * for each order
-        *     for each part,
-        *
-        */
-// dd($request->all());
-
-        $orderedList=   DB::table('lines')
-                            ->select('lines.item_no',
-                            'lines.order_no',
-                            'lines.order_qty',
-                            'lines.ass_qty',
-                            'lines.part',
-                            'lines.customer_spec',
-                            'lines.item_description',
-                            'lines.line_no'
-                            )
-                            ->where('ass_qty',0)
-
-
-                            ->when($request->has('item')&&$request->item[0]!='',fn($q)=>$q->whereIn('lines.item_no',$request->item))
-                            ->when($request->has('order_no'),fn($q)=>$q->whereIn('lines.order_no',$request->order_no))
-                            ->join('orders', fn($q)=>$q->on('lines.order_no','=','orders.order_no')
-                            ->when($request->has('shp_date'),fn($q)=>$q->where('shp_date',$request->shp_date))
-                            ->when(!$request->has('shp_date'),fn($q)=>$q->where('shp_date','>=',Carbon::now()->toDateString()))
-
-                            ->when($request->has('sp_code')&& $request->sp_code[0]!='',fn($q)=>$q->whereIn('orders.sp_code',$request->sp_code))
-                            ->where('orders.status','Execute')
-                            )
-                            ->join('prepacks',fn($q)=>$q->on('prepacks.item_no','=','lines.item_no')
-                            ->where('isActive',true))
-                            ->get()->groupBy(['order_no','part']);
-                    // dd($orderedList);
-
-        foreach($orderedList as $order)
-        {
-
-            foreach($order as $part)
-            {
-                //initializing Carton count for the part
-                $cartonCount=0;
-                foreach ($part as $item)
-                {           DB::table('line_prepacks')
-                              ->where('order_no',$item->order_no)
-                              ->delete();
-                    // dd($item);
-                    //do the prepack here
-                    $itemPrepacks=DB::table('prepacks')
-                                    ->where('item_no',$item->item_no)
-                                    ->orderByDesc('pack_size')
-                                    ->get();
-
-                    $remaining=$item->order_qty;
-                    $batch_no=preg_replace('/[:\- ]/','', Carbon::now()->toDateTimeString());
-                    $carton_no=0;
-                    foreach($itemPrepacks as $prepack )
-                    {
-                        if ($remaining<$prepack->pack_size)
-                        continue;
-                        else
-                        {
-
-                            //get maximum multiples
-                            $prepack_count=intdiv($remaining,$prepack->pack_size);
-                            $total_qty=$prepack_count*$prepack->pack_size;
-
-
-                            DB::table('line_prepacks')
-                            ->insert([
-                                'order_no'=>$item->order_no,
-                                'line_no'=>$item->line_no,
-                                'prepack_name'=>$prepack->prepack_name,
-                                'prepack_count'=>$prepack_count,
-                                'total_quantity'=>$total_qty,
-                                'user_id'=>$request->user()->id,
-                                'batch_no'=>$batch_no,
-                                'carton_no'=>'1-'.strval($prepack_count),
-                                'created_at'=>Carbon::now(),
-                                'updated_at'=>Carbon::now()
-
-                            ]);
-                            //update remaining
-
-                            $remaining-=$total_qty;
-
-                        }
-                    }
-
-
-
-
-
-
-                }
-            }
-        }
-
-
-        //return inertia('Prepacks/OrderPrepacks',['prepackLines'=>LinePrepackResource::collection(LinePrepack::paginate(15))]);
-        //    $this->orderPrepacks($request);
-        return redirect(route('linePrepacks.index'));
-
-    }
 
 
     public function orderPrepacks(Request $request)

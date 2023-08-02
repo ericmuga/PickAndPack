@@ -74,7 +74,7 @@ let showModal=ref(false);
                                           aria-label="Favorite" />
                                     </div>
 
-                                    <SearchBox model="linePrepacks.index" />
+                                    <SearchBox :model="route('linePrepacks.index')" />
 
                                 </template>
                             </Toolbar>
