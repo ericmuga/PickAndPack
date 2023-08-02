@@ -71,7 +71,7 @@ const cdata = ref({
                                     <template>
                                         <div class="card">
                                             <ProgressBar :value="pending"
-                                            :pt="{ value: { style: { background:'#60789e'}}}"
+
                                             >{{ pending}}/{{ todays }} </ProgressBar>
                                         </div>
                                     </template>
