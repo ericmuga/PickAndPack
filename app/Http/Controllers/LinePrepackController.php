@@ -123,6 +123,8 @@ class LinePrepackController extends Controller
                                 'carton_no'=>'1-'.$count,
                                 'order_no'=>$line->order_no,
                                 'user_id'=>$request->user()->id,
+                                'created_at'=>Carbon::now(),
+                                'updated_at'=>Carbon::now(),
 
                             ]);
                 }
