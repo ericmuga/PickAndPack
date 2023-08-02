@@ -83,7 +83,7 @@ const confirmPack=(order_no,part)=>{
 
 
                                             <!-- <InputText v-model="search" aria-placeholder="search"/> -->
-                                            <SearchBox model="order.pack" />
+                                            <SearchBox :model="route('order.pack')" />
 
                                             </template>
                                         </Toolbar>
