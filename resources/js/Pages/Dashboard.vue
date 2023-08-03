@@ -60,7 +60,7 @@ const cdata = ref({
 
 
                                 <div class="card">
-                                    <span class="text-xs">Pending Confirmation</span>
+                                    <span class="text-xs">Pending Confirmation {{ pending}}/{{ todays }}</span>
                                 <div class="card">
                                 <ProgressBar :value="pending"
 
