@@ -24,7 +24,6 @@ import ConfirmPopup from 'primevue/confirmpopup';
 import ConfirmationService from 'primevue/confirmationservice';
 import Calendar from 'primevue/calendar';
 import Dropdown from 'primevue/dropdown';
-import ProgressBar from 'primevue/progressbar';
 import Swal from 'sweetalert2';
 
 import SearchBox from '@/Components/SearchBox.vue'
@@ -50,7 +49,6 @@ createInertiaApp({
             .component('Pagination',Pagination)
             .component('SearchBox',SearchBox)
             .component('Calendar',Calendar)
-            .component('ProgressBar',ProgressBar)
             .component('Swal',Swal)
             .mount(el);
     },
