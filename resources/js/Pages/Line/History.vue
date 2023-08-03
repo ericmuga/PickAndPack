@@ -106,7 +106,7 @@ const props= defineProps({
 
 
                                     <tbody>
-                                        <tr v-for="line in orderLines.data" :key="order.line_no"
+                                        <tr v-for="line in orderLines.data" :key="line.line_no"
                                         class="bg-white border-b dark:bg-gray-900 dark:border-gray-700 hover:text-white hover:bg-slate-400">
 
                                         <td class="px-3 py-2 text-xs text-center">

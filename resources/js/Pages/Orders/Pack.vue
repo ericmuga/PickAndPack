@@ -2,20 +2,15 @@
 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
-import Toolbar from 'primevue/toolbar';
-import Button from 'primevue/button';
-import MultiSelect from 'primevue/multiselect';
-import InputText from 'primevue/inputtext';
-import { useForm } from '@inertiajs/inertia-vue3'
+// import Toolbar from 'primevue/toolbar';
+// import Button from 'primevue/button';
+
 import { Inertia } from '@inertiajs/inertia';
 import debounce from 'lodash/debounce';
 import {watch, ref,onMounted} from 'vue';
-import Pagination from '@/Components/Pagination.vue'
-import Swal from 'sweetalert2'
-import TabView from 'primevue/tabview';
-import TabPanel from 'primevue/tabpanel';
-import PickList from 'primevue/picklist';
-import Modal from '@/Components/Modal.vue';
+
+// import Swal from 'sweetalert2'
+
 import SearchBox from '@/Components/SearchBox.vue'
 
 const search=ref()
