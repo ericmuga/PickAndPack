@@ -9,7 +9,7 @@ import { Inertia } from '@inertiajs/inertia';
 import debounce from 'lodash/debounce';
 import {watch, ref,onMounted} from 'vue';
 
-// import Swal from 'sweetalert2'
+import Swal from 'sweetalert2'
 
 import SearchBox from '@/Components/SearchBox.vue'
 
