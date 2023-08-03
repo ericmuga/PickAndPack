@@ -7,7 +7,7 @@ import SpacedRule from '@/Components/SpacedRule.vue';
 import DataTable from '@/Components/DataTable.vue';
 import PieChart from '@/Components/PieChart.vue';
 import {ref} from 'vue'
-
+import ProgressBar from 'primevue/progressbar';
 
 defineProps({
                todays:Number,
@@ -61,13 +61,8 @@ const cdata = ref({
 
                                 <div class="card">
                                     <span class="text-xs">Pending Confirmation</span>
-                                    <!-- <ProgressBar :value="todays"
-                                     :pt="{
-                                                value: { style: { background: 'linear-gradient(to right, #8e2de2, #4a00e0)' } }
-                                            }"
-                                    > </ProgressBar> -->
-<div class="card">
-                                            <ProgressBar :value="pending"
+                                <div class="card">
+                                <ProgressBar :value="pending"
 
                                             >{{ pending}}/{{ todays }} </ProgressBar>
                                         </div>
