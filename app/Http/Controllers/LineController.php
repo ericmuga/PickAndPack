@@ -7,7 +7,7 @@ use App\Http\Requests\StoreLineRequest;
 use App\Http\Requests\UpdateLineRequest;
 use App\Http\Resources\LineResource;
 use Illuminate\Http\Request;
-use App\Services\SearchService;
+use App\Services\{SearchQueryService};
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 class LineController extends Controller
@@ -122,7 +122,6 @@ $sp_codes = DB::table('orders')
     public function history (Request $request)
     {
 
-        // dd('here');
             $query = Line::query()->with('order')
                                   ->withSum('assemblies','ass_qty')
                                   ->withSum('prepacks','total_quantity')

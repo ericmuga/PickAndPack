@@ -4,18 +4,10 @@ import { Head } from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
 import Button from 'primevue/button';
 import MultiSelect from 'primevue/multiselect';
-import InputText from 'primevue/inputtext';
-import { useForm } from '@inertiajs/inertia-vue3'
-import { Inertia } from '@inertiajs/inertia';
-import {debounce,pickby} from 'lodash/debounce';
-import {watch, ref,onMounted} from 'vue';
+import {ref} from 'vue';
 import Pagination from '@/Components/Pagination.vue'
-import Swal from 'sweetalert2'
-import TabView from 'primevue/tabview';
-import TabPanel from 'primevue/tabpanel';
-import PickList from 'primevue/picklist';
 import Modal from '@/Components/Modal.vue';
-import SearchBox from '@/Components/SearchBox.vue';
+// import SearchBox from '@/Components/SearchBox.vue';
 
 
 
@@ -33,7 +25,6 @@ const sectors= ref([
 const props= defineProps({
     orderLines:Object,
 
-    // printed:Object
 })
 
 
@@ -72,7 +63,7 @@ const props= defineProps({
                                 <template #end>
 
                                     <Button type="button" rounded disabled label="Total Lines"  :badge=props.orderLines.meta.total badgeClass="p-badge-danger" outlined class="justify-end" />
-                                    <SearchBox model="lines.history"/>
+                                    <SearchBox :model="route('lines.history')"/>
 
                                 </template>
                             </Toolbar>
@@ -115,48 +106,26 @@ const props= defineProps({
 
 
                                     <tbody>
-                                        <tr v-for="order in orderLines.data" :key="order.line_no"
+                                        <tr v-for="line in orderLines.data" :key="order.line_no"
                                         class="bg-white border-b dark:bg-gray-900 dark:border-gray-700 hover:text-white hover:bg-slate-400">
 
                                         <td class="px-3 py-2 text-xs text-center">
-                                            {{ order.order_no }}
+                                            {{ line.order_no }}
                                             <!-- <span class="p-1 text-xs text-center">{{ order.order.shp_date }}</span> -->
                                         </td>
 
 
-                                        <!-- <td v-if="order.order.shp_name=='' " class="px-3 py-2 text-xs">
-                                            {{ order.order.customer_name }}
-                                            <span class="p-1 m-1 text-xs bg-orange-200 rounded">{{order.order.sector}}</span>
-                                        </td>
-                                        <td v-else class="px-3 py-2 text-xs">
-                                            {{ order.order.shp_name }}
-                                             <span class="p-1 m-1 text-xs bg-orange-200 rounded">{{order.order.sector}}</span>
-                                        </td>
-                                        <td class="px-3 py-2 text-xs text-center bg-orange-300 rounded-md">
-                                            <p>
-                                                {{ order.order.sp_code }}
-                                            </p>
-                                            <p>
-                                                {{ order.order.sp_name }}
-                                            </p>
-                                        </td> -->
                                         <td class="px-3 py-2 text-xs">
-                                            {{ order.item_no }}
+                                            {{ line.item_no }}
                                         </td>
                                         <td class="px-3 py-2 text-xs">
-                                            {{ order.item_description }}
+                                            {{ line.item_description }}
                                         </td>
                                         <td class="px-3 py-2 text-xs text-center">
-                                            {{ order.order_qty }}
+                                            {{ line.order_qty }}
                                         </td>
-
-                                        <!-- <td class="px-3 py-2 text-xs text-center">
-
-                                        </td> -->
-
-
                                         <td class="px-3 py-2 text-xs text-center">
-                                            {{ order.ass_qty }}
+                                            {{ line.ass_qty }}
                                         </td>
                                     </tr>
 

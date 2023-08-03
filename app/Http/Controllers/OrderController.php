@@ -48,7 +48,7 @@ class OrderController extends Controller
         try
         {
             DB::statement('EXEC dbo.refresh');
-            return $this->index($request,null);
+            return redirect(route('dashboard'));
         }
         catch(QueryException $e){
             $errorMessage = $e->getMessage();
