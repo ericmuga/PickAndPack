@@ -262,6 +262,7 @@ public function pack(Request $request)
 {
     //this will be the view to select the order
     //give a list of all orders ready for packing
+    // dd($request->all());
     $orders= OrderResource::collection(Order::query()
                                             ->when($request->has('search'),fn($q)=>
                                                     $q->where('order_no','like','%'.$request->search)

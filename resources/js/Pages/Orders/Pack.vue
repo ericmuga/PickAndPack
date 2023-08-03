@@ -2,7 +2,7 @@
 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
-// import Toolbar from 'primevue/toolbar';
+import Toolbar from 'primevue/toolbar';
 // import Button from 'primevue/button';
 
 import { Inertia } from '@inertiajs/inertia';
@@ -18,6 +18,16 @@ watch(search, debounce(()=>{Inertia.post('/order/all',{search:search.value}, {pr
 
 const prop=defineProps({
     orders:Object})
+    const inputField=ref(null);
+
+    onMounted(() => {
+    inputField.value.focus();
+});
+let newItem=ref('');
+watch( newItem,
+debounce( ()=>{Inertia.get(route('order.pack'),{'search':newItem.value})})
+,500);
+
 
 const confirmPack=(order_no,part)=>{
 
@@ -64,6 +74,9 @@ const confirmPack=(order_no,part)=>{
                                 <template #center>
                                     <div>
                                         <!-- <Pagination :links="orderLines.meta.links" /> -->
+                                        <input type="text" v-model="newItem"  ref="inputField" class="m-2 rounded-lg bg-slate-300 text-md">
+
+                                        <!-- <SearchBox :model="route('order.pack')" /> -->
                                     <div>
                                         <!-- <Pagination :links="orders.meta.links" /> -->
                                     </div>
@@ -78,7 +91,7 @@ const confirmPack=(order_no,part)=>{
 
 
                                             <!-- <InputText v-model="search" aria-placeholder="search"/> -->
-                                            <SearchBox :model="route('order.pack')" />
+
 
                                             </template>
                                         </Toolbar>
