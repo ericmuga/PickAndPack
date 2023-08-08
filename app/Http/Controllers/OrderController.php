@@ -110,25 +110,27 @@ public function confirmation(Request $request)
 {
 
     // dd($request->all());
-    if ($request->has('order_no','part_no')){
+    if ($request->has('order_no','part_no'))
+    {
 
         if (!Order::checkConfirmation($request->order_no,$request->part_no))
         {
             Confirmation::insert(['order_no'=>$request->order_no,
-            'part_no'=>$request->part_no,
-            'user_id'=>$request->user()->name,
-            'created_at'=>Carbon::now(),
-            'updated_at'=>Carbon::now()
-        ]);
-        $this->index($request);
+                                    'part_no'=>$request->part_no,
+                                    'user_id'=>$request->user()->name,
+                                    'created_at'=>Carbon::now(),
+                                    'updated_at'=>Carbon::now()
+                                ]);
+
        }
+
        $order=Order::firstWhere('order_no',$request->order_no);
        if ($order->getParts()==$order->confirmations()->count())
        {
         $order->confirmed=true;
         $order->save();
        }
-
+$this->index($request);
   }
 }
 
