@@ -2,23 +2,17 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
-// import Button from 'primevue/button';
-// import MultiSelect from 'primevue/multiselect';
-// import InputText from 'primevue/inputtext';
 import { useForm } from '@inertiajs/inertia-vue3'
 import { Inertia } from '@inertiajs/inertia';
 import debounce from 'lodash/debounce';
-import {watch, ref} from 'vue';
+import {watch, ref,onMounted} from 'vue';
 import Pagination from '@/Components/Pagination.vue'
-// import Swal from 'sweetalert2'
-// import FilterPane from '@/Components/FilterPane.vue'
 import Modal from '@/Components/Modal.vue'
 import { useStorage } from '@/Composables/useStorage';
 import { useDates } from '@/Composables/useDates';
 import DownloadButton from '@/Components/DownloadButton.vue';
 import SearchBox from '@/Components/SearchBox.vue';
-
-// const todaysDate=useDates.getCurrentDate();
+import InputSwitch from 'primevue/inputswitch';
 
 const form = useForm({
     search: null,
@@ -28,10 +22,19 @@ const form = useForm({
 let showModal=ref(false);
 
 const showFilterPane=()=>{showModal=true;}
+let isConfirmed= ref((props.previousInput.hasOwnProperty('isConfirmed'))&&(props.previousInput.isConfirmed=='true')?true:false);
+
+watch(isConfirmed,()=>{
+                          Inertia.get(route('confirmations.index'),{'isConfirmed':isConfirmed.value})
+                                //  .onSuccess(()=>{isConfirmed.value=props.previousInput.isConfirmed.value})
+});
+
+
+
 
 const search=ref()
 watch(search, debounce(()=>{Inertia.get(route('confirmations.index'),{search:search.value}, {preserveScroll: true})}, 500));
-// watch(form.searchKey, debounce(form.post('all',{preserveScroll:true}),600))
+
 
 const form2 =useForm({
     Part:String,
@@ -43,7 +46,8 @@ const selectedParts =ref([])
 const props= defineProps({
     orders:Object,
     printed:Object,
-    columnListing:Object
+    columnListing:Object,
+    previousInput:Object,
 })
 
 watch(selectedParts,console.log(selectedParts));
@@ -179,6 +183,11 @@ const postForm=(dynamicObject,dateDynamicObject)=>{
                                 </template>
 
                                     <template #end>
+
+                                         <div class="flex flex-col items-center gap-1 p-3 text-center card">
+                                            <span class="text-xs">Confirmed?</span>
+                                            <InputSwitch v-model="isConfirmed" />
+                                        </div>
                                         <!-- <a href="/orders/download" class="">
                                             <Button icon="pi pi-download" severity="primary" text raised rounded label="confirmations"/>
                                         </a> -->

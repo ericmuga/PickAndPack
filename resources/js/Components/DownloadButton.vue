@@ -7,7 +7,7 @@
 </script>
 
 <template>
-    <div>
+    <div class="mx-2">
         <a
          :href="link"
         >

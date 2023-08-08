@@ -63,12 +63,22 @@ class Order extends Model
 
      public function scopeConfirmed(Builder $query) :void
      {
-        $query->where('confirmed',true);
+        $query->where('confirmed',1);
+     }
+
+     public function scopePending(Builder $query): void
+     {
+        $query->where('confirmed',0);
      }
 
     public function scopeSector(Builder $query,$sector)
     {
          $query->where('sector','=',$sector);
+    }
+
+    public function picks()
+    {
+        return $this->belongsToMany(Pick::class,'PickOrders','order_no','pick_no','pick_no','order_no');
     }
 
     public function confirmations()

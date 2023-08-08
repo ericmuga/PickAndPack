@@ -46,7 +46,9 @@ const showingNavigationDropdown = ref(false);
                                 <NavLink :href="route('linePrepacks.index')" :active="route().current('linePrepacks.index')">
                                     Prepacked Orders
                                 </NavLink>
-
+                               <NavLink :href="route('order.pick')" :active="route().current('order.pick')">
+                                    Assemble Picks
+                                </NavLink>
 
                                  <NavLink :href="route('order.pack')" :active="route().current('order.pack')">
                                     Assembly
@@ -165,6 +167,10 @@ const showingNavigationDropdown = ref(false);
                                 <!-- <NavLink href="/LinePrepacks">
                                     Prepacked Orders
                                 </NavLink> -->
+
+                                <NavLink :href="route('order.pick')" :active="route().current('order.pick')">
+                                    Assemble Picks
+                                </NavLink>
                                  <NavLink :href="route('order.pack')" :active="route().current('order.pack')">
                                     Assembly
                                 </NavLink>

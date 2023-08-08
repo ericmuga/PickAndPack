@@ -18,9 +18,13 @@ class ConfirmationController extends Controller
 public function index(Request $request)
 {
     // Define the columns to select in the query
+    // dd($request->all());
     $columns = ['customer_name', 'shp_name', 'order_no', 'shp_date', 'sp_code', 'ending_date','ended_by'];
 
-    $queryBuilder = Order::current()->select($columns); // You can also use `Order::firstWhere('no', 2)` here
+    $queryBuilder = Order::current()
+                         ->when($request->has('isConfirmed')&&($request->isConfirmed=='true'),fn($q)=>$q->confirmed()) // You can also use `Order::firstWhere('no', 2)` here
+                         ->when(!($request->has('isConfirmed'))||($request->has('isConfirmed')&&($request->isConfirmed=='false')),fn($q)=>$q->pending())
+                         ->select($columns); // You can also use `Order::firstWhere('no', 2)` here
     $searchParameter = $request->has('search')?$request->search:'';
     $searchColumns = ['customer_name', 'shp_name','order_no'];
     $strictColumns = [];
@@ -48,10 +52,12 @@ public function index(Request $request)
 
 
     // Return the view with data
+    // dd($request->all());
     return inertia('Orders/List', [
         'orders' => OrderResource::collection($orders),
         'columnListing' => $columns,
         'items' => $prepackItems,
+        'previousInput'=>$request->all(),
     ]);
 }
 

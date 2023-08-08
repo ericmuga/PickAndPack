@@ -20,7 +20,7 @@ import Swal from 'sweetalert2'
 // import FilterPane from '@/Components/FilterPane.vue'
 import Modal from '@/Components/Modal.vue'
 import Drop from '@/Components/Drop.vue'
-// import Route from 'vendor/tightenco/ziggy/src/js/Route';
+
 
 const form= useForm({
      'item_no':'',
@@ -28,6 +28,10 @@ const form= useForm({
      'barcode':'',
     'posting_group':''
 })
+
+
+
+
 
 const createOrUpdateItem=()=>{
     if (mode.state=='Create')
@@ -116,6 +120,8 @@ const showUpdateModal=(item)=>{
                                 </template>
 
                                     <template #end>
+
+
                                         <a :href="route('items.download')" class="">
                                             <Button icon="pi pi-download" severity="primary" text raised rounded label="Items"/>
                                         </a>
