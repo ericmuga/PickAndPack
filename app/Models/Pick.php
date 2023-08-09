@@ -15,8 +15,11 @@ class Pick extends Model
     public function orders()
      {
        //this will return all orders of that pick
-       return Order::whereIn('order_no',Pick::select('order_no')->distinct());
-
+      return Order::whereIn('order_no',Pick::where('pick_no',$this->pick_no)->select('order_no'));
         //return $this->belongsToMany(Order::class,'PickOrders','pick_no','order_no','pick_no','order_no');
      }
+
+
+
+
 }

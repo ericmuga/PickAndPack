@@ -5,7 +5,8 @@ use App\Http\Controllers\{ConfirmationController, DashboardController, ItemContr
                           LinePrepackController,
                           ProfileController,
                           OrderController,
-                          PrepackController};
+    PickController,
+    PrepackController};
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\{Route,Auth};
 use illuminate\Http\Request;
@@ -98,7 +99,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/order/all', [OrderController::class, 'pack'])->name('order.listing');
         Route::post('/order/scanItems', [OrderController::class, 'scanItems'])->name('order.scanItems');
         Route::get('/order/scanItems', [OrderController::class, 'scanItems'])->name('order.scanItemsGET');
-        Route::get('pick',[OrderController::class,'pick'])->name('order.pick');
+        // Route::get('pick',[OrderController::class,'pick'])->name('order.pick');
+
+        //picks
+        Route::resource('picks',PickController::class);
 
         //confirmations
         Route::resource('confirmations',ConfirmationController::class);
