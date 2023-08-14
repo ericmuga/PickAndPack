@@ -71,8 +71,8 @@ public function index(Request $request, $e = null)
 // Usage example
 $queryBuilder = Order::current()
                      ->select($columns)
-                     ->when($request->has('Confirmed')&&($request->Confirmed=='true'),fn($q)=>$q->confirmed()) // You can also use `Order::firstWhere('no', 2)` here
-                     ->when(!($request->has('Confirmed'))||($request->has('Confirmed')&&($request->Confirmed=='false')),fn($q)=>$q->pending()); // You can also use `Order::firstWhere('no', 2)` here
+                     ->when($request->has('isConfirmed')&&($request->Confirmed=='true'),fn($q)=>$q->confirmed()) // You can also use `Order::firstWhere('no', 2)` here
+                     ->when(!($request->has('isConfirmed'))||($request->has('isConfirmed')&&($request->Confirmed=='false')),fn($q)=>$q->pending()); // You can also use `Order::firstWhere('no', 2)` here
 $searchParameter = $request->has('search')?$request->search:'';
 $searchColumns = ['customer_name', 'shp_name','order_no'];
 $strictColumns = [];
