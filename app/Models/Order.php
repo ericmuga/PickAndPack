@@ -46,9 +46,8 @@ class Order extends Model
     }
     public function getParts()
     {
-        return $this->lines()
-                    ->groupBy('part')
-                    ->count();
+        return $this->lines()->get()->groupBy('part')->count();
+
     }
 
     public function scopeCurrent(Builder $query) :void

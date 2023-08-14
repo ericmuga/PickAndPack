@@ -19,15 +19,18 @@ class PickController extends Controller
         //display all picks for the day
 
         // $picks=Pick::paginate(15);
+        $orders=Order::shipCurrent()->select('order_no')->get();
 
         $picks = Pick::select('pick_no', 'part')
             //    ->current()
             ->when(
                 $request->has('search') && $request->search != '',
                 fn ($q) => $q->where('pick_no', 'LIKE', '%' . $request->search)
-                    ->orWhereHas('pick_orders', fn ($q) => $q->where('serial_no', 'LIKE', '%' . $request->search))
+                    ->orWhereHas('pick_orders', fn ($q) => $q->where('serial_no', 'LIKE', '%' . $request->search)
 
+                    )
             )
+
 
             ->paginate(15);
 
@@ -56,7 +59,7 @@ class PickController extends Controller
                         ->appends($request->all())
                         ->withQueryString();
 
-        return inertia('Orders/PartPackLines', [
+        return inertia('Picks/PartPackLines', [
             'orderLines' => LineResource::collection($orderLines),
             'previousInput' => $request->all(),
         ]);
