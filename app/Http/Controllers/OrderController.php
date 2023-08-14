@@ -70,16 +70,16 @@ public function index(Request $request, $e = null)
 
 // Usage example
 $queryBuilder = Order::current()
-                     ->select($columns)
-                     ->when($request->has('isConfirmed')&&($request->Confirmed=='true'),fn($q)=>$q->confirmed()) // You can also use `Order::firstWhere('no', 2)` here
-                     ->when(!($request->has('isConfirmed'))||($request->has('isConfirmed')&&($request->Confirmed=='false')),fn($q)=>$q->pending()); // You can also use `Order::firstWhere('no', 2)` here
+                     ->select($columns);
+                    //  ->when($request->has('isConfirmed')&&($request->Confirmed=='true'),fn($q)=>$q->confirmed()) // You can also use `Order::firstWhere('no', 2)` here
+                    //  ->when(!($request->has('isConfirmed'))||($request->has('isConfirmed')&&($request->Confirmed=='false')),fn($q)=>$q->pending()); // You can also use `Order::firstWhere('no', 2)` here
 $searchParameter = $request->has('search')?$request->search:'';
 $searchColumns = ['customer_name', 'shp_name','order_no'];
 $strictColumns = [];
 $relatedModels = [
-    'relatedModel1' => ['related_column1', 'related_column2'],
-    'relatedModel2' => ['related_column3'],
-];
+                    'relatedModel1' => ['related_column1', 'related_column2'],
+                    'relatedModel2' => ['related_column3'],
+                 ];
 
 $searchService = new SearchQueryService($queryBuilder, $searchParameter, $searchColumns, [], []);
 $orders = $searchService
@@ -93,11 +93,7 @@ $orders = $searchService
                                         $q->where('isActive',true);
                                     })
                         ->get();
-
-
-
-    // Return the view with data
-    return inertia('Orders/List', [
+return inertia('Orders/List', [
         'orders' => OrderResource::collection($orders),
         'refreshError' => $e,
         'columnListing' => $columns,
