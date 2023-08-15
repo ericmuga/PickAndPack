@@ -25,7 +25,7 @@ const showFilterPane=()=>{showModal=true;}
 let isConfirmed= ref((props.previousInput.hasOwnProperty('isConfirmed'))&&(props.previousInput.isConfirmed=='true')?true:false);
 
 watch(isConfirmed,()=>{
-                          Inertia.get(route('confirmations.index'),{'isConfirmed':isConfirmed.value})
+                          Inertia.get(route('confirmations.index'),{'isConfirmed':isConfirmed.value, 'search':search.value})
                                 //  .onSuccess(()=>{isConfirmed.value=props.previousInput.isConfirmed.value})
 });
 

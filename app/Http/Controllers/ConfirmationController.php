@@ -22,9 +22,16 @@ public function index(Request $request)
     $columns = ['customer_name', 'shp_name', 'order_no', 'shp_date', 'sp_code', 'ending_date','ended_by'];
 
     $queryBuilder = Order::current()
-                        //  ->when($request->has('isConfirmed')&&($request->isConfirmed=='true'),fn($q)=>$q->confirmed()) // You can also use `Order::firstWhere('no', 2)` here
-                        //  ->when(!($request->has('isConfirmed'))||($request->has('isConfirmed')&&($request->isConfirmed=='false')),fn($q)=>$q->pending())
-                         ->select($columns); // You can also use `Order::firstWhere('no', 2)` here
+                         ->when(   (!$request->has('search')||(($request->has('search')&&$request->search=='')))&&
+                                    $request->has('isConfirmed')&&
+                                   ($request->isConfirmed=='true'),
+
+                                   fn($q)=>$q->confirmed()
+                              ) // You can also use `Order::firstWhere('no', 2)` here
+                         ->when(!($request->has('isConfirmed'))||($request->has('isConfirmed')&&($request->isConfirmed=='false')),fn($q)=>$q->pending())
+                         ->select($columns);
+
+                         // You can also use `Order::firstWhere('no', 2)` here
     $searchParameter = $request->has('search')?$request->search:'';
     $searchColumns = ['customer_name', 'shp_name','order_no'];
     $strictColumns = [];
