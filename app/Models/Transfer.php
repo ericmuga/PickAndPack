@@ -78,12 +78,12 @@ class Transfer extends Model
                              (select sum(a.order_qty) from lines as a
                              inner join orders as b on a.order_no=b.order_no and b.shp_date>=DATEADD(d,2,DATEDIFF(d,0,GETDATE()))
                              where a.item_no=Transfers.item_no
-                             )reserved_qty,
+                             )Due_After_Tomorrow,
 
                              (select sum(a.order_qty) from lines as a
                              inner join orders as b on a.order_no=b.order_no and b.shp_date>=DATEADD(d,0,DATEDIFF(d,0,GETDATE())) and b.shp_date<=DATEADD(d,2,DATEDIFF(d,0,GETDATE()))
                              where a.item_no=Transfers.item_no
-                             )ordered_qty,
+                             )Today_and_Tomorrow,
 
                              (select sum(line_prepacks.total_quantity)
                                   from line_prepacks
