@@ -336,7 +336,7 @@ public function pack(Request $request)
 public function closeAssembly(Request $request)
 {
     //
-       dd($request->all());
+    //    dd($request->all());
     //insert the line into assembly line
     foreach($request->data as $line)
     {
@@ -349,7 +349,7 @@ public function closeAssembly(Request $request)
             'order_no'=>$line['order_no'],
             'line_no'=>$line['line_no'],
             'user_id'=>$request->user()->id,
-            'ass_qty'=>$line['ass_qty'],
+            'ass_qty'=>$line['assembled_qty'],
         ]);
         // else redirect()->back()->withErrors(['message'=>'line'.$line['line_no'].'of Order'.$line['order_no'].'already exists']);
     }
