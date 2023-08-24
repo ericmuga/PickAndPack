@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 // use Illuminate\Http\Request;
-use App\Models\{Transfer,Order};
+use App\Models\{Transfer,Order, Stock};
 use Illuminate\Http\Request;
 use App\Services\SearchQueryService;
 use Inertia\Inertia;
@@ -33,12 +33,31 @@ class DashboardController extends Controller
 
         $searchService = new SearchQueryService($queryBuilder, $searchParameter, $searchColumns, [], $relatedModels);
 
-        $stocks = $searchService
-            // ->with(['item.description']) // Example of eager loading related models
-            ->search()
-            ->orderByDesc('Inventory_Kgs')
-            ->paginate(15)
-            ->withQueryString();
+        $stocks = $searchService->search()
+                                // ->orderByDesc('Inventory_Kgs')
+                                ->paginate(15)
+                                ->withQueryString();
+
+
+
+    //   $queryBuilder = (new Stock())->orderByDesc('closing_weight'); // You can also use `Order::firstWhere('no', 2)` here
+    //     $searchParameter = $request->has('search')?$request->search:'';
+    //     $searchColumns = ['item_no','description'];
+    //     $strictColumns = [];
+    //     $relatedModels = [
+    //         'item' => ['description'],
+    //         'relatedModel2' => ['related_column3'],
+    //     ];
+
+    //     $searchService = new SearchQueryService($queryBuilder, $searchParameter, $searchColumns, [], $relatedModels);
+
+    //     $stocks = $searchService->search()
+    //                             ->orderByDesc('Inventory_Kgs')
+    //                             ->paginate(15)
+    //                             ->withQueryString();
+
+
+
 
 
 
@@ -52,7 +71,7 @@ class DashboardController extends Controller
                        'pending'=>$orders->where('confirmed',false)->count(),
                        'stocks'=>$stocks,
                         'top5Labels'=>$stocks->take(5)->pluck('description'),
-                        'top5Weights'=>$stocks->take(5)->pluck('Inventory_Kgs'),
+                        'top5Weights'=>$stocks->take(5)->pluck('closing_pieces'),
                         'headers'=>$stocks->count()>0?array_keys($stocks->first()->toArray()):[],
                         // $headings = $collection->count() > 0 ? array_keys($collection->first()->toArray()) : [];
                       ];

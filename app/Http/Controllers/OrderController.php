@@ -338,20 +338,20 @@ public function closeAssembly(Request $request)
     //
     //    dd($request->all());
     //insert the line into assembly line
-    foreach($request->extractedData as $line)
+    foreach($request->data as $line)
     {
         //  dd($line);
-        if (!AssemblyLine::where('order_no',$line['order_no'])
-        ->where('line_no',$line['line_no'])
-        ->exists())
+        // if (!AssemblyLine::where('order_no',$line['order_no'])
+        // ->where('line_no',$line['line_no'])
+        // ->exists())
 
-        AssemblyLine::create([
+        AssemblyLine::updateOrCreate([
             'order_no'=>$line['order_no'],
             'line_no'=>$line['line_no'],
             'user_id'=>$request->user()->id,
             'ass_qty'=>$line['ass_qty'],
         ]);
-        else redirect()->back()->withErrors(['message'=>'line'.$line['line_no'].'of Order'.$line['order_no'].'already exists']);
+        // else redirect()->back()->withErrors(['message'=>'line'.$line['line_no'].'of Order'.$line['order_no'].'already exists']);
     }
 
     return redirect(route('order.pack'));

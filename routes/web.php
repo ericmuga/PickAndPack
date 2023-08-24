@@ -6,13 +6,13 @@ use App\Http\Controllers\{ConfirmationController, DashboardController, ItemContr
                           ProfileController,
                           OrderController,
     PickController,
-    PrepackController};
+    PrepackController, StockController};
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\{Route,Auth};
 use illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Resources\{OrderResource};
-use App\Models\{Line,LinePrepack,Order,Prepack};
+use App\Models\{Line,LinePrepack,Order,Prepack, Stock};
 
 /*
 |--------------------------------------------------------------------------
@@ -103,6 +103,9 @@ Route::middleware('auth')->group(function () {
 
         //picks
         Route::resource('picks',PickController::class);
+
+        //stocks
+        Route::resource('stocks',StockController::class);
 
         //confirmations
         Route::resource('confirmations',ConfirmationController::class);

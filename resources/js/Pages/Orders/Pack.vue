@@ -29,24 +29,7 @@ debounce( ()=>{Inertia.get(route('order.pack'),{'search':newItem.value})})
 ,500);
 
 
-const confirmPack=(order_no,part)=>{
-
-
-    Swal.fire({
-                                        title: 'Are you sure?',
-                                        text: "Assembled orders may not be undone!",
-                                        icon: 'warning',
-                                        showCancelButton: true,
-                                        confirmButtonColor: '#3085d6',
-                                        cancelButtonColor: '#d33',
-                                        confirmButtonText: 'Confirm Assembly!'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                                           Inertia.get(route('order.scanItemsGET',{'order_no':order_no,'part_no':part}))
-
-                                                            }
-                        })
-}
+const confirmPack=(order_no,part)=>{ Inertia.get(route('order.scanItemsGET',{'order_no':order_no,'part_no':part}))}
 </script>
 
 

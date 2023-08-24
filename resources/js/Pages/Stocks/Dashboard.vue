@@ -60,23 +60,26 @@ const cdata = ref({
 
 
                                 <div class="card">
-                                    <span class="text-xs">Pending Confirmation {{ pending}}/{{ todays }}</span>
+                                    <!-- <span class="text-xs">Pending Confirmation {{ pending}}/{{ todays }}</span>
                                 <div class="card">
                                 <ProgressBar :value="pending"
 
                                             >{{ pending}}/{{ todays }} </ProgressBar>
-                                        </div>
+                                        </div>-->
 
-
+                                 <Button
+                                   label="Stock Take"
+                                   severity="warning"
+                                 />
 
 
                                 </div>
-                                <Link :href="route('refresh')" class="w-5 h-10 m-10 mx-auto text-center ">
-                                        <!-- <span class="text-xs">Refresh</span> -->
-                                       <!-- <img src="/img/refresh.png" /> -->
+                                <!-- <Link :href="route('refresh')" class="w-5 h-10 m-10 mx-auto text-center ">
+                                        <span class="text-xs">Refresh</span>
+                                       <img src="/img/refresh.png" />
                                        <Button icon="pi pi-refresh" severity="warning" aria-label="Filter" />
 
-                                    </Link>
+                                    </Link> -->
 
 
 
@@ -106,7 +109,7 @@ const cdata = ref({
                             <div class="col-span-2 mx-2 my-2">
                                 <DataTable
                                   class="text-xs"
-                                  :searchUrl="route('dashboard')"
+                                  :searchUrl="route('stocks.index')"
                                   :items="stocks"
                                   :headers="headers"
 

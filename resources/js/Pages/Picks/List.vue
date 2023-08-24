@@ -20,22 +20,22 @@ const props=defineProps({
                         })
 
  const confirmPack=(pick_no)=>{
+Inertia.get(route('picks.show',{'pick':pick_no}))
 
+// Swal.fire({
+//                                     title: 'Are you sure?',
+//                                     text: "Assembled orders may not be undone!",
+//                                     icon: 'warning',
+//                                     showCancelButton: true,
+//                                     confirmButtonColor: '#3085d6',
+//                                     cancelButtonColor: '#d33',
+//                                     confirmButtonText: 'Confirm Assembly!'
+//                                     }).then((result) => {
+//                                         if (result.isConfirmed) {
+//                                                                        Inertia.get(route('picks.show',{'pick':pick_no}))
 
-Swal.fire({
-                                    title: 'Are you sure?',
-                                    text: "Assembled orders may not be undone!",
-                                    icon: 'warning',
-                                    showCancelButton: true,
-                                    confirmButtonColor: '#3085d6',
-                                    cancelButtonColor: '#d33',
-                                    confirmButtonText: 'Confirm Assembly!'
-                                    }).then((result) => {
-                                        if (result.isConfirmed) {
-                                                                       Inertia.get(route('picks.show',{'pick':pick_no}))
-
-                                                        }
-                    })
+//                                                         }
+//                     })
 }
 
 const inputField=ref(null);
