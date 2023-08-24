@@ -75,12 +75,12 @@ class Transfer extends Model
                 ->selectRaw('Transfers.item_no,
                              items.description,
                              SUM(receiver_total_weight) as Inventory_Kgs,
-                             (select sum(a.order_qty) from lines as a
+                             (select sum(a.qty_base) from lines as a
                              inner join orders as b on a.order_no=b.order_no and b.shp_date>=DATEADD(d,2,DATEDIFF(d,0,GETDATE()))
                              where a.item_no=Transfers.item_no
                              )Due_After_Tomorrow,
 
-                             (select sum(a.order_qty) from lines as a
+                             (select sum(a.qty_base) from lines as a
                              inner join orders as b on a.order_no=b.order_no and b.shp_date>=DATEADD(d,0,DATEDIFF(d,0,GETDATE())) and b.shp_date<=DATEADD(d,2,DATEDIFF(d,0,GETDATE()))
                              where a.item_no=Transfers.item_no
                              )Today_and_Tomorrow,

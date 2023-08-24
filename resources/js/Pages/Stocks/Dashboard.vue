@@ -28,9 +28,10 @@ const form=useForm({
    stock_date:new Date(),
    pieces:'',
    weight:'',
-   chiller_code:''
+   chiller_code:'',
    location:'3535'
 });
+
 let showModal=ref(false);
 let closeModal=ref(true);
 
@@ -89,7 +90,7 @@ const submitForm=()=>{
 
                                   <Button
 
-                                    label=" Allocate"
+                                    label=" Stock Take"
                                     severity="warning"
                                     @click="showModal=true"
                                     />
