@@ -336,7 +336,7 @@ public function pack(Request $request)
 public function closeAssembly(Request $request)
 {
     //
-    //    dd($request->all());
+       dd($request->all());
     //insert the line into assembly line
     foreach($request->data as $line)
     {

@@ -51,6 +51,7 @@ const extractedData = ref(Object.entries(props.orderLines.data).map(([key, value
         'item_no':value.item_no,
         'item_description':value.item_description,
         'order_no':value.order_no,
+        'line_no':value.line_no
 
     };
 }));
@@ -100,7 +101,8 @@ const form=useForm({
    assembled_qty:0,
    item_description:'',
    batch_no:'',
-   order_no:''
+   order_no:'',
+   line_no:''
 
 
 });
@@ -130,7 +132,8 @@ const submitForm=()=>{
                                    'item_description':form.item_description,
                                    'barcode':form.barcode,
                                     'item_no':form.item_no,
-                                    'order_no':form.order_no
+                                    'order_no':form.order_no,
+                                    'line_no':form.line_no
 
                                 });
     }
@@ -152,6 +155,7 @@ const updateScannedItem =(item)=>{
     form.pick_no=props.pick_no
     form.item_description=item.item_description
     form.order_no=item.order_no
+    form.line_no=item.line_no
 
 
 
