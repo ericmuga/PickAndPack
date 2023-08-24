@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 
-use App\Models\{Transfer,Order, Stock};
+use App\Models\{Item, Transfer,Order, Stock};
 use Illuminate\Http\Request;
 use App\Services\SearchQueryService;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
 
 class StockController extends Controller
 {
@@ -32,7 +33,8 @@ class StockController extends Controller
 
 
 
-
+     $items=Item::select('item_no','description')->get();
+    //  $chillers=Transfer::select('chiller_code')->distinct();
 
 
            $orders=Order::current()->select('confirmed')->get();
@@ -47,10 +49,35 @@ class StockController extends Controller
                        'top5Labels'=>$stocks->take(5)->pluck('description'),
                        'top5Weights'=>$stocks->take(5)->pluck('closing_pieces'),
                        'headers'=>$stocks->count()>0?array_keys($stocks->first()->toArray()):[],
+                       'items'=>$items,
+                       'chillers'=>[
+                                    ['chiller_code'=>'U'],
+                                    ['chiller_code'=>'V']
+                                  ],
                        // $headings = $collection->count() > 0 ? array_keys($collection->first()->toArray()) : [];
                      ];
         return  inertia('Stocks/Dashboard',$data);
 
+   }
+
+
+   public function store(Request $request)
+   {
+    // dd($request->all());
+
+    $stock=DB::table('stock_entries')
+            ->where('stock_date',$request->stock_date)
+            ->where('item_no',$request->item_no)
+            ->where('location',$request->location)
+            ->where('chiller',$request->chiller)
+            ->get();
+     if($stock->count()>0) $stock->delete();
+
+     DB::table('stock_entries')
+          ->insert($request->all());
+
+
+    return redirect(route('stocks.index'));
    }
 
 }

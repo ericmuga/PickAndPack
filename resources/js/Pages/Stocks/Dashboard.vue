@@ -7,8 +7,10 @@ import SpacedRule from '@/Components/SpacedRule.vue';
 import DataTable from '@/Components/DataTable.vue';
 import PieChart from '@/Components/PieChart.vue';
 import {ref} from 'vue'
+import Calendar from 'primevue/calendar';
 import ProgressBar from 'primevue/progressbar';
-
+import Modal from '@/Components/Modal.vue';
+import { useForm } from '@inertiajs/inertia-vue3'
 defineProps({
                todays:Number,
                pending:Number,
@@ -17,7 +19,20 @@ defineProps({
                headers:Object,
                top5Labels:Object,
                top5Weights:Object,
+               items:Object,
+               chillers:Object,
           })
+
+const form=useForm({
+   item_no:'',
+   stock_date:new Date(),
+   pieces:'',
+   weight:'',
+   chiller_code:''
+   location:'3535'
+});
+let showModal=ref(false);
+let closeModal=ref(true);
 
 const cdata = ref({
                     labels: ['Red', 'Blue', 'Yellow'],
@@ -29,13 +44,18 @@ const cdata = ref({
                         },
                     ],
                 });
+const submitForm=()=>{
+
+    form.post(route('stocks.store'))
+    form.reset()
+}
 
 </script>
 
 <template>
     <Head title="Dashboard" />
 
-    <AuthenticatedLayout>
+    <AuthenticatedLayout @add="showModal=true">
         <!-- <template #header>
             <h2 class="text-xl font-semibold leading-tight text-gray-800">Dashboard</h2>
         </template> -->
@@ -67,11 +87,12 @@ const cdata = ref({
                                             >{{ pending}}/{{ todays }} </ProgressBar>
                                         </div>-->
 
-                                 <Button
-                                   label="Stock Take"
-                                   severity="warning"
-                                 />
+                                  <Button
 
+                                    label=" Allocate"
+                                    severity="warning"
+                                    @click="showModal=true"
+                                    />
 
                                 </div>
                                 <!-- <Link :href="route('refresh')" class="w-5 h-10 m-10 mx-auto text-center ">
@@ -131,4 +152,64 @@ const cdata = ref({
             </div>
         </div>
     </AuthenticatedLayout>
+    <div>
+        <Modal :show="showModal" @close="showModal=false" :errors="errors"> <!-- {{ dynamicModalContent  }} -->
+     <!-- {{ showModal }} -->
+
+     <div class="p-4 font-bold text-center text-white bg-slate-600"> Stock Take</div>
+       <div>
+
+
+        <form @submit.prevent="submitForm()" class="flex flex-col justify-center gap-2 p-5">
+
+        <Calendar v-model="form.stock_date"  showIcon />
+
+        <!-- <div class="flex card justify-content-center"> -->
+           <Dropdown v-model="form.item_no"
+              :options="items"
+              optionLabel="description"
+              optionValue="item_no"
+              placeholder="Select an Item"
+              class="w-full md:w-14rem"
+              filter
+            />
+       <!-- </div> -->
+
+
+           <InputText
+             ref="scanItem"
+             v-model="form.pieces"
+             placeholder="Pieces"
+           />
+
+           <InputText
+             v-model="form.weight"
+             placeholder="Weight"
+           />
+
+
+           <Dropdown v-model="form.chiller_code"
+              :options="chillers"
+              optionLabel="chiller_code"
+              optionValue="chiller_code"
+              placeholder="Select a chiller"
+              class="w-full md:w-14rem"
+              filter
+            />
+
+            <!-- <input v-model="form.shp_date" placeholder="Shipment Date" type="date"/> -->
+            <!-- {{currentItem}} -->
+            <Button  label="Save" icon="pi pi-send" class="w-sm" severity="success"  type="submit" :disabled="form.processing" />
+            <Button label="Cancel" severity="danger" icon="pi pi-cancel" @click="showModal=false"/>
+
+
+        </form>
+
+
+     </div>
+
+
+
+  </Modal>
+    </div>
 </template>

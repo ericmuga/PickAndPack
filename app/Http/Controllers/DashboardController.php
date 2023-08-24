@@ -34,7 +34,7 @@ class DashboardController extends Controller
         $searchService = new SearchQueryService($queryBuilder, $searchParameter, $searchColumns, [], $relatedModels);
 
         $stocks = $searchService->search()
-                                // ->orderByDesc('Inventory_Kgs')
+                                ->orderByDesc('Inventory_Kgs')
                                 ->paginate(15)
                                 ->withQueryString();
 
