@@ -146,6 +146,7 @@ const updateScannedItem =(item)=>{
     form.assembled_qty=item.total_order_qty-item.prepacked_qty
     form.pick_no=props.pick_no
     form.item_description=item.item_description
+    form.batch_no=''
 
 
 

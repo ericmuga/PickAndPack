@@ -107,6 +107,20 @@ const form=useForm({
 
 });
 
+
+const form2=useForm({
+   item_no:'',
+   order_qty:0,
+   prepacks_total_quantity:0,
+   assembled_qty:0,
+   item_description:'',
+   batch_no:'',
+   order_no:'',
+   line_no:''
+
+
+});
+
 const ItemInAssembledArray=(item_no)=>{
    const existingItemIndex= assembledArray.value.findIndex(item => item.item_no === item_no)
    return(existingItemIndex!==-1)
@@ -116,14 +130,37 @@ const ItemInAssembledArray=(item_no)=>{
 const submitForm=()=>{
    //push item into assembled array
 
+
+     if ((form2.order_qty-form2.prepacks_total_quantity)!=form.assembled_qty)
+     {
+           Swal.fire({
+                                        title: 'The assembled qty is lower/higher than expected',
+                                        text: "Are you sure you want to assemble non default qty?",
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#3085d6',
+                                        cancelButtonColor: '#d33',
+                                        confirmButtonText: 'Ok'
+                                        }).then((result) => {
+                                            if (!result.isConfirmed) { return}
+                        });
+
+     }
+
+
     const existingItemIndex = assembledArray.value.findIndex(item => item.item_no === form.item_no);
 
-    if (existingItemIndex !== -1) {
+
+
+
+    if (existingItemIndex !== -1)
+    {
       // If the key already exists, update the value
-    //   alert('here')
+      //   alert('here')
       assembledArray.value[existingItemIndex].item_no = form.item_no;
       assembledArray.value[existingItemIndex].assembled_qty = form.assembled_qty;
-    } else {
+    } else
+    {
       // If the key doesn't exist, push a new key-value pair
       assembledArray.value.push({ 'item_no':form.item_no,
                                    'assembled_qty':form.assembled_qty,
@@ -146,6 +183,8 @@ const submitForm=()=>{
 
 
 const updateScannedItem =(item)=>{
+
+
 //update form
     form.item_no=item.item_no
     form.barcode=item.barcode
@@ -156,6 +195,20 @@ const updateScannedItem =(item)=>{
     form.item_description=item.item_description
     form.order_no=item.order_no
     form.line_no=item.line_no
+    form.batch_no=''
+
+
+    ///hold the current item statically
+
+    form2.item_no=item.item_no
+    form2.barcode=item.barcode
+    form2.order_qty=item.order_qty
+    form2.prepacks_total_quantity=item.prepacks_total_quantity
+    form2.assembled_qty=item.order_qty-item.prepacks_total_quantity
+    form2.pick_no=props.pick_no
+    form2.item_description=item.item_description
+    form2.order_no=item.order_no
+    form2.line_no=item.line_no
 
 
 
@@ -163,7 +216,13 @@ const updateScannedItem =(item)=>{
 
 
 
+
+
 const closeAssembly=()=>{
+
+     //if the assembled quantity is not equal to the ordered quantity
+
+
 
      Swal.fire({
                                         title: 'Are you sure?',
@@ -217,10 +276,12 @@ const closeAssembly=()=>{
                                     <div flex flex-row>
                                         <!-- <Pagination :links="orderLines.meta.links" /> -->
                                                 <!-- <Button type="button" rounded disabled label="Total Lines"  :badge=props.orderLines.meta.total badgeClass="p-badge-danger" outlined  /> -->
+                                                <!-- :disabled="assembledArray.length==orderLines.data.length" -->
                                                 <Button
                                                     class="justify-end"
                                                    label="Close Assembly"
                                                    @click="closeAssembly()"
+
 
 
                                                 />
