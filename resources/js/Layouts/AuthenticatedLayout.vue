@@ -55,6 +55,10 @@ const showingNavigationDropdown = ref(false);
                                  <NavLink :href="route('order.pack')" :active="route().current('order.pack')">
                                     Assembly
                                 </NavLink>
+
+                                <NavLink :href="route('packing.index')" :active="route().current('packing.index')">
+                                    Packing
+                                </NavLink>
                                 <NavLink :href="route('items.index')" :active="route().current('items.index')">
                                     Items
                                 </NavLink>
@@ -178,6 +182,9 @@ const showingNavigationDropdown = ref(false);
                                 </NavLink>
                                  <NavLink :href="route('order.pack')" :active="route().current('order.pack')">
                                     Assembly
+                                </NavLink>
+                                <NavLink :href="route('packing.index')" :active="route().current('packing.index')">
+                                    Packing
                                 </NavLink>
 
                                 <NavLink :href="route('items.index')" :active="route().current('items.index')">

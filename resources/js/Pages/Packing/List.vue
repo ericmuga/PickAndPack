@@ -3,16 +3,9 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
-// import Button from 'primevue/button';
-
 import { Inertia } from '@inertiajs/inertia';
 import debounce from 'lodash/debounce';
 import {watch, ref,onMounted} from 'vue';
-
-import Swal from 'sweetalert2'
-
-import SearchBox from '@/Components/SearchBox.vue'
-
 const search=ref()
 watch(search, debounce(()=>{Inertia.post('/order/all',{search:search.value}, {preserveScroll: true})}, 500));
 
@@ -24,12 +17,15 @@ const prop=defineProps({
     inputField.value.focus();
 });
 let newItem=ref('');
+
 watch( newItem,
-debounce( ()=>{Inertia.get(route('order.pack'),{'search':newItem.value})})
+debounce( ()=>{Inertia.get(route('packing.index'),{'search':newItem.value})})
 ,500);
 
 
-const confirmPack=(order_no,part)=>{ Inertia.get(route('order.scanItemsGET',{'order_no':order_no,'part_no':part}))}
+const confirmPack=(order_no,part)=>{ Inertia.get(route('packing.pack',{'order_no':order_no,'part_no':part}))}
+
+
 </script>
 
 
@@ -38,7 +34,7 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('order.scanItemsGET',{'or
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">Assembly</h2>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">Packing</h2>
         </template>
 
         <div class="py-6">
@@ -158,7 +154,7 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('order.scanItemsGET',{'or
         </td>
         <td class="p-1 px-3 py-2 text-xs text-center " v-if="order.part_a!=0">
 
-            <Button v-show="order.confirm_a" icon="pi pi-cart-plus" severity="warning" rounded :label="pack" @click="confirmPack(order.order_no,'A')" />
+            <Button v-show="order.confirm_a" icon="pi pi-gift" severity="danger" rounded :label="pack" @click="confirmPack(order.order_no,'A')" />
 <!--
             <Button  v-show="!order.confirm_a" icon="pi pi-bell" severity="warning" :badge=order.part_a text raised rounded aria-label="Notification" @click="ConfirmPrint(order.order_no,'A')"/>
          -->
@@ -167,7 +163,7 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('order.scanItemsGET',{'or
 
         </td>
         <td class="p-1 px-3 py-2 text-xs text-center " v-if="order.part_b!=0">
-            <Button v-show="order.confirm_b" icon="pi pi-cart-plus" severity="warning" rounded :label="pack" @click="confirmPack(order.order_no,'B')" />
+            <Button v-show="order.confirm_b" icon="pi pi-gift" severity="danger" rounded :label="pack" @click="confirmPack(order.order_no,'B')" />
 
             <!-- <Button  v-show="!order.confirm_b" icon="pi pi-bell" severity="warning" :badge=order.part_b text raised rounded aria-label="Notification" @click="
             ConfirmPrint(order.order_no,'B')"/> -->
@@ -176,14 +172,14 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('order.scanItemsGET',{'or
 
         </td>
         <td class="p-1 px-3 py-2 text-xs text-center " v-if="order.part_c!=0">
-            <Button v-show="order.confirm_c" icon="pi pi-cart-plus" severity="warning" rounded :label="pack" @click="confirmPack(order.order_no,'C')" />
+            <Button v-show="order.confirm_c" icon="pi pi-gift" severity="danger" rounded :label="pack" @click="confirmPack(order.order_no,'C')" />
             <!-- <Button  v-show="!order.confirm_c" icon="pi pi-bell" severity="warning" :badge=order.part_c text raised rounded aria-label="Notification" @click="ConfirmPrint(order.order_no,'C')"/> -->
         </td>
         <td v-else  class="bg-slat-200">
 
         </td>
         <td class="p-1 px-3 py-2 text-xs text-center " v-if="order.part_d!=0">
-            <Button v-show="order.confirm_d" icon="pi pi-cart-plus" severity="warning" rounded :label="pack" @click="confirmPack(order.order_no,'D')" />
+            <Button v-show="order.confirm_d" icon="pi pi-gift" severity="danger" rounded :label="pack" @click="confirmPack(order.order_no,'D')" />
             <!-- <Button  v-show="!order.confirm_d" icon="pi pi-bell" :badge=order.part_d severity="warning" text raised rounded aria-label="Notification" @click="ConfirmPrint(order.order_no,'D')"/> -->
         </td>
         <td v-else  class="bg-slat-200">

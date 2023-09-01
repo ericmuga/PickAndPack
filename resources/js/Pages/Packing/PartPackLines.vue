@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
 import Button from 'primevue/button';
-import MultiSelect from 'primevue/multiselect';
+// import MultiSelect from 'primevue/multiselect';
 import InputText from 'primevue/inputtext';
 import { useForm } from '@inertiajs/inertia-vue3'
 import { Inertia } from '@inertiajs/inertia';
@@ -22,7 +22,7 @@ const scanItem=ref(null);
 
 const props= defineProps({
     orderLines:Object,
-    pick_no:String,
+    // pick_no:String,
 
 })
 
@@ -41,17 +41,20 @@ let showModal=ref(false);
 let closeModal=ref(true);
 const isActive = ref(false);
 
-const extractedData = ref(Object.entries(props.orderLines).map(([key, value]) => {
+const extractedData = ref(Object.entries(props.orderLines.data).map(([key, value]) => {
 
     return {
 
-        'total_order_qty': value.total_order_qty ,// Use the value with ref/ Extract 'age' key as value with ref
-        'prepacked_qty': value.prepacked_qty ,// Use the value with ref/ Extract 'age' key as value with ref
-        'barcode':value.barcode,
-        'item_no':value.item_no,
-        'item_description':value.item_description,
-
-    };
+            'order_qty': value.order_qty ,// Use the value with ref/ Extract 'age' key as value with ref
+            'prepacks_total_quantity': value.prepacks_total_quantity ,// Use the value with ref/ Extract 'age' key as value with ref
+            'barcode':value.barcode,
+            'item_no':value.item_no,
+            'item_description':value.item_description,
+            'order_no':value.order_no,
+            'line_no':value.line_no,
+            'packed_qty':value.order_qty,
+            'carton_no':value.carton_no
+          };
 }));
 
 const searchKey = ref('');
@@ -73,7 +76,7 @@ watch( newItem,
                        if (searchResult.value!=0)
                         {
 
-                            if (parseFloat(searchResult.value.total_order_qty)>parseFloat(searchResult.value.prepacked_qty))
+                            if (parseFloat(searchResult.value.order_qty)>parseFloat(searchResult.value.prepacks_total_quantity))
                             {
                                 showModal.value=true
                                 updateScannedItem(searchResult.value)
@@ -81,7 +84,7 @@ watch( newItem,
 
 
                             }
-                            else scanError.value=`Maximum limit ${searchResult.value.total_order_qty} reached.`;
+                            else scanError.value=`Maximum limit ${searchResult.value.order_qty} reached.`;
 
                         }
                         else scanError.value=`Item Not found!`;
@@ -94,11 +97,31 @@ watch( newItem,
 
 const form=useForm({
    item_no:'',
-   total_order_qty:0,
-   prepacked_qty:0,
+   order_qty:0,
+   prepacks_total_quantity:0,
    assembled_qty:0,
    item_description:'',
-   batch_no:''
+   batch_no:'',
+   order_no:'',
+   line_no:'',
+   packed_qty:0,
+   carton_no:1,
+
+
+});
+
+
+const form2=useForm({
+   item_no:'',
+   order_qty:0,
+   prepacks_total_quantity:0,
+   assembled_qty:0,
+   item_description:'',
+   batch_no:'',
+   order_no:'',
+   line_no:'',
+   packed_qty:0,
+   carton_no:1,
 
 
 });
@@ -112,24 +135,54 @@ const ItemInAssembledArray=(item_no)=>{
 const submitForm=()=>{
    //push item into assembled array
 
+
+     if ((form2.order_qty-form2.prepacks_total_quantity)!=form.assembled_qty)
+     {
+           Swal.fire({
+                                        title: 'The packed qty is lower/higher than expected',
+                                        text: "Are you sure you want to pack  non default qty?",
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#3085d6',
+                                        cancelButtonColor: '#d33',
+                                        confirmButtonText: 'Ok'
+                                        }).then((result) => {
+                                            if (!result.isConfirmed) { return}
+                        });
+
+     }
+
+
     const existingItemIndex = assembledArray.value.findIndex(item => item.item_no === form.item_no);
 
-    if (existingItemIndex !== -1) {
+
+
+
+    if (existingItemIndex !== -1)
+    {
       // If the key already exists, update the value
-    //   alert('here')
+      //   alert('here')
       assembledArray.value[existingItemIndex].item_no = form.item_no;
-      assembledArray.value[existingItemIndex].assembled_qty = form.assembled_qty;
+      assembledArray.value[existingItemIndex].packed_qty = form.packed_qty;
       assembledArray.value[existingItemIndex].batch_no = form.batch_no;
-    } else {
+      assembledArray.value[existingItemIndex].carton_no = form.carton_no;
+    //   assembledArray.value[existingItemIndex].assembled_qty = form.packed_qty;
+
+    } else
+    {
       // If the key doesn't exist, push a new key-value pair
       assembledArray.value.push({ 'item_no':form.item_no,
                                    'assembled_qty':form.assembled_qty,
-                                   'total_order_qty':form.total_order_qty,
-                                   'prepacked_qty':form.prepacked_qty,
+                                   'order_qty':form.order_qty,
+                                   'prepacks_total_quantity':form.prepacks_total_quantity,
                                    'item_description':form.item_description,
                                    'barcode':form.barcode,
                                     'item_no':form.item_no,
-                                    'batch_no':form.batch_no
+                                    'order_no':form.order_no,
+                                    'line_no':form.line_no,
+                                    'packed_qty':form.packed_qty,
+                                    'carton_no':form.carton_no,
+
                                 });
     }
 
@@ -141,15 +194,37 @@ const submitForm=()=>{
 
 
 const updateScannedItem =(item)=>{
+
+
 //update form
     form.item_no=item.item_no
     form.barcode=item.barcode
-    form.total_order_qty=item.total_order_qty
-    form.prepacked_qty=item.prepacked_qty
-    form.assembled_qty=item.total_order_qty-item.prepacked_qty
+    form.order_qty=item.order_qty
+    form.prepacks_total_quantity=item.prepacks_total_quantity
+    form.assembled_qty=item.order_qty-item.prepacks_total_quantity
     form.pick_no=props.pick_no
     form.item_description=item.item_description
+    form.order_no=item.order_no
+    form.line_no=item.line_no
     form.batch_no=''
+    form.packed_qty=item.packed_qty
+    form.carton_no=item.carton_no
+
+
+    ///hold the current item statically
+
+    form2.item_no=item.item_no
+    form2.barcode=item.barcode
+    form2.order_qty=item.order_qty
+    form2.prepacks_total_quantity=item.prepacks_total_quantity
+    form2.assembled_qty=item.order_qty-item.prepacks_total_quantity
+    form2.pick_no=props.pick_no
+    form2.item_description=item.item_description
+    form2.order_no=item.order_no
+    form2.line_no=item.line_no
+    form2.batch_no=item.batch_no
+    form2.packed_qty=item.packed_qty
+    form2.carton_no=item.carton_no
 
 
 
@@ -157,18 +232,24 @@ const updateScannedItem =(item)=>{
 
 
 
+
+
 const closeAssembly=()=>{
+
+     //if the assembled quantity is not equal to the ordered quantity
+
+
 
      Swal.fire({
                                         title: 'Are you sure?',
-                                        text: "Assembled orders may not be undone!",
+                                        text: "Packed orders may not be undone!",
                                         icon: 'warning',
                                         showCancelButton: true,
                                         confirmButtonColor: '#3085d6',
                                         cancelButtonColor: '#d33',
-                                        confirmButtonText: 'Close Assembly!'
+                                        confirmButtonText: 'Pack Order!'
                                         }).then((result) => {
-                                            if (result.isConfirmed) {Inertia.post(route('picks.store'),{'data':assembledArray.value,'pick_no':props.pick_no});}
+                                            if (result.isConfirmed) {Inertia.post(route('packing.close'),{'data':assembledArray.value});}
                         })
 
 
@@ -182,7 +263,7 @@ const closeAssembly=()=>{
 </script>
 
 <template >
-    <Head title="Orders"/>
+    <Head title="Packing"/>
 
     <AuthenticatedLayout  @add="showModal=true">
         <!-- <template #header>
@@ -211,10 +292,13 @@ const closeAssembly=()=>{
                                     <div flex flex-row>
                                         <!-- <Pagination :links="orderLines.meta.links" /> -->
                                                 <!-- <Button type="button" rounded disabled label="Total Lines"  :badge=props.orderLines.meta.total badgeClass="p-badge-danger" outlined  /> -->
+                                                <!-- :disabled="assembledArray.length==orderLines.data.length" -->
                                                 <Button
                                                     class="justify-end"
-                                                   label="Close Assembly"
+                                                    severity="warning"
+                                                   label="End Packing"
                                                    @click="closeAssembly()"
+
 
 
                                                 />
@@ -249,9 +333,9 @@ const closeAssembly=()=>{
                                             <div class="w-full m-2 text-center">
 
 
-                                               {{assembledArray.length }} / {{ orderLines.length }}
+                                               {{assembledArray.length }} / {{ orderLines.data.length }}
 
-                                               <ProgressBar :value="Math.round((assembledArray.length)/(orderLines.length)*100)" />
+                                               <ProgressBar :value="Math.round((assembledArray.length)/(orderLines.data.length)*100)" />
 
                                             </div>
 
@@ -280,7 +364,7 @@ const closeAssembly=()=>{
                                                         <tbody>
                                                             <tr
 
-                                                              v-for="line in orderLines" :key="line.item_description"
+                                                              v-for="line in orderLines.data" :key="line.item_description"
 
                                                                 class="bg-white border-b dark:bg-gray-900 dark:border-gray-700 hover:bg-slate-400 hover:text-white ">
                                                                 <div v-if="!ItemInAssembledArray(line.item_no)" class="flex justify-between">
@@ -294,18 +378,18 @@ const closeAssembly=()=>{
                                                                     {{ line.barcode }}
                                                                 </td>
                                                                 <td class="px-3 py-2 text-xs">
-                                                                    {{ line.total_order_qty }}
+                                                                    {{ line.order_qty }}
                                                                 </td>
 
                                                                 <!-- <td class="px-3 py-2 text-xs">
-                                                                    {{ line.prepacked_qty}}
+                                                                    {{ line.prepacks_total_quantity}}
                                                                 </td> -->
 
                                                                 <!-- <td class="px-3 py-2 text-xs text-center text-black bg-yellow-300 rounded-sm">
                                                                     <input
                                                                       class="text-center rounded"
                                                                       v-model="order.ass_qty"
-                                                                      :disabled="order.prepacked_qty==order.total_order_qty"
+                                                                      :disabled="order.prepacks_total_quantity==order.order_qty"
                                                                     />
                                                                 </td> -->
                                                                 </div>
@@ -315,12 +399,12 @@ const closeAssembly=()=>{
                                                     </table>
                                                 </div>
                                                 <div class="col-span-1"  >
-                                             <div  class="w-full p-3 m-2 text-center text-white bg-slate-400"> Assembled</div>
+                                             <div  class="w-full p-3 m-2 text-center text-white bg-slate-400"> Packed</div>
                                                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 ">
                                                         <!-- <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
                                                             <tr class="bg-slate-300">
-                                                                <th  scopes="col" class="px-6 py-3">Item No.</th>
+                                                                <th  scope="col" class="px-6 py-3">Item No.</th>
                                                                 <th  scope="col" class="px-6 py-3">Item</th>
 
                                                                 <th  scope="col" class="px-6 py-3">Barcode</th>
@@ -351,16 +435,19 @@ const closeAssembly=()=>{
                                                                 <td class="px-3 py-2 text-xs">
                                                                     {{ line.assembled_qty }}
                                                                 </td>
+                                                                 <td class="px-3 py-2 text-xs">
+                                                                    Carton:{{ line.carton_no }}
+                                                                </td>
 
                                                                 <!-- <td class="px-3 py-2 text-xs">
-                                                                    {{ line.prepacked_qty}}
+                                                                    {{ line.prepacks_total_quantity}}
                                                                 </td> -->
 
                                                                 <!-- <td class="px-3 py-2 text-xs text-center text-black bg-yellow-300 rounded-sm">
                                                                     <input
                                                                       class="text-center rounded"
                                                                       v-model="order.ass_qty"
-                                                                      :disabled="order.prepacked_qty==order.total_order_qty"
+                                                                      :disabled="order.prepacks_total_quantity==order.order_qty"
                                                                     />
                                                                 </td> -->
                                                                 </div>
@@ -418,25 +505,51 @@ const closeAssembly=()=>{
         <div class="flex flex-row justify_between ">
 
             <span class="px-3 text-center capitalize">Ordered Qty</span>
-            <span class="px-3 text-center capitalize">{{ form.total_order_qty }}</span>
+            <span class="px-3 text-center capitalize">{{ form.order_qty }}</span>
         </div>
         <div class="flex flex-row justify_between">
 
             <span class="px-3 text-center capitalize">Prepacked Qty</span>
-            <span class="px-3 text-center capitalize">{{ form.prepacked_qty }}</span>
+            <span class="px-3 text-center capitalize">{{ form.prepacks_total_quantity }}</span>
         </div>
 
 
-           <InputText
-             ref="scanItem"
-             v-model="form.assembled_qty"
-             :placeholder="form.assembled_qty"
-           />
-           <InputText
 
-             v-model="form.batch_no"
-             placeholder="Batch Nos."
+
+
+           <div class="flex flex-row items-center justify_between">
+
+                <span class="px-3 text-center capitalize">Packed Qty.</span>
+                <InputText
+                    ref="scanItem"
+
+                    v-model="form.packed_qty"
+                    :placeholder="form.packed_qty"
+                />
+            </div>
+
+           <div class="flex flex-row items-center justify_between">
+
+                <span class="px-3 text-center capitalize">Batch Nos.</span>
+                <InputText
+
+                        v-model="form.batch_no"
+                        placeholder="Batch Nos."
+                        />
+            </div>
+
+
+           <div class="flex flex-row items-center justify_between">
+
+            <span class="px-3 text-center capitalize">Carton no.</span>
+            <InputText
+
+             v-model="form.carton_no"
+             placeholder="Carton No."
            />
+        </div>
+
+
             <!-- <input v-model="form.shp_date" placeholder="Shipment Date" type="date"/> -->
             <!-- {{currentItem}} -->
             <Button  label="Assemble" icon="pi pi-send" class="w-sm" severity="success"  type="submit" :disabled="form.processing" />

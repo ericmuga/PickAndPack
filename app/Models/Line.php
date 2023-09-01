@@ -43,6 +43,11 @@ use Compoships;
             return $this->hasMany(LinePrepack::class,['order_no','line_no'],['order_no','line_no']);
     }
 
+    public function packing()
+    {
+        return $this->hasMany(Packing::class,['order_no','line_no'],['order_no','line_no']);
+    }
+
     public function assemblies()
     {
         return $this->hasMany(AssemblyLine::class,['order_no','line_no'],['order_no','line_no']);

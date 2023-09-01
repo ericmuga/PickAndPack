@@ -5,6 +5,7 @@ use App\Http\Controllers\{ConfirmationController, DashboardController, ItemContr
                           LinePrepackController,
                           ProfileController,
                           OrderController,
+    PackingController,
     PickController,
     PrepackController, StockController};
 use Illuminate\Foundation\Application;
@@ -43,7 +44,12 @@ Route::middleware('auth')->group(function () {
 
         Route::post('download/linePrepacks',[LinePrepackController::class,'export'])->name('linePrepacks.download');
         Route::resource('linePrepacks',LinePrepackController::class);
-
+        // Route::resource('packing',PackingController::class);
+        Route::get('packing',[PackingController::class,'index'])->name('packing.index');
+        Route::get('packing/pack',[PackingController::class, 'pack'])->name('packing.pack');
+        Route::post('packing/closeAssembly',[PackingController::class,'closeAssembly'])->name('packing.close');
+        // Route::post('/packing/scanItems', [PackingController::class, 'scanItems'])->name('packing.scanItems');
+        // Route::get('/packing/scanItems', [PackingController::class, 'scanItems'])->name('packing.scanItemsGET');
 
 
         // Route::get('linePrepacks',[LinePrepackController::class,'index'])->name('slinePrepacks.index');

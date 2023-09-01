@@ -103,7 +103,17 @@ class Transfer extends Model
                                   assembly_lines.line_no=a.line_no
                                     and assembly_lines.order_no=a.order_no
                                     and a.item_no=Transfers.item_no
-                                ) as assembled_qty
+                                ) as assembled_qty,
+                                (select sum(packing.packed_qty)
+                                  from packing
+                                  inner join lines as a  on a.line_no=packing.line_no
+                                  inner join orders as b on a.order_no=b.order_no and b.shp_date>=DATEADD(d,0,DATEDIFF(d,0,GETDATE()))
+                                  where
+                                  packing.line_no=a.line_no
+                                    and packing.order_no=a.order_no
+                                    and a.item_no=Transfers.item_no
+                                ) as packed_qty
+
                            ')
                 ->groupBy('Transfers.item_no','items.description');
 
