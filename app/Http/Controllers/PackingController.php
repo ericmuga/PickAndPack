@@ -69,6 +69,10 @@ class PackingController extends Controller
         // ->where('line_no',$line['line_no'])
         // ->exists())
 
+        if (!Packing::where('order_no',$line['order_no'])
+                    ->where('order_no',$line['line_no'])
+                    ->exist())
+
         Packing::updateOrCreate([
             'order_no'=>$line['order_no'],
             'line_no'=>$line['line_no'],
