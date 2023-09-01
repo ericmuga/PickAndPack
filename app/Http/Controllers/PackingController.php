@@ -69,11 +69,15 @@ class PackingController extends Controller
         // ->where('line_no',$line['line_no'])
         // ->exists())
 
-        if (!Packing::where('order_no',$line['order_no'])
+        if (Packing::where('order_no',$line['order_no'])
                     ->where('order_no',$line['line_no'])
-                    ->exist())
+                    ->exists())
 
-        Packing::updateOrCreate([
+        Packing::where('order_no',$line['order_no'])
+                    ->where('order_no',$line['line_no'])
+                    ->delete();
+
+        Packing::create([
             'order_no'=>$line['order_no'],
             'line_no'=>$line['line_no'],
             'user_id'=>$request->user()->id,
