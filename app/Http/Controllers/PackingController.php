@@ -79,7 +79,7 @@ class PackingController extends Controller
         // else redirect()->back()->withErrors(['message'=>'line'.$line['line_no'].'of Order'.$line['order_no'].'already exists']);
     }
 
-    return redirect(route('packing.pack'));
+    return redirect(route('packing.index'));
 }
 
 
