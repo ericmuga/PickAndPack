@@ -74,7 +74,7 @@ class PackingController extends Controller
                     ->exists())
 
         Packing::where('order_no',$line['order_no'])
-                    ->where('order_no',$line['line_no'])
+                    ->where('line_no',$line['line_no'])
                     ->delete();
 
         Packing::create([
