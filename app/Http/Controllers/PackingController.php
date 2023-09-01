@@ -82,7 +82,7 @@ class PackingController extends Controller
             'line_no'=>$line['line_no'],
             'user_id'=>$request->user()->id,
             'packed_qty'=>$line['packed_qty'],
-            'carton_no'=>$line['carton_no'],
+            // 'carton_no'=>$line['carton_no'],
         ]);
         // else redirect()->back()->withErrors(['message'=>'line'.$line['line_no'].'of Order'.$line['order_no'].'already exists']);
     }

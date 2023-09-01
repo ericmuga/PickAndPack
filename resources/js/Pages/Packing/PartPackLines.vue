@@ -76,7 +76,7 @@ watch( newItem,
                        if (searchResult.value!=0)
                         {
 
-                            if (parseFloat(searchResult.value.order_qty)>parseFloat(searchResult.value.prepacks_total_quantity))
+                            if (parseFloat(searchResult.value.packed_qty)>parseFloat(searchResult.value.prepacks_total_quantity))
                             {
                                 showModal.value=true
                                 updateScannedItem(searchResult.value)
