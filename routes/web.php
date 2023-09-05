@@ -44,6 +44,7 @@ Route::middleware('auth')->group(function () {
 
         Route::post('download/linePrepacks',[LinePrepackController::class,'export'])->name('linePrepacks.download');
         Route::resource('linePrepacks',LinePrepackController::class);
+        // Route::get('stores/form',fn()=>inertia('Stores/Form'))->name('stores.form');
         // Route::resource('packing',PackingController::class);
         Route::get('packing',[PackingController::class,'index'])->name('packing.index');
         Route::get('packing/pack',[PackingController::class, 'pack'])->name('packing.pack');

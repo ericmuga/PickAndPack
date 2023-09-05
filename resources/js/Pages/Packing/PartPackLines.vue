@@ -494,7 +494,7 @@ const closeAssembly=()=>{
   <Modal :show="showModal" @close="showModal=false" :errors="errors"> <!-- {{ dynamicModalContent  }} -->
      <!-- {{ showModal }} -->
 
-     <div class="p-4 font-bold text-center text-white bg-slate-600"> Assembly</div>
+     <div class="p-4 font-bold text-center text-white bg-slate-600"> Packing</div>
        <div>
 
 
@@ -552,7 +552,7 @@ const closeAssembly=()=>{
 
             <!-- <input v-model="form.shp_date" placeholder="Shipment Date" type="date"/> -->
             <!-- {{currentItem}} -->
-            <Button  label="Assemble" icon="pi pi-send" class="w-sm" severity="success"  type="submit" :disabled="form.processing" />
+            <Button  label="Pack" icon="pi pi-send" class="w-sm" severity="success"  type="submit" :disabled="form.processing" />
             <Button label="Cancel" severity="danger" icon="pi pi-cancel" @click="showModal=false"/>
 
 
