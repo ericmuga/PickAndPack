@@ -26,10 +26,13 @@ const props= defineProps({
 
 })
 
+
 onMounted(() => {
     inputField.value.focus();
 });
 
+
+const manualScan=(item)=>{newItem.value=''; newItem.value=item;};
 const newItem = ref('');
 const items = reactive([]);
 const count = ref(0);
@@ -88,6 +91,7 @@ watch( newItem,
                         }
                         else scanError.value=`Item Not found!`;
                     }
+                      newItem.value='' 
                         }
             ,300)
 
@@ -277,14 +281,7 @@ const closeAssembly=()=>{
                                         <!-- <Pagination :links="orderLines.meta.links" /> -->
                                                 <!-- <Button type="button" rounded disabled label="Total Lines"  :badge=props.orderLines.meta.total badgeClass="p-badge-danger" outlined  /> -->
                                                 <!-- :disabled="assembledArray.length==orderLines.data.length" -->
-                                                <Button
-                                                    class="justify-end"
-                                                   label="Close Assembly"
-                                                   @click="closeAssembly()"
-
-
-
-                                                />
+                                               
                                     </div>
 
 
@@ -346,6 +343,7 @@ const closeAssembly=()=>{
 
                                                         <tbody>
                                                             <tr
+                                                              @click="newItem=line.item_no"
 
                                                               v-for="line in orderLines.data" :key="line.item_description"
 
@@ -401,7 +399,9 @@ const closeAssembly=()=>{
 
                                                         <tbody>
 
-                                                            <tr v-for="line in assembledArray" :key="line.item_description"
+                                                            <tr v-for="line in assembledArray" :key="line.item_description" 
+                                                            @click="newItem=line.item_no"
+
                                                                 class="bg-white border-b dark:bg-gray-900 dark:border-gray-700 hover:bg-slate-400 hover:text-white ">
 
                                                                 <div v-if="ItemInAssembledArray(line.item_no)" class="flex justify-between">
@@ -445,6 +445,14 @@ const closeAssembly=()=>{
                                             <Toolbar>
                                                 <template #center>
                                                     <!-- <Pagination :links="orderLines.meta.links" /> -->
+                                                     <Button
+                                                    class="justify-end"
+                                                   label="Close Assembly"
+                                                   @click="closeAssembly()"
+
+
+
+                                                />
 
                                                 </template>
                                             </Toolbar>

@@ -30,7 +30,9 @@ class PackingController extends Controller
                                             );
 
 
-     $listing=collect((new ColumnListing('orders'))->getColumns())->only('customer_name','shp_name','order_no','shp_date','sp_code','ending_date');
+     $listing=collect((new ColumnListing('orders'))->getColumns())
+                     ->only('customer_name','shp_name','order_no','shp_date','sp_code','ending_date');
+
      return inertia('Packing/List',['orders'=>$orders,'refreshError'=>null,'columnListing'=>$listing]);
 
 
@@ -41,13 +43,14 @@ class PackingController extends Controller
     public function pack(Request $request)
     {
         // Get the items that belong to the order and part for packing
+        // dd('here');
         $orderLines = Line::query()
                             ->where('order_no', $request->order_no)
                             ->where('part', $request->part_no)
                             ->withSum('prepacks', 'total_quantity')
                             ->withSum('packing','packed_qty')
                             ->orderBy('item_description')
-                            ->paginate(15)
+                            ->paginate(300)
                             ->appends($request->all())
                             ->withQueryString();
 

@@ -45,7 +45,7 @@ class LineController extends Controller
 public function filtered(Request $request)
 {
     $prepackItems=Item::select('description','item_no')
-                      ->whereHas('prepacks',fn($q)=>$q->where('isActive',true))
+                    ->whereHas('prepacks',fn($q)=>$q->where('isActive',true))
                       ->get();
 
 

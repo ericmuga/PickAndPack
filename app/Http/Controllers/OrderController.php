@@ -71,8 +71,8 @@ public function index(Request $request, $e = null)
 // Usage example
 $queryBuilder = Order::current()
                      ->select($columns);
-                    //  ->when($request->has('isConfirmed')&&($request->Confirmed=='true'),fn($q)=>$q->confirmed()) // You can also use `Order::firstWhere('no', 2)` here
-                    //  ->when(!($request->has('isConfirmed'))||($request->has('isConfirmed')&&($request->Confirmed=='false')),fn($q)=>$q->pending()); // You can also use `Order::firstWhere('no', 2)` here
+
+
 $searchParameter = $request->has('search')?$request->search:'';
 $searchColumns = ['customer_name', 'shp_name','order_no'];
 $strictColumns = [];
@@ -81,18 +81,27 @@ $relatedModels = [
                     'relatedModel2' => ['related_column3'],
                  ];
 
+
+
 $searchService = new SearchQueryService($queryBuilder, $searchParameter, $searchColumns, [], []);
+// dd($searchService);
 $orders = $searchService
-    ->with(['confirmations']) // Example of eager loading related models
-    ->search();
+          ->with(['confirmations']) // Example of eager loading related models
+          ->search();
 
 
-    // Get the list of prepack items
-    $prepackItems = Item::select('description', 'item_no')
-                        ->whereHas('prepacks', function ($q) {
-                                        $q->where('isActive',true);
-                                    })
-                        ->get();
+
+
+
+// Get the list of prepack items
+$prepackItems = Item::select('description', 'item_no')
+                    ->whereHas('prepacks', function ($q) {
+                                    $q->where('isActive',true);
+                                })
+                    ->get();
+
+
+
 return inertia('Orders/List', [
         'orders' => OrderResource::collection($orders),
         'refreshError' => $e,

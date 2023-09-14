@@ -89,6 +89,7 @@ watch( newItem,
                         }
                         else scanError.value=`Item Not found!`;
                     }
+                     newItem.value='' 
                         }
             ,300)
 
@@ -363,7 +364,7 @@ const closeAssembly=()=>{
 
                                                         <tbody>
                                                             <tr
-
+                                                               @click="newItem=line.item_no"
                                                               v-for="line in orderLines.data" :key="line.item_description"
 
                                                                 class="bg-white border-b dark:bg-gray-900 dark:border-gray-700 hover:bg-slate-400 hover:text-white ">
@@ -419,6 +420,7 @@ const closeAssembly=()=>{
                                                         <tbody>
 
                                                             <tr v-for="line in assembledArray" :key="line.item_description"
+                                                                @click="newItem=line.item_no"
                                                                 class="bg-white border-b dark:bg-gray-900 dark:border-gray-700 hover:bg-slate-400 hover:text-white ">
 
                                                                 <div v-if="ItemInAssembledArray(line.item_no)" class="flex justify-between">
@@ -433,7 +435,7 @@ const closeAssembly=()=>{
                                                                     {{ line.barcode }}
                                                                 </td>
                                                                 <td class="px-3 py-2 text-xs">
-                                                                    {{ line.assembled_qty }}
+                                                                    {{ line.packed_qty }}
                                                                 </td>
                                                                  <td class="px-3 py-2 text-xs">
                                                                     Carton:{{ line.carton_no }}

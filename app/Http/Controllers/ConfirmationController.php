@@ -21,7 +21,7 @@ public function index(Request $request)
     // dd($request->all());
     $columns = ['customer_name', 'shp_name', 'order_no', 'shp_date', 'sp_code', 'ending_date','ended_by'];
 
-    $queryBuilder = Order::current()
+    $queryBuilder = Order::query()
                         //  ->when(   (!$request->has('search')||(($request->has('search')&&$request->search=='')))&&
                         //             $request->has('isConfirmed')&&
                         //            ($request->isConfirmed=='true'),
