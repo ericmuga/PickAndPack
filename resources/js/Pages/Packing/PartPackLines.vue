@@ -8,7 +8,7 @@ import InputText from 'primevue/inputtext';
 import { useForm } from '@inertiajs/inertia-vue3'
 import { Inertia } from '@inertiajs/inertia';
 // import {debounce} from 'lodash/debounce';
-import {watch, ref,onMounted, nextTick,reactive,computed} from 'vue';
+import {watch, ref,onMounted, nextTick,reactive,computed,onUnmounted} from 'vue';
 import Swal from 'sweetalert2'
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
@@ -28,6 +28,7 @@ const props= defineProps({
 
 onMounted(() => {
     inputField.value.focus();
+    // startTime()
 });
 
 const newItem = ref('');
@@ -40,6 +41,12 @@ let currentOrderQty=ref('');
 let showModal=ref(false);
 let closeModal=ref(true);
 const isActive = ref(false);
+const  vessels=ref([
+                        { label: 'Crate', value: 'Crate' },
+                        { label: 'Carton', value: 'Carton' },
+                        
+                    ]);
+    
 
 const extractedData = ref(Object.entries(props.orderLines.data).map(([key, value]) => {
 
@@ -53,7 +60,11 @@ const extractedData = ref(Object.entries(props.orderLines.data).map(([key, value
             'order_no':value.order_no,
             'line_no':value.line_no,
             'packed_qty':value.order_qty,
-            'carton_no':value.carton_no
+            'packed_pcs':value.order_qty,
+            'carton_no':value.carton_no,
+            'vessel':value.vessel,
+            'from_vessel':value.from_vessel,
+            'to_vessel':value.to_vessel
           };
 }));
 
@@ -69,6 +80,8 @@ const assembledArray=ref([]);
 watch( newItem,
  debounce(
             function () {
+
+                startTimer();
                 if (newItem.value.trim()!='' ){
                             scanError.value = '';
 
@@ -80,10 +93,7 @@ watch( newItem,
                             {
                                 showModal.value=true
                                 updateScannedItem(searchResult.value)
-
-
-
-                            }
+                             }
                             else scanError.value=`Maximum limit ${searchResult.value.order_qty} reached.`;
 
                         }
@@ -95,7 +105,6 @@ watch( newItem,
 
         );
 
-
 const form=useForm({
    item_no:'',
    order_qty:0,
@@ -106,10 +115,15 @@ const form=useForm({
    order_no:'',
    line_no:'',
    packed_qty:0,
+   packed_pcs:0,
    carton_no:1,
-
+   vessel:'',
+   from_vessel:1,
+   to_vessel:0,
 
 });
+
+
 
 
 const form2=useForm({
@@ -122,8 +136,11 @@ const form2=useForm({
    order_no:'',
    line_no:'',
    packed_qty:0,
+   packed_pcs:0,
    carton_no:1,
-
+   vessel:'',
+   from_vessel:1,
+   to_vessel:1,
 
 });
 
@@ -167,6 +184,9 @@ const submitForm=()=>{
       assembledArray.value[existingItemIndex].packed_qty = form.packed_qty;
       assembledArray.value[existingItemIndex].batch_no = form.batch_no;
       assembledArray.value[existingItemIndex].carton_no = form.carton_no;
+      assembledArray.value[existingItemIndex].vessel = form.vessel;
+      assembledArray.value[existingItemIndex].from_vessel = form.from_vessel;
+      assembledArray.value[existingItemIndex].to_vessel = form.to_vessel;
     //   assembledArray.value[existingItemIndex].assembled_qty = form.packed_qty;
 
     } else
@@ -182,7 +202,11 @@ const submitForm=()=>{
                                     'order_no':form.order_no,
                                     'line_no':form.line_no,
                                     'packed_qty':form.packed_qty,
+                                    'packed_pcs':form.packed_pcs,
                                     'carton_no':form.carton_no,
+                                    'vessel':form.vessel,
+                                    'from_vessel':form.from_vessel,
+                                    'to_vessel':form.to_vessel,
 
                                 });
     }
@@ -209,7 +233,11 @@ const updateScannedItem =(item)=>{
     form.line_no=item.line_no
     form.batch_no=''
     form.packed_qty=item.packed_qty
+    form.packed_qty=item.packed_qty
     form.carton_no=item.carton_no
+    form.vessel=item.vessel
+    form.to_vessel=item.to_vessel
+    form.from_vessel=item.from_vessel
 
 
     ///hold the current item statically
@@ -225,7 +253,11 @@ const updateScannedItem =(item)=>{
     form2.line_no=item.line_no
     form2.batch_no=item.batch_no
     form2.packed_qty=item.packed_qty
+    form2.packed_pcs=item.packed_pcs
     form2.carton_no=item.carton_no
+    form2.vessel=item.vessel
+    form2.to_vessel=item.to_vessel
+    form2.from_vessel=item.from_vessel 
 
 
 
@@ -250,7 +282,18 @@ const closeAssembly=()=>{
                                         cancelButtonColor: '#d33',
                                         confirmButtonText: 'Pack Order!'
                                         }).then((result) => {
-                                            if (result.isConfirmed) {Inertia.post(route('packing.close'),{'data':assembledArray.value});}
+                                            if (result.isConfirmed) 
+                                            {
+
+                                              stopTimer();
+                                              // console.log(formatTime);
+                                                Inertia.post(route('packing.close'),{'data':assembledArray.value,
+                                                                                     'packing_time':formatTime.value,
+                                                                                    }
+                                                             );
+                                            
+
+                                            }
                         })
 
 
@@ -259,7 +302,55 @@ const closeAssembly=()=>{
 
 }
 
+const isRunning = ref(false);
+const startTime = ref(0);
+const currentTime = ref(0);
 
+const formatTime = computed(() => {
+  const totalMilliseconds = currentTime.value;
+  const milliseconds = totalMilliseconds % 1000;
+  const totalSeconds = (totalMilliseconds - milliseconds) / 1000;
+  const seconds = totalSeconds % 60;
+  const totalMinutes = (totalSeconds - seconds) / 60;
+  const minutes = totalMinutes % 60;
+  const hours = (totalMinutes - minutes) / 60;
+  
+  const formatMilliseconds = milliseconds.toString().padStart(3, '0');
+  const formatSeconds = seconds.toString().padStart(2, '0');
+  const formatMinutes = minutes.toString().padStart(2, '0');
+  const formatHours = hours.toString().padStart(2, '0');
+
+  return `${formatHours}:${formatMinutes}:${formatSeconds}.${formatMilliseconds}`;
+});
+
+
+const startTimer = () => {
+  if (!isRunning.value) {
+    startTime.value = Date.now() - currentTime.value;
+    isRunning.value = true;
+  }
+};
+
+const stopTimer = () => {
+  if (isRunning.value) {
+    isRunning.value = false;
+  }
+};
+const resetTimer = () => {
+  if (!isRunning.value) {
+    currentTime.value = 0;
+  }
+};
+
+const timerInterval = setInterval(() => {
+  if (isRunning.value) {
+    currentTime.value = Date.now() - startTime.value;
+  }
+}, 100);
+
+onUnmounted(() => {
+  clearInterval(timerInterval);
+});
 
 </script>
 
@@ -294,15 +385,13 @@ const closeAssembly=()=>{
                                         <!-- <Pagination :links="orderLines.meta.links" /> -->
                                                 <!-- <Button type="button" rounded disabled label="Total Lines"  :badge=props.orderLines.meta.total badgeClass="p-badge-danger" outlined  /> -->
                                                 <!-- :disabled="assembledArray.length==orderLines.data.length" -->
-                                                <Button
-                                                    class="justify-end"
-                                                    severity="warning"
-                                                   label="End Packing"
-                                                   @click="closeAssembly()"
-
-
-
-                                                />
+                                               
+                                               <div>
+                                                     <h2 class="font-bold tracking-wide text-xl text-red-500"> {{ formatTime }}</h2>
+                                                      <!--  <button @click="startTimer" :disabled="isRunning">Start</button>
+                                                        <button @click="stopTimer" :disabled="!isRunning">Stop</button>
+                                                        <button @click="resetTimer" :disabled="!isRunning && currentTime === 0">Reset</button> -->
+                                                  </div>
                                     </div>
 
 
@@ -365,7 +454,7 @@ const closeAssembly=()=>{
                                                         <tbody>
                                                             <tr
                                                                @click="newItem=line.item_no"
-                                                              v-for="line in orderLines.data" :key="line.item_description"
+                                                                v-for="line in orderLines.data" :key="line.item_description"
 
                                                                 class="bg-white border-b dark:bg-gray-900 dark:border-gray-700 hover:bg-slate-400 hover:text-white ">
                                                                 <div v-if="!ItemInAssembledArray(line.item_no)" class="flex justify-between">
@@ -465,9 +554,15 @@ const closeAssembly=()=>{
                                                 </div>
                                             </div>
                                             <Toolbar>
-                                                <template #center>
-                                                    <!-- <Pagination :links="orderLines.meta.links" /> -->
 
+                                                <template #center>
+                                                    <Button
+                                                    class="justify-end"
+                                                    severity="warning"
+                                                   label="End Packing"
+                                                   @click="closeAssembly()"
+
+                                              />
                                                 </template>
                                             </Toolbar>
                                         </div>
@@ -503,16 +598,17 @@ const closeAssembly=()=>{
         <form @submit.prevent="submitForm()"
 
         class="flex flex-col justify-center gap-2 p-5">
-        <span class="p-3 text-center capitalize">{{ form.item_description }}</span>
-        <div class="flex flex-row justify_between ">
+        <span class="p-3 text-center capitalize font-bold text-xl text-cyan-800">{{ form.item_description }}</span>
+        <div class="flex flex-row justify_between text-center text-blue-800 text-md w-full">
 
             <span class="px-3 text-center capitalize">Ordered Qty</span>
             <span class="px-3 text-center capitalize">{{ form.order_qty }}</span>
-        </div>
+        <span class="px-3 text-center capitalize">Prepacked Qty</span>
+            <span class="px-3 text-center capitalize">{{ form.prepacks_total_quantity }}</span>
+            </div>
         <div class="flex flex-row justify_between">
 
-            <span class="px-3 text-center capitalize">Prepacked Qty</span>
-            <span class="px-3 text-center capitalize">{{ form.prepacks_total_quantity }}</span>
+            
         </div>
 
 
@@ -521,35 +617,70 @@ const closeAssembly=()=>{
 
            <div class="flex flex-row items-center justify_between">
 
-                <span class="px-3 text-center capitalize">Packed Qty.</span>
+                <span class="px-3 text-center capitalize">Quantities</span>
+                <span class="px-3 text-center capitalize">Weight</span>
+                <InputText
+                    ref="scanItem"
+                    v-model="form.packed_qty"
+                    :placeholder="form.packed_qty"
+                /> 
+                <span class="px-3 text-center capitalize">PCS.</span>
                 <InputText
                     ref="scanItem"
 
-                    v-model="form.packed_qty"
+                    v-model="form.packed_pcs"
                     :placeholder="form.packed_qty"
                 />
             </div>
 
+            <div class="flex flex-row items-center justify_between">
+
+               
+            </div>
+
+           
+
            <div class="flex flex-row items-center justify_between">
 
-                <span class="px-3 text-center capitalize">Batch Nos.</span>
-                <InputText
+            
+            <Dropdown
+               v-model="form.vessel"
+               :options=vessels
+               optionLabel='label'
+               optionValue='value'
+               placeholder='Vessel'
+               class="mx-2"
+             />
+             From
+            <InputNumber
+             class="mx-2"
+             v-model="form.from_vessel"
+             
+           />
+           To
+            <InputNumber
+             class="mx-2"
+             v-model="form.to_vessel"
+             
+           />
+        </div>
+        <div class="flex flex-row items-center justify_between gap-3">
 
-                        v-model="form.batch_no"
+                <span class="px-3 text-center capitalize">Batch Nos.</span>
+                From
+                <InputText
+                      v-model="form.batch_no"
                         placeholder="Batch Nos."
+                        class="mx-2"
+                        />
+                        To
+                        <InputText
+                      v-model="form.to_no"
+                        placeholder="Batch Nos."
+                        class="mx-2"
                         />
             </div>
 
-
-           <div class="flex flex-row items-center justify_between">
-
-            <span class="px-3 text-center capitalize">Carton no.</span>
-            <InputText
-
-             v-model="form.carton_no"
-             placeholder="Carton No."
-           />
-        </div>
 
 
             <!-- <input v-model="form.shp_date" placeholder="Shipment Date" type="date"/> -->

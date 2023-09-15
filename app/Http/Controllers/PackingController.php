@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Resources\{OrderResource,LineResource};
 use Carbon\Carbon;
 use App\Helpers\ColumnListing;
-use App\Models\{Line,Order, Packing};
+use App\Models\{Line,Order, Packing,PackingSession};
 
 class PackingController extends Controller
 {
@@ -60,17 +60,57 @@ class PackingController extends Controller
         ]);
     }
 
-    public function closeAssembly(Request $request)
+    public function closePacking(Request $request)
 {
     //
-    //    dd($request->all());
+       // dd(Line::where('order_no',$request->data[0]['order_no'])
+       //                 ->where('line_no',$request->data[0]['line_no'])
+       //                 ->first()->part);
+    // dd($request->packing_time);
     //insert the line into assembly line
+    
+    //insert a packing session
+
+// Insert Packing Session
+          
+
+
+       /*
+
+            $table->id();
+            $table->string('order_no');
+            $table->string('part');
+            $table->time('packing_time');
+            $table->foreignIdFor(User::class);
+            $table->timestamps();
+
+       */
+      
+
+
+       PackingSession::create([
+                                       'order_no'=>$request->data[0]['order_no'],
+                                       'part'=>Line::where('order_no',$request->data[0]['order_no'])
+                                           ->where('line_no',$request->data[0]['line_no'])
+                                           ->first()->part,
+                                        'packing_time'=>$request->packing_time,
+                                        'user_id'=>$request->user()->id
+                            ]);
+
+        
+
+
+
     foreach($request->data as $line)
     {
         //  dd($line);
         // if (!AssemblyLine::where('order_no',$line['order_no'])
         // ->where('line_no',$line['line_no'])
         // ->exists())
+
+
+       
+
 
         if (Packing::where('order_no',$line['order_no'])
                     ->where('order_no',$line['line_no'])
@@ -85,6 +125,11 @@ class PackingController extends Controller
             'line_no'=>$line['line_no'],
             'user_id'=>$request->user()->id,
             'packed_qty'=>$line['packed_qty'],
+            'packed_pcs'=>$line['packed_pcs'],
+            'from_vessel'=>$line['from_vessel'],
+            'to_vessel'=>$line['to_vessel'],
+            'vessel'=>$line['vessel'],
+            ''
             // 'carton_no'=>$line['carton_no'],
         ]);
         // else redirect()->back()->withErrors(['message'=>'line'.$line['line_no'].'of Order'.$line['order_no'].'already exists']);

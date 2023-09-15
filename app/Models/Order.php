@@ -50,6 +50,12 @@ class Order extends Model
 
     }
 
+
+    public function FunctionName($value='')
+    {
+        // code...
+    }
+
     public function scopeCurrent(Builder $query) :void
     {
       $query->where('ending_date','>=',Carbon::today()->toDateString());
@@ -99,6 +105,11 @@ class Order extends Model
     $query = $this->hasMany(LinePrepack::class, 'order_no', 'order_no');
     $query->getQuery()->withoutGlobalScope(OrderByScope::class);
     return $query;
+    }
+
+    public function packin_session($PARAMETERS)
+    {
+        return $this->hasMany(PackingSession::class,'order_no','order_no');
     }
 
 }

@@ -48,7 +48,7 @@ Route::middleware('auth')->group(function () {
         // Route::resource('packing',PackingController::class);
         Route::get('packing',[PackingController::class,'index'])->name('packing.index');
         Route::get('packing/pack',[PackingController::class, 'pack'])->name('packing.pack');
-        Route::post('packing/closeAssembly',[PackingController::class,'closeAssembly'])->name('packing.close');
+        Route::post('packing/closeAssembly',[PackingController::class,'closePacking'])->name('packing.close');
         // Route::post('/packing/scanItems', [PackingController::class, 'scanItems'])->name('packing.scanItems');
         // Route::get('/packing/scanItems', [PackingController::class, 'scanItems'])->name('packing.scanItemsGET');
 

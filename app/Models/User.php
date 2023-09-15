@@ -53,4 +53,11 @@ class User extends Authenticatable
         return $this->hasMany(AssemblyLine::class);
      }
 
+     public function packing_sessions()
+     {
+         return $this->hasMany(PackingSession::class);
+     }
+
+
+
 }

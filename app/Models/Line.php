@@ -64,6 +64,10 @@ use Compoships;
     //                 ->withPivot(['prepack_count', 'total_quantity'])
     //                 ->withTimestamps();
     // }
-
+ 
+  public function packing_time()
+  {
+      return $this->hasMany(PackingSession::class,'line_no','line_no');
+  }
 
 }
