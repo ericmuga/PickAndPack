@@ -45,22 +45,18 @@ const showingNavigationDropdown = ref(false);
                                 </NavLink>
         </li>
         <li>
+           <NavLink :href="route('picks.index')" :active="route().current('picks.index')">
+                                    Assemble Picks
+                                </NavLink>
+        </li>
+        <li>
          <NavLink :href="route('packing.index')" :active="route().current('packing.index')">
                                     Packing
           </NavLink>
         </li>
      
         
-        <li>
-            <NavLink :href="route('items.index')" :active="route().current('items.index')">
-                                    Items
-                                </NavLink>
-         </li>
-          <li>
-            <NavLink :href="route('prepacks.index')" :active="route().current('prepacks.index')">
-                            Prepacks
-                        </NavLink>
-          </li>
+        
            <li>
             <NavLink :href="route('orders.lines')" :active="route().current('orders.lines')">
                                     Allocate Prepacks
@@ -71,6 +67,12 @@ const showingNavigationDropdown = ref(false);
                                     Prepacked Orders
                                 </NavLink>
           </li>
+          <li>
+             <NavLink :href="route('stocks.index')" :active="route().current('stocks.index')">
+                                   Stocks
+                                </NavLink>
+          </li>
+          
                  
               
     
@@ -82,6 +84,17 @@ const showingNavigationDropdown = ref(false);
             <!-- Dropdown menu -->
             <div id="dropdownNavbar" class="z-10 hidden font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
                 <ul class="py-2 text-sm text-gray-700 dark:text-gray-400" aria-labelledby="dropdownLargeButton">
+                  <li>
+            <NavLink :href="route('items.index')" :active="route().current('items.index')">
+                                    Items
+                                </NavLink>
+         </li>
+          <li>
+            <NavLink :href="route('prepacks.index')" :active="route().current('prepacks.index')">
+                            Prepacks
+                        </NavLink>
+          </li>
+
                   <li>
                     <DropdownLink :href="route('profile.edit')"> Profile </DropdownLink>
                   </li>
