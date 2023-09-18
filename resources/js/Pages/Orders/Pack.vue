@@ -85,41 +85,29 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('order.scanItemsGET',{'or
     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
         <tr class="bg-slate-300">
-            <!-- <th scope="col" class="px-6 py-3">
-                Barcode
-            </th> -->
-            <th scope="col" class="px-6 py-3">
+            <th scope="col" class="px-2 py-2">
                 Order No.
             </th>
-            <th scope="col" class="px-6 py-3 text-center">
+            <th scope="col" class="px-2 py-2 text-center">
                 Sales Person
             </th>
-            <th scope="col" class="px-6 py-3">
+            <th scope="col" class="px-2 py-2">
                 Ship-to Name
             </th>
-            <th scope="col" class="px-6 py-3">
+            <th scope="col" class="px-2 py-2">
                 Shipment Date
             </th>
 
-            <th scope="col" class="px-6 py-3">
-                Printing Time
-            </th>
-            <th scope="col" class="px-6 py-3">
-                Printed By
-            </th>
-            <th scope="col" class="px-6 py-3">
-                Printing Date
-            </th>
-            <th scope="col" class="px-6 py-3 text-center">
+            <th scope="col" class="px-2 py-2 text-center">
                 Part A Items
             </th>
-            <th scope="col" class="px-6 py-3 text-center">
+            <th scope="col" class="px-2 py-2 text-center">
                 Part B Items
             </th>
-            <th scope="col" class="px-6 py-3 text-center">
+            <th scope="col" class="px-2 py-2 text-center">
                 Part C Items
             </th>
-            <th scope="col" class="px-6 py-3 text-center">
+            <th scope="col" class="px-2 py-2 text-center">
                 Part D Items
             </th>
 
@@ -144,18 +132,7 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('order.scanItemsGET',{'or
             {{ order.shp_date }}
         </td>
 
-        <td class="px-3 py-2 text-xs">
-
-                {{order.ending_time}}
-
-        </td>
-        <td class="px-3 py-2 text-xs">
-            {{ order.ended_by}}
-        </td>
-        <td class="px-3 py-2 text-xs">
-            {{      order.ending_date}}
-
-        </td>
+        
         <td class="p-1 px-3 py-2 text-xs text-center " v-if="order.part_a!=0">
 
             <Button v-show="order.confirm_a" icon="pi pi-cart-plus" severity="warning" rounded :label="pack" @click="confirmPack(order.order_no,'A')" />
