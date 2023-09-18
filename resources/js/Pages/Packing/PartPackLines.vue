@@ -363,17 +363,12 @@ onUnmounted(() => {
         </template> -->
 
         <div class="py-3">
-            <!-- <Modal :show="true" > Hi there </Modal> -->
+            
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="p-2 text-gray-900">
 
-                        <!--stats bar -->
-
-                        <!-- <Button
-                          label="test"
-                         @click="logOrderLines()"
-                        ></Button> -->
+                        
 
                         <div>
                             <Toolbar>
@@ -382,10 +377,7 @@ onUnmounted(() => {
                                 </template>
                                 <template #center>
                                     <div flex flex-row>
-                                        <!-- <Pagination :links="orderLines.meta.links" /> -->
-                                                <!-- <Button type="button" rounded disabled label="Total Lines"  :badge=props.orderLines.meta.total badgeClass="p-badge-danger" outlined  /> -->
-                                                <!-- :disabled="assembledArray.length==orderLines.data.length" -->
-                                               
+                                      
                                                <div>
                                                      <h2 class="font-bold tracking-wide text-xl text-red-500"> {{ formatTime }}</h2>
                                                       <!--  <button @click="startTimer" :disabled="isRunning">Start</button>
@@ -411,8 +403,7 @@ onUnmounted(() => {
                                 </div>
 
 
-                                <TabView>
-                                    <TabPanel header="Order Lines">
+                                
                                         <div class="flex flex-row items-center justify-center w-full gap-1 text-center">
 
                                                     <input type="text" v-model="newItem"  ref="inputField" placeholder="Scan Item" class="m-2 rounded-lg bg-slate-300 text-md">
@@ -566,13 +557,7 @@ onUnmounted(() => {
                                                 </template>
                                             </Toolbar>
                                         </div>
-                                    </TabPanel>
-
-
-
-                                </TabView>
-
-
+                                    
 
 
                             </div>

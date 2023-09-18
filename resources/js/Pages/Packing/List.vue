@@ -97,15 +97,7 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('packing.pack',{'order_no
                 Shipment Date
             </th>
 
-            <th scope="col" class="px-6 py-3">
-                Printing Time
-            </th>
-            <th scope="col" class="px-6 py-3">
-                Printed By
-            </th>
-            <th scope="col" class="px-6 py-3">
-                Printing Date
-            </th>
+            
             <th scope="col" class="px-6 py-3 text-center">
                 Part A Items
             </th>
@@ -126,7 +118,7 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('packing.pack',{'order_no
         <tr v-for="order in orders.data" :key="order.order_no"
         class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
 
-        <td class="px-3 py-2 text-xs">
+        <td class="px-3 py-2 text-xs breal-all">
             {{ order.order_no }}
         </td>
         <td class="flex flex-col px-3 py-2 text-xs text-center">
@@ -140,18 +132,7 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('packing.pack',{'order_no
             {{ order.shp_date }}
         </td>
 
-        <td class="px-3 py-2 text-xs">
-
-                {{order.ending_time}}
-
-        </td>
-        <td class="px-3 py-2 text-xs">
-            {{ order.ended_by}}
-        </td>
-        <td class="px-3 py-2 text-xs">
-            {{      order.ending_date}}
-
-        </td>
+       
         <td class="p-1 px-3 py-2 text-xs text-center " v-if="order.part_a!=0">
 
             <Button v-show="order.confirm_a" icon="pi pi-gift" severity="danger" rounded :label="pack" @click="confirmPack(order.order_no,'A')" />

@@ -272,37 +272,13 @@ const closeAssembly=()=>{
                         ></Button> -->
 
                         <div>
-                            <Toolbar>
-                                <template #start>
+                            
 
-                                </template>
-                                <template #center>
-                                    <div flex flex-row>
-                                        <!-- <Pagination :links="orderLines.meta.links" /> -->
-                                                <!-- <Button type="button" rounded disabled label="Total Lines"  :badge=props.orderLines.meta.total badgeClass="p-badge-danger" outlined  /> -->
-                                                <!-- :disabled="assembledArray.length==orderLines.data.length" -->
-                                               
-                                    </div>
+                                
 
 
-
-                                </template>
-
-                                <template #end>
-
-
-
-                                    </template>
-                                </Toolbar>
-
-                                <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-
-
-                                </div>
-
-
-                                <TabView>
-                                    <TabPanel header="Order Lines">
+                               
+                                    
                                         <div class="flex flex-row items-center justify-center w-full gap-1 text-center">
 
                                                     <input type="text" v-model="newItem"  ref="inputField" placeholder="Scan Item" class="m-2 rounded-lg bg-slate-300 text-md">
@@ -457,12 +433,7 @@ const closeAssembly=()=>{
                                                 </template>
                                             </Toolbar>
                                         </div>
-                                    </TabPanel>
-
-
-
-                                </TabView>
-
+                               
 
 
 
