@@ -172,12 +172,12 @@ watch( newItem,
         );
 
 const form=useForm({
-   // item_no:'',
-   // order_qty:0,
-   // prepacks_total_quantity:0,
-   // assembled_qty:0,
-   // item_description:'',
-   // batch_no:'',
+   item_no:'',
+   order_qty:0,
+   prepacks_total_quantity:0,
+   assembled_qty:0,
+   item_description:'',
+   batch_no:'',
    order_no:'',
    line_no:'',
    packed_qty:0,
@@ -195,12 +195,12 @@ const form=useForm({
 
 
 const form2=useForm({
-   // item_no:'',
-   // order_qty:0,
-   // prepacks_total_quantity:0,
-   // assembled_qty:0,
-   // item_description:'',
-   // batch_no:'',
+   item_no:'',
+   order_qty:0,
+   prepacks_total_quantity:0,
+   assembled_qty:0,
+   item_description:'',
+   batch_no:'',
    order_no:'',
    line_no:'',
    packed_qty:0,
@@ -568,9 +568,11 @@ onUnmounted(() => {
                                                                 <td class="px-3 py-2 text-xs">
                                                                     {{ line.item_no }}
                                                                 </td>
+                                                                
                                                                 <td class="px-3 py-2 text-xs">
                                                                     {{ line.item_description }}
                                                                 </td>
+
                                                                 <td class="px-3 py-2 text-xs">
                                                                     #:{{ line.from_batch}}-
                                                                     {{ line.to_batch}}
