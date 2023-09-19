@@ -271,11 +271,11 @@ const submitForm=()=>{
                                     'line_no':form.line_no,
                                     'packed_qty':form.packed_qty,
                                     'packed_pcs':form.packed_pcs,
-                                    'from_vessel':form.from_vessel,
-                                    'to_vessel':form.to_vessel,
                                     'vessel':form.vessel,
                                     'from_vessel':form.from_vessel,
                                     'to_vessel':form.to_vessel,
+                                    'from_batch':form.from_batch,
+                                    'to_batch':form.to_batch,
                                 });
     }
 
