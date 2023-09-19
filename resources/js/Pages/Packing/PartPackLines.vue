@@ -172,19 +172,19 @@ watch( newItem,
         );
 
 const form=useForm({
-   item_no:'',
-   order_qty:0,
-   prepacks_total_quantity:0,
-   assembled_qty:0,
-   item_description:'',
-   batch_no:'',
+   // item_no:'',
+   // order_qty:0,
+   // prepacks_total_quantity:0,
+   // assembled_qty:0,
+   // item_description:'',
+   // batch_no:'',
    order_no:'',
    line_no:'',
    packed_qty:0,
    packed_pcs:0,
-   carton_no:1,
+   // carton_no:1,
    vessel:'',
-   from_vessel:1,
+   from_vessel:0,
    to_vessel:0,
     from_batch:'',
    to_batch:0,
@@ -195,17 +195,17 @@ const form=useForm({
 
 
 const form2=useForm({
-   item_no:'',
-   order_qty:0,
-   prepacks_total_quantity:0,
-   assembled_qty:0,
-   item_description:'',
-   batch_no:'',
+   // item_no:'',
+   // order_qty:0,
+   // prepacks_total_quantity:0,
+   // assembled_qty:0,
+   // item_description:'',
+   // batch_no:'',
    order_no:'',
    line_no:'',
    packed_qty:0,
    packed_pcs:0,
-   carton_no:1,
+   // carton_no:1,
    vessel:'',
    from_vessel:1,
    to_vessel:1,
@@ -663,19 +663,20 @@ onUnmounted(() => {
            <div class="flex flex-row items-center justify_between">
 
                 <span class="px-3 text-center capitalize">Quantities</span>
-                <span class="px-3 text-center capitalize">Qty</span>
-                <InputText
-                    ref="scanItem"
-                    v-model="form.packed_qty"
-                    :placeholder="form.packed_qty"
-                /> 
-                <span class="px-3 text-center capitalize">PCS.</span>
+                
+                <span class="px-3 text-center capitalize">PCS:</span>
                 <InputText
                     ref="scanItem"
 
                     v-model="form.packed_pcs"
               
                 />
+                <span class="px-3 text-center capitalize">WT:</span>
+                <InputText
+                    ref="scanItem"
+                    v-model="form.packed_qty"
+                    :placeholder="form.packed_qty"
+                /> 
             </div>
 
             <div class="flex flex-row items-center justify_between">
