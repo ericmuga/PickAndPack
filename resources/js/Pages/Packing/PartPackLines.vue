@@ -572,7 +572,7 @@ onUnmounted(() => {
                                                                     {{ line.item_description }}
                                                                 </td>
                                                                 <td class="px-3 py-2 text-xs">
-                                                                    B:{{ line.from_batch}}-
+                                                                    #:{{ line.from_batch}}-
                                                                     {{ line.to_batch}}
                                                                 </td>
                                                                 <td class="px-3 py-2 text-xs">
@@ -583,9 +583,7 @@ onUnmounted(() => {
                                                                     {{line.vessel}}:{{ line.from_vessel }}-{{line.to_vessel}}
                                                                 </td>
 
-                                                                <!-- <td class="px-3 py-2 text-xs">
-                                                                    {{ line.prepacks_total_quantity}}
-                                                                </td> -->
+                                                                
 
                                                                 <!-- <td class="px-3 py-2 text-xs text-center text-black bg-yellow-300 rounded-sm">
                                                                     <input
