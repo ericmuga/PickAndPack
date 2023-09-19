@@ -42,6 +42,7 @@ class LineResource extends JsonResource
                  'prepacks_available'=>Prepack::where('item_no',$this->item_no)->get(),
                  'prepacks_total_quantity' => $this->prepacks()->sum('total_quantity'),
                  'packed_qty' => $this->packing()->sum('packed_qty'),
+                 'packing'=>$this->whenLoaded('packing'),
 
 
         ];

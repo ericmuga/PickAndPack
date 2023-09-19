@@ -7,7 +7,7 @@ use App\Http\Resources\{OrderResource,LineResource};
 use Carbon\Carbon;
 use App\Helpers\ColumnListing;
 use App\Models\{Line,Order, Packing,PackingSession};
-
+use Illuminate\Support\Facades\DB;
 class PackingController extends Controller
 {
     public function index(Request $request)
@@ -48,7 +48,7 @@ class PackingController extends Controller
                             ->where('order_no', $request->order_no)
                             ->where('part', $request->part_no)
                             ->withSum('prepacks', 'total_quantity')
-                            ->withSum('packing','packed_qty')
+                            ->with('packing')
                             ->orderBy('item_description')
                             ->paginate(300)
                             ->appends($request->all())
@@ -62,30 +62,7 @@ class PackingController extends Controller
 
     public function closePacking(Request $request)
 {
-    //
-       // dd(Line::where('order_no',$request->data[0]['order_no'])
-       //                 ->where('line_no',$request->data[0]['line_no'])
-       //                 ->first()->part);
-    // dd($request->packing_time);
-    //insert the line into assembly line
     
-    //insert a packing session
-
-// Insert Packing Session
-          
-
-
-       /*
-
-            $table->id();
-            $table->string('order_no');
-            $table->string('part');
-            $table->time('packing_time');
-            $table->foreignIdFor(User::class);
-            $table->timestamps();
-
-       */
-      
 
 
        PackingSession::create([
@@ -103,36 +80,25 @@ class PackingController extends Controller
 
     foreach($request->data as $line)
     {
-        //  dd($line);
-        // if (!AssemblyLine::where('order_no',$line['order_no'])
-        // ->where('line_no',$line['line_no'])
-        // ->exists())
+        
+        DB::table('packing')
+          ->where('line_no',$line['line_no'])
+          ->where('order_no',$line['order_no'])
+          ->delete();
 
-
-       
-
-
-        if (Packing::where('order_no',$line['order_no'])
-                    ->where('order_no',$line['line_no'])
-                    ->exists())
-
-        Packing::where('order_no',$line['order_no'])
-                    ->where('line_no',$line['line_no'])
-                    ->delete();
-
-        Packing::create([
-            'order_no'=>$line['order_no'],
-            'line_no'=>$line['line_no'],
-            'user_id'=>$request->user()->id,
-            'packed_qty'=>$line['packed_qty'],
-            'packed_pcs'=>$line['packed_pcs'],
-            'from_vessel'=>$line['from_vessel'],
-            'to_vessel'=>$line['to_vessel'],
-            'vessel'=>$line['vessel'],
-            ''
-            // 'carton_no'=>$line['carton_no'],
-        ]);
-        // else redirect()->back()->withErrors(['message'=>'line'.$line['line_no'].'of Order'.$line['order_no'].'already exists']);
+       Packing::create([
+                            'order_no'=>$line['order_no'],
+                            'line_no'=>$line['line_no'],
+                            'user_id'=>$request->user()->id,
+                            'packed_qty'=>$line['packed_qty'],
+                            'packed_pcs'=>array_key_exists('packed_pcs',$line)?$line['packed_pcs']:0,
+                            'from_vessel'=> array_key_exists('from_vessel',$line)?$line['from_vessel']:0,
+                            'to_vessel'=>array_key_exists('to_vessel',$line)?$line['to_vessel']:(array_key_exists('from_vessel',$line)?$line['from_vessel']:0),
+                            'from_batch'=> array_key_exists('from_batch',$line)?$line['from_batch']:0,
+                            'to_batch'=>array_key_exists('to_batch',$line)?$line['to_batch']:(array_key_exists('from_batch',$line)?$line['from_batch']:0),
+                            'vessel'=>array_key_exists('vessel',$line)?$line['vessel']:'Crate',
+                       ]);
+        
     }
 
     return redirect(route('packing.index'));

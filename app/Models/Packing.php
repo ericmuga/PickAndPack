@@ -12,7 +12,7 @@ class Packing extends Model
     use Compoships;
    protected $table='packing';
 
-   protected $fillable=['line_no','order_no','user_id','packed_qty','carton_no'];
+   protected $fillable=['line_no','order_no','user_id','packed_qty','packed_pcs','from_batch','to_batch','from_vessel','to_vessel','vessel'];
 
    public function user()
    {

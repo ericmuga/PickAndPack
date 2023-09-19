@@ -21,14 +21,66 @@ const inputField=ref(null);
 const scanItem=ref(null);
 
 const props= defineProps({
-    orderLines:Object,
-    // pick_no:String,
+                            orderLines:Object,
+                            
 
-})
+                        });
+
+const assembledArray=ref([]);
 
 onMounted(() => {
     inputField.value.focus();
-    // startTime()
+    // console.log(form.vessel.value)
+//populate assembled array
+if (props.orderLines.data.length>0) 
+
+{
+   for (var i = props.orderLines.data.length - 1; i >= 0; i--) 
+   {
+
+
+      
+
+    for (var j = props.orderLines.data[i].packing.length - 1; j >= 0; j--) 
+    {
+     const result = searchByMultipleKeyValues([
+                                                  ['line_no', props.orderLines.data[i].packing[j].line_no],
+                                                  ['order_no', props.orderLines.data[i].packing[j].order_no]
+                                                  
+                                                ]);
+     console.log(result.item_no)
+
+
+      if (result.value!=0)
+      {
+        assembledArray.value.push({
+                                   'item_no':result.item_no,
+                                   'assembled_qty':result.assembled_qty,
+                                   'order_qty':result.order_qty,
+                                   'prepacks_total_quantity':result.prepacks_total_quantity,
+                                   'item_description':result.item_description,
+                                   'barcode':result.barcode,
+                                    'item_no':result.item_no,
+                                    'order_no':result.order_no,
+                                    'line_no':result.line_no,
+                                    'packed_qty':props.orderLines.data[i].packing[j].packed_qty,
+                                    'packed_pcs':props.orderLines.data[i].packing[j].packed_pcs,
+                                    'vessel':props.orderLines.data[i].packing[j].vessel,
+                                    'from_vessel':props.orderLines.data[i].packing[j].from_vessel,
+                                    'to_vessel':props.orderLines.data[i].packing[j].to_vessel,
+                                     'from_batch':props.orderLines.data[i].packing[j].from_batch,
+                                     'to_batch':props.orderLines.data[i].packing[j].to_batch,
+
+                            });
+      };
+
+             
+    };
+
+};
+    
+};
+
 });
 
 const newItem = ref('');
@@ -42,10 +94,13 @@ let showModal=ref(false);
 let closeModal=ref(true);
 const isActive = ref(false);
 const  vessels=ref([
+                        // { label: '', value: '',selected:true },
                         { label: 'Crate', value: 'Crate' },
                         { label: 'Carton', value: 'Carton' },
                         
                     ]);
+
+
     
 
 const extractedData = ref(Object.entries(props.orderLines.data).map(([key, value]) => {
@@ -64,16 +119,27 @@ const extractedData = ref(Object.entries(props.orderLines.data).map(([key, value
             'carton_no':value.carton_no,
             'vessel':value.vessel,
             'from_vessel':value.from_vessel,
-            'to_vessel':value.to_vessel
+            'to_vessel':value.to_vessel,
+            'from_batch':value.from_batch,
+            'to_batch':value.to_batch
           };
 }));
 
 const searchKey = ref('');
 const searchValue = ref('');
-const {searchByBarcodeOrItemNo } = useSearchArray(extractedData)
+const {searchByBarcodeOrItemNo,searchByMultipleKeyValues } = useSearchArray(extractedData)
 const searchResult = ref(0);
 
-const assembledArray=ref([]);
+/*
+
+   if an item has already been packed, populate the assembled array with the packed items
+
+
+*/
+
+
+
+
 
 
 
@@ -120,6 +186,8 @@ const form=useForm({
    vessel:'',
    from_vessel:1,
    to_vessel:0,
+    from_batch:'',
+   to_batch:0,
 
 });
 
@@ -141,6 +209,8 @@ const form2=useForm({
    vessel:'',
    from_vessel:1,
    to_vessel:1,
+   from_batch:'',
+   to_batch:1,
 
 });
 
@@ -180,34 +250,29 @@ const submitForm=()=>{
     {
       // If the key already exists, update the value
       //   alert('here')
-      assembledArray.value[existingItemIndex].item_no = form.item_no;
+     
       assembledArray.value[existingItemIndex].packed_qty = form.packed_qty;
-      assembledArray.value[existingItemIndex].batch_no = form.batch_no;
-      assembledArray.value[existingItemIndex].carton_no = form.carton_no;
-      assembledArray.value[existingItemIndex].vessel = form.vessel;
+      assembledArray.value[existingItemIndex].packed_pcs = form.packed_pcs;
+      assembledArray.value[existingItemIndex].from_batch = form.from_batch;
+      assembledArray.value[existingItemIndex].to_batch = form.to_batch;
       assembledArray.value[existingItemIndex].from_vessel = form.from_vessel;
       assembledArray.value[existingItemIndex].to_vessel = form.to_vessel;
+      assembledArray.value[existingItemIndex].vessel = form.vessel;
+     
     //   assembledArray.value[existingItemIndex].assembled_qty = form.packed_qty;
 
     } else
     {
       // If the key doesn't exist, push a new key-value pair
-      assembledArray.value.push({ 'item_no':form.item_no,
-                                   'assembled_qty':form.assembled_qty,
-                                   'order_qty':form.order_qty,
-                                   'prepacks_total_quantity':form.prepacks_total_quantity,
-                                   'item_description':form.item_description,
-                                   'barcode':form.barcode,
-                                    'item_no':form.item_no,
-                                    'order_no':form.order_no,
+      assembledArray.value.push({   'order_no':form.order_no,
                                     'line_no':form.line_no,
                                     'packed_qty':form.packed_qty,
                                     'packed_pcs':form.packed_pcs,
-                                    'carton_no':form.carton_no,
+                                    'from_vessel':form.from_vessel,
+                                    'to_vessel':form.to_vessel,
                                     'vessel':form.vessel,
                                     'from_vessel':form.from_vessel,
                                     'to_vessel':form.to_vessel,
-
                                 });
     }
 
@@ -295,11 +360,6 @@ const closeAssembly=()=>{
 
                                             }
                         })
-
-
-
-
-
 }
 
 const isRunning = ref(false);
@@ -512,13 +572,15 @@ onUnmounted(() => {
                                                                     {{ line.item_description }}
                                                                 </td>
                                                                 <td class="px-3 py-2 text-xs">
-                                                                    {{ line.barcode }}
+                                                                    B:{{ line.from_batch}}-
+                                                                    {{ line.to_batch}}
                                                                 </td>
                                                                 <td class="px-3 py-2 text-xs">
-                                                                    {{ line.packed_qty }}
+                                                                    Qty:{{ line.packed_qty }}
+                                                                    PCS:{{ line.packed_pcs }}
                                                                 </td>
                                                                  <td class="px-3 py-2 text-xs">
-                                                                    Carton:{{ line.carton_no }}
+                                                                    {{line.vessel}}:{{ line.from_vessel }}-{{line.to_vessel}}
                                                                 </td>
 
                                                                 <!-- <td class="px-3 py-2 text-xs">
@@ -603,7 +665,7 @@ onUnmounted(() => {
            <div class="flex flex-row items-center justify_between">
 
                 <span class="px-3 text-center capitalize">Quantities</span>
-                <span class="px-3 text-center capitalize">Weight</span>
+                <span class="px-3 text-center capitalize">Qty</span>
                 <InputText
                     ref="scanItem"
                     v-model="form.packed_qty"
@@ -614,7 +676,7 @@ onUnmounted(() => {
                     ref="scanItem"
 
                     v-model="form.packed_pcs"
-                    :placeholder="form.packed_qty"
+              
                 />
             </div>
 
@@ -640,6 +702,7 @@ onUnmounted(() => {
             <InputNumber
              class="mx-2"
              v-model="form.from_vessel"
+
              
            />
            To
@@ -654,13 +717,13 @@ onUnmounted(() => {
                 <span class="px-3 text-center capitalize">Batch Nos.</span>
                 From
                 <InputText
-                      v-model="form.batch_no"
+                      v-model="form.from_batch"
                         placeholder="Batch Nos."
                         class="mx-2"
                         />
                         To
                         <InputText
-                      v-model="form.to_no"
+                      v-model="form.to_batch"
                         placeholder="Batch Nos."
                         class="mx-2"
                         />
@@ -670,8 +733,10 @@ onUnmounted(() => {
 
             <!-- <input v-model="form.shp_date" placeholder="Shipment Date" type="date"/> -->
             <!-- {{currentItem}} -->
-            <Button  label="Pack" icon="pi pi-send" class="w-sm" severity="success"  type="submit" :disabled="form.processing" />
-            <Button label="Cancel" severity="danger" icon="pi pi-cancel" @click="showModal=false"/>
+            <Button  label="Pack" 
+             v-show="(parseInt(form.from_vessel)>0)&&(form.from_batch!='')&&(form.vessel!=null)"
+            icon="pi pi-send" class="w-sm" severity="success"  type="submit" :disabled="form.processing" />
+            <Button label="Cancel" icon="pi pi-cancel"  severity="danger"  @click="showModal=false"/>
 
 
         </form>

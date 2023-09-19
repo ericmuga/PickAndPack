@@ -61,11 +61,27 @@ export function useSearchArray(initialArray) {
     }
   };
 
+  const searchByMultipleKeyValues = (keyValuePairs) => {
+    const result = array.value.find((item) => {
+      return keyValuePairs.every(([key, value]) => item[key] === value);
+    });
+
+    if (result) {
+      return { ...result };
+    } else {
+      return 0;
+    }
+  };
+
   return {
     array,
     search,
     advancedSearch,
     searchKeyValuePair,
     searchByBarcodeOrItemNo,
+    searchByMultipleKeyValues,
   };
+
+
+
 }
