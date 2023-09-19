@@ -264,7 +264,10 @@ const submitForm=()=>{
     } else
     {
       // If the key doesn't exist, push a new key-value pair
+
       assembledArray.value.push({   'order_no':form.order_no,
+                                    'item_no':form.item_no,
+                                    'item_description':form.item_description,
                                     'line_no':form.line_no,
                                     'packed_qty':form.packed_qty,
                                     'packed_pcs':form.packed_pcs,
@@ -568,7 +571,7 @@ onUnmounted(() => {
                                                                 <td class="px-3 py-2 text-xs">
                                                                     {{ line.item_no }}
                                                                 </td>
-                                                                
+
                                                                 <td class="px-3 py-2 text-xs">
                                                                     {{ line.item_description }}
                                                                 </td>
