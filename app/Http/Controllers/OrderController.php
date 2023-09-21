@@ -345,7 +345,7 @@ public function pack(Request $request)
 public function closeAssembly(Request $request)
 {
     //
-    //    dd($request->all());
+       // dd($request->all());
     //insert the line into assembly line
     foreach($request->data as $line)
     {
@@ -357,6 +357,9 @@ public function closeAssembly(Request $request)
         AssemblyLine::updateOrCreate([
             'order_no'=>$line['order_no'],
             'line_no'=>$line['line_no'],
+            'from_batch'=>array_key_exists('from_batch',$line)?$line['from_batch']:'',
+            'from_batch'=>array_key_exists('to_batch',$line)?$line['to_batch']:'',
+            // 'packing_time'=>$request->assembly_time,
             'user_id'=>$request->user()->id,
             'ass_qty'=>$line['assembled_qty'],
         ]);

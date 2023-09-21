@@ -225,7 +225,7 @@ const submitForm=()=>{
    //push item into assembled array
 
 
-     if ((form2.order_qty-form2.prepacks_total_quantity)!=form.assembled_qty)
+     if ((form2.packed_qty)!=form.order_qty)
      {
            Swal.fire({
                                         title: 'The packed qty is lower/higher than expected',

@@ -8,7 +8,7 @@ import InputText from 'primevue/inputtext';
 import { useForm } from '@inertiajs/inertia-vue3'
 import { Inertia } from '@inertiajs/inertia';
 // import {debounce} from 'lodash/debounce';
-import {watch, ref,onMounted, nextTick,reactive,computed} from 'vue';
+import {watch, ref,onMounted, nextTick,reactive,computed,onUnmounted} from 'vue';
 import Swal from 'sweetalert2'
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
@@ -71,6 +71,7 @@ const assembledArray=ref([]);
 watch( newItem,
  debounce(
             function () {
+                startTimer();
                 if (newItem.value.trim()!='' ){
                             scanError.value = '';
 
@@ -104,7 +105,8 @@ const form=useForm({
    prepacks_total_quantity:0,
    assembled_qty:0,
    item_description:'',
-   batch_no:'',
+   from_batch:'',
+   to_batch:'',
    order_no:'',
    line_no:''
 
@@ -118,7 +120,8 @@ const form2=useForm({
    prepacks_total_quantity:0,
    assembled_qty:0,
    item_description:'',
-   batch_no:'',
+  from_batch:'',
+   to_batch:'',
    order_no:'',
    line_no:''
 
@@ -146,7 +149,7 @@ const submitForm=()=>{
                                         cancelButtonColor: '#d33',
                                         confirmButtonText: 'Ok'
                                         }).then((result) => {
-                                            if (!result.isConfirmed) { return}
+                                            if (!result.isConfirmed) {return }
                         });
 
      }
@@ -163,6 +166,8 @@ const submitForm=()=>{
       //   alert('here')
       assembledArray.value[existingItemIndex].item_no = form.item_no;
       assembledArray.value[existingItemIndex].assembled_qty = form.assembled_qty;
+      assembledArray.value[existingItemIndex].from_batch = form.from_batch;
+      assembledArray.value[existingItemIndex].to_batch = form.to_batch;
     } else
     {
       // If the key doesn't exist, push a new key-value pair
@@ -174,7 +179,9 @@ const submitForm=()=>{
                                    'barcode':form.barcode,
                                     'item_no':form.item_no,
                                     'order_no':form.order_no,
-                                    'line_no':form.line_no
+                                    'line_no':form.line_no,
+                                    'from_batch':form.from_batch,
+                                    'to_batch':form.to_batch
 
                                 });
     }
@@ -237,7 +244,11 @@ const closeAssembly=()=>{
                                         cancelButtonColor: '#d33',
                                         confirmButtonText: 'Close Assembly!'
                                         }).then((result) => {
-                                            if (result.isConfirmed) {Inertia.post(route('orders.close'),{'data':assembledArray.value});}
+                                            stopTimer();
+                                            if (result.isConfirmed) {Inertia.post(route('orders.close'),{'data':assembledArray.value,
+                                                                                                         'assembly_time':formatTime.value,
+
+                                        });}
                         })
 
 
@@ -245,6 +256,58 @@ const closeAssembly=()=>{
 
 
 }
+
+const isRunning = ref(false);
+const startTime = ref(0);
+const currentTime = ref(0);
+
+const formatTime = computed(() => {
+  const totalMilliseconds = currentTime.value;
+  const milliseconds = totalMilliseconds % 1000;
+  const totalSeconds = (totalMilliseconds - milliseconds) / 1000;
+  const seconds = totalSeconds % 60;
+  const totalMinutes = (totalSeconds - seconds) / 60;
+  const minutes = totalMinutes % 60;
+  const hours = (totalMinutes - minutes) / 60;
+  
+  const formatMilliseconds = milliseconds.toString().padStart(3, '0');
+  const formatSeconds = seconds.toString().padStart(2, '0');
+  const formatMinutes = minutes.toString().padStart(2, '0');
+  const formatHours = hours.toString().padStart(2, '0');
+
+  return `${formatHours}:${formatMinutes}:${formatSeconds}.${formatMilliseconds}`;
+});
+
+
+const startTimer = () => {
+  if (!isRunning.value) {
+    startTime.value = Date.now() - currentTime.value;
+    isRunning.value = true;
+  }
+};
+
+const stopTimer = () => {
+  if (isRunning.value) {
+    isRunning.value = false;
+  }
+};
+const resetTimer = () => {
+  if (!isRunning.value) {
+    currentTime.value = 0;
+  }
+};
+
+const timerInterval = setInterval(() => {
+  if (isRunning.value) {
+    currentTime.value = Date.now() - startTime.value;
+  }
+}, 100);
+
+onUnmounted(() => {
+  clearInterval(timerInterval);
+});
+
+
 
 
 
@@ -257,6 +320,7 @@ const closeAssembly=()=>{
         <!-- <template #header>
             <h2 class="text-xl font-semibold leading-tight text-gray-800">Parts</h2>
         </template> -->
+
 
         <div class="py-3">
             <!-- <Modal :show="true" > Hi there </Modal> -->
@@ -272,14 +336,34 @@ const closeAssembly=()=>{
                         ></Button> -->
 
                         <div>
+                        <Toolbar>
+                                <template #start>
+
+                                </template>
+                                <template #center>
+                                    <div flex flex-row>
+                                      
+                                               <div>
+                                                     <h2 class="font-bold tracking-wide text-xl text-red-500"> {{ formatTime }}</h2>
+                                                      <!--  <button @click="startTimer" :disabled="isRunning">Start</button>
+                                                        <button @click="stopTimer" :disabled="!isRunning">Stop</button>
+                                                        <button @click="resetTimer" :disabled="!isRunning && currentTime === 0">Reset</button> -->
+                                                  </div>
+                                    </div>
+
+
+
+                                </template>
+
+                                <template #end>
+
+
+
+                                    </template>
+                                </Toolbar>
                             
 
-                                
-
-
-                               
-                                    
-                                        <div class="flex flex-row items-center justify-center w-full gap-1 text-center">
+                                <div class="flex flex-row items-center justify-center w-full gap-1 text-center">
 
                                                     <input type="text" v-model="newItem"  ref="inputField" placeholder="Scan Item" class="m-2 rounded-lg bg-slate-300 text-md">
                                                                 <p v-if="scanError" class="p-3 m-3 font-bold text-black bg-red-400 rounded">{{ scanError }}</p>
@@ -482,11 +566,15 @@ const closeAssembly=()=>{
            
            <InputText
 
-             v-model="form.batch_no"
-             placeholder="Batch Nos."
+             v-model="form.from_batch"
+             placeholder="From Batch."
            />
-            <!-- <input v-model="form.shp_date" placeholder="Shipment Date" type="date"/> -->
-            <!-- {{currentItem}} -->
+           <InputText
+
+             v-model="form.to_batch"
+             placeholder="To Batch."
+           />
+      
             <Button  label="Assemble" icon="pi pi-send" class="w-sm" severity="success"  type="submit" :disabled="form.processing" />
             <Button label="Cancel" severity="danger" icon="pi pi-cancel" @click="showModal=false"/>
 
