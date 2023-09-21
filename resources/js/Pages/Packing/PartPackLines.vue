@@ -641,12 +641,14 @@ onUnmounted(() => {
         <div v-show="showModal">
   <Modal :show="showModal" @close="showModal=false" :errors="errors"> <!-- {{ dynamicModalContent  }} -->
     
-    <div >
+    <div class="grid place-items-center">
+    
+    <div class="w-full p-4 font-bold text-center text-white bg-slate-600"> Packing</div>
 
 
-        <form @submit.prevent="submitForm()" class="flex flex-col  gap-2 p-5">
+        <form @submit.prevent="submitForm()" class="flex flex-col  gap-2  text-center">
 
-        <span class="text-center capitalize font-bold text-xl text-cyan-800">{{ form.item_description }}</span>
+        <span class=" capitalize font-bold text-xl text-cyan-800">{{ form.item_description }}</span>
             <div class="flex space-x-2 items-center">  
             <span class="px-3 text-center capitalize">Ordered Qty</span>
             <span class="px-3 text-center capitalize">{{ form.order_qty }}</span>
@@ -654,7 +656,7 @@ onUnmounted(() => {
             <span class="px-3 text-center capitalize">{{ form.prepacks_total_quantity }}</span>
             </div>
 
-             <div class="flex space-x-2 items-center ">  
+             <div class="flex space-x-2 items-center text-center ">  
              <span class="px-3 text-center capitalize">Pieces</span>
              <InputText
                     placeholder="Pieces"
@@ -684,6 +686,7 @@ onUnmounted(() => {
           
           <div class="flex space-x-2">  
             <Dropdown
+            style="width: 5em "
                v-model="form.vessel"
                :options=vessels
                optionLabel='label'
