@@ -51,7 +51,7 @@ export function useSearchArray(initialArray) {
   const searchByBarcodeOrItemNo = (input) => {
 
     const result = array.value.find((item) => {
-      return item.barcode === input || item.item_no === input;
+      return item.barcode === input || item.item_no === input || item.barcode.slice(0,12)===input;
     });
 
     if (result) {
