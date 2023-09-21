@@ -188,7 +188,7 @@ const form=useForm({
    from_vessel:0,
    to_vessel:0,
     from_batch:'',
-   to_batch:0,
+   to_batch:'',
 
 });
 
@@ -211,7 +211,7 @@ const form2=useForm({
    from_vessel:1,
    to_vessel:1,
    from_batch:'',
-   to_batch:1,
+   to_batch:'',
 
 });
 
@@ -640,64 +640,45 @@ onUnmounted(() => {
         </AuthenticatedLayout>
         <div v-show="showModal">
   <Modal :show="showModal" @close="showModal=false" :errors="errors"> <!-- {{ dynamicModalContent  }} -->
-     <!-- {{ showModal }} -->
-
-     <div class="p-2 font-bold text-center text-white bg-slate-600"> Packing</div>
-       <div >
+     <div class="w-full p-4 font-bold text-center text-white bg-slate-600"> Packing</div>
+    <div >
 
 
-        <form @submit.prevent="submitForm()" class="flex flex-col items-center gap-2 p-5">
-        <span class="p-3 text-center capitalize font-bold text-xl text-cyan-800">{{ form.item_description }}</span>
-        <div class=" text-center text-blue-800 text-md w-full">
+        <form @submit.prevent="submitForm()" class="flex flex-col justify-center gap-2 p-5">
 
+        <span class="text-center capitalize font-bold text-xl text-cyan-800">{{ form.item_description }}</span>
+            <div class="flex space-x-2 items-center">  
             <span class="px-3 text-center capitalize">Ordered Qty</span>
             <span class="px-3 text-center capitalize">{{ form.order_qty }}</span>
-        <span class="px-3 text-center capitalize">Prepacked Qty</span>
+            <span class="px-3 text-center capitalize">Prepacked Qty</span>
             <span class="px-3 text-center capitalize">{{ form.prepacks_total_quantity }}</span>
             </div>
-        <div class="flex flex-row justify_between">
 
-            
-        </div>
-
-
-
-
-
-           <div class="flex flex-row items-center justify_between">
-
-                <span class="px-3 text-center capitalize">Quantities</span>
-                
-                <span class="px-3 text-center capitalize">PCS:</span>
-                <input
-                   size="5"
-                   class="rounded p-1"
+             <div class="flex justify-between items-center ">  
+             <span class="px-3 text-center capitalize">Pieces</span>
+             <InputText
+                    placeholder="Pieces"
                     ref="scanItem"
 
                     v-model="form.packed_pcs"
               
                 />
-                <span class="px-3 text-center capitalize">WT:</span>
-
-                <input
-                    size="5"
-                   class="rounded p-1"
+                </div>
+                <div class="flex justify-between items-center"> 
+                <span class="px-3 text-center capitalize">Weight</span>
+              <InputText
+                    placeholder="Weight"
                     ref="scanItem"
                     v-model="form.packed_qty"
                     :placeholder="form.packed_qty"
                 /> 
             </div>
-
-            <div class="flex flex-row items-center justify_between">
-
                
-            </div>
-
+       
            
 
-           <div class="flex flex-row items-center justify_between">
-
-            
+          
+          <div class="flex justify-between">  
             <Dropdown
                v-model="form.vessel"
                :options=vessels
@@ -705,47 +686,46 @@ onUnmounted(() => {
                optionValue='value'
                placeholder='Vessel'
                class="mx-2"
-               style="width: 7em"
-             />
-             From
 
-            <input
-                        style="width: 5em" type="number" 
+              
+             />
+           
+
+            <InputText
+             size="5"
+            placeholder="From Vessel"
+                        
              class="mx-2 rounded p-1"
              v-model="form.from_vessel"
 
              
            />
-           To
-            <input
-                     style="width: 5em" type="number" 
+          <InputText
+           size="5"
+              placeholder="To Vessel"
              class="mx-2 rounded p-1"
              v-model="form.to_vessel"
              
            />
-        </div>
-        <div class="flex flex-row items-center justify_between gap-3">
-
-                <span class="px-3 text-center capitalize">Batch Nos.</span>
-                From
-                <input
-                    size="5" 
+           </div>
+      <div class="flex space-x-2">
+                <InputText
+                    
                       v-model="form.from_batch"
-                      
+                      placeholder="From Batch"
                         class="mx-2"
                         />
-                        To
-                        <input size="5" 
-                        v-model="form.to_batch"
                         
-                        class="mx-2 rounded p-1"
+                        <InputText
+                         placeholder="To Batch" 
+                        v-model="form.to_batch"
+                         class="mx-2"
+
                         />
-            </div>
+           
 
-
-
-            <!-- <input v-model="form.shp_date" placeholder="Shipment Date" type="date"/> -->
-            <!-- {{currentItem}} -->
+         </div>
+           
             <Button  label="Pack" 
              v-show="(parseInt(form.from_vessel)>0)&&(form.from_batch!='')&&(form.vessel!=null)"
             icon="pi pi-send" class="w-md" severity="success"  type="submit" :disabled="form.processing" />
@@ -755,9 +735,9 @@ onUnmounted(() => {
         </form>
 
 
-     </div>
+     
 
-
+</div>
 
   </Modal>
         </div>
