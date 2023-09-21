@@ -146,6 +146,7 @@ const searchResult = ref(0);
 watch( newItem,
  debounce(
             function () {
+                alert(newItem.value);
 
                 startTimer();
                 if (newItem.value.trim()!='' ){
