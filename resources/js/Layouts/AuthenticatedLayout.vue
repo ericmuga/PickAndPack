@@ -8,112 +8,145 @@ import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import { Link } from '@inertiajs/inertia-vue3';
 
 const showingNavigationDropdown = ref(false);
+
+let isOpen=ref(false);
+let dropDownIsOpen= ref(false);
+let dropDown2IsOpen= ref(false);
+let dropDown3IsOpen= ref(false);
+let dropDown4IsOpen= ref(false);
+
+const openOrCloseMenu=()=>{isOpen.value=!isOpen.value};
+const openOrCloseDropDownMenu=()=>{dropDownIsOpen.value=!dropDownIsOpen.value};
+const openOrCloseDropDown2Menu=()=>{dropDown2IsOpen.value=!dropDown2IsOpen.value};
+const openOrCloseDropDown3Menu=()=>{dropDown3IsOpen.value=!dropDown3IsOpen.value};
+const openOrCloseDropDown4Menu=()=>{dropDown4IsOpen.value=!dropDown4IsOpen.value};
+
 </script>
 
 <template>
     <div>
+      <!--nav bar -->
+        <div class="bg-gray-400">
+        <!-- navbar right -->
+          <div class="flex justify-between px-4 py-3 sm:items-center">
+              <div class="flex justify-between items-center space-x-2">
+                   
+                   <Link :href="route('dashboard')"><img src="/fcl1.png" alt="logo" class="h-10"> </Link>
+              </div>
+              <div class="md:hidden">
+                <button @click="openOrCloseMenu" class="text-gray-700 focus:text-white focus:outline-none hover:text-white">
+                   <svg  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" 
+                     class="w-6 h-6 fill-current">
+                     <path v-if="!isOpen" stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5" />
+                     <path v-else stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button> 
+              </div>
+          
+            <div class="px-4 py-2 md:flex" :class="isOpen?'block':'hidden'">
+              <Link :href="route('confirmations.index')" :active="route().current('confirmations.index')" class="block text-white font-semibold rounded px-2 py-1 hover:bg-gray-600 ">Registry</Link>
+
+              <div class="text-white font-semibold rounded px-2 py-1 hover:bg-gray-600 mt-1 md:p-0 md:mx-2">
+                <button class="flex items-center justify-between space-x-2" @click="openOrCloseDropDown4Menu" >Assembly
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                      <path v-if="!dropDown4IsOpen" stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />  
+                      <path v-else stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                    </svg>
+                </button>
+                <div class="py-2 space-y-1 md:flex flex-col" >
+                   <Link :href="route('order.pack')" :active="route().current('order.pack')"
+                   class="text-white font-semibold rounded px-3 py-1 hover:bg-gray-100 mt-1 md:p-0 md:mx-2 "
+                   :class="dropDown4IsOpen?'block':'hidden'"
+                   >Assembly </Link>
+
+                   <Link :href="route('picks.index')" :active="route().current('picks.index')"
+                   class="text-white font-semibold rounded px-3 py-1 hover:bg-gray-100 mt-1 md:p-0 md:mx-2 "
+                   :class="dropDown4IsOpen?'block':'hidden'"
+                   >Assemble Picks </Link>
+                   
+                  
+                </div>
+               </div> 
+           
+              <Link :href="route('packing.index')" :active="route().current('packing.index')" class="block text-white font-semibold rounded px-2 py-1 hover:bg-gray-600 ">Packing</Link>
+              
+              <div class="text-white font-semibold rounded px-2 py-1 hover:bg-gray-600 mt-1 md:p-0 md:mx-2">
+                <button class="flex items-center justify-between space-x-2" @click="openOrCloseDropDown2Menu" >Prepacks
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                      <path v-if="!dropDown2IsOpen" stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />  
+                      <path v-else stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                    </svg>
+                </button>
+                <div class="py-2 space-y-1 md:flex flex-col" >
+                   <Link :href="route('orders.lines')" :active="route().current('orders.lines')" 
+                   class="text-white font-semibold rounded px-3 py-1 hover:bg-gray-100 mt-1 md:p-0 md:mx-2 "
+                   :class="dropDown2IsOpen?'block':'hidden'"
+                   >Allocate Prepacks </Link>
+
+                   <Link :href="route('linePrepacks.index')" :active="route().current('linePrepacks.index')" 
+                   class="text-white font-semibold rounded px-3 py-1 hover:bg-gray-100 mt-1 md:p-0 md:mx-2 "
+                   :class="dropDown2IsOpen?'block':'hidden'"
+                   >Prepacked Orders </Link>
+                   
+                   
+                    
+                </div>
+               </div> 
+
+                <div class="text-white font-semibold rounded px-2 py-1 hover:bg-gray-600 mt-1 md:p-0 md:mx-2">
+                <button class="flex items-center justify-between space-x-2" @click="openOrCloseDropDown3Menu" >Admin
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                      <path v-if="!dropDown3IsOpen" stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />  
+                      <path v-else stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                    </svg>
+                </button>
+                <div class="py-2 space-y-1 md:flex flex-col" >
+                   <Link :href="route('items.index')" :active="route().current('items.index')"
+                   class="text-white font-semibold rounded px-3 py-1 hover:bg-gray-100 mt-1 md:p-0 md:mx-2 "
+                   :class="dropDown3IsOpen?'block':'hidden'"
+                   >Items </Link>
+
+                   <Link :href="route('prepacks.index')" :active="route().current('prepacks.index')" 
+                      class="text-white font-semibold rounded px-3 py-1 hover:bg-gray-100 mt-1 md:p-0 md:mx-2"
+                     :class="dropDown3IsOpen?'block':'hidden'"
+                      >Define Prepacks </Link>
+                    
+                </div>
+               </div> 
+               
+              <Link :href="route('stocks.index')" :active="route().current('stocks.index')" class="block text-white font-semibold rounded px-2 py-1 hover:bg-gray-600 mt-1 md:p-0 md:mx-2">Stocks </Link>
+             
+              
+              
+              <div class="text-white font-semibold rounded px-2 py-1 hover:bg-gray-600 mt-1 md:p-0 md:mx-2">
+                <button class="flex items-center justify-between space-x-2" @click="openOrCloseDropDownMenu" >{{ $page.props.auth.user.name }}
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                      <path v-if="!dropDownIsOpen" stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />  
+                      <path v-else stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                    </svg>
+                </button>
+                <div class="py-2 space-y-1 md:flex flex-col" >
+                    <Link  :href="route('profile.edit')" :class="dropDownIsOpen?'block':'hidden'" 
+                         class="text-white font-semibold rounded px-3 py-1 hover:bg-gray-100 mt-1 md:p-0 md:mx-2">Profile </Link>
+                    <Link  :href="route('logout')" method="post" as="button" 
+                     :class="dropDownIsOpen?'block':'hidden'" 
+                        class="text-white font-semibold rounded px-3 py-1 hover:bg-gray-100 mt-1 md:p-0 md:mx-2">Logout </Link>
+                </div>
+              </div>
+
+              
+            </div>  
+        </div>
+        <!--navbar left -->
+          <div>
+
+          </div>
+        </div>
+    <!--end of nav bar -->
+
         <div class="min-h-screen bg-gray-100">
           
-<nav class="  bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-700 items-center">
-  <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-    <a :href="route('dashboard')" class="flex items-center">
-        <img src="/fcl1.png" class="h-8 mr-3" alt="FCL" />
-       Dashboard   
-         
-    </a>
 
-    <button data-collapse-toggle="navbar-multi-level" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-multi-level" aria-expanded="false">
-        <span class="sr-only">Open main menu</span>
-        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
-        </svg>
-    </button>
-    <div class="hidden w-full md:block md:w-auto" id="navbar-multi-level">
-      <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-        <li>
-          
-        </li>
-        <li>
-          <NavLink :href="route('confirmations.index')" :active="route().current('confirmations.index')">
-                                Confirmation
-                            </NavLink>
-        </li>
-        
-        <li>
-           <NavLink :href="route('order.pack')" :active="route().current('order.pack')">
-                                    Assembly
-                                </NavLink>
-        </li>
-        <li>
-           <NavLink :href="route('picks.index')" :active="route().current('picks.index')">
-                                    Assemble Picks
-                                </NavLink>
-        </li>
-        <li>
-         <NavLink :href="route('packing.index')" :active="route().current('packing.index')">
-                                    Packing
-          </NavLink>
-        </li>
-     
-        
-        
-           <li>
-            <NavLink :href="route('orders.lines')" :active="route().current('orders.lines')">
-                                    Allocate Prepacks
-                                </NavLink>
-          </li>
-          <li>
-             <NavLink :href="route('linePrepacks.index')" :active="route().current('linePrepacks.index')">
-                                    Prepacked Orders
-                                </NavLink>
-          </li>
-          <li>
-             <NavLink :href="route('stocks.index')" :active="route().current('stocks.index')">
-                                   Stocks
-                                </NavLink>
-          </li>
-          
-                 
-              
-    
-        <li>
-            <button id="dropdownNavbarLink" data-dropdown-toggle="dropdownNavbar" class="flex items-center justify-between w-full py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent">{{ $page.props.auth.user.name }} <svg class="w-2.5 h-2.5 ml-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-  </svg>
-  </button>
-            <!-- Dropdown menu -->
-            <div id="dropdownNavbar" class="z-10 hidden font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
-                <ul class="py-2 text-sm text-gray-700 dark:text-gray-400" aria-labelledby="dropdownLargeButton">
-                  <li>
-            <NavLink :href="route('items.index')" :active="route().current('items.index')">
-                                    Items
-                                </NavLink>
-         </li>
-          <li>
-            <NavLink :href="route('prepacks.index')" :active="route().current('prepacks.index')">
-                            Prepacks
-                        </NavLink>
-          </li>
-
-                  <li>
-                    <DropdownLink :href="route('profile.edit')"> Profile </DropdownLink>
-                  </li>
-                  <li>
-                     <DropdownLink :href="route('logout')" method="post" as="button">
-                                            Log Out
-                      </DropdownLink>
-                                    
-                  </li>
-                  
-                </ul>
-                
-            </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
- 
 
             <!-- Page Heading -->
             <header class="bg-white shadow" v-if="$slots.header">
