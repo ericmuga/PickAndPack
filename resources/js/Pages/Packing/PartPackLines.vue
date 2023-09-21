@@ -485,7 +485,7 @@ onUnmounted(() => {
 
 
 
-                                            <div class="grid grid-cols-2 gap-3 ">
+                                            <div class="grid sm:grid-cols-1 md:grid-cols-2 gap-3 ">
 
                                                 <div class="col-span-1">
                                                     <div  class="w-full p-3 m-2 text-center text-white bg-orange-200"> Ordered</div>
