@@ -146,7 +146,7 @@ const searchResult = ref(0);
 watch( newItem,
  debounce(
             function () {
-                alert(newItem.value);
+                // alert(newItem.value);
 
                 startTimer();
                 if (newItem.value.trim()!='' ){
@@ -642,15 +642,13 @@ onUnmounted(() => {
   <Modal :show="showModal" @close="showModal=false" :errors="errors"> <!-- {{ dynamicModalContent  }} -->
      <!-- {{ showModal }} -->
 
-     <div class="p-4 font-bold text-center text-white bg-slate-600"> Packing</div>
-       <div>
+     <div class="p-2 font-bold text-center text-white bg-slate-600"> Packing</div>
+       <div >
 
 
-        <form @submit.prevent="submitForm()"
-
-        class="flex flex-col justify-center gap-2 p-5">
+        <form @submit.prevent="submitForm()" class="flex flex-col items-center gap-2 p-5">
         <span class="p-3 text-center capitalize font-bold text-xl text-cyan-800">{{ form.item_description }}</span>
-        <div class="flex flex-row justify_between text-center text-blue-800 text-md w-full">
+        <div class=" text-center text-blue-800 text-md w-full">
 
             <span class="px-3 text-center capitalize">Ordered Qty</span>
             <span class="px-3 text-center capitalize">{{ form.order_qty }}</span>
@@ -671,14 +669,19 @@ onUnmounted(() => {
                 <span class="px-3 text-center capitalize">Quantities</span>
                 
                 <span class="px-3 text-center capitalize">PCS:</span>
-                <InputText
+                <input
+                   size="5"
+                   class="rounded p-1"
                     ref="scanItem"
 
                     v-model="form.packed_pcs"
               
                 />
                 <span class="px-3 text-center capitalize">WT:</span>
-                <InputText
+
+                <input
+                    size="5"
+                   class="rounded p-1"
                     ref="scanItem"
                     v-model="form.packed_qty"
                     :placeholder="form.packed_qty"
@@ -702,17 +705,21 @@ onUnmounted(() => {
                optionValue='value'
                placeholder='Vessel'
                class="mx-2"
+               style="width: 7em"
              />
              From
-            <InputNumber
-             class="mx-2"
+
+            <input
+                        style="width: 5em" type="number" 
+             class="mx-2 rounded p-1"
              v-model="form.from_vessel"
 
              
            />
            To
-            <InputNumber
-             class="mx-2"
+            <input
+                     style="width: 5em" type="number" 
+             class="mx-2 rounded p-1"
              v-model="form.to_vessel"
              
            />
@@ -721,16 +728,17 @@ onUnmounted(() => {
 
                 <span class="px-3 text-center capitalize">Batch Nos.</span>
                 From
-                <InputText
+                <input
+                    size="5" 
                       v-model="form.from_batch"
-                        placeholder="Batch Nos."
+                      
                         class="mx-2"
                         />
                         To
-                        <InputText
-                      v-model="form.to_batch"
-                        placeholder="Batch Nos."
-                        class="mx-2"
+                        <input size="5" 
+                        v-model="form.to_batch"
+                        
+                        class="mx-2 rounded p-1"
                         />
             </div>
 
@@ -740,7 +748,7 @@ onUnmounted(() => {
             <!-- {{currentItem}} -->
             <Button  label="Pack" 
              v-show="(parseInt(form.from_vessel)>0)&&(form.from_batch!='')&&(form.vessel!=null)"
-            icon="pi pi-send" class="w-sm" severity="success"  type="submit" :disabled="form.processing" />
+            icon="pi pi-send" class="w-md" severity="success"  type="submit" :disabled="form.processing" />
             <Button label="Cancel" icon="pi pi-cancel"  severity="danger"  @click="showModal=false"/>
 
 
