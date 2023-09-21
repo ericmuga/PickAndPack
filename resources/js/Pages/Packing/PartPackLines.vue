@@ -640,11 +640,11 @@ onUnmounted(() => {
         </AuthenticatedLayout>
         <div v-show="showModal">
   <Modal :show="showModal" @close="showModal=false" :errors="errors"> <!-- {{ dynamicModalContent  }} -->
-     <div class="w-full p-4 font-bold text-center text-white bg-slate-600"> Packing</div>
+    
     <div >
 
 
-        <form @submit.prevent="submitForm()" class="flex flex-col justify-center gap-2 p-5">
+        <form @submit.prevent="submitForm()" class="flex flex-col  gap-2 p-5">
 
         <span class="text-center capitalize font-bold text-xl text-cyan-800">{{ form.item_description }}</span>
             <div class="flex space-x-2 items-center">  
@@ -654,20 +654,24 @@ onUnmounted(() => {
             <span class="px-3 text-center capitalize">{{ form.prepacks_total_quantity }}</span>
             </div>
 
-             <div class="flex justify-between items-center ">  
+             <div class="flex space-x-2 items-center ">  
              <span class="px-3 text-center capitalize">Pieces</span>
              <InputText
                     placeholder="Pieces"
                     ref="scanItem"
+                    style="width: 5em "
+                    class="mx-5"
 
                     v-model="form.packed_pcs"
               
                 />
                 </div>
-                <div class="flex justify-between items-center"> 
+                <div class="flex space-x-2 items-center"> 
                 <span class="px-3 text-center capitalize">Weight</span>
               <InputText
                     placeholder="Weight"
+                    style="width: 5em "
+                    class="mx-5"
                     ref="scanItem"
                     v-model="form.packed_qty"
                     :placeholder="form.packed_qty"
@@ -678,7 +682,7 @@ onUnmounted(() => {
            
 
           
-          <div class="flex justify-between">  
+          <div class="flex space-x-2">  
             <Dropdown
                v-model="form.vessel"
                :options=vessels
@@ -692,8 +696,8 @@ onUnmounted(() => {
            
 
             <InputText
-             size="5"
-            placeholder="From Vessel"
+             size="2"
+            placeholder="From "
                         
              class="mx-2 rounded p-1"
              v-model="form.from_vessel"
@@ -701,22 +705,24 @@ onUnmounted(() => {
              
            />
           <InputText
-           size="5"
-              placeholder="To Vessel"
+           size="2"
+              placeholder="To"
              class="mx-2 rounded p-1"
              v-model="form.to_vessel"
              
            />
            </div>
-      <div class="flex space-x-2">
+      <div class="flex space-x-2 items-center">
+      <span class="px-3 text-center capitalize">Batch</span>
                 <InputText
-                    
+                      size="5"
                       v-model="form.from_batch"
                       placeholder="From Batch"
                         class="mx-2"
                         />
                         
                         <InputText
+                        size="5"
                          placeholder="To Batch" 
                         v-model="form.to_batch"
                          class="mx-2"
@@ -729,7 +735,7 @@ onUnmounted(() => {
             <Button  label="Pack" 
              v-show="(parseInt(form.from_vessel)>0)&&(form.from_batch!='')&&(form.vessel!=null)"
             icon="pi pi-send" class="w-md" severity="success"  type="submit" :disabled="form.processing" />
-            <Button label="Cancel" icon="pi pi-cancel"  severity="danger"  @click="showModal=false"/>
+            <Button label="Cancel" icon="pi pi-cancel"  severity="danger"  @click="showModal=false" class="w-md"/>
 
 
         </form>
