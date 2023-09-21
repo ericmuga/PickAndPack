@@ -22,7 +22,6 @@
     "dependencies": {
         "@vue-hero-icons/solid": "^1.7.2",
         "chart.js": "^4.3.2",
-        "flowbite": "^1.8.1",
         "moment": "^2.29.4",
         "pinia": "^2.0.0-rc.10",
         "primeicons": "^6.0.1",
