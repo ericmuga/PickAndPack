@@ -6,7 +6,7 @@ use Carbon\Carbon;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\{AssemblyLine, Order,Item, LinePrepack, Part, Pick, Prepack};
+use App\Models\{AssemblyLine, Order,Item, LinePrepack, Part, Pick, Prepack,AsseblySession};
 use App\Http\Resources\{LinePrepackResource, OrderResource,LineResource, PrepackResource};
 use App\Models\Confirmation;
 use App\Models\Line;
@@ -344,9 +344,19 @@ public function pack(Request $request)
 
 public function closeAssembly(Request $request)
 {
-    //
-       // dd($request->all());
-    //insert the line into assembly line
+    
+    //create assembly session
+
+     AsseblySession::create([
+                                       'order_no'=>$request->data[0]['order_no'],
+                                       'part'=>Line::where('order_no',$request->data[0]['order_no'])
+                                           ->where('line_no',$request->data[0]['line_no'])
+                                           ->first()->part,
+                                        'packing_time'=>$request->packing_time,
+                                        'user_id'=>$request->user()->id
+                            ]);
+
+
     foreach($request->data as $line)
     {
         //  dd($line);

@@ -10,6 +10,7 @@ use App\Models\{Line,Order, Packing,PackingSession};
 use Illuminate\Support\Facades\DB;
 class PackingController extends Controller
 {
+
     public function index(Request $request)
     {
         //this will display orders ready for packing
@@ -43,7 +44,8 @@ class PackingController extends Controller
     public function pack(Request $request)
     {
         // Get the items that belong to the order and part for packing
-        // dd('here');
+       
+
         $orderLines = Line::query()
                             ->where('order_no', $request->order_no)
                             ->where('part', $request->part_no)
@@ -54,6 +56,7 @@ class PackingController extends Controller
                             ->appends($request->all())
                             ->withQueryString();
 
+
         return inertia('Packing/PartPackLines', [
             'orderLines' => LineResource::collection($orderLines),
             'previousInput' => $request->all(),
@@ -61,7 +64,7 @@ class PackingController extends Controller
     }
 
     public function closePacking(Request $request)
-{
+    {
     
 
 

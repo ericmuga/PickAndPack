@@ -107,9 +107,14 @@ class Order extends Model
     return $query;
     }
 
-    public function packin_session($PARAMETERS)
+    public function packing_sessions()
     {
         return $this->hasMany(PackingSession::class,'order_no','order_no');
+    }
+
+    public function assembly_sessions()
+    {
+        return $this->hasMany(AssemblySession::class,'order_no','order_no');
     }
 
 }

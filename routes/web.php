@@ -1,13 +1,18 @@
 <?php
 
-use App\Http\Controllers\{ConfirmationController, DashboardController, ItemController,
+use App\Http\Controllers\{ConfirmationController, 
+                          DashboardController, 
+                          ItemController,
                           LineController,
                           LinePrepackController,
                           ProfileController,
                           OrderController,
-    PackingController,
-    PickController,
-    PrepackController, StockController};
+                          PackingController,
+                          PickController,
+                          PrepackController, 
+                          StockController,
+                         AssemblyController
+                       };
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\{Route,Auth};
 use illuminate\Http\Request;
@@ -44,6 +49,16 @@ Route::middleware('auth')->group(function () {
 
         Route::post('download/linePrepacks',[LinePrepackController::class,'export'])->name('linePrepacks.download');
         Route::resource('linePrepacks',LinePrepackController::class);
+
+
+
+        /////////////////////Assembly Routes //////////////////////
+         ///list orders ready for assembly
+        Route::resource('assembly',AssemblyController::class);
+         ///select order for assembly
+        Route::get('assemble/order', [AssemblyController::class, 'assembleOrder'])->name('assemble.order');
+        
+
         // Route::get('stores/form',fn()=>inertia('Stores/Form'))->name('stores.form');
         // Route::resource('packing',PackingController::class);
         Route::get('packing',[PackingController::class,'index'])->name('packing.index');
@@ -65,7 +80,7 @@ Route::middleware('auth')->group(function () {
         // Route::get('orders/assemble/{part?}/{sector?}/{sp_code?}',[OrderController::class, 'assemble'])->name('orders.assemble');
         Route::get('allocate/orders',[OrderController::class, 'assemble'])->name('orders.lines');
         Route::post('orders/prepack',[OrderController::class,'prepack'])->name('orders.prepack');
-        Route::post('orders/closeAssembly',[OrderController::class,'closeAssembly'])->name('orders.close');
+        
         // Route::get('orders/prepacked',[OrderController::class,'orderPrepacks'])->name('orders.prepacks');
 
         //Prepacked Orders
@@ -102,10 +117,17 @@ Route::middleware('auth')->group(function () {
         Route::post('/order/confirm',[OrderController::class ,'confirmation'])->name('order.confirm');
         Route::post('/order/filter',[OrderController::class ,'filter'])->name('order.filter');
         Route::get('/order/filter',[OrderController::class ,'filter'])->name('order.filters');
+        
+        
+
+
         Route::get('/order/pack',[OrderController::class ,'pack'])->name('order.pack');
+
+
         Route::post('/order/all', [OrderController::class, 'pack'])->name('order.listing');
         Route::post('/order/scanItems', [OrderController::class, 'scanItems'])->name('order.scanItems');
-        Route::get('/order/scanItems', [OrderController::class, 'scanItems'])->name('order.scanItemsGET');
+
+        
         // Route::get('pick',[OrderController::class,'pick'])->name('order.pick');
 
         //picks

@@ -59,5 +59,11 @@ class User extends Authenticatable
      }
 
 
+     public function assembly_sessions()
+     {
+         return $this->hasMany(AssemblySession::class);
+     }
+
+
 
 }

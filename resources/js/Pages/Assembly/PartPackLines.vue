@@ -245,7 +245,7 @@ const closeAssembly=()=>{
                                         confirmButtonText: 'Close Assembly!'
                                         }).then((result) => {
                                             stopTimer();
-                                            if (result.isConfirmed) {Inertia.post(route('orders.close'),{'data':assembledArray.value,
+                                            if (result.isConfirmed) {Inertia.post(route('assembly.store'),{'data':assembledArray.value,
                                                                                                          'assembly_time':formatTime.value,
 
                                         });}

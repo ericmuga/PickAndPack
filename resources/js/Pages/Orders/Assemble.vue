@@ -25,11 +25,11 @@ const prop=defineProps({
 });
 let newItem=ref('');
 watch( newItem,
-debounce( ()=>{Inertia.get(route('order.pack'),{'search':newItem.value})})
+debounce( ()=>{Inertia.get(route('assembly.index'),{'search':newItem.value})})
 ,500);
 
 
-const confirmPack=(order_no,part)=>{ Inertia.get(route('order.scanItemsGET',{'order_no':order_no,'part_no':part}))}
+const confirmPack=(order_no,part)=>{ Inertia.get(route('assemble.order',{'order_no':order_no,'part_no':part}))}
 </script>
 
 
@@ -57,7 +57,7 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('order.scanItemsGET',{'or
                                 <template #center>
                                     <div>
                                         <!-- <Pagination :links="orderLines.meta.links" /> -->
-                                        <input type="text" v-model="newItem"  ref="inputField" class="m-2 rounded-lg bg-slate-300 text-md">
+                                        <input type="text" v-model="newItem"  ref="inputField" placeholder="Search Order" class=" text-center m-2 rounded-lg bg-slate-300 text-md">
 
                                         <!-- <SearchBox :model="route('order.pack')" /> -->
                                     <div>
@@ -91,7 +91,7 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('order.scanItemsGET',{'or
             <th scope="col" class="px-2 py-2 text-center">
                 Sales Person
             </th>
-            <th scope="col" class="px-2 py-2">
+            <th scope="col" class="px-2 py-2 ">
                 Ship-to Name
             </th>
             <th scope="col" class="px-2 py-2">
@@ -121,11 +121,11 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('order.scanItemsGET',{'or
         <td class="px-2 py-2 text-xs break-all">
             {{ order.order_no }}
         </td>
-        <td class="flex flex-col px-2 py-2 text-xs text-center">
+        <td class="flex flex-col px-2 py-2 text-xs text-center  ">
             <span class="text-xs font-bold">{{order.sp_code}}</span>
-            <span class="text-xs font-thin">{{order.sp_name}}</span>
+            <span class="text-xs bg-gray-100 rounded-lg font-semibold text-red-500">{{order.sp_name}}</span>
         </td>
-        <td class="px-2 py-2 text-xs font-bold text-center capitalize bg-yellow-200 rounded-full">
+        <td class="px-2 py-2 text-xs font-bold text-center text-black capitalize bg-yellow-200 rounded-full">
             {{ order.shp_name }}
         </td>
         <td class="px-3 py-2 text-xs font-bold">

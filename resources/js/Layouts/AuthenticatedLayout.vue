@@ -54,15 +54,15 @@ const openOrCloseDropDown4Menu=()=>{dropDown4IsOpen.value=!dropDown4IsOpen.value
                     </svg>
                 </button>
                 <div class="py-2 space-y-1 md:flex flex-col" >
-                   <Link :href="route('order.pack')" :active="route().current('order.pack')"
+                   <Link :href="route('assembly.index')" :active="route().current('assembly.index')"
                    class="text-white font-semibold rounded px-3 py-1 hover:bg-gray-100 mt-1 md:p-0 md:mx-2 "
                    :class="dropDown4IsOpen?'block':'hidden'"
-                   >Assembly </Link>
+                   >Assemble Order </Link>
 
                    <Link :href="route('picks.index')" :active="route().current('picks.index')"
                    class="text-white font-semibold rounded px-3 py-1 hover:bg-gray-100 mt-1 md:p-0 md:mx-2 "
                    :class="dropDown4IsOpen?'block':'hidden'"
-                   >Assemble Picks </Link>
+                   >Assemble Pick </Link>
                    
                   
                 </div>

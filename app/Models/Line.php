@@ -58,16 +58,16 @@ use Compoships;
            return $this->hasManyThrough(Prepack::class,Item::class,'item_no','item_no','item_no','item_no');
    }
 
-    // public function prepacks()
-    // {
-    //     return $this->belongsToMany(Prepack::class, 'line_prepack_pivot', 'line_no', 'prepack_name')
-    //                 ->withPivot(['prepack_count', 'total_quantity'])
-    //                 ->withTimestamps();
-    // }
- 
-  public function packing_time()
+   
+  public function packing_sessions()
   {
       return $this->hasMany(PackingSession::class,'line_no','line_no');
   }
+
+  public function assembly_sessions()
+  {
+      return $this->hasMany(AssemblySession::class,'line_no','line_no');
+  }
+
 
 }

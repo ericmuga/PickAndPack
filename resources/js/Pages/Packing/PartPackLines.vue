@@ -32,6 +32,7 @@ onMounted(() => {
     inputField.value.focus();
     // console.log(form.vessel.value)
 //populate assembled array
+
 if (props.orderLines.data.length>0) 
 
 {
@@ -48,7 +49,7 @@ if (props.orderLines.data.length>0)
                                                   ['order_no', props.orderLines.data[i].packing[j].order_no]
                                                   
                                                 ]);
-     console.log(result.item_no)
+    
 
 
       if (result.value!=0)
@@ -72,6 +73,7 @@ if (props.orderLines.data.length>0)
                                      'to_batch':props.orderLines.data[i].packing[j].to_batch,
 
                             });
+
       };
 
              
@@ -82,6 +84,12 @@ if (props.orderLines.data.length>0)
 };
 
 });
+
+
+
+ 
+
+
 
 const newItem = ref('');
 const items = reactive([]);
@@ -171,6 +179,8 @@ watch( newItem,
             ,300)
 
         );
+
+
 
 const form=useForm({
    item_no:'',
@@ -283,11 +293,20 @@ const submitForm=()=>{
     showModal.value=false
     newItem.value = '';
     inputField.value.focus();
+     form.reset();
+        form2.reset();
 }
 
 
 
 const updateScannedItem =(item)=>{
+
+
+ //update batch no from assembly
+   
+
+    
+
 
 
 //update form
@@ -300,7 +319,8 @@ const updateScannedItem =(item)=>{
     form.item_description=item.item_description
     form.order_no=item.order_no
     form.line_no=item.line_no
-    form.batch_no=''
+    form.to_batch=item.to_batch
+    form.from_batch=item.from_batch
     form.packed_qty=item.packed_qty
     form.packed_qty=item.packed_qty
     form.carton_no=item.carton_no
@@ -320,7 +340,8 @@ const updateScannedItem =(item)=>{
     form2.item_description=item.item_description
     form2.order_no=item.order_no
     form2.line_no=item.line_no
-    form2.batch_no=item.batch_no
+    form2.to_batch=item.to_batch
+    form2.from_batch=item.from_batch
     form2.packed_qty=item.packed_qty
     form2.packed_pcs=item.packed_pcs
     form2.carton_no=item.carton_no
@@ -339,8 +360,6 @@ const updateScannedItem =(item)=>{
 const closeAssembly=()=>{
 
      //if the assembled quantity is not equal to the ordered quantity
-
-
 
      Swal.fire({
                                         title: 'Are you sure?',
@@ -686,7 +705,7 @@ onUnmounted(() => {
           
           <div class="flex space-x-2">  
             <Dropdown
-            style="width: 5em "
+            style="width: 10em "
                v-model="form.vessel"
                :options=vessels
                optionLabel='label'
