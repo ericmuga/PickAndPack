@@ -189,6 +189,8 @@ const submitForm=()=>{
     showModal.value=false
     newItem.value = '';
     inputField.value.focus();
+    form.reset();
+    form2.reset();
 }
 
 
