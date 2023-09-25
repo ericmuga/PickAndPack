@@ -104,6 +104,7 @@ const form=useForm({
    order_qty:0,
    prepacks_total_quantity:0,
    assembled_qty:0,
+   assembled_pcs:0,
    item_description:'',
    from_batch:'',
    to_batch:'',
@@ -119,6 +120,7 @@ const form2=useForm({
    order_qty:0,
    prepacks_total_quantity:0,
    assembled_qty:0,
+   assembled_pcs:0,
    item_description:'',
   from_batch:'',
    to_batch:'',
@@ -173,6 +175,7 @@ const submitForm=()=>{
       // If the key doesn't exist, push a new key-value pair
       assembledArray.value.push({ 'item_no':form.item_no,
                                    'assembled_qty':form.assembled_qty,
+                                   'assembled_pcs':form.assembled_pcs,
                                    'order_qty':form.order_qty,
                                    'prepacks_total_quantity':form.prepacks_total_quantity,
                                    'item_description':form.item_description,
@@ -202,6 +205,7 @@ const updateScannedItem =(item)=>{
     form.item_no=item.item_no
     form.barcode=item.barcode
     form.order_qty=item.order_qty
+    form.order_pcs=item.order_pcs
     form.prepacks_total_quantity=item.prepacks_total_quantity
     form.assembled_qty=item.order_qty-item.prepacks_total_quantity
     form.pick_no=props.pick_no
@@ -216,6 +220,7 @@ const updateScannedItem =(item)=>{
     form2.item_no=item.item_no
     form2.barcode=item.barcode
     form2.order_qty=item.order_qty
+    form2.order_pcs=item.order_pcs
     form2.prepacks_total_quantity=item.prepacks_total_quantity
     form2.assembled_qty=item.order_qty-item.prepacks_total_quantity
     form2.pick_no=props.pick_no
@@ -561,13 +566,31 @@ onUnmounted(() => {
             <span class="px-3 text-center capitalize">Prepacked Qty</span>
             <span class="px-3 text-center capitalize">{{ form.prepacks_total_quantity }}</span>
         </div>
+          <div
+            class="flex items-center space-x-8"
+            >
 
+            <span>PCS </span>
 
            <InputText
-             ref="scanItem"
+             
              v-model="form.assembled_qty"
+             placeholder="PCS"
+           /></div>
+           <div
+            class="flex items-center space-x-2"
+            >
+           <span>Weight</span>
+           <InputText
+             ref="scanItem"
+             v-model="form.assembled_pcs"
              :placeholder="form.assembled_qty"
            />
+</div>
+
+
+            
+           
 
            
            <InputText

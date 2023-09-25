@@ -12,7 +12,7 @@ class AssemblyLine extends Model
     use Compoships;
 
 
-   protected $fillable=['line_no','order_no','user_id','ass_qty','from_batch','to_batch'];
+   protected $fillable=['line_no','order_no','user_id','ass_qty','from_batch','to_batch','ass_pcs'];
 
    public function user()
    {

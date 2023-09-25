@@ -90,6 +90,7 @@ public function store(Request $request)
             'to_batch'=>array_key_exists('to_batch',$line)?$line['to_batch']:'',
             'user_id'=>$request->user()->id,
             'ass_qty'=>$line['assembled_qty'],
+            'ass_pcs'=>$line['assembled_pcs'],
         ]);
          }
 
