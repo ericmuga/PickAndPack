@@ -117,4 +117,8 @@ class Order extends Model
         return $this->hasMany(AssemblySession::class,'order_no','order_no');
     }
 
+    public function assignments()
+    {
+        return $this->hasMany(Assignment::class,'order_no','order_no');
+    }
 }

@@ -461,11 +461,15 @@ onUnmounted(() => {
                                 <template #center>
                                     <div flex flex-row>
                                       
-                                               <div>
+                                               <div class="flex flex-col text-center">
                                                      <h2 class="font-bold tracking-wide text-xl text-red-500"> {{ formatTime }}</h2>
                                                       <!--  <button @click="startTimer" :disabled="isRunning">Start</button>
                                                         <button @click="stopTimer" :disabled="!isRunning">Stop</button>
                                                         <button @click="resetTimer" :disabled="!isRunning && currentTime === 0">Reset</button> -->
+
+                                                        <span class="font-bold tracking-wide text-yellow-500 p-2 bg-gray-600 rounded">{{orderLines.data[0].order.shp_name}} </span>
+
+                                                       <span class="font-bold tracking-wide text-yellow-500 p-2 bg-gray-600 rounded">{{orderLines.data[0].order.sp_search_name}} </span>
                                                   </div>
                                     </div>
 

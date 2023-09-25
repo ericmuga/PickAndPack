@@ -50,7 +50,7 @@ class PackingController extends Controller
                             ->where('order_no', $request->order_no)
                             ->where('part', $request->part_no)
                             ->withSum('prepacks', 'total_quantity')
-                            ->with('packing')
+                            ->with('packing','order')
                             ->orderBy('item_description')
                             ->paginate(300)
                             ->appends($request->all())

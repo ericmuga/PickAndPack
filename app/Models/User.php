@@ -64,6 +64,16 @@ class User extends Authenticatable
          return $this->hasMany(AssemblySession::class);
      }
 
+     public function assignments()
+     {
+        return $this->hasMany(Assignment::class,'assignee_id','id');
+     }
+
+     public function assignedTo()
+     {
+        return $this->hasMany(Assignment::class,'assignor_id','id');
+     }
+
 
 
 }
