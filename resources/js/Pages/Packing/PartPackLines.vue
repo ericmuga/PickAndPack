@@ -182,6 +182,7 @@ watch( newItem,
 
 
 
+
 const form=useForm({
    item_no:'',
    order_qty:0,
@@ -199,6 +200,7 @@ const form=useForm({
    to_vessel:0,
     from_batch:'',
    to_batch:'',
+   empty:false,
 
 });
 
@@ -222,8 +224,13 @@ const form2=useForm({
    to_vessel:1,
    from_batch:'',
    to_batch:'',
+   empty:false,
 
 });
+
+
+watch(form.empty, ()=>{alert('here')})
+watch(form2.empty, ()=>{if(form2.empty.value){form2.assembled_qty.value=0; form2.packed_qty.value=0;}})
 
 const ItemInAssembledArray=(item_no)=>{
    const existingItemIndex= assembledArray.value.findIndex(item => item.item_no === item_no)
@@ -701,6 +708,7 @@ onUnmounted(() => {
                     v-model="form.packed_qty"
                     :placeholder="form.packed_qty"
                 /> 
+
             </div>
                
        
@@ -753,18 +761,20 @@ onUnmounted(() => {
                         v-model="form.to_batch"
                          class="mx-2"
 
-                        />
-           
+                />
+           Empty? <input type="checkbox" v-model="form.empty"  />
 
          </div>
            
             <Button  label="Pack" 
-             v-show="(parseInt(form.from_vessel)>0)&&(form.from_batch!='')&&(form.vessel!=null)"
+             v-show="((parseInt(form.from_vessel)>0)&&(form.from_batch!='')&&(form.vessel!=null))||form.empty"
             icon="pi pi-send" class="w-md" severity="success"  type="submit" :disabled="form.processing" />
             <Button label="Cancel" icon="pi pi-cancel"  severity="danger"  @click="showModal=false" class="w-md"/>
 
 
         </form>
+
+
 
 
      

@@ -7,6 +7,7 @@ use App\Http\Resources\{OrderResource,LineResource};
 use App\Models\{Order,Line,AssemblySession,AssemblyLine};
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Services\MyServices;
 
 class AssemblyController extends Controller
 {
@@ -46,7 +47,7 @@ class AssemblyController extends Controller
                             ->where('order_no', $request->order_no)
                             ->where('part', $request->part_no)
                             ->withSum('prepacks', 'total_quantity')
-                            ->with('order')
+                            ->with('order','assemblies')
                             ->orderBy('item_description')
                             ->paginate(300)
                             ->appends($request->all())
@@ -60,7 +61,7 @@ class AssemblyController extends Controller
 
 
 public function store(Request $request)
- {
+{
     
     //create assembly session
 
@@ -86,12 +87,12 @@ public function store(Request $request)
         AssemblyLine::create([
             'order_no'=>$line['order_no'],
             'line_no'=>$line['line_no'],
-            'from_batch'=>array_key_exists('from_batch',$line)?$line['from_batch']:'',
-            'to_batch'=>array_key_exists('to_batch',$line)?$line['to_batch']:'',
+            'from_batch'=>MyServices::preventNullsFromArray('from_batch',$line,''),
+            'to_batch'=>MyServices::preventNullsFromArray('to_batch',$line)?:MyServices::preventNullsFromArray('from_batch',$line,''),
             'user_id'=>$request->user()->id,
-            'ass_qty'=>$line['assembled_qty'],
-            'ass_pcs'=>$line['assembled_pcs'],
-        ]);
+            'ass_qty'=>MyServices::preventNullsFromArray('assembled_qty',$line,0),
+            'ass_pcs'=>MyServices::preventNullsFromArray('assembled_pcs',$line,0),
+              ]);
          }
 
        return redirect(route('assembly.index'));

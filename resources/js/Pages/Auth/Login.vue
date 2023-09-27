@@ -6,6 +6,7 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Head, Link, useForm } from '@inertiajs/inertia-vue3';
+import {onMounted} from 'vue'
 
 defineProps({
     canResetPassword: Boolean,
@@ -17,6 +18,9 @@ const form = useForm({
     password: '',
     remember: false,
 });
+
+onMounted(()=>form.reset())
+
 
 const submit = () => {
     form.post(route('login'), {
@@ -59,7 +63,7 @@ const submit = () => {
                     class="mt-1 block w-full"
                     v-model="form.password"
                     required
-                    autocomplete="current-password"
+                    autocomplete="new-password"
                 />
 
                 <InputError class="mt-2" :message="form.errors.password" />

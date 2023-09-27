@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use App\Helpers\ColumnListing;
 use App\Models\{Line,Order, Packing,PackingSession};
 use Illuminate\Support\Facades\DB;
+use App\Services\MyServices;
 class PackingController extends Controller
 {
 
@@ -89,23 +90,30 @@ class PackingController extends Controller
           ->where('order_no',$line['order_no'])
           ->delete();
 
-       Packing::create([
-                            'order_no'=>$line['order_no'],
-                            'line_no'=>$line['line_no'],
-                            'user_id'=>$request->user()->id,
-                            'packed_qty'=>$line['packed_qty'],
-                            'packed_pcs'=>array_key_exists('packed_pcs',$line)?$line['packed_pcs']:0,
-                            'from_vessel'=> array_key_exists('from_vessel',$line)?$line['from_vessel']:0,
-                            'to_vessel'=>array_key_exists('to_vessel',$line)?$line['to_vessel']:(array_key_exists('from_vessel',$line)?$line['from_vessel']:0),
-                            'from_batch'=> array_key_exists('from_batch',$line)?$line['from_batch']:0,
-                            'to_batch'=>array_key_exists('to_batch',$line)?$line['to_batch']:(array_key_exists('from_batch',$line)?$line['from_batch']:0),
-                            'vessel'=>array_key_exists('vessel',$line)?$line['vessel']:'Crate',
-                       ]);
+       
+
+    Packing::create([
+
+        'order_no'=>$line['order_no'],
+        'line_no'=>$line['line_no'],
+        'user_id'=>$request->user()->id,
+        'packed_qty'=>$line['packed_qty'],
+        'packed_pcs'=>MyServices::preventNullsFromArray('packed_pcs',$line,0),
+        'from_vessel'=> MyServices::preventNullsFromArray('from_vessel',$line,0),
+        'to_vessel'=>MyServices::preventNullsFromArray('to_vessel',$line,0)>0?:MyServices::preventNullsFromArray('from_vessel',$line,0),
+        'from_batch'=>MyServices::preventNullsFromArray('from_batch',$line,''),
+        'to_batch'=>MyServices::preventNullsFromArray('to_batch',$line,'')?:MyServices::preventNullsFromArray('from_batch',$line,''),
+        'vessel'=>MyServices::preventNullsFromArray('vessel',$line,'Crate'),
+                 
+                   ]);
         
     }
 
     return redirect(route('packing.index'));
 }
+
+    
+
 
 
 }

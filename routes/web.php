@@ -32,6 +32,7 @@ use App\Models\{Line,LinePrepack,Order,Prepack, Stock};
 */
  Route::get('/',fn()=>Auth::check()?redirect('dashboard'):redirect('login'));
 
+
 // Route::get('/', function () {
 //     return Inertia::render('Welcome', [
 //         'canLogin' => Route::has('login'),
@@ -57,7 +58,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('assembly',AssemblyController::class);
          ///select order for assembly
         Route::get('assemble/order', [AssemblyController::class, 'assembleOrder'])->name('assemble.order');
-        
+
 
         // Route::get('stores/form',fn()=>inertia('Stores/Form'))->name('stores.form');
         // Route::resource('packing',PackingController::class);
