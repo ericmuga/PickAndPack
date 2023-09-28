@@ -7,7 +7,9 @@ class MyServices
    {
 
         if(array_key_exists($arrayKey,$array))
-            return intval(strval($array[$arrayKey]))
+        {
+            return intval(strval($array[$arrayKey]));
+        }
         else return $return;
    }
 	
