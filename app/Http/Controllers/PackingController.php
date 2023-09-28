@@ -72,8 +72,8 @@ class PackingController extends Controller
        PackingSession::create([
                                        'order_no'=>$request->data[0]['order_no'],
                                        'part'=>Line::where('order_no',$request->data[0]['order_no'])
-                                           ->where('line_no',$request->data[0]['line_no'])
-                                           ->first()->part,
+                                               ->where('line_no',$request->data[0]['line_no'])
+                                               ->first()->part,
                                         'packing_time'=>$request->packing_time,
                                         'user_id'=>$request->user()->id
                             ]);
@@ -81,7 +81,7 @@ class PackingController extends Controller
         
 
 
-
+/*
     foreach($request->data as $line)
     {
         
@@ -108,6 +108,7 @@ class PackingController extends Controller
                    ]);
         
     }
+    */
 
     return redirect(route('packing.index'));
 }
