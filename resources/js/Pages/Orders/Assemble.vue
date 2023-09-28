@@ -82,7 +82,7 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('assemble.order',{'order_
                                         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
 
 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+    <thead class="text-xs text-gray-700 uppercase bg-gray-50  dark:text-gray-400">
 
         <tr class="bg-slate-300">
             <th scope="col" class="px-2 py-2">
@@ -135,7 +135,7 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('assemble.order',{'order_
         
         <td class="p-1 px-2 py-2 text-xs text-center " v-if="order.part_a!=0">
 
-            <Button v-show="order.confirm_a" icon="pi pi-cart-plus" severity="warning" rounded :label="pack" @click="confirmPack(order.order_no,'A')" />
+            <Button v-show="order.assigned_a" icon="pi pi-cart-plus" severity="warning" rounded :label="pack" @click="confirmPack(order.order_no,'A')" />
 <!--
             <Button  v-show="!order.confirm_a" icon="pi pi-bell" severity="warning" :badge=order.part_a text raised rounded aria-label="Notification" @click="ConfirmPrint(order.order_no,'A')"/>
          -->
@@ -144,7 +144,7 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('assemble.order',{'order_
 
         </td>
         <td class="p-1 px-2 py-2 text-xs text-center " v-if="order.part_b!=0">
-            <Button v-show="order.confirm_b" icon="pi pi-cart-plus" severity="warning" rounded :label="pack" @click="confirmPack(order.order_no,'B')" />
+            <Button v-show="order.assigned_b" icon="pi pi-cart-plus" severity="warning" rounded :label="pack" @click="confirmPack(order.order_no,'B')" />
 
             <!-- <Button  v-show="!order.confirm_b" icon="pi pi-bell" severity="warning" :badge=order.part_b text raised rounded aria-label="Notification" @click="
             ConfirmPrint(order.order_no,'B')"/> -->
@@ -153,14 +153,14 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('assemble.order',{'order_
 
         </td>
         <td class="p-1 px-2 py-2 text-xs text-center " v-if="order.part_c!=0">
-            <Button v-show="order.confirm_c" icon="pi pi-cart-plus" severity="warning" rounded :label="pack" @click="confirmPack(order.order_no,'C')" />
+            <Button v-show="order.assigned_c" icon="pi pi-cart-plus" severity="warning" rounded :label="pack" @click="confirmPack(order.order_no,'C')" />
             <!-- <Button  v-show="!order.confirm_c" icon="pi pi-bell" severity="warning" :badge=order.part_c text raised rounded aria-label="Notification" @click="ConfirmPrint(order.order_no,'C')"/> -->
         </td>
         <td v-else  class="bg-slat-200">
 
         </td>
         <td class="p-1 px-2 py-2 text-xs text-center " v-if="order.part_d!=0">
-            <Button v-show="order.confirm_d" icon="pi pi-cart-plus" severity="warning" rounded :label="pack" @click="confirmPack(order.order_no,'D')" />
+            <Button v-show="order.assigned_d" icon="pi pi-cart-plus" severity="warning" rounded :label="pack" @click="confirmPack(order.order_no,'D')" />
             <!-- <Button  v-show="!order.confirm_d" icon="pi pi-bell" :badge=order.part_d severity="warning" text raised rounded aria-label="Notification" @click="ConfirmPrint(order.order_no,'D')"/> -->
         </td>
         <td v-else  class="bg-slat-200">

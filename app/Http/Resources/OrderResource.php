@@ -35,6 +35,10 @@ class OrderResource extends JsonResource
             'part_b'=>$this->lines()->OfPart('B')->count(),
             'part_c'=>$this->lines()->OfPart('C')->count(),
             'part_d'=>$this->lines()->OfPart('D')->count(),
+            'assigned_a'=>$this->assignments()->where('part','=','A')->exists(),
+            'assigned_b'=>$this->assignments()->where('part','=','B')->exists(),
+            'assigned_c'=>$this->assignments()->where('part','=','C')->exists(),
+            'assigned_d'=>$this->assignments()->where('part','=','D')->exists(),
             'confirm_a'=>Order::checkConfirmation($this->order_no,'A'),
             'confirm_b'=>Order::checkConfirmation($this->order_no,'B'),
             'confirm_c'=>Order::checkConfirmation($this->order_no,'C'),
@@ -44,11 +48,11 @@ class OrderResource extends JsonResource
             'ending_time'=>Carbon::parse($this->ending_time)->toTimeString(),
             'ending_date'=>Carbon::parse($this->ending_date)->toDateString(),
             'search_name'=>$this->order_no.'|'.$this->customer_name.'|'.$this->shp_name,
-            //    'SearchName'=>'5038135196799'.'|'.'Carrefour'.'|'.'Junction'
-            // ],
-
+            // 'assignments'=>$this->whenLoaded('assignments')
+          
 
         ];
 
     }
+
 }

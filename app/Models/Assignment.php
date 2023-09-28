@@ -14,10 +14,12 @@ class Assignment extends Model
    {
     return $this->belongsTo(User::class,'assignor_id','id');
    }
-   public function assignees()
+
+   public function assignee()
    {
-    return $this->hasMany(User::class,'assignee_id','id');
+    return $this->belongsTo(User::class,'assignee_id','id');
    }
+
    public function order()
    {
        return $this->belongsTo(Order::class,'order_no','order_no');
@@ -25,6 +27,6 @@ class Assignment extends Model
 
    public function scopeOfPart(Builder $query,$part)
    {
-       $query->where('part',$part);
+       $query->where('part','LIKE','%'.$part);
    }
 }

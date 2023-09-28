@@ -24,10 +24,11 @@ class AssemblyController extends Controller
                                                                
                                                                 )
                                                         ->whereHas('confirmations')
+                                                        ->whereHas('assignments', fn($q)=>$q->where('assignee_id',$request->user()->id))
                                                         ->where('shp_date','>=',Carbon::now()->toDateString())
                                                         ->orderByDesc('ending_date')
                                                         ->orderByDesc('ending_time')
-                                                        ->with('confirmations')
+                                                        ->with('confirmations','assignments')
                                                         ->paginate(5)
                                                         ->withQuerystring()
 

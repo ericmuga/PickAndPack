@@ -11,7 +11,8 @@ use App\Http\Controllers\{ConfirmationController,
                           PickController,
                           PrepackController, 
                           StockController,
-                         AssemblyController
+                         AssemblyController,
+                         AssignmentController,
                        };
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\{Route,Auth};
@@ -47,6 +48,8 @@ use App\Models\{Line,LinePrepack,Order,Prepack, Stock};
 
 
 Route::middleware('auth')->group(function () {
+
+        Route::resource('assignment',AssignmentController::class);
 
         Route::post('download/linePrepacks',[LinePrepackController::class,'export'])->name('linePrepacks.download');
         Route::resource('linePrepacks',LinePrepackController::class);

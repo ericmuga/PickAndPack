@@ -13,15 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('assignments', function (Blueprint $table) {
+        Schema::create('roles', function (Blueprint $table) {
             $table->id();
-
-            $table->unsignedBigInteger('assignee_id')->references('user_id')->on('users');
-            $table->unsignedBigInteger('assignor_id')->references('user_id')->on('users');
-            $table->string('order_no')->references('order_no')->on('orders');
-            $table->string('part',10);
-            // $table->string('')
-          
+            $table->string('role_name')->unique();
+            $table->string('role_description');
             $table->timestamps();
         });
     }
@@ -33,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('assignments');
+        Schema::dropIfExists('roles');
     }
 };

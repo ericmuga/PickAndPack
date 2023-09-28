@@ -46,6 +46,8 @@ const openOrCloseDropDown4Menu=()=>{dropDown4IsOpen.value=!dropDown4IsOpen.value
             <div class="px-4 py-2 md:flex" :class="isOpen?'block':'hidden'">
               <Link :href="route('confirmations.index')" :active="route().current('confirmations.index')" class="block text-white font-semibold rounded px-2 py-1 hover:bg-gray-600 ">Registry</Link>
 
+              <Link :href="route('assignment.index')" :active="route().current('assignment.index')" class="block text-white font-semibold rounded px-2 py-1 hover:bg-gray-600 ">Assignment</Link>
+
               <div class="text-white font-semibold rounded px-2 py-1 hover:bg-gray-600 mt-1 md:p-0 md:mx-2">
                 <button class="flex items-center justify-between space-x-2" @click="openOrCloseDropDown4Menu" >Assembly
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
