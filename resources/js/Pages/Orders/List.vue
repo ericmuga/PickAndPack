@@ -221,7 +221,7 @@ const postForm=(dynamicObject,dateDynamicObject)=>{
                                             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
-                                                    <tr class="bg-slate-300">
+                                                    <tr class="bg-gray-700 text-white ">
                                                         <!-- <th scope="col" class="px-6 py-3">
                                                             Barcode
                                                         </th> -->
@@ -265,7 +265,7 @@ const postForm=(dynamicObject,dateDynamicObject)=>{
                                                 </thead>
                                                 <tbody>
                                                     <tr v-for="order in orders.data" :key="order.order_no"
-                                                    class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
+                                                    class="bg-white text-black hover:bg-gray-300 font-semibold">
 
                                                     <td class="px-3 py-2 text-xs">
                                                         {{ order.order_no }}
