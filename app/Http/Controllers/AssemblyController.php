@@ -89,7 +89,7 @@ public function store(Request $request)
             'order_no'=>$line['order_no'],
             'line_no'=>$line['line_no'],
             'from_batch'=>MyServices::preventNullsFromArray('from_batch',$line,''),
-            'to_batch'=>MyServices::preventNullsFromArray('to_batch',$line)?:MyServices::preventNullsFromArray('from_batch',$line,''),
+            'to_batch'=>MyServices::preventNullsFromArray('to_batch',$line)?:'',
             'user_id'=>$request->user()->id,
             'ass_qty'=>MyServices::preventNullsFromArray('assembled_qty',$line,0),
             'ass_pcs'=>MyServices::preventNullsFromArray('assembled_pcs',$line,0),
