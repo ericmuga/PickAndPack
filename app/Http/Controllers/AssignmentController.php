@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Http\Resources\{OrderResource,AssignmentResource};
 use Illuminate\Http\Request;
-use App\Models\{Assignment,Line,User};
+use App\Models\{Assignment,Line,User,Order};
 use Illuminate\Support\Facades\DB;
+use App\Services\SearchQueryService;
 
 class AssignmentController extends Controller
 {
@@ -14,29 +15,37 @@ class AssignmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        
+    public function index(Request $request)
+     {
 
-        $ass= AssignmentResource::collection(Assignment::get());
-        $assemblers =User::select('name','id')->get();
+            //the request will hold the search variable and the current state of the cart
+           
+            // $assignee
 
-        
+        // dd(Carbon::parse($request->shp_date)->toDateString());
+           $records=$request->records?:10;
+          
+            $orders = OrderResource::collection(Order::shipcurrent()
+                                  // ->unassigned()       
+                                  ->when($request->has('spcodes')&&($request->spcodes<>''),fn($q)=>$q->whereIn('sp_code',$request->spcodes))
+                                  ->when($request->has('shp_date')&&($request->shp_date<>''),fn($q)=>$q->where('shp_date',Carbon::parse($request->shp_date)->toDateString()))
+                                  ->select('customer_name', 'shp_name', 'order_no', 'shp_date', 'sp_code')
+                                  ->with(['confirmations','lines']) 
+                                  ->paginate($records)
+                                  ->appends($request->all())
+                                  ->withQueryString());
+          
 
-        $order_parts =DB::table('order_parts')
-                        ->select('order_part','description','line_count','order_qty')
-                        ->groupBy('order_part','description','line_count','order_qty')
+            $spcodes=DB::table('sales_people')->select('name','code')->get();
 
+            $assemblers=DB::table('users')->select('name','id')->get();
 
-                        ->where('shp_date','>=',Carbon::today()->toDateString())
-                        ->get();
+             
 
-
-      
-
-        return inertia('Assignment/List',compact('ass','assemblers','order_parts'));
-    }
-
+            return inertia('Assignment/List',compact('orders' ,'spcodes','assemblers'));
+                
+     }
+ 
     /**
      * Show the form for creating a new resource.
      *
@@ -52,15 +61,16 @@ class AssignmentController extends Controller
      */
     public function store(Request $request)
     {
-        
-       foreach($request->order_parts as $order_part)
+        // dd($request->all());
+
+       foreach($request->selectedParts as $p)
        {
 
          Assignment::create([
                              'assignee_id'=>$request->assignee,
                              'assignor_id'=>$request->user()->id,
-                             'part'=>$request->part, 
-                             'order_no'=>substr($order_part,0,-2), 
+                             'part'=>$p['part'], 
+                             'order_no'=>$p['order_no'], 
                            ]); 
         }
        return redirect(route('assignment.index'));

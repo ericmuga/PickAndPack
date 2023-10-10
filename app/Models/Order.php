@@ -86,6 +86,25 @@ class Order extends Model
         return $this->belongsToMany(Pick::class,'PickOrders','order_no','pick_no','pick_no','order_no');
     }
 
+  
+      public function scopeUnAssigned($query)
+        {
+            $count=$this->getParts();
+            return $query->whereHas('assignments', function ($query) use ($count) {
+                $query->havingRaw('count(*) < ?', [$count]);
+            });
+        }
+
+      public function scopeAssigned($query)
+        {
+            
+            return $query->whereHas('assignments', function ($query) use ($count) {
+                $query->havingRaw('count(*) = ?', [$count]);
+            });
+        }
+    
+    
+
     public function confirmations()
     {
        return $this->hasMany(Confirmation::class,'order_no','order_no');

@@ -34,6 +34,7 @@ class LineResource extends JsonResource
                  'assembler'=>$this->assembler,
                  'checker'=>$this->checker,
                  'order'=>OrderResource::make($this->whenLoaded('order')),
+                 'qty_base'=>$this->qty_base,
 
                  'prepacks'=>OrderResource::collection($this->whenLoaded('prepacks')),
                  // 'assemblies'=>OrderResource::collection($this->whenLoaded('assemblies')),

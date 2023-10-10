@@ -49,6 +49,7 @@ const extractedData = ref(Object.entries(props.orderLines.data).map(([key, value
     return {
 
         'order_qty': value.order_qty ,// Use the value with ref/ Extract 'age' key as value with ref
+        'qty_base': value.qty_base ,// Use the value with ref/ Extract 'age' key as value with ref
         'prepacks_total_quantity': value.prepacks_total_quantity ,// Use the value with ref/ Extract 'age' key as value with ref
         'barcode':value.barcode,
         'item_no':value.item_no,
@@ -105,6 +106,7 @@ const form=useForm({
    prepacks_total_quantity:0,
    assembled_qty:0,
    assembled_pcs:0,
+   qty_base:0,
    item_description:'',
    from_batch:'',
    to_batch:'',
@@ -121,6 +123,7 @@ const form2=useForm({
    prepacks_total_quantity:0,
    assembled_qty:0,
    assembled_pcs:0,
+   qty_base:0,
    item_description:'',
   from_batch:'',
    to_batch:'',
@@ -170,6 +173,7 @@ const submitForm=()=>{
       assembledArray.value[existingItemIndex].assembled_qty = form.assembled_qty;
       assembledArray.value[existingItemIndex].from_batch = form.from_batch;
       assembledArray.value[existingItemIndex].to_batch = form.to_batch;
+      // assembledArray.value[existingItemIndex].qty_base = form.qty_base;
     } else
     {
       // If the key doesn't exist, push a new key-value pair
@@ -200,14 +204,15 @@ const submitForm=()=>{
 
 const updateScannedItem =(item)=>{
 
-
+// console.log(item)
 //update form
     form.item_no=item.item_no
     form.barcode=item.barcode
-    form.order_qty=item.order_qty
-    form.order_pcs=item.order_pcs
+    form.order_qty=item.qty_base
+    form.order_pcs=item.order_qty
     form.prepacks_total_quantity=item.prepacks_total_quantity
-    form.assembled_qty=item.order_qty-item.prepacks_total_quantity
+    form.assembled_qty=item.qty_base
+    form.assembled_pcs=item.order_qty
     form.pick_no=props.pick_no
     form.item_description=item.item_description
     form.order_no=item.order_no
@@ -219,10 +224,11 @@ const updateScannedItem =(item)=>{
 
     form2.item_no=item.item_no
     form2.barcode=item.barcode
-    form2.order_qty=item.order_qty
-    form2.order_pcs=item.order_pcs
+    form2.order_qty=item.qty_base
+    form2.order_pcs=item.order_qty
     form2.prepacks_total_quantity=item.prepacks_total_quantity
-    form2.assembled_qty=item.order_qty-item.prepacks_total_quantity
+    form2.assembled_qty=item.order_qty
+    form2.assembled_pcs=item.qty_base
     form2.pick_no=props.pick_no
     form2.item_description=item.item_description
     form2.order_no=item.order_no
@@ -577,6 +583,8 @@ onUnmounted(() => {
              v-model="form.assembled_qty"
              placeholder="PCS"
            /></div>
+           
+
            <div
             class="flex items-center space-x-2"
             >
@@ -584,7 +592,7 @@ onUnmounted(() => {
            <InputText
              ref="scanItem"
              v-model="form.assembled_pcs"
-             :placeholder="form.assembled_qty"
+             
            />
 </div>
 
