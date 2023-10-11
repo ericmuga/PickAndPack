@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Services\{SearchQueryService,ExcelExportService};
 use Carbon\Carbon;
 
+use Illuminate\Support\Facades\DB;
 
 class ConfirmationController extends Controller
 {
@@ -19,16 +20,16 @@ public function index(Request $request)
 {
     // Define the columns to select in the query
     // dd($request->all());
+
+
+    $records=$request->records?:10;
+     
+      $spcodes=DB::table('sales_people')->select('name','code')->get();
     $columns = ['customer_name', 'shp_name', 'order_no', 'shp_date', 'sp_code', 'ending_date','ended_by'];
 
     $queryBuilder = Order::query()
-                        //  ->when(   (!$request->has('search')||(($request->has('search')&&$request->search=='')))&&
-                        //             $request->has('isConfirmed')&&
-                        //            ($request->isConfirmed=='true'),
-
-                        //            fn($q)=>$q->confirmed()
-                        //       ) // You can also use `Order::firstWhere('no', 2)` here
-                        //  ->when(!($request->has('isConfirmed'))||($request->has('isConfirmed')&&($request->isConfirmed=='false')),fn($q)=>$q->pending())
+                        ->when($request->has('spcodes')&&($request->spcodes<>''),fn($q)=>$q->whereIn('sp_code',$request->spcodes))
+                        ->when($request->has('shp_date')&&($request->shp_date<>''),fn($q)=>$q->where('shp_date',Carbon::parse($request->shp_date)->toDateString()))
                          ->select($columns);
 
                          // You can also use `Order::firstWhere('no', 2)` here
@@ -45,7 +46,7 @@ public function index(Request $request)
                 ->with(['confirmations']) // Example of eager loading related models
                 ->search()
                 ->orderByDesc('ending_date')
-                ->paginate(15)
+                ->paginate($records)
                 ->withQueryString();
 
 
@@ -65,6 +66,7 @@ public function index(Request $request)
         'columnListing' => $columns,
         'items' => $prepackItems,
         'previousInput'=>$request->all(),
+        'spcodes'=>$spcodes
     ]);
 }
 

@@ -27,6 +27,8 @@ const submit = () => {
         onFinish: () => form.reset('password'),
     });
 };
+
+
 </script>
 
 <template>
@@ -37,7 +39,7 @@ const submit = () => {
             {{ status }}
         </div>
 
-        <form @submit.prevent="submit">
+        <form @submit.prevent="submit" >
             <div>
                 <InputLabel for="email" value="Email" />
 

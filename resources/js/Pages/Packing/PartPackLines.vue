@@ -207,6 +207,7 @@ const form=useForm({
 
 
 
+
 const form2=useForm({
    item_no:'',
    order_qty:0,
@@ -240,6 +241,7 @@ const ItemInAssembledArray=(item_no)=>{
 
 const submitForm=()=>{
    //push item into assembled array
+
 
 
      if ((form2.packed_qty)!=form.order_qty)
@@ -369,27 +371,27 @@ const closeAssembly=()=>{
      //if the assembled quantity is not equal to the ordered quantity
 
      Swal.fire({
-                                        title: 'Are you sure?',
-                                        text: "Packed orders may not be undone!",
-                                        icon: 'warning',
-                                        showCancelButton: true,
-                                        confirmButtonColor: '#3085d6',
-                                        cancelButtonColor: '#d33',
-                                        confirmButtonText: 'Pack Order!'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) 
-                                            {
+                    title: 'Are you sure?',
+                    text: "Packed orders may not be undone!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Pack Order!'
+                    }).then((result) => {
+                        if (result.isConfirmed) 
+                        {
 
-                                              stopTimer();
-                                              // console.log(formatTime);
-                                                Inertia.post(route('packing.close'),{'data':assembledArray.value,
-                                                                                     'packing_time':formatTime.value,
-                                                                                    }
-                                                             );
-                                            
+                          stopTimer();
+                          // console.log(formatTime);
+                            Inertia.post(route('packing.close'),{'data':assembledArray.value,
+                                                                 'packing_time':formatTime.value,
+                                                                }
+                                         );
+                        
 
-                                            }
-                        })
+                        }
+    })
 }
 
 const isRunning = ref(false);
@@ -581,7 +583,6 @@ onUnmounted(() => {
                                                             <tr class="bg-slate-300">
                                                                 <th  scope="col" class="px-6 py-3">Item No.</th>
                                                                 <th  scope="col" class="px-6 py-3">Item</th>
-
                                                                 <th  scope="col" class="px-6 py-3">Barcode</th>
                                                                 <th  scope="col" class="px-6 py-3">Ordered qty</th>
                                                                 <th  scope="col" class="px-6 py-3">Prepack qty</th>
@@ -681,6 +682,7 @@ onUnmounted(() => {
         <span class=" capitalize font-bold text-xl text-cyan-800">{{ form.item_description }}</span>
             <div class="flex space-x-2 items-center">  
             <span class="px-3 text-center capitalize">Ordered Qty</span>
+
             <span class="px-3 text-center capitalize">{{ form.order_qty }}</span>
             <span class="px-3 text-center capitalize">Prepacked Qty</span>
             <span class="px-3 text-center capitalize">{{ form.prepacks_total_quantity }}</span>
@@ -693,7 +695,6 @@ onUnmounted(() => {
                     ref="scanItem"
                     style="width: 5em "
                     class="mx-5"
-
                     v-model="form.packed_pcs"
               
                 />
@@ -753,14 +754,13 @@ onUnmounted(() => {
                       v-model="form.from_batch"
                       placeholder="From Batch"
                         class="mx-2"
-                        />
+                 />
                         
-                        <InputText
+                <InputText
                         size="5"
                          placeholder="To Batch" 
                         v-model="form.to_batch"
                          class="mx-2"
-
                 />
            Empty? <input type="checkbox" v-model="form.empty"  />
 

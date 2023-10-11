@@ -271,53 +271,10 @@ $sp_codes = DB::table('orders')
 
 
 
-public function pack(Request $request)
-{
-    //this will be the view to select the order
-    //give a list of all orders ready for packing
-    // dd($request->all());
-    $orders= OrderResource::collection(Order::query()
-                                            ->when($request->has('search'),fn($q)=>
-                                                    $q->where('order_no','like','%'.$request->search)
-                                                    // ->orWhere('customer_name','like','%'.$request->search.'%')
-                                                    )
-                                            ->whereHas('confirmations')
-                                            ->where('shp_date','>=',Carbon::now()->toDateString())
-                                            ->orderByDesc('ending_date')
-                                            ->orderByDesc('ending_time')
-                                            ->with('confirmations')
-                                            ->paginate(5)
-                                            ->withQuerystring()
-
-                                        );
-
-
- $listing=collect((new ColumnListing('orders'))->getColumns())->only('customer_name','shp_name','order_no','shp_date','sp_code','ending_date');
- return inertia('Orders/Pack',['orders'=>$orders,'refreshError'=>null,'columnListing'=>$listing]);
 
 
 
-}
-
-
-    public function scanItems(Request $request)
-    {
-        // Get the items that belong to the order and part
-        $orderLines = Line::query()
-        ->where('order_no', $request->order_no)
-        ->where('part', $request->part_no)
-        ->withSum('prepacks', 'total_quantity')
-        ->orderBy('item_description')
-        ->paginate(15)
-        ->appends($request->all())
-        ->withQueryString();
-
-        return inertia('Orders/PartPackLines', [
-            'orderLines' => LineResource::collection($orderLines),
-            'previousInput' => $request->all(),
-        ]);
-    }
-
+    
 
 
 
@@ -341,43 +298,6 @@ public function pack(Request $request)
     ]);
 }
 
-
-public function closeAssembly(Request $request)
-{
-    
-    //create assembly session
-
-     AsseblySession::create([
-                                       'order_no'=>$request->data[0]['order_no'],
-                                       'part'=>Line::where('order_no',$request->data[0]['order_no'])
-                                           ->where('line_no',$request->data[0]['line_no'])
-                                           ->first()->part,
-                                        'packing_time'=>$request->packing_time,
-                                        'user_id'=>$request->user()->id
-                            ]);
-
-
-    foreach($request->data as $line)
-    {
-        //  dd($line);
-        // if (!AssemblyLine::where('order_no',$line['order_no'])
-        // ->where('line_no',$line['line_no'])
-        // ->exists())
-
-        AssemblyLine::updateOrCreate([
-            'order_no'=>$line['order_no'],
-            'line_no'=>$line['line_no'],
-            'from_batch'=>array_key_exists('from_batch',$line)?$line['from_batch']:'',
-            'from_batch'=>array_key_exists('to_batch',$line)?$line['to_batch']:'',
-            // 'packing_time'=>$request->assembly_time,
-            'user_id'=>$request->user()->id,
-            'ass_qty'=>$line['assembled_qty'],
-        ]);
-        // else redirect()->back()->withErrors(['message'=>'line'.$line['line_no'].'of Order'.$line['order_no'].'already exists']);
-    }
-
-    return redirect(route('order.pack'));
-}
 
 
 

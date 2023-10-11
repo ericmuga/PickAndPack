@@ -48,6 +48,7 @@ const props= defineProps({
     printed:Object,
     columnListing:Object,
     previousInput:Object,
+    spcodes:Object,
 })
 
 watch(selectedParts,console.log(selectedParts));
@@ -143,8 +144,24 @@ const postForm=(dynamicObject,dateDynamicObject)=>{
         //    .onSuccess(showModal=false)
 }
 
-// console.log(dateDynamicObject);
- // Output: ['column3', 'column4']
+const selected_spcodes=ref([]);
+const records=ref('');
+const shipmentDate=ref('');
+
+const refreshSearch=()=>{
+                         
+// alert('here');
+  Inertia.get(route('confirmations.index'),
+                      {
+                        'spcodes':selected_spcodes.value,
+                        'shp_date':shipmentDate.value,
+                        'records':records.value
+                      },
+                      {
+
+                        preserveScroll:true,preserveState:true,replace:true}
+               );
+}
 </script>
 
 <template>
@@ -152,7 +169,7 @@ const postForm=(dynamicObject,dateDynamicObject)=>{
 
     <AuthenticatedLayout @add="showModal=true">
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">Orders {{ }}</h2>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800 justify-end"> Confimation List</h2>
         </template>
 
         <div class="py-6">
@@ -172,49 +189,51 @@ const postForm=(dynamicObject,dateDynamicObject)=>{
 
                                 </template>
                                 <template #center>
-                                    <div>
-                                        <Pagination :links="orders.meta.links" />
+                                 <div class="flex flex-col ">
+                                   
+                                   <form @submit.prevent="refreshSearch()">
+                                      <div class="space-x-3 flex justify-between items-center text-center w-full">
+
+                                        Sales Codes:
+                                          <MultiSelect
+                                             v-model="selected_spcodes"
+                                             optionLabel="name"
+                                             optionValue="code"
+                                             :options="props.spcodes"
+                                             filter
+
+                                          />
+
+                                          Records:
+                                          <Dropdown
+                                             v-model="records"
+                                             :options="[10,20,50,100]"
+                                             placeholder="10"
+
+                                          />
+                                      
+                                      <div>
+                                         Shipment Date:
+                                       
+                                        <input type="date"  class="hover:border-indigo-500 p-3" v-model="shipmentDate" />
+                                        
+                                        <Button type="submit"  label="Go!"/>
+
+
+                                      </div>
                                     </div>
-                                    <!-- <Modal :show="showModal.value">
-                                        <FilterPane :propsData="columnListing" />
-                                    </Modal> -->
-                                      <!-- <FilterPane :propsData="columnListing" /> -->
+                                  </form>
+                                 <div class="items-center  flex flex-row justify-center text-center m-3">
+                                          <SearchBox :model="route('confirmations.index')" />  
+                                          <!-- <DownloadButton :link="route('export.confirmations')" /> -->
 
-                                </template>
-
-                                    <template #end>
-
-                                         <div class="flex flex-col items-center gap-1 p-3 text-center card">
-                                            <span class="text-xs">Confirmed?</span>
-                                            <InputSwitch v-model="isConfirmed" />
-                                        </div>
-                                        <!-- <a href="/orders/download" class="">
-                                            <Button icon="pi pi-download" severity="primary" text raised rounded label="confirmations"/>
-                                        </a> -->
-                                        <DownloadButton :link="route('export.confirmations')" />
-
-
-                                         <!-- <Link :href="route('refresh')" class="w-20 h-20 m-5 mx-auto text-center ">
-                                            <img src="/img/refresh.png" />
-                                            <Button icon="pi pi-heart" severity="help" rounded aria-label="Favorite" />
-                                            <Button icon="pi pi-refresh" severity="primary" rounded />
-                                            <img src="/img/scanner.jpg" />
-                                        </Link>
-                                         -->
-                                    <!-- <Button
-                                         label="Filters"
-                                         @click="showModal=true"
-                                         rounded
-                                    ></Button> -->
-
-
-                                            <!-- <InputText v-model="search" aria-placeholder="search"/>
-                                             -->
-
-
-                                            <SearchBox :model="route('confirmations.index')" />
-                                            </template>
-                                        </Toolbar>
+                                            
+                                 </div>
+                                        
+                                
+                             </div>
+                            </template>
+                                </Toolbar>
 
                                         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
 
@@ -222,41 +241,41 @@ const postForm=(dynamicObject,dateDynamicObject)=>{
                                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
                                                     <tr class="bg-gray-700 text-white ">
-                                                        <!-- <th scope="col" class="px-6 py-3">
+                                                        <!-- <th scope="col" class="px-4 py-2">
                                                             Barcode
                                                         </th> -->
-                                                        <th scope="col" class="px-6 py-3">
+                                                        <th scope="col" class="px-4 py-2">
                                                             Order No.
                                                         </th>
-                                                        <th scope="col" class="px-6 py-3 text-center">
+                                                        <th scope="col" class="px-4 py-2 text-center">
                                                             Sales Person
                                                         </th>
-                                                        <th scope="col" class="px-6 py-3">
+                                                        <th scope="col" class="px-4 py-2">
                                                             Ship-to Name
                                                         </th>
-                                                        <th scope="col" class="px-6 py-3">
+                                                        <th scope="col" class="px-4 py-2">
                                                             Shipment Date
                                                         </th>
 
-                                                        <th scope="col" class="px-6 py-3">
+                                                        <th scope="col" class="px-4 py-2">
                                                             Printing Time
                                                         </th>
-                                                        <th scope="col" class="px-6 py-3">
+                                                        <th scope="col" class="px-4 py-2">
                                                             Printed By
                                                         </th>
-                                                        <th scope="col" class="px-6 py-3">
+                                                        <th scope="col" class="px-4 py-2">
                                                             Printing Date
                                                         </th>
-                                                        <th scope="col" class="px-6 py-3 text-center">
+                                                        <th scope="col" class="px-4 py-2 text-center">
                                                             Part A Items
                                                         </th>
-                                                        <th scope="col" class="px-6 py-3 text-center">
+                                                        <th scope="col" class="px-4 py-2 text-center">
                                                             Part B Items
                                                         </th>
-                                                        <th scope="col" class="px-6 py-3 text-center">
+                                                        <th scope="col" class="px-4 py-2 text-center">
                                                             Part C Items
                                                         </th>
-                                                        <th scope="col" class="px-6 py-3 text-center">
+                                                        <th scope="col" class="px-4 py-2 text-center">
                                                             Part D Items
                                                         </th>
 

@@ -14,24 +14,7 @@ class PackingResource extends JsonResource
      */
     public function toArray($request)
     {
-        /*
-
-                                            'item_no':form.item_no,
-                                           'assembled_qty':form.assembled_qty,
-                                           'order_qty':form.order_qty,
-                                           'prepacks_total_quantity':form.prepacks_total_quantity,
-                                           'item_description':form.item_description,
-                                           'barcode':form.barcode,
-                                            'item_no':form.item_no,
-                                            'order_no':form.order_no,
-                                            'line_no':form.line_no,
-                                            'packed_qty':form.packed_qty,
-                                            'packed_pcs':form.packed_pcs,
-                                            'carton_no':form.carton_no,
-                                            'vessel':form.vessel,
-                                            'from_vessel':form.from_vessel,
-                                            'to_vessel':form.to_vessel,
-        */
+        
 
         return [  
                     'item_no'=>$this->line->item_no,
