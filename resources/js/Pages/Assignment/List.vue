@@ -21,6 +21,8 @@ import Drop from '@/Components/Drop.vue'
 // import {Inertia} from '@inertiajs/inertia'
 
 
+
+
 const today = new Date();
 
 const assignable = computed(() => (selectedOrderParts.value.length>0) && (assignee.value!='') );
@@ -55,7 +57,7 @@ Inertia.post(route('assignment.store'),
                'assignee': assignee.value
              }, 
              {
-                      onSuccess:()=>{Swal.fire('Assignment created Successfully!','','success')},
+                      onSuccess:()=>{selectedOrderParts.value=[]; assignee.value='';  Swal.fire('Assignment created Successfully!','','success')},
                  preserveScroll:true,
                   preserveState:true,
                         replace:true
@@ -369,8 +371,12 @@ const removePart=(newObj)=>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr v-for="order in orders.data" :key="order.order_no"
-                                                    class="bg-white text-black hover:bg-gray-300 font-semibold">
+                                                    <tr 
+                                                         v-for="order in orders.data.filter(item => item.confirmations_count !== item.assignments_count)" :key="order.order_no"
+
+                                                         class="bg-white text-black hover:bg-gray-300 font-semibold"
+
+                                                     >
 
                                                     <td class="px-3 py-2 text-xs">
                                                         {{ order.order_no }}

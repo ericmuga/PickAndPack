@@ -11,13 +11,25 @@ import Modal from '@/Components/Modal.vue'
 import { useStorage } from '@/Composables/useStorage';
 import { useDates } from '@/Composables/useDates';
 import DownloadButton from '@/Components/DownloadButton.vue';
-import SearchBox from '@/Components/SearchBox.vue';
-import InputSwitch from 'primevue/inputswitch';
+// import SearchBox from '@/Components/SearchBox.vue';
+// import InputSwitch from 'primevue/inputswitch';
 
-const form = useForm({
-    search: null,
+ let searchKey=ref('')
+//   const getRoute=computed(()=>route(`${props.model}'.index'`))
+  watch(searchKey,debounce((value)=>{
+                                            //   alert(value)
+                                    Inertia.get(route('confirmations.index'),{
+                                        'search':searchKey.value,
+                                        'spcodes':selected_spcodes.value,
+                                        'shp_date':shipmentDate.value,
+                                        'records':records.value,
 
-})
+
+                                    },{preserveState:true,replace:true})
+                                    },300));
+
+
+
 
 let showModal=ref(false);
 
@@ -155,7 +167,8 @@ const refreshSearch=()=>{
                       {
                         'spcodes':selected_spcodes.value,
                         'shp_date':shipmentDate.value,
-                        'records':records.value
+                        'records':records.value,
+                        'search':searchKey.value
                       },
                       {
 
@@ -223,8 +236,11 @@ const refreshSearch=()=>{
                                       </div>
                                     </div>
                                   </form>
-                                 <div class="items-center  flex flex-row justify-center text-center m-3">
-                                          <SearchBox :model="route('confirmations.index')" />  
+                                 <div class="items-center  flex flex-row justify-center text-center m-5">
+                                
+
+                                            <input type="text" 
+                                               v-model="searchKey" placeholder="Search Order" class="m-2 rounded-lg bg-slate-300 text-md" />
                                           <!-- <DownloadButton :link="route('export.confirmations')" /> -->
 
                                             

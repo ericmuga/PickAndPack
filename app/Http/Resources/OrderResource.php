@@ -53,6 +53,8 @@ class OrderResource extends JsonResource
             'ending_date'=>Carbon::parse($this->ending_date)->toDateString(),
             'search_name'=>$this->order_no.'|'.$this->customer_name.'|'.$this->shp_name,
             'lines'=>$this->whenLoaded('lines'),
+            'confirmations_count'=>$this->whenCounted('confirmations'),
+            'assignments_count'=>$this->whenCounted('assignments'),
           
 
         ];

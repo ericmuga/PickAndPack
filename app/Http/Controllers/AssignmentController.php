@@ -26,11 +26,11 @@ class AssignmentController extends Controller
            $records=$request->records?:10;
           
             $orders = OrderResource::collection(Order::shipcurrent()
-                                  // ->unassigned()       
                                   ->when($request->has('spcodes')&&($request->spcodes<>''),fn($q)=>$q->whereIn('sp_code',$request->spcodes))
                                   ->when($request->has('shp_date')&&($request->shp_date<>''),fn($q)=>$q->where('shp_date',Carbon::parse($request->shp_date)->toDateString()))
                                   ->select('customer_name', 'shp_name', 'order_no', 'shp_date', 'sp_code')
-                                  ->with(['confirmations','lines']) 
+                                  ->with(['confirmations','lines'])
+                                  ->withCount(['assignments','confirmations']) 
                                   ->paginate($records)
                                   ->appends($request->all())
                                   ->withQueryString());
@@ -65,8 +65,8 @@ class AssignmentController extends Controller
 
        foreach($request->selectedParts as $p)
        {
-
-         Assignment::create([
+         
+         Assignment::updateOrCreate([
                              'assignee_id'=>$request->assignee,
                              'assignor_id'=>$request->user()->id,
                              'part'=>$p['part'], 
