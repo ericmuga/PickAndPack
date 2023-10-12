@@ -20,7 +20,7 @@ import Drop from '@/Components/Drop.vue'
 
 // import {Inertia} from '@inertiajs/inertia'
 
-
+const searchKey=ref('');
 
 
 const today = new Date();
@@ -57,7 +57,7 @@ Inertia.post(route('assignment.store'),
                'assignee': assignee.value
              }, 
              {
-                      onSuccess:()=>{selectedOrderParts.value=[]; assignee.value='';  Swal.fire('Assignment created Successfully!','','success')},
+                  onSuccess:()=>{selectedOrderParts.value=[]; assignee.value='';  Swal.fire('Assignment created Successfully!','','success')},
                  preserveScroll:true,
                   preserveState:true,
                         replace:true
@@ -288,14 +288,14 @@ const removePart=(newObj)=>
                                 </template>
 
                                 <template #center>
-                                <div class="grid sm:grid-cols-1 md:grid-cols-3">
-
-                                <div class="col-span-2">
-                                  <form @submit.prevent="refreshSearch()">
-                                      <div class="space-x-3 flex justify-between items-center text-center w-full">
+                                 <div class="flex flex-col ">
+                                   
+                                   <form @submit.prevent="refreshSearch()">
+                                      <div class="space-x-3  flex flex-col justify-between items-center text-center overflow-x-auto">
 
                                         Sales Codes:
-                                          <MultiSelect
+                                        <div class="max-w-2xl">
+                                        <MultiSelect
                                              v-model="selected_spcodes"
                                              optionLabel="name"
                                              optionValue="code"
@@ -303,7 +303,10 @@ const removePart=(newObj)=>
                                              filter
 
                                           />
+                                        </div>
 
+                                          
+                                      
                                           Records:
                                           <Dropdown
                                              v-model="records"
@@ -313,18 +316,28 @@ const removePart=(newObj)=>
                                           />
                                       
                                       <div>
-                                     Shipment Date:
-                                   
-                                    <input type="date" :placeholder=tomorrow class="hover:border-indigo-500 p-3" v-model="shipmentDate" />
-                                    </div>
-                                    <Button type="submit"  label="Go!"/>
+                                         Shipment Date:
+                                       
+                                        <input type="date"  class="hover:border-indigo-500 p-3" v-model="shipmentDate" />
+                                        
+                                        <Button type="submit"  label="Go!"/>
 
 
                                       </div>
-                                    
+                                    </div>
                                   </form>
-                                  </div>
-                          </div>
+                                 <div class="items-center  flex flex-row justify-center text-center m-5">
+                                
+
+                                            <input type="text" 
+                                               v-model="searchKey" placeholder="Search Order" class="m-2 rounded-lg bg-slate-300 text-md" />
+                                          <!-- <DownloadButton :link="route('export.confirmations')" /> -->
+
+                                            
+                                 </div>
+                                        
+                                
+                             </div>
                                    
                                 </template>
                            </Toolbar>
