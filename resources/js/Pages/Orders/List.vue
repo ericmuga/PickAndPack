@@ -205,10 +205,11 @@ const refreshSearch=()=>{
                                  <div class="flex flex-col ">
                                    
                                    <form @submit.prevent="refreshSearch()">
-                                      <div class="space-x-3 flex justify-between items-center text-center w-full">
+                                      <div class="space-x-3  flex flex-col justify-between items-center text-center overflow-x-auto">
 
                                         Sales Codes:
-                                          <MultiSelect
+                                        <div class="max-w-2xl">
+                                        <MultiSelect
                                              v-model="selected_spcodes"
                                              optionLabel="name"
                                              optionValue="code"
@@ -216,7 +217,10 @@ const refreshSearch=()=>{
                                              filter
 
                                           />
+                                        </div>
 
+                                          
+                                      
                                           Records:
                                           <Dropdown
                                              v-model="records"
