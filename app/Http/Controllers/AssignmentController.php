@@ -18,11 +18,6 @@ class AssignmentController extends Controller
     public function create(Request $request)
     {
 
-        //the request will hold the search variable and the current state of the cart
-
-        // $assignee
-
-        // dd(Carbon::parse($request->shp_date)->toDateString());
         $records=$request->records?:10;
 
         $orders = OrderResource::collection(Order::shipcurrent()
@@ -67,8 +62,9 @@ class AssignmentController extends Controller
     {
         //list all the assignments that are on going
 
-        $assignments= Assignment::with('assignee','assignor')
-        ->paginate(15);
+        $assignments= AssignmentResource::collection(Assignment::with('assignee','assignor')
+                                ->withCount('lines')
+                                ->paginate(15));
 
         //list of assemblers
 
@@ -106,7 +102,7 @@ class AssignmentController extends Controller
                 'order_no'=>$p['order_no'],
             ]);
         }
-        return redirect('assignment.index');
+        return redirect(route('assignment.index'));
 
     }
 

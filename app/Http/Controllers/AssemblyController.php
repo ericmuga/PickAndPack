@@ -11,24 +11,26 @@ use App\Services\MyServices;
 
 class AssemblyController extends Controller
 {
-    
+
 
     //this will show all orders pending assembly
 
     public function index(Request $request)
     {
-        
+
                 $orders= OrderResource::collection(Order::query()
                                                         ->when($request->has('search'),fn($q)=>
                                                                 $q->where('order_no','like','%'.$request->search)
-                                                               
+
                                                                 )
                                                         ->whereHas('confirmations')
-                                                            ->whereHas('assignments', fn($q)=>$q->where('assignee_id',$request->user()->id))
+                                                            ->whereHas('assignmentLines', fn($q)=>$q->whereHas('assignment', fn($q)=>$q->where(
+
+                                                                'assignee_id',$request->user()->id)))
                                                         ->where('shp_date','>=',Carbon::now()->toDateString())
                                                         ->orderByDesc('ending_date')
                                                         ->orderByDesc('ending_time')
-                                                        ->with('confirmations','assignments')
+                                                        ->with('confirmations','assignmentLines')
                                                         ->paginate(5)
                                                         ->withQuerystring()
 
@@ -43,7 +45,7 @@ class AssemblyController extends Controller
    // Get the items that belong to the order and part
     public function assembleOrder(Request $request)
     {
-        
+
         $orderLines = Line::query()
                             ->where('order_no', $request->order_no)
                             ->where('part', $request->part_no)
@@ -63,7 +65,7 @@ class AssemblyController extends Controller
 
 public function store(Request $request)
 {
-    
+
     //create assembly session
 
      AssemblySession::create([

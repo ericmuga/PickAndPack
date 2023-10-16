@@ -36,7 +36,7 @@ tomorrow.setDate(today.getDate() + 1);
 const refreshSearch=()=>{
 
 
-  Inertia.get(route('assignment.index'),
+  Inertia.get(route('assignment.create'),
                       {
                         'spcodes':selected_spcodes.value,
                        'shp_date':shipmentDate.value,

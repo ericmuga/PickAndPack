@@ -18,12 +18,14 @@ class AssignmentResource extends JsonResource
 
         return [
 
-                'order'=>$this->order->order_no.'|'.$this->order->shp_name,
-                'part'=>$this->part,
+                // 'order'=>$this->order->order_no.'|'.$this->order->shp_name,
+                // 'part'=>$this->part,
                 'assignee'=>$this->assignee->name,
                 'assignor'=>$this->assignor->name,
                 'time'=>$this->created_at->diffForHumans(),
-                'id'=>$this->id
+                'id'=>$this->id,
+                'lines_count'=>$this->whenCounted('lines'),
+                'orders_count'=>$this->lines()->groupBy('order_no')->count()
                ];
     }
 }
