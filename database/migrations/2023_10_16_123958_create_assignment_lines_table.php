@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Assignment;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,11 +14,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('assignments', function (Blueprint $table) {
+        Schema::create('assignment_lines', function (Blueprint $table) {
             $table->id();
-
-            $table->unsignedBigInteger('assignee_id')->references('user_id')->on('users');
-            $table->unsignedBigInteger('assignor_id')->references('user_id')->on('users');
+            $table->foreignIdFor(Assignment::class);
+            $table->string('batch_no')->references('batch_no')->on('assignments');
+            $table->string('order_no')->references('order_no')->on('orders');
+            $table->string('part',1);
             $table->timestamps();
         });
     }
@@ -29,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('assignments');
+        Schema::dropIfExists('assignment_lines');
     }
 };

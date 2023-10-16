@@ -33,6 +33,8 @@ import DownloadButton from '@/Components/DownloadButton.vue';
 
 let showModal=ref(false);
 
+let showFilters=ref(true);
+
 const showFilterPane=()=>{showModal=true;}
 let isConfirmed= ref((props.previousInput.hasOwnProperty('isConfirmed'))&&(props.previousInput.isConfirmed=='true')?true:false);
 
@@ -161,7 +163,7 @@ const records=ref('');
 const shipmentDate=ref('');
 
 const refreshSearch=()=>{
-                         
+
 // alert('here');
   Inertia.get(route('confirmations.index'),
                       {
@@ -182,7 +184,7 @@ const refreshSearch=()=>{
 
     <AuthenticatedLayout @add="showModal=true">
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800 justify-end"> Confimation List</h2>
+            <h2 class="justify-end text-xl font-semibold leading-tight text-gray-800"> Confimation List</h2>
         </template>
 
         <div class="py-6">
@@ -193,19 +195,29 @@ const refreshSearch=()=>{
                         <!--stats bar -->
 
                         <div>
+                            <Button  class="" severity="info" @click="showFilters=!showFilters"  >
+
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                  <path v-if="showFilters" stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l7.5-7.5 7.5 7.5m-15 6l7.5-7.5 7.5 7.5" />
+                                  <path v-else stroke-linecap="round" stroke-linejoin="round" d="M19.5 5.25l-7.5 7.5-7.5-7.5m15 6l-7.5 7.5-7.5-7.5" />
+                                </svg>
+
+
+                                 </Button>
                             <Toolbar>
                                 <template #start>
-                                    <!-- <Button label="New" icon="pi pi-plus" class="mr-2" />
-                                        <Button label="Upload" icon="pi pi-upload" class="p-button-success" /> -->
-                                        <!-- <i class="mr-2 pi pi-bars p-toolbar-separator" /> -->
-                                        <!-- <SplitButton label="Save" icon="pi pi-check" :model="items" class="p-button-warning"></SplitButton> -->
+
 
                                 </template>
                                 <template #center>
-                                 <div class="flex flex-col ">
-                                   
+
+                                 <div class="flex flex-col "
+                                    :class="showFilters?'block':'hidden'"
+
+                                 >
+
                                    <form @submit.prevent="refreshSearch()">
-                                      <div class="space-x-3  flex flex-col justify-between items-center text-center overflow-x-auto">
+                                      <div class="flex flex-col items-center justify-between space-x-3 overflow-x-auto text-center">
 
                                         Sales Codes:
                                         <div class="max-w-2xl">
@@ -219,8 +231,8 @@ const refreshSearch=()=>{
                                           />
                                         </div>
 
-                                          
-                                      
+
+
                                           Records:
                                           <Dropdown
                                              v-model="records"
@@ -228,29 +240,29 @@ const refreshSearch=()=>{
                                              placeholder="10"
 
                                           />
-                                      
+
                                       <div>
                                          Shipment Date:
-                                       
-                                        <input type="date"  class="hover:border-indigo-500 p-3" v-model="shipmentDate" />
-                                        
+
+                                        <input type="date"  class="p-3 hover:border-indigo-500" v-model="shipmentDate" />
+
                                         <Button type="submit"  label="Go!"/>
 
 
                                       </div>
                                     </div>
                                   </form>
-                                 <div class="items-center  flex flex-row justify-center text-center m-5">
-                                
+                                 <div class="flex flex-row items-center justify-center m-5 text-center">
 
-                                            <input type="text" 
+
+                                            <input type="text"
                                                v-model="searchKey" placeholder="Search Order" class="m-2 rounded-lg bg-slate-300 text-md" />
                                           <!-- <DownloadButton :link="route('export.confirmations')" /> -->
 
-                                            
+
                                  </div>
-                                        
-                                
+
+
                              </div>
                             </template>
                                 </Toolbar>
@@ -260,7 +272,7 @@ const refreshSearch=()=>{
                                             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
-                                                    <tr class="bg-gray-700 text-white ">
+                                                    <tr class="text-white bg-gray-700 ">
                                                         <!-- <th scope="col" class="px-4 py-2">
                                                             Barcode
                                                         </th> -->
@@ -304,7 +316,7 @@ const refreshSearch=()=>{
                                                 </thead>
                                                 <tbody>
                                                     <tr v-for="order in orders.data" :key="order.order_no"
-                                                    class="bg-white text-black hover:bg-gray-300 font-semibold">
+                                                    class="font-semibold text-black bg-white hover:bg-gray-300">
 
                                                     <td class="px-3 py-2 text-xs">
                                                         {{ order.order_no }}

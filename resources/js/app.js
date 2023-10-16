@@ -51,6 +51,7 @@ createInertiaApp({
             .component('SearchBox',SearchBox)
             .component('Calendar',Calendar)
             .component('Swal',Swal)
+            // .component('Link',Link)
             .mount(el);
     },
 });

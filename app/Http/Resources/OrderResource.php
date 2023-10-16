@@ -35,10 +35,10 @@ class OrderResource extends JsonResource
             'part_b'=>$this->lines()->OfPart('B')->count(),
             'part_c'=>$this->lines()->OfPart('C')->count(),
             'part_d'=>$this->lines()->OfPart('D')->count(),
-            'assigned_a'=>$this->assignments()->where('part','=','A')->exists(),
-            'assigned_b'=>$this->assignments()->where('part','=','B')->exists(),
-            'assigned_c'=>$this->assignments()->where('part','=','C')->exists(),
-            'assigned_d'=>$this->assignments()->where('part','=','D')->exists(),
+            'assigned_a'=>$this->assignmentLines()->where('part','=','A')->exists(),
+            'assigned_b'=>$this->assignmentLines()->where('part','=','B')->exists(),
+            'assigned_c'=>$this->assignmentLines()->where('part','=','C')->exists(),
+            'assigned_d'=>$this->assignmentLines()->where('part','=','D')->exists(),
             // 'assigned_a'=>true,
             // 'assigned_b'=>true,
             // 'assigned_c'=>true,
@@ -54,8 +54,8 @@ class OrderResource extends JsonResource
             'search_name'=>$this->order_no.'|'.$this->customer_name.'|'.$this->shp_name,
             'lines'=>$this->whenLoaded('lines'),
             'confirmations_count'=>$this->whenCounted('confirmations'),
-            'assignments_count'=>$this->whenCounted('assignments'),
-          
+            'assignmentLines_count'=>$this->whenCounted('assignmentLines'),
+
 
         ];
 

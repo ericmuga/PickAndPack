@@ -1,7 +1,7 @@
 
 import {defineStore} from "pinia";
 import { Inertia } from "@inertiajs/inertia";
-import axios from 'axios'
+// import axios from 'axios'
 // import route from "vendor/tightenco/ziggy/src/js";
 // import { router } from '@inertiajs/vue3'
 // import route from 'vendor/tightenco/ziggy/src/js';

@@ -86,7 +86,7 @@ class Order extends Model
         return $this->belongsToMany(Pick::class,'PickOrders','order_no','pick_no','pick_no','order_no');
     }
 
-  
+
       public function scopeUnAssigned($query)
         {
             $count=$this->getParts();
@@ -97,13 +97,13 @@ class Order extends Model
 
       public function scopeAssigned($query)
         {
-            
+
             return $query->whereHas('assignments', function ($query) use ($count) {
                 $query->havingRaw('count(*) = ?', [$count]);
             });
         }
-    
-    
+
+
 
     public function confirmations()
     {
@@ -136,8 +136,8 @@ class Order extends Model
         return $this->hasMany(AssemblySession::class,'order_no','order_no');
     }
 
-    public function assignments()
+    public function assignmentLines()
     {
-        return $this->hasMany(Assignment::class,'order_no','order_no');
+        return $this->hasMany(AssignmentLine::class,'order_no','order_no');
     }
 }

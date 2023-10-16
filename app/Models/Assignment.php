@@ -20,6 +20,11 @@ class Assignment extends Model
     return $this->belongsTo(User::class,'assignee_id','id');
    }
 
+
+   public function lines(){
+    return $this->hasMany(AssignmentLine::class);
+   }
+
    public function order()
    {
        return $this->belongsTo(Order::class,'order_no','order_no');
