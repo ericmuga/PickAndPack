@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Resources\{OrderResource,LineResource};
-use App\Models\{Order,Line,AssemblySession,AssemblyLine};
+use App\Models\{Order,Line,AssemblySession,AssemblyLine, Assignment, AssignmentLine};
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Services\MyServices;
+use Illuminate\Support\Facades\Auth;
 
 class AssemblyController extends Controller
 {
@@ -66,16 +67,32 @@ class AssemblyController extends Controller
 public function store(Request $request)
 {
 
+    //get assignment
+   $user=Auth::user()->id;
+//    dd($user);
+    $part=Line::where('order_no',$request->data[0]['order_no'])
+                                   ->where('line_no',$request->data[0]['line_no'])
+                                   ->first()->part;
+
+    $ass_id=AssignmentLine::where('order_no',$request->data[0]['order_no'])
+                       ->where('part',$part)
+                       ->first()->assignment_id;
+
     //create assembly session
 
-     AssemblySession::create([
-                               'order_no'=>$request->data[0]['order_no'],
-                               'part'=>Line::where('order_no',$request->data[0]['order_no'])
-                                   ->where('line_no',$request->data[0]['line_no'])
-                                   ->first()->part,
-                                'assembly_time'=>$request->assembly_time,
-                                'user_id'=>$request->user()->id
-                            ]);
+
+     $session=AssemblySession::updateOrCreate([
+                                        'order_no'=>$request->data[0]['order_no'],
+                                        'part'=>$part,
+                                        'assignment_id'=>$ass_id,
+                                        ],
+                                        [
+                                        'assembly_time'=>$request->assembly_time,
+                                        'user_id'=>$user,
+                                        'system_entry'=>$request->autosave
+                                        ]
+
+                                    );
 
     //create assembly lines
     foreach($request->data as $line)
@@ -88,17 +105,22 @@ public function store(Request $request)
           ->delete();
 
         AssemblyLine::create([
-                            'order_no'=>$line['order_no'],
-                            'line_no'=>$line['line_no'],
-                            'from_batch'=>MyServices::preventNullsFromArray('from_batch',$line),
-                            'to_batch'=>MyServices::preventNullsFromArray('to_batch',$line)?:MyServices::preventNullsFromArray('from_batch',$line),
-                            'user_id'=>$request->user()->id,
-                            'ass_qty'=>MyServices::preventNullsFromArray('assembled_qty',$line,0),
-                            'ass_pcs'=>MyServices::preventNullsFromArray('assembled_pcs',$line,0),
+                                'order_no'=>$line['order_no'],
+                                'line_no'=>$line['line_no'],
+                                'from_batch'=>MyServices::preventNullsFromArray('from_batch',$line),
+                                'to_batch'=>MyServices::preventNullsFromArray('to_batch',$line)?:MyServices::preventNullsFromArray('from_batch',$line),
+                                'assembly_session_id'=>$session->id,
+                                'user_id'=>$user,
+                                'ass_qty'=>MyServices::zeroIfNullOrBlank('assembled_qty',$line,0),
+                                'ass_pcs'=>intVal(MyServices::zeroIfNullOrBlank('assembled_pcs',$line,0)),
                               ]);
          }
 
-       return redirect(route('assembly.index'));
+     if (!$request->autosave)
+      return redirect(route('assembly.index'));
+    else
+      return response('',200,[]);
+
   }
 
 

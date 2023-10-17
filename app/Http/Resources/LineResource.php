@@ -37,7 +37,7 @@ class LineResource extends JsonResource
                  'qty_base'=>$this->qty_base,
 
                  'prepacks'=>OrderResource::collection($this->whenLoaded('prepacks')),
-                 // 'assemblies'=>OrderResource::collection($this->whenLoaded('assemblies')),
+                 'assemblies'=>$this->whenLoaded('assemblies'),
                  'from_batch'=>($this->assemblies()->orderByDesc('created_at')->count()>0)?$this->assemblies()->orderByDesc('created_at')->first()->from_batch:'',
                  'to_batch'=>($this->assemblies()->orderByDesc('created_at')->count()>0)?$this->assemblies()->orderByDesc('created_at')->first()->to_batch:'',
 

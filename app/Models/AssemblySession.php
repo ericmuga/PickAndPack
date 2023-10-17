@@ -13,7 +13,7 @@ class AssemblySession extends Model
 
     public function user()
     {
-      return $this->belongsTo(User::class);    
+      return $this->belongsTo(User::class);
     }
 
     public function orders()
@@ -21,8 +21,14 @@ class AssemblySession extends Model
         return $this->belongsTo(Order::class,'order_no','order_no');
     }
 
-    public function line()
-    {
-        return $this->belongsTo(Line::class,'line_no','line_no');
-    }
+   public function lines()
+   {
+    return $this->hasMany(AssemblyLine::class,null,'session_id');
+   }
+
+   public function assignment()
+   {
+    return $this->belongsTo(Assignment::class);
+   }
+
 }

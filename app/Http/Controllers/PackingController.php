@@ -45,7 +45,7 @@ class PackingController extends Controller
     public function pack(Request $request)
     {
         // Get the items that belong to the order and part for packing
-       
+
 
         $orderLines = Line::query()
                             ->where('order_no', $request->order_no)
@@ -66,7 +66,7 @@ class PackingController extends Controller
 
     public function closePacking(Request $request)
     {
-    
+
 
 
        PackingSession::create([
@@ -78,19 +78,19 @@ class PackingController extends Controller
                                         'user_id'=>$request->user()->id
                             ]);
 
-        
 
 
-/*
+
+
     foreach($request->data as $line)
     {
-        
+
         DB::table('packing')
           ->where('line_no',$line['line_no'])
           ->where('order_no',$line['order_no'])
           ->delete();
 
-       
+
 
     Packing::create([
 
@@ -98,22 +98,22 @@ class PackingController extends Controller
         'line_no'=>$line['line_no'],
         'user_id'=>$request->user()->id,
         'packed_qty'=>$line['packed_qty'],
-        'packed_pcs'=>MyServices::preventNullsFromArray('packed_pcs',$line,0),
-        'from_vessel'=> MyServices::preventNullsFromArray('from_vessel',$line,0),
-        'to_vessel'=>MyServices::preventNullsFromArray('to_vessel',$line,0)>0?:MyServices::preventNullsFromArray('from_vessel',$line,0),
-        'from_batch'=>MyServices::preventNullsFromArray('from_batch',$line,''),
+        'packed_pcs'=>MyServices::zeroIfNullOrBlank('packed_pcs',$line,0),
+        'from_vessel'=> MyServices::zeroIfNullOrBlank('from_vessel',$line,0),
+        'to_vessel'=>MyServices::zeroIfNullOrBlank('to_vessel',$line,0)>0?:MyServices::zeroIfNullOrBlank('from_vessel',$line,0),
+        'from_batch'=>MyServices::zeroIfNullOrBlank('from_batch',$line,''),
         'to_batch'=>MyServices::preventNullsFromArray('to_batch',$line,'')?:MyServices::preventNullsFromArray('from_batch',$line,''),
         'vessel'=>MyServices::preventNullsFromArray('vessel',$line,'Crate'),
-                 
+
                    ]);
-        
+
     }
-    */
+
 
     return redirect(route('packing.index'));
 }
 
-    
+
 
 
 

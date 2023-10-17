@@ -12,7 +12,7 @@ class AssemblyLine extends Model
     use Compoships;
 
 
-   protected $fillable=['line_no','order_no','user_id','ass_qty','from_batch','to_batch','ass_pcs'];
+   protected $guarded=['id'];
 
    public function user()
    {
@@ -28,4 +28,11 @@ class AssemblyLine extends Model
    {
     return $this->belongsTo(Line::class,['order_no','line_no'],['order_no','line_no']);
    }
+
+   public function session()
+   {
+    return $this->belongsTo(AssemblySession::class);
+   }
+
+
 }

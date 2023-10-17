@@ -7,18 +7,11 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, useForm} from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
-// import {  } from '@inertiajs/inertia-vue3'
-
 import { Inertia } from '@inertiajs/inertia';
-import debounce from 'lodash/debounce';
 import {watch, ref,onMounted,computed} from 'vue';
 import Pagination from '@/Components/Pagination.vue'
 import Swal from 'sweetalert2'
 import Modal from '@/Components/Modal.vue'
-import Drop from '@/Components/Drop.vue'
-// import { router } from '@inertiajs/vue3'
-
-// import {Inertia} from '@inertiajs/inertia'
 
 const searchKey=ref('');
 

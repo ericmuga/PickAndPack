@@ -3,15 +3,11 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
 import Button from 'primevue/button';
-import MultiSelect from 'primevue/multiselect';
 import InputText from 'primevue/inputtext';
 import { useForm } from '@inertiajs/inertia-vue3'
 import { Inertia } from '@inertiajs/inertia';
-// import {debounce} from 'lodash/debounce';
-import {watch, ref,onMounted, nextTick,reactive,computed,onUnmounted} from 'vue';
+import {watch, ref,onMounted,reactive,computed,onUnmounted} from 'vue';
 import Swal from 'sweetalert2'
-import TabView from 'primevue/tabview';
-import TabPanel from 'primevue/tabpanel';
 import Modal from '@/Components/Modal.vue';
 import debounce from 'lodash/debounce'
 import ProgressBar from 'primevue/progressbar';
@@ -29,6 +25,68 @@ const props= defineProps({
 
 onMounted(() => {
     inputField.value.focus();
+
+    //populate assembled
+    //for each line, get the last assembly push that into the assembled array
+
+    if (props.orderLines.data.length>0)
+
+  {
+   for (var i = props.orderLines.data.length - 1; i >= 0; i--)
+   {
+
+
+
+
+    for (var j = props.orderLines.data[i].assemblies.length - 1; j >= 0; j--)
+    {
+     const result = searchByMultipleKeyValues([
+                                                  ['line_no', props.orderLines.data[i].assemblies[j].line_no],
+                                                  ['order_no', props.orderLines.data[i].assemblies[j].order_no]
+
+                                                ]);
+
+
+
+      if (result.value!=0)
+      {
+        assembledArray.value.push({
+                                   'item_no':result.item_no,
+                                   'assembled_qty':result.assembled_qty,
+                                    'assembled_pcs':result.assembled_pcs,
+                                    'order_qty':result.order_qty,
+                                   'prepacks_total_quantity':result.prepacks_total_quantity,
+                                   'item_description':result.item_description,
+                                   'barcode':result.barcode,
+                                    'order_no':result.order_no,
+                                    'line_no':result.line_no,
+                                     'from_batch':props.orderLines.data[i].assemblies[j].from_batch,
+                                     'to_batch':props.orderLines.data[i].assemblies[j].to_batch,
+
+                            });
+
+
+
+      };
+
+
+    };
+
+};
+
+};
+
+
+    setInterval(() => {
+        if (!assembledArray.value.length==0 && isRunning.value==true)
+           Inertia.post(route('assembly.store'),{'data':assembledArray.value,
+                                                    'autosave':true,
+                                                    'assembly_time':formatTime.value
+                                                },{preserveScroll:true,preserveState:true}
+                                                )
+
+}, 10000);
+
 });
 
 
@@ -62,7 +120,7 @@ const extractedData = ref(Object.entries(props.orderLines.data).map(([key, value
 
 const searchKey = ref('');
 const searchValue = ref('');
-const {searchByBarcodeOrItemNo } = useSearchArray(extractedData)
+const {searchByBarcodeOrItemNo,searchByMultipleKeyValues } = useSearchArray(extractedData)
 const searchResult = ref(0);
 
 const assembledArray=ref([]);
@@ -93,7 +151,7 @@ watch( newItem,
                         }
                         else scanError.value=`Item Not found!`;
                     }
-                      newItem.value='' 
+                      newItem.value=''
                         }
             ,300)
 
@@ -259,16 +317,17 @@ const closeAssembly=()=>{
                                         }).then((result) => {
                                             stopTimer();
                                             if (result.isConfirmed) {Inertia.post(route('assembly.store'),{'data':assembledArray.value,
-                                                                                                         'assembly_time':formatTime.value,
-
-                                        });}
-                        })
-
-
-
-
-
+                                                                                                            'autosave':false,
+                                                                                                         'assembly_time':formatTime.value
+                                                                                                        });
+                                                                    }
+                                                           })
 }
+
+
+
+
+let autosave=ref(false);
 
 const isRunning = ref(false);
 const startTime = ref(0);
@@ -282,7 +341,7 @@ const formatTime = computed(() => {
   const totalMinutes = (totalSeconds - seconds) / 60;
   const minutes = totalMinutes % 60;
   const hours = (totalMinutes - minutes) / 60;
-  
+
   const formatMilliseconds = milliseconds.toString().padStart(3, '0');
   const formatSeconds = seconds.toString().padStart(2, '0');
   const formatMinutes = minutes.toString().padStart(2, '0');
@@ -355,15 +414,15 @@ onUnmounted(() => {
                                 </template>
                                 <template #center>
                                     <div flex flex-row>
-                                      
+
                                                <div class="flex flex-col text-center">
-                                                     <h2 class="font-bold tracking-wide text-xl text-red-500"> {{ formatTime }}</h2>
+                                                     <h2 class="text-xl font-bold tracking-wide text-red-500"> {{ formatTime }}</h2>
                                                       <!--  <button @click="startTimer" :disabled="isRunning">Start</button>
                                                         <button @click="stopTimer" :disabled="!isRunning">Stop</button>
                                                         <button @click="resetTimer" :disabled="!isRunning && currentTime === 0">Reset</button> -->
-                                                       <span class="font-bold tracking-wide text-yellow-500 p-2 bg-gray-600 rounded">{{orderLines.data[0].order.shp_name}} </span>
+                                                       <span class="p-2 font-bold tracking-wide text-yellow-500 bg-gray-600 rounded">{{orderLines.data[0].order.shp_name}} </span>
 
-                                                       <span class="font-bold tracking-wide text-yellow-500 p-2 bg-gray-600 rounded">{{orderLines.data[0].order.sp_search_name}} </span>
+                                                       <span class="p-2 font-bold tracking-wide text-yellow-500 bg-gray-600 rounded">{{orderLines.data[0].order.sp_search_name}} </span>
 
                                                   </div>
                                     </div>
@@ -378,7 +437,7 @@ onUnmounted(() => {
 
                                     </template>
                                 </Toolbar>
-                            
+
 
                                 <div class="flex flex-row items-center justify-center w-full gap-1 text-center">
 
@@ -398,7 +457,7 @@ onUnmounted(() => {
 
 
 
-                                            <div class="grid sm:grid-cols-1 md:grid-cols-2 gap-3 ">
+                                            <div class="grid gap-3 sm:grid-cols-1 md:grid-cols-2 ">
 
                                                 <div class="col-span-1">
                                                     <div  class="w-full p-3 m-2 text-center text-white bg-orange-200"> Ordered</div>
@@ -476,7 +535,7 @@ onUnmounted(() => {
 
                                                         <tbody>
 
-                                                            <tr v-for="line in assembledArray" :key="line.item_description" 
+                                                            <tr v-for="line in assembledArray" :key="line.item_description"
                                                             @click="newItem=line.item_no"
 
                                                                 class="bg-white border-b dark:bg-gray-900 dark:border-gray-700 hover:bg-slate-400 hover:text-white ">
@@ -534,7 +593,7 @@ onUnmounted(() => {
                                                 </template>
                                             </Toolbar>
                                         </div>
-                               
+
 
 
 
@@ -579,11 +638,11 @@ onUnmounted(() => {
             <span>PCS </span>
 
            <InputText
-             
+
              v-model="form.assembled_qty"
              placeholder="PCS"
            /></div>
-           
+
 
            <div
             class="flex items-center space-x-2"
@@ -592,15 +651,15 @@ onUnmounted(() => {
            <InputText
              ref="scanItem"
              v-model="form.assembled_pcs"
-             
+
            />
 </div>
 
 
-            
-           
 
-           
+
+
+
            <InputText
 
              v-model="form.from_batch"
@@ -611,7 +670,7 @@ onUnmounted(() => {
              v-model="form.to_batch"
              placeholder="To Batch."
            />
-      
+
             <Button  label="Assemble" icon="pi pi-send" class="w-sm" severity="success"  type="submit" :disabled="form.processing" />
             <Button label="Cancel" severity="danger" icon="pi pi-cancel" @click="showModal=false"/>
 

@@ -21,17 +21,17 @@ class Assignment extends Model
    }
 
 
-   public function lines(){
+   public function lines()
+   {
     return $this->hasMany(AssignmentLine::class);
    }
 
-   public function order()
+   public function assembly_session()
    {
-       return $this->belongsTo(Order::class,'order_no','order_no');
+    return $this->hasMany(AssemblySession::class);
    }
 
-   public function scopeOfPart(Builder $query,$part)
-   {
-       $query->where('part','LIKE','%'.$part);
-   }
+
+
+
 }
