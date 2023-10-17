@@ -14,6 +14,8 @@ import Pagination from '@/Components/Pagination.vue'
                         assignments   : Object,
            })
 
+
+
 </script>
 
 <template>
@@ -56,16 +58,7 @@ import Pagination from '@/Components/Pagination.vue'
                                 </template>
 
                                     <template #end>
-
-
-                                        <!-- <a :href="route('items.download')" class="">
-                                            <Button icon="pi pi-download" severity="primary" text raised rounded label="Items"/>
-                                        </a> -->
-
-
-
-
-                                             <SearchBox model="assignments.index" />
+                          <SearchBox model="assignments.index" />
                                     </template>
                                         </Toolbar>
 

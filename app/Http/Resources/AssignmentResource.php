@@ -25,7 +25,9 @@ class AssignmentResource extends JsonResource
                 'time'=>$this->created_at->diffForHumans(),
                 'id'=>$this->id,
                 'lines_count'=>$this->whenCounted('lines'),
-                'orders_count'=>$this->lines()->groupBy('order_no')->count()
+                'orders_count'=>$this->lines()->groupBy('order_no')->count(),
+                'percentage'=>$this->percentage(),
+
                ];
     }
 }
