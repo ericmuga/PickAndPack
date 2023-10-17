@@ -64,6 +64,7 @@ class AssignmentController extends Controller
 
         $assignments= AssignmentResource::collection(Assignment::with('assignee','assignor')
                                                                ->withCount('lines')
+                                                               ->latest()
                                                                ->paginate(15));
 
         //list of assemblers
