@@ -1,7 +1,3 @@
-
-
-
-
 <script setup>
 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
@@ -12,6 +8,7 @@ import {watch, ref,onMounted,computed} from 'vue';
 import Pagination from '@/Components/Pagination.vue'
 import Swal from 'sweetalert2'
 import Modal from '@/Components/Modal.vue'
+
 
 const searchKey=ref('');
 
@@ -37,9 +34,7 @@ const refreshSearch=()=>{
                        'assignee': assignee.value,
                        'records':records.value
                       },
-                      {
-
-                        preserveScroll:true,preserveState:true,replace:true}
+                      {preserveScroll:true,preserveState:true,replace:true}
                );
 }
 
@@ -316,8 +311,8 @@ const removePart=(newObj)=>
                                           Records:
                                           <Dropdown
                                              v-model="records"
-                                             :options="[10,20,50,100]"
-                                             placeholder="10"
+                                             :options="[5,10,20,50,100]"
+                                             placeholder="5"
 
                                           />
 
@@ -415,15 +410,25 @@ const removePart=(newObj)=>
                                                     <td class="flex-col p-1 px-3 py-2 text-xs text-center " v-if="order.part_a!=0">
 
 
-                                                        <Button  v-show="order.confirm_a" icon="pi pi-eye" severity="warning"
-                                                        :badge=order.part_a text raised rounded aria-label="Notification"
-                                                        @click="showLines(order.order_no,'A')"
+                                                          <Button
+                                                            v-show="order.confirm_a"
+                                                            icon="pi pi-eye"
+                                                            :severity="order.assigned_a?'warning':'info'"
+                                                           :disabled="order.assigned_a"
+                                                           :badge=order.part_a raised rounded
+                                                            @click="showLines(order.order_no,'A')"
 
                                                         />
 
+
+
                                                        <span class="p-2 m-1 text-teal-500 rounded-full"
-                                                        v-show="checkSelected({'order_no':order.order_no,'part':'A'})">
+                                                            v-show="checkSelected({'order_no':order.order_no,'part':'A'})">
                                                             Selected
+                                                        </span>
+                                                        <span class="p-2 m-1 text-red-500 rounded-full"
+                                                            v-show="order.assigned_a">
+                                                            Assigned
                                                         </span>
 
                                                     </td>
@@ -433,23 +438,47 @@ const removePart=(newObj)=>
                                                     <td class="p-1 px-3 py-2 text-xs text-center " v-if="order.part_b!=0">
 
 
-                                                        <Button  v-show="order.confirm_b" icon="pi pi-eye" severity="warning" :badge=order.part_b text raised rounded aria-label="Notification" @click="showLines(order.order_no,'B')"/>
+                                                       <Button
+                                                            v-show="order.confirm_b"
+                                                            icon="pi pi-eye"
+                                                            :severity="order.assigned_b?'warning':'info'"
+                                                           :disabled="order.assigned_b"
+                                                           :badge=order.part_b raised rounded
+                                                            @click="showLines(order.order_no,'B')"
 
+                                                        />
                                                           <span class="p-2 m-1 text-teal-500 rounded-full"
                                                         v-show="checkSelected({'order_no':order.order_no,'part':'B'})">
                                                             Selected
+                                                        </span>
+                                                        <span class="p-2 m-1 text-red-500 rounded-full"
+                                                            v-show="order.assigned_b">
+                                                            Assigned
                                                         </span>
 
                                                     </td>
                                                     <td v-else  class="bg-slat-200">
 
                                                     </td>
-                                                    <td class="p-1 px-3 py-2 text-xs text-center " v-if="order.part_c!=0">
 
-                                                        <Button  v-show="order.confirm_c" icon="pi pi-eye" severity="warning" :badge=order.part_c text raised rounded aria-label="Notification" @click="showLines(order.order_no,'C')"/>
-                                                         <span class="p-2 m-1 text-teal-500 rounded-full"
+                                                    <td class="p-1 px-3 py-2 text-xs text-center " v-if="order.part_c!=0">
+                                                        <Button
+                                                            v-show="order.confirm_c"
+                                                            icon="pi pi-eye"
+                                                            :severity="order.assigned_c?'warning':'info'"
+                                                           :disabled="order.assigned_c"
+                                                           :badge=order.part_c raised rounded
+                                                            @click="showLines(order.order_no,'C')"
+
+                                                        />
+
+                                                          <span class="p-2 m-1 text-teal-500 rounded-full"
                                                         v-show="checkSelected({'order_no':order.order_no,'part':'C'})">
                                                             Selected
+                                                        </span>
+                                                        <span class="p-2 m-1 text-red-500 rounded-full"
+                                                            v-show="order.assigned_c">
+                                                            Assigned
                                                         </span>
                                                     </td>
                                                     <td v-else  class="bg-slat-200">
@@ -457,11 +486,22 @@ const removePart=(newObj)=>
                                                     </td>
                                                     <td class="p-1 px-3 py-2 text-xs text-center " v-if="order.part_d!=0">
 
-                                                        <Button  v-show="order.confirm_d" icon="pi pi-eye" :badge=order.part_d severity="warning" text raised rounded aria-label="Notification" @click="showLines(order.order_no,'D')"/>
+                                                      <Button
+                                                            v-show="order.confirm_d"
+                                                            icon="pi pi-eye"
+                                                            :severity="order.assigned_d?'warning':'info'"
+                                                           :disabled="order.assigned_d"
+                                                           :badge=order.part_d raised rounded
+                                                            @click="showLines(order.order_no,'D')"
 
-                                                         <span class="p-1 m-4 text-teal-500 rounded-full"
+                                                        />
+                                                         <span class="p-1 m-4 text-teal-500 rounded-full bg-red"
                                                         v-show="checkSelected({'order_no':order.order_no,'part':'D'})">
                                                             Selected
+                                                        </span>
+                                                        <span class="p-2 m-1 text-red-500 rounded-full"
+                                                            v-show="order.assigned_d">
+                                                            Assigned
                                                         </span>
                                                     </td>
                                                     <td v-else  class="bg-slat-200">

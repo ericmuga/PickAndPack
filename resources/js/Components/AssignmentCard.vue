@@ -37,7 +37,17 @@
                         <div>{{assignment.lines_count  }}</div>
                         </li>
 
+
+
+
                     </ul>
+                     <div class="w-full p-3 m-2 text-center">
+                            <span class="p-3 m-2 text-white" :class="(assignment.percentage==100)? 'bg-lime-800 rounded-full':'bg-rose-900   rounded-full'">
+                                {{ (assignment.percentage==100)?'Complete!':'In Progress...' }}
+                            </span>
+
+                     </div>
+
                          <ProgressBar :value="assignment.percentage"></ProgressBar>
                     </div>
 

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Resources\{OrderResource,LineResource};
-use App\Models\{Order,Line,AssemblySession,AssemblyLine, Assignment, AssignmentLine};
+use App\Http\Resources\{AssemblyOrderResource,LineResource};
+use App\Models\{Assembly, Order,Line,AssemblySession,AssemblyLine, Assignment, AssignmentLine};
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Services\MyServices;
@@ -19,7 +19,7 @@ class AssemblyController extends Controller
     public function index(Request $request)
     {
 
-                $orders= OrderResource::collection(Order::query()
+                $orders= AssemblyOrderResource::collection(Order::query()
                                                         ->when($request->has('search'),fn($q)=>
                                                                 $q->where('order_no','like','%'.$request->search)
 
@@ -28,10 +28,10 @@ class AssemblyController extends Controller
                                                             ->whereHas('assignmentLines', fn($q)=>$q->whereHas('assignment', fn($q)=>$q->where(
 
                                                                 'assignee_id',$request->user()->id)))
-                                                        ->where('shp_date','>=',Carbon::now()->toDateString())
+                                                        ->shipcurrent()
                                                         ->orderByDesc('ending_date')
                                                         ->orderByDesc('ending_time')
-                                                        ->with('confirmations','assignmentLines')
+                                                        // ->with('confirmations','assignmentLines')
                                                         ->paginate(5)
                                                         ->withQuerystring()
 

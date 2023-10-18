@@ -34,5 +34,11 @@ class AssemblyLine extends Model
     return $this->belongsTo(AssemblySession::class);
    }
 
+//    public function scopeOfPart($query,$part)
+//    {
+//        $query->whereHas('line',fn($q)=>where('part','LIKE','%'.$part));
+//    }
+// }
+
 
 }

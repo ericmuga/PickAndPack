@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 use Carbon\Carbon;
-use App\Http\Resources\{OrderResource,AssignmentResource};
+use App\Http\Resources\{AssignmentOrderResource,AssignmentResource};
 use Illuminate\Http\Request;
 use App\Models\{Assignment,AssignmentLine,Order};
 use Illuminate\Support\Facades\DB;
@@ -20,15 +20,16 @@ class AssignmentController extends Controller
 
         $records=$request->records?:10;
 
-        $orders = OrderResource::collection(Order::shipcurrent()
-        ->when($request->has('spcodes')&&($request->spcodes<>''),fn($q)=>$q->whereIn('sp_code',$request->spcodes))
-        ->when($request->has('shp_date')&&($request->shp_date<>''),fn($q)=>$q->where('shp_date',Carbon::parse($request->shp_date)->toDateString()))
-        ->select('customer_name', 'shp_name', 'order_no', 'shp_date', 'sp_code')
-        ->with(['confirmations','lines'])
-        ->withCount(['assignmentLines','confirmations'])
-        ->paginate($records)
-        ->appends($request->all())
-        ->withQueryString());
+        $orders = AssignmentOrderResource::collection(Order::shipcurrent()
+                                                            ->when($request->has('spcodes')&&($request->spcodes<>''),fn($q)=>$q->whereIn('sp_code',$request->spcodes))
+                                                            ->when($request->has('shp_date')&&($request->shp_date<>''),fn($q)=>$q->where('shp_date',Carbon::parse($request->shp_date)->toDateString()))
+                                                            ->select('shp_name', 'order_no', 'shp_date', 'sp_code')
+                                                            ->with(['lines','assignmentLines'])
+                                                            ->withCount(['assignmentLines','confirmations'])
+                                                            ->paginate($records)
+                                                            ->appends($request->all())
+                                                            ->withQueryString()
+                                                    );
 
 
         $spcodes=DB::table('sales_people')->select('name','code')->get();

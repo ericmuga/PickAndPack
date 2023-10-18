@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Builder;
 class AssemblySession extends Model
 {
     use HasFactory;
@@ -30,5 +30,11 @@ class AssemblySession extends Model
    {
     return $this->belongsTo(Assignment::class);
    }
+
+   public function scopeOfPart(Builder $query, $part,$system=false) :void
+    {
+        $query->where('part',$part)
+              ->when($system,fn($q)=>$q->where('system_entry',$system));
+    }
 
 }

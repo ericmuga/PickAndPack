@@ -57,7 +57,7 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('assemble.order',{'order_
                                 <template #center>
                                     <div>
                                         <!-- <Pagination :links="orderLines.meta.links" /> -->
-                                        <input type="text" v-model="newItem"  ref="inputField" placeholder="Search Order" class=" text-center m-2 rounded-lg bg-slate-300 text-md">
+                                        <input type="text" v-model="newItem"  ref="inputField" placeholder="Search Order" class="m-2 text-center rounded-lg bg-slate-300 text-md">
 
                                         <!-- <SearchBox :model="route('order.pack')" /> -->
                                     <div>
@@ -84,7 +84,7 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('assemble.order',{'order_
 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
-        <tr class="bg-gray-700 text-white">
+        <tr class="text-white bg-gray-700">
             <th scope="col" class="px-2 py-2">
                 Order No.
             </th>
@@ -116,14 +116,14 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('assemble.order',{'order_
     </thead>
     <tbody>
         <tr v-for="order in orders.data" :key="order.order_no"
-        class="bg-white text-black hover:bg-gray-300 font-semibold">
+        class="font-semibold text-black bg-white hover:bg-gray-300">
 
         <td class="px-2 py-2 text-xs break-all">
             {{ order.order_no }}
         </td>
-        <td class="flex flex-col px-2 py-2 text-xs text-center  ">
+        <td class="flex flex-col px-2 py-2 text-xs text-center ">
             <span class="text-xs font-bold">{{order.sp_code}}</span>
-            <span class="text-xs bg-gray-100 rounded-lg font-semibold text-red-500">{{order.sp_name}}</span>
+            <span class="text-xs font-semibold text-red-500 bg-gray-100 rounded-lg">{{order.sp_name}}</span>
         </td>
         <td class="px-2 py-2 text-xs font-bold text-center text-black capitalize bg-yellow-200 rounded-full">
             {{ order.shp_name }}
@@ -132,36 +132,64 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('assemble.order',{'order_
             {{ order.shp_date }}
         </td>
 
-        
+
         <td class="p-1 px-2 py-2 text-xs text-center " v-if="order.part_a!=0">
 
-            <Button v-show="order.assigned_a" icon="pi pi-cart-plus" severity="warning" rounded :label="pack" @click="confirmPack(order.order_no,'A')" />
-<!--
-            <Button  v-show="!order.confirm_a" icon="pi pi-bell" severity="warning" :badge=order.part_a text raised rounded aria-label="Notification" @click="ConfirmPrint(order.order_no,'A')"/>
-         -->
+            <Button
+               v-show="order.assigned_a"
+               :icon="order.assembled_a?'pi pi-check':'pi pi-cart-plus'"
+               :severity="order.assembled_a?'success':'warning'"
+               :disabled="order.assembled_a"
+               rounded
+               :label="pack"
+               @click="confirmPack(order.order_no,'A')"
+             />
+
         </td>
         <td v-else  class="bg-slat-200">
 
         </td>
         <td class="p-1 px-2 py-2 text-xs text-center " v-if="order.part_b!=0">
-            <Button v-show="order.assigned_b" icon="pi pi-cart-plus" severity="warning" rounded :label="pack" @click="confirmPack(order.order_no,'B')" />
+            <Button
+               v-show="order.assigned_b"
+               :icon="order.assembled_b?'pi pi-check':'pi pi-cart-plus'"
+               :severity="order.assembled_b?'success':'warning'"
+               :disabled="order.assembled_b"
+               rounded
+               :label="pack"
+               @click="confirmPack(order.order_no,'B')"
+             />
 
-            <!-- <Button  v-show="!order.confirm_b" icon="pi pi-bell" severity="warning" :badge=order.part_b text raised rounded aria-label="Notification" @click="
-            ConfirmPrint(order.order_no,'B')"/> -->
         </td>
         <td v-else  class="bg-slat-200">
 
         </td>
         <td class="p-1 px-2 py-2 text-xs text-center " v-if="order.part_c!=0">
-            <Button v-show="order.assigned_c" icon="pi pi-cart-plus" severity="warning" rounded :label="pack" @click="confirmPack(order.order_no,'C')" />
-            <!-- <Button  v-show="!order.confirm_c" icon="pi pi-bell" severity="warning" :badge=order.part_c text raised rounded aria-label="Notification" @click="ConfirmPrint(order.order_no,'C')"/> -->
+            <Button
+               v-show="order.assigned_c"
+               :icon="order.assembled_c?'pi pi-check':'pi pi-cart-plus'"
+               :severity="order.assembled_c?'success':'warning'"
+               :disabled="order.assembled_c"
+               rounded
+               :label="pack"
+               @click="confirmPack(order.order_no,'C')"
+             />
+
         </td>
         <td v-else  class="bg-slat-200">
 
         </td>
         <td class="p-1 px-2 py-2 text-xs text-center " v-if="order.part_d!=0">
-            <Button v-show="order.assigned_d" icon="pi pi-cart-plus" severity="warning" rounded :label="pack" @click="confirmPack(order.order_no,'D')" />
-            <!-- <Button  v-show="!order.confirm_d" icon="pi pi-bell" :badge=order.part_d severity="warning" text raised rounded aria-label="Notification" @click="ConfirmPrint(order.order_no,'D')"/> -->
+           <Button
+               v-show="order.assigned_d"
+               :icon="order.assembled_d?'pi pi-check':'pi pi-cart-plus'"
+               :severity="order.assembled_d?'success':'warning'"
+               :disabled="order.assembled_d"
+               rounded
+               :label="pack"
+               @click="confirmPack(order.order_no,'D')"
+             />
+
         </td>
         <td v-else  class="bg-slat-200">
 
