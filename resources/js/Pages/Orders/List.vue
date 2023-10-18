@@ -33,9 +33,9 @@ import DownloadButton from '@/Components/DownloadButton.vue';
 
 let showModal=ref(false);
 
-let showFilters=ref(true);
+let showFilters=ref(false);
 
-const showFilterPane=()=>{showModal=true;}
+// const showFilterPane=()=>{showModal=true;}
 let isConfirmed= ref((props.previousInput.hasOwnProperty('isConfirmed'))&&(props.previousInput.isConfirmed=='true')?true:false);
 
 watch(isConfirmed,()=>{

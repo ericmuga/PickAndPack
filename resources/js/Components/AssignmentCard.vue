@@ -2,7 +2,7 @@
     <div>
 
          <div class="p-2 m-3">
-           <div class="w-full p-3 tracking-wide text-center capitalize bg-green-300 rounded-md text-slate-700">#{{ assignment.id }} </div>
+           <div class="w-full p-3 tracking-wide text-center capitalize rounded-md bg-emerald-500 text-slate-700">#{{ assignment.id }} </div>
            <div>
                  <div class="max-w-2xl mx-4 mt-16 text-gray-900 bg-white rounded-lg shadow-xl sm:max-w-sm md:max-w-sm lg:max-w-sm xl:max-w-sm sm:mx-auto md:mx-auto lg:mx-auto xl:mx-auto">
 

@@ -14,7 +14,7 @@ const searchKey=ref('');
 
 
 const today = new Date();
-let showFilters=ref(true);
+let showFilters=ref(false);
 
 const assignable = computed(() => (selectedOrderParts.value.length>0) && (assignee.value!='') );
 

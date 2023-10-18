@@ -18,7 +18,7 @@ class AssignmentController extends Controller
     public function create(Request $request)
     {
 
-        $records=$request->records?:10;
+        $records=$request->records?:5;
 
         $orders = AssignmentOrderResource::collection(Order::shipcurrent()
                                                             ->when($request->has('spcodes')&&($request->spcodes<>''),fn($q)=>$q->whereIn('sp_code',$request->spcodes))

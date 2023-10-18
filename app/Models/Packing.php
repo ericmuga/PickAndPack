@@ -12,12 +12,7 @@ class Packing extends Model
     use Compoships;
    protected $table='packing';
 
-   protected $fillable=['line_no','order_no','user_id','packed_qty','packed_pcs','from_batch','to_batch','from_vessel','to_vessel','vessel'];
-
-   public function user()
-   {
-    return $this->belongsTo(User::class);
-   }
+   protected $guarded=[];
 
    public function order()
    {
@@ -27,5 +22,10 @@ class Packing extends Model
    public function line()
    {
     return $this->belongsTo(Line::class,['order_no','line_no'],['order_no','line_no']);
+   }
+
+   public function packing_session()
+   {
+     return $this->belongsTo(PackingSession::class);
    }
 }
