@@ -40,6 +40,7 @@ class AssignmentOrderResource extends JsonResource
             'assignmentLines'=>$this->whenLoaded('assignmentLines'),
 
 
+
         ];
 
     }

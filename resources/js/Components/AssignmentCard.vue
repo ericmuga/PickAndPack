@@ -11,6 +11,8 @@
                         <h2 class="font-semibold">{{assignment.assignee  }}</h2>
                         Ass. By :{{assignment.assignor  }}
                         <p>{{ assignment.time }}</p>
+                        <p class="p-1 text-blue-400 rounded rounded-full bg-slate-100">{{ assignment.total_time }}</p>
+
                     </div>
 
                     <ul class="flex items-center justify-around py-4 mt-2 text-gray-700">

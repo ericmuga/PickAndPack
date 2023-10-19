@@ -34,11 +34,8 @@ class AssignmentController extends Controller
 
         $spcodes=DB::table('sales_people')->select('name','code')->get();
 
-        $assemblers=DB::table('users')->select('name','id')->get();
-
-
-
-        return inertia('Assignment/Create',compact('orders' ,'spcodes','assemblers'));
+        $assemblers=DB::table('users')->select('name','id')->orderBy('name')->get();
+return inertia('Assignment/Create',compact('orders' ,'spcodes','assemblers'));
 
     }
 
@@ -59,19 +56,30 @@ class AssignmentController extends Controller
 
 
 
-    public function index()
+    public function index(Request $request)
     {
         //list all the assignments that are on going
 
         $assignments= AssignmentResource::collection(Assignment::with('assignee','assignor')
+                                                               ->when($request->has('assemblers'),fn($q)=>$q->whereIn('assignee_id',$request->assemblers))
+                                                               ->when($request->has('date')&&($request->date<>''),
+                                                                           fn($q)=>$q->where('created_at','>=',Carbon::parse($request->date)->toDateString())
+                                                                                     ->where('created_at','<=',Carbon::parse($request->date)->addDay(1)->toDateString()))
+                                                               ->when(!$request->has('date')||($request->date==''),
+                                                                           fn($q)=>$q->where('created_at','>=',Carbon::today()->toDateString())
+                                                                                     ->where('created_at','<=',Carbon::tomorrow(1)->toDateString()))
                                                                ->withCount('lines')
                                                                ->latest()
-                                                               ->paginate(15));
+                                                               ->paginate(15)
+                                                               ->appends($request->all())
+                                                                );
 
         //list of assemblers
+        $dateParam=$request->has('date')?$request->date:Carbon::today()->toDateString();
+        $assemblersParam=$request->has('assemblers')?$request->assemblers:[];
+       $assemblers=DB::table('users')->select('name','id')->orderBy('name')->get();
 
-
-        return inertia('Assignment/List',compact('assignments'));
+        return inertia('Assignment/List',compact('assignments','assemblers','assemblersParam','dateParam'));
     }
 
     public function store(Request $request)

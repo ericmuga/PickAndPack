@@ -4,16 +4,33 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, useForm,Link} from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
-import { ref, reactive } from 'vue';
+import { onMounted } from 'vue';
 import AssignmentCard from "@/Components/AssignmentCard.vue";
 import Swal from 'sweetalert2'
 import Modal from '@/Components/Modal.vue'
 import Pagination from '@/Components/Pagination.vue'
+import { stringify } from 'postcss';
+import { Inertia } from '@inertiajs/inertia';
+
 
     const props = defineProps({
                         assignments   : Object,
+                        assemblers:Object,
+                        dateParam:String,
+                        assemblersParam:[],
            })
 
+    const form = useForm({
+        assemblers:props.assemblersParam,
+        date:props.dateParam
+    })
+
+    // onMounted(() => {
+    //  setInterval(() => {
+    //     Inertia.get(route('assignment.index'),{'assemblers':form.assemblers,'date':form.date},{preserveScroll:true,preserveState:true})
+    //  }, 60000);
+
+    // });
 
 
 </script>
@@ -38,13 +55,16 @@ import Pagination from '@/Components/Pagination.vue'
                             <Toolbar>
                                 <template #start>
                                     <Link :href="route('assignment.create')">
-                                    <Button
-                                         label="Add"
-                                         icon="pi pi-plus"
-                                         severity="success"
+                                        <Button
+                                            label="Add"
+                                            icon="pi pi-plus"
+                                            severity="success"
 
-                                         rounded
-                                    ></Button> </Link>
+                                            rounded
+                                        >
+                                        </Button>
+                                    </Link>
+
                                 </template>
                                 <template #center>
                                     <div>
@@ -58,6 +78,36 @@ import Pagination from '@/Components/Pagination.vue'
                                 </template>
 
                                     <template #end>
+                                 <form @submit.prevent="form.get(route('assignment.index'))" class="mx-3">
+
+                                        <MultiSelect
+                                          v-model="form.assemblers"
+                                          :options="assemblers"
+                                          optionLabel="name"
+                                          optionValue="id"
+                                          filter
+                                        />
+
+                                         <input
+                                           type="date"
+                                           class="p-3 mx-2 rounded-md"
+                                           v-model="form.date"
+
+                                         />
+
+                                        <Button
+                                          severity="success"
+                                          icon="pi pi-search"
+                                          label="Go!"
+                                          type="submit"
+                                          :disabled="form.processing"
+                                          class="mx-2"
+                                        />
+
+
+
+                                    </form>
+
                           <SearchBox model="assignments.index" />
                                     </template>
                                         </Toolbar>
