@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\{Model,Builder};
 use  Awobaz\Compoships\Compoships;
 
 class Packing extends Model
@@ -28,4 +28,6 @@ class Packing extends Model
    {
      return $this->belongsTo(PackingSession::class);
    }
+
+
 }

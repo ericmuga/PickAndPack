@@ -70,10 +70,15 @@ class PackingController extends Controller
                                        'part'=>Line::where('order_no',$request->data[0]['order_no'])
                                                ->where('line_no',$request->data[0]['line_no'])
                                                ->first()->part,
-                                        'packing_time'=>$request->packing_time,
                                         'user_id'=>$request->user()->id,
                                         'system_entry'=>$request->autosave
-                              ]);
+                                       ],
+                                        [
+                                          'packing_time'=>$request->packing_time,
+
+                                        ]
+
+                                    );
 
 
 

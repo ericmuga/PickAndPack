@@ -34,7 +34,7 @@ class AssemblySession extends Model
    public function scopeOfPart(Builder $query, $part,$system=false) :void
     {
         $query->where('part',$part)
-              ->when($system,fn($q)=>$q->where('system_entry',$system));
+              ->where('system_entry',$system);
     }
 
 }

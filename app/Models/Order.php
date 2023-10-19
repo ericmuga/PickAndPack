@@ -51,10 +51,7 @@ class Order extends Model
     }
 
 
-    public function FunctionName($value='')
-    {
-        // code...
-    }
+
 
     public function scopeCurrent(Builder $query) :void
     {
@@ -125,12 +122,6 @@ class Order extends Model
     $query->getQuery()->withoutGlobalScope(OrderByScope::class);
     return $query;
     }
-
-    public function packing_sessions()
-    {
-        return $this->hasMany(PackingSession::class,'order_no','order_no');
-    }
-
     public function assembly_sessions()
     {
         return $this->hasMany(AssemblySession::class,'order_no','order_no');
@@ -140,4 +131,19 @@ class Order extends Model
     {
         return $this->hasMany(AssignmentLine::class,'order_no','order_no');
     }
+
+
+    public function packing_sessions()
+    {
+        return $this->hasMany(PackingSession::class,'order_no','order_no');
+    }
+
+    public function packingLines()
+    {
+        return $this->hasMany(Packing::class,'order_no','order_no');
+    }
+
+
+
+
 }

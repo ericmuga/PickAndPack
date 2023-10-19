@@ -82,17 +82,17 @@ public function store(Request $request)
 
 
      $session=AssemblySession::updateOrCreate([
-                                        'order_no'=>$request->data[0]['order_no'],
-                                        'part'=>$part,
-                                        'assignment_id'=>$ass_id,
-                                        ],
-                                        [
-                                        'assembly_time'=>$request->assembly_time,
-                                        'user_id'=>$user,
-                                        'system_entry'=>$request->autosave
-                                        ]
+                                                    'order_no'=>$request->data[0]['order_no'],
+                                                    'part'=>$part,
+                                                    'system_entry'=>$request->autosave,
+                                                    ],
+                                                    [
+                                                    'assembly_time'=>$request->assembly_time,
+                                                    'user_id'=>$user,
+                                                    'assignment_id'=>$ass_id,
+                                                    ]
 
-                                    );
+                                                );
 
     //create assembly lines
     foreach($request->data as $line)
