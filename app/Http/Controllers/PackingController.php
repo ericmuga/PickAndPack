@@ -99,7 +99,7 @@ class PackingController extends Controller
                         'order_no'=>$line['order_no'],
                         'line_no'=>$line['line_no'],
                         'packing_session_id'=>$session->id,
-                        'packed_qty'=>$line['packed_qty'],
+                        'packed_qty'=>MyServices::zeroIfNullOrBlank('packed_qty',$line,0),
                         'packed_pcs'=>MyServices::zeroIfNullOrBlank('packed_pcs',$line,0),
                         'from_vessel'=> MyServices::zeroIfNullOrBlank('from_vessel',$line,0),
                         'to_vessel'=>MyServices::zeroIfNullOrBlank('to_vessel',$line,0)>0?:MyServices::zeroIfNullOrBlank('from_vessel',$line,0),
