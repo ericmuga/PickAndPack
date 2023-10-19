@@ -22,10 +22,15 @@ class PackingOrderResource extends JsonResource
             'sp_code'=>$this->sp_code,
              'shp_date'=>Carbon::parse($this->shp_date)->toDateString(),
 
-            'assembled_a'=>$this->assembly_sessions()->OfPart('A')->count()==1,
-            'assembled_b'=>$this->assembly_sessions()->OfPart('B')->count()==1,
-            'assembled_c'=>$this->assembly_sessions()->OfPart('C')->count()==1,
-            'assembled_d'=>$this->assembly_sessions()->OfPart('D')->count()==1,
+            // 'assembled_a'=>$this->assembly_sessions()->OfPart('A')->count()==1,
+            // 'assembled_b'=>$this->assembly_sessions()->OfPart('B')->count()==1,
+            // 'assembled_c'=>$this->assembly_sessions()->OfPart('C')->count()==1,
+            // 'assembled_d'=>$this->assembly_sessions()->OfPart('D')->count()==1,
+
+             'assembled_a'=>Order::checkConfirmation($this->order_no,'A'),
+            'assembled_b'=>Order::checkConfirmation($this->order_no,'B'),//$this->assembly_sessions()->OfPart('B')->count()==1,
+            'assembled_c'=>Order::checkConfirmation($this->order_no,'C'),//$this->assembly_sessions()->OfPart('C')->count()==1,
+            'assembled_d'=>Order::checkConfirmation($this->order_no,'D'),//$this->assembly_sessions()->OfPart('D')->count()==1,
 
             'packed_a'=>$this->packing_sessions()->OfPart('A')->count()==1,
             'packed_b'=>$this->packing_sessions()->OfPart('B')->count()==1,

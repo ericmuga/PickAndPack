@@ -20,7 +20,7 @@ class PackingController extends Controller
                                                 ->when($request->has('search'),fn($q)=>
                                                         $q->where('order_no','like','%'.$request->search)
                                                         )
-                                                ->whereHas('assembly_sessions',fn($q)=>$q->where('system_entry',false))
+                                                // ->whereHas('assembly_sessions',fn($q)=>$q->where('system_entry',false))
                                                 ->shipcurrent()
                                                 ->orderByDesc('ending_date')
                                                 ->orderByDesc('ending_time')
