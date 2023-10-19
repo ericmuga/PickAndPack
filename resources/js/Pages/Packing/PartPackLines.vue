@@ -41,7 +41,7 @@ onMounted(() => {
                                                 },{preserveScroll:true,preserveState:true}
                                                 )
 
-                     }, 10000);
+                     }, 60000);
     // console.log(form.vessel.value)
 //populate assembled array
 

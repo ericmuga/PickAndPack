@@ -85,7 +85,7 @@ onMounted(() => {
                                                 },{preserveScroll:true,preserveState:true}
                                                 )
 
-}, 10000);
+}, 60000);
 
 });
 

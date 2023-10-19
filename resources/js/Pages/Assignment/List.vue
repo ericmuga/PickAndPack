@@ -78,9 +78,15 @@ import { Inertia } from '@inertiajs/inertia';
                                 </template>
 
                                     <template #end>
-                                 <form @submit.prevent="form.get(route('assignment.index'))" class="mx-3">
 
-                                        <MultiSelect
+
+
+                                 <form @submit.prevent="form.get(route('assignment.index'))">
+
+
+                                    <MultiSelect
+
+
                                           v-model="form.assemblers"
                                           :options="assemblers"
                                           optionLabel="name"
