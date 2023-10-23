@@ -17,12 +17,13 @@ class AssignmentController extends Controller
     */
     public function create(Request $request)
     {
-
-        $records=$request->records?:5;
+        if($request->records=='ALL')$records=500;
+        else         $records=$request->records?:5;
+        $date=$request->has('shp_date')?$request->shp_date:Carbon::tomorrow()->toDateString();
 
         $orders = AssignmentOrderResource::collection(Order::shipcurrent()
                                                             ->when($request->has('spcodes')&&($request->spcodes<>''),fn($q)=>$q->whereIn('sp_code',$request->spcodes))
-                                                            ->when($request->has('shp_date')&&($request->shp_date<>''),fn($q)=>$q->where('shp_date',Carbon::parse($request->shp_date)->toDateString()))
+                                                            ->where('shp_date',$date)
                                                             ->select('shp_name', 'order_no', 'shp_date', 'sp_code')
                                                             ->with(['lines','assignmentLines'])
                                                             ->withCount(['assignmentLines','confirmations'])
@@ -34,8 +35,10 @@ class AssignmentController extends Controller
 
         $spcodes=DB::table('sales_people')->select('name','code')->get();
 
+
+
         $assemblers=DB::table('users')->select('name','id')->orderBy('name')->get();
-return inertia('Assignment/Create',compact('orders' ,'spcodes','assemblers'));
+return inertia('Assignment/Create',compact('orders' ,'spcodes','assemblers','date'));
 
     }
 

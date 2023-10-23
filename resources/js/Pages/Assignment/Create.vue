@@ -8,10 +8,24 @@ import {watch, ref,onMounted,computed} from 'vue';
 import Pagination from '@/Components/Pagination.vue'
 import Swal from 'sweetalert2'
 import Modal from '@/Components/Modal.vue'
+import debounce from 'lodash/debounce';
 
 
 const searchKey=ref('');
 
+let filteredOrders=ref({});
+
+
+watch(searchKey,debounce((value)=>{
+                                    if (searchKey.value!='')
+                                    filteredOrders.value=props.orders.data.filter(item => item.confirmations_count !== item.assignments_count)
+                                                                          .filter(item=>item.order_no.endsWith(searchKey.value));
+                                    else
+                                    filteredOrders.value=props.orders.data.filter(item => item.confirmations_count !== item.assignments_count);
+                                                                          //.filter(item=>item.order_no.endsWith(searchKey.value));
+                                  }
+                                    ,{preserveState:true,replace:true})
+                                    ,300);
 
 const today = new Date();
 let showFilters=ref(false);
@@ -64,12 +78,9 @@ Inertia.post(route('assignment.store'),
 const parts=['A','B','C','D'];
 
 
-onMounted({
-
-  // selectedOrderParts=props.orderParts
-  // selected_spcodes=props.sp
-  // assignee=props.assignee
-});
+onMounted(()=>{
+            filteredOrders.value=props.orders.data.filter(item => item.confirmations_count !== item.assignments_count);
+       });
 
 const props=defineProps({
          order_parts:Object,
@@ -81,6 +92,7 @@ const props=defineProps({
          orderParts:Object,
          shp_date:'',
          sp:Object,
+         date:''
 
   })
 
@@ -311,7 +323,7 @@ const removePart=(newObj)=>
                                           Records:
                                           <Dropdown
                                              v-model="records"
-                                             :options="[5,10,20,50,100]"
+                                             :options="[5,10,20,50,100,'ALL']"
                                              placeholder="5"
 
                                           />
@@ -330,8 +342,7 @@ const removePart=(newObj)=>
                                  <div class="flex flex-row items-center justify-center m-5 text-center">
 
 
-                                            <input type="text"
-                                               v-model="searchKey" placeholder="Search Order" class="m-2 rounded-lg bg-slate-300 text-md" />
+
                                           <!-- <DownloadButton :link="route('export.confirmations')" /> -->
 
 
@@ -339,6 +350,8 @@ const removePart=(newObj)=>
 
 
                              </div>
+                               <input type="text"
+                                               v-model="searchKey" placeholder="Search Order" class="m-2 rounded-lg bg-slate-300 text-md" />
 
                                 </template>
                            </Toolbar>
@@ -386,7 +399,7 @@ const removePart=(newObj)=>
                                                 </thead>
                                                 <tbody>
                                                     <tr
-                                                         v-for="order in orders.data.filter(item => item.confirmations_count !== item.assignments_count)" :key="order.order_no"
+                                                         v-for="order in filteredOrders " :key="order.order_no"
 
                                                          class="font-semibold text-black bg-white hover:bg-gray-300"
 
