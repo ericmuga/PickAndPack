@@ -622,14 +622,16 @@ onUnmounted(() => {
         class="flex flex-col justify-center gap-2 p-5">
         <span class="p-3 text-center capitalize">{{ form.item_description }}</span>
         <div class="flex flex-row justify_between ">
+             <span class="px-3 text-center capitalize">Ordered PCS</span>
+            <span class="p-3 px-3 text-center text-black capitalize bg-lime-400">{{ form.assembled_pcs }}</span>
 
-            <span class="px-3 text-center capitalize">Ordered Qty</span>
-            <span class="px-3 text-center capitalize">{{ form.order_qty }}</span>
+            <span class="px-3 text-center capitalize">Ordered Weight</span>
+            <span class="p-3 px-3 text-center text-white capitalize bg-teal-400">{{ form.order_qty,2 }}</span>
         </div>
         <div class="flex flex-row justify_between">
 
             <span class="px-3 text-center capitalize">Prepacked Qty</span>
-            <span class="px-3 text-center capitalize">{{ form.prepacks_total_quantity }}</span>
+            <span class="p-3 px-3 text-center text-black capitalize bg-orange-500">{{ form.prepacks_total_quantity }}</span>
         </div>
           <div
             class="flex items-center space-x-8"
@@ -639,9 +641,9 @@ onUnmounted(() => {
 
            <InputText
 
-             v-model="form.assembled_qty"
-             placeholder="PCS"
+             v-model="form.assembled_pcs"
            /></div>
+
 
 
            <div
@@ -649,17 +651,9 @@ onUnmounted(() => {
             >
            <span>Weight</span>
            <InputText
-             ref="scanItem"
-             v-model="form.assembled_pcs"
-
+             v-model="form.assembled_qty"
            />
 </div>
-
-
-
-
-
-
            <InputText
 
              v-model="form.from_batch"

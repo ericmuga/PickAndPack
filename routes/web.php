@@ -13,7 +13,8 @@ use App\Http\Controllers\{ConfirmationController,
                           StockController,
                          AssemblyController,
                          AssignmentController,
-                       };
+    PackingSessionController,
+};
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\{Route,Auth};
 use illuminate\Http\Request;
@@ -65,6 +66,11 @@ Route::middleware('auth')->group(function () {
 
         Route::resource('packing',PackingController::class);
         Route::get('pack/order', [PackingController::class, 'packOrder'])->name('pack.order');
+
+
+        ////////////////packing session routes/////////////////////////////
+        Route::resource('packingSession',PackingSessionController::class);
+
 
         Route::get('/dashboard',[DashboardController::class,'dashboard'] )->name('dashboard');
 
