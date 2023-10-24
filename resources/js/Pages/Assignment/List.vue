@@ -129,10 +129,19 @@ import { Inertia } from '@inertiajs/inertia';
        <div v-for="assignment in assignments.data" :key="assignment.id">
           <AssignmentCard :assignment="assignment"  />
        </div>
+
 </div>
                                       </div>
                                       </div>
                                       </div>
+         <Toolbar>
+             <template #center>
+
+                <Pagination :links="assignments.meta.links" />
+             </template>
+
+
+       </Toolbar>
                                       </div>
     </div>
     </AuthenticatedLayout>
