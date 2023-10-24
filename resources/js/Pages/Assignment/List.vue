@@ -68,7 +68,7 @@ import { Inertia } from '@inertiajs/inertia';
                                 </template>
                                 <template #center>
                                     <div>
-                                        <!-- <Pagination :links="assignments.meta.links" /> -->
+                                        <Pagination :links="assignments.meta.links" />
                                     </div>
                                     <!-- <Modal :show="showModal.value">
                                         <FilterPane :propsData="columnListing" />

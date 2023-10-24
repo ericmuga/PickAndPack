@@ -49,7 +49,13 @@ const refreshSearch=()=>{
                        'records':records.value
                       },
                       {preserveScroll:true,preserveState:true,replace:true}
+
                );
+      if (searchKey.value!='')
+                                    filteredOrders.value=props.orders.data.filter(item => item.confirmations_count !== item.assignments_count)
+                                                                          .filter(item=>item.order_no.endsWith(searchKey.value));
+                                    else
+                                    filteredOrders.value=props.orders.data.filter(item => item.confirmations_count !== item.assignments_count);
 }
 
 
