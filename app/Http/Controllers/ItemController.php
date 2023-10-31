@@ -99,7 +99,6 @@ class ItemController extends Controller
      */
     public function destroy($item)
     {
-        // dd($item);
         Prepack::where('item_no',$item)->delete();
         Item::firstWhere('item_no',$item)?->delete();
         return redirect(route('items.index'));

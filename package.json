@@ -22,10 +22,12 @@
     "dependencies": {
         "@vue-hero-icons/solid": "^1.7.2",
         "chart.js": "^4.3.2",
+        "jspdf": "^2.5.1",
         "moment": "^2.29.4",
         "pinia": "^2.0.0-rc.10",
         "primeicons": "^6.0.1",
         "primevue": "^3.29.1",
+        "qrcode-generator": "^1.4.4",
         "sweetalert2": "^11.7.8",
         "vue-barcode-reader": "^1.0.3"
     }

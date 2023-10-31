@@ -15,6 +15,7 @@ let dropDown2IsOpen= ref(false);
 let dropDown3IsOpen= ref(false);
 let dropDown4IsOpen= ref(false);
 let dropDown5IsOpen= ref(false);
+let dropDown6IsOpen= ref(false);
 
 const openOrCloseMenu=()=>{isOpen.value=!isOpen.value};
 const openOrCloseDropDownMenu=()=>{dropDownIsOpen.value=!dropDownIsOpen.value};
@@ -22,6 +23,7 @@ const openOrCloseDropDown2Menu=()=>{dropDown2IsOpen.value=!dropDown2IsOpen.value
 const openOrCloseDropDown3Menu=()=>{dropDown3IsOpen.value=!dropDown3IsOpen.value};
 const openOrCloseDropDown4Menu=()=>{dropDown4IsOpen.value=!dropDown4IsOpen.value};
 const openOrCloseDropDown5Menu=()=>{dropDown5IsOpen.value=!dropDown5IsOpen.value};
+const openOrCloseDropDown6Menu=()=>{dropDown6IsOpen.value=!dropDown6IsOpen.value};
 
 </script>
 
@@ -94,6 +96,26 @@ const openOrCloseDropDown5Menu=()=>{dropDown5IsOpen.value=!dropDown5IsOpen.value
                  </div>
                </div>
 
+               <div class="px-2 py-1 mt-1 font-semibold text-white rounded hover:bg-gray-600 md:p-0 md:mx-2">
+                <button class="flex items-center justify-between space-x-2" @click="openOrCloseDropDown6Menu" >Loading
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                      <path v-if="!dropDown6IsOpen" stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                      <path v-else stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                    </svg>
+                </button>
+                <div class="flex-col py-2 space-y-1 md:flex" >
+                  <Link :href="route('loadingSession.index')" :active="route().current('loadingSession.index')"
+                   class="px-3 py-1 mt-1 font-semibold text-white rounded hover:bg-gray-100 md:p-0 md:mx-2 "
+                   :class="dropDown6IsOpen?'block':'hidden'"
+                   >Loading Sessions
+                 </Link>
+
+                 </div> <Link :href="route('loadingSession.index')" :active="route().current('loadingSession.Show')"
+                   class="px-3 py-1 mt-1 font-semibold text-white rounded hover:bg-gray-100 md:p-0 md:mx-2 "
+                   :class="dropDown6IsOpen?'block':'hidden'"
+                   >Load Truck </Link>
+               </div>
+
 
 
 
@@ -129,6 +151,16 @@ const openOrCloseDropDown5Menu=()=>{dropDown5IsOpen.value=!dropDown5IsOpen.value
                    class="px-3 py-1 mt-1 font-semibold text-white rounded hover:bg-gray-100 md:p-0 md:mx-2 "
                    :class="dropDown3IsOpen?'block':'hidden'"
                    >Items </Link>
+                   <Link :href="route('users.index')" :active="route().current('users.index')"
+                   class="px-3 py-1 mt-1 font-semibold text-white rounded hover:bg-gray-100 md:p-0 md:mx-2 "
+                   :class="dropDown3IsOpen?'block':'hidden'"
+                   >Users </Link>
+
+                   <Link :href="route('items.index')" :active="route().current('items.index')"
+                   class="px-3 py-1 mt-1 font-semibold text-white rounded hover:bg-gray-100 md:p-0 md:mx-2 "
+                   :class="dropDown3IsOpen?'block':'hidden'"
+                   >Vehicles </Link>
+
 
                    <Link :href="route('prepacks.index')" :active="route().current('prepacks.index')"
                       class="px-3 py-1 mt-1 font-semibold text-white rounded hover:bg-gray-100 md:p-0 md:mx-2"

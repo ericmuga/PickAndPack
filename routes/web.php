@@ -13,14 +13,17 @@ use App\Http\Controllers\{ConfirmationController,
                           StockController,
                          AssemblyController,
                          AssignmentController,
+    LoadingSessionController,
     PackingSessionController,
+    UserController,
 };
 use Illuminate\Foundation\Application;
+use Mpdf\Mpdf;
 use Illuminate\Support\Facades\{Route,Auth};
 use illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Resources\{OrderResource};
-use App\Models\{Line,LinePrepack,Order,Prepack, Stock};
+use App\Models\{Line,LinePrepack, LoadingSession, Order,Prepack, Stock};
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +52,17 @@ use App\Models\{Line,LinePrepack,Order,Prepack, Stock};
 
 
 Route::middleware('auth')->group(function () {
+
+      Route::resource('loadingSession',LoadingSessionController::class);
+
+      Route::resource('users', UserController::class);
+      Route::get('userDownload',[UserController::class,'download'])->name('users.download');
+
+      Route::get('load', [LoadingSessionController::class,'load'
+      ])->name('load');
+
+
+       Route::post('/generate-pdf',[PackingController::class,'printLabel'])->name('packing.printLabel');
 
         Route::resource('assignment',AssignmentController::class);
 

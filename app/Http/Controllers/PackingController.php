@@ -9,12 +9,15 @@ use App\Helpers\ColumnListing;
 use App\Models\{Line,Order, Packing,PackingSession};
 use Illuminate\Support\Facades\DB;
 use App\Services\MyServices;
+use Mpdf\Mpdf;
 class PackingController extends Controller
 {
 
     public function index(Request $request)
     {
         //this will display orders ready for packing
+
+
 
         $orders= PackingOrderResource::collection(Order::query()
                                                 ->when($request->has('search'),fn($q)=>
@@ -111,6 +114,8 @@ class PackingController extends Controller
 
     }
 
+    //print
+$this->PrintLabel($request,$session);
 
      if (!$request->autosave)
       return redirect(route('packing.index'));
@@ -118,6 +123,43 @@ class PackingController extends Controller
       return response('',200,[]);
 }
 
+
+public function PrintLabel(Request $request,PackingSession $session)
+{
+     //dd($request->all());
+       //$data = a;
+
+
+        $mpdf = new Mpdf();
+        $html = '';
+
+        $html = '<h1>Session:'.$session->ID.'--Packer:'.$request->user()->name.'</h1>';
+
+        //Iterate through the data and generate HTML content
+        foreach ($request->data as $key => $value)
+        {
+            // dd($value);
+            // $line=Line::where('order_no',$value['order_no'])
+            //     ->where('line_no',$value['line_no'])
+            //     ->first();
+           $html .= "<p>".($key+1)."--".$value['item_description']."--packed_pcs--".$value['packed_pcs']."--packed_wt--".$value['packed_qty']."</p>";
+       }
+        $mpdf->WriteHTML($html);
+
+        $pdfFilePath = storage_path('app/public/'.$session->id.'.pdf');
+        $mpdf->Output($pdfFilePath, 'F');
+
+        // Return the PDF file with the correct content-type header
+        return response()->file($pdfFilePath, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="document.pdf"',
+        ]);//->deleteFileAfterSend(true);
+
+
+
+
+
+}
 
 
 

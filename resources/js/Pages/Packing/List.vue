@@ -7,6 +7,8 @@ import { Inertia } from '@inertiajs/inertia';
 import debounce from 'lodash/debounce';
 import {watch, ref,onMounted} from 'vue';
 import Pagination from '@/Components/Pagination.vue';
+import GeneratePdf from '@/Components/GeneratePdf.vue';
+import axios from 'axios';
 const search=ref()
 watch(search, debounce(()=>{Inertia.post('/order/all',{search:search.value}, {preserveScroll: true})}, 500));
 
@@ -25,6 +27,7 @@ debounce( ()=>{Inertia.get(route('packing.index'),{'search':newItem.value})})
 
 
 const confirmPack=(order_no,part)=>{ Inertia.get(route('pack.order',{'order_no':order_no,'part_no':part}))}
+
 
 
 </script>
@@ -72,7 +75,9 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('pack.order',{'order_no':
 
                                             <!-- <InputText v-model="search" aria-placeholder="search"/> -->
 
+                                             <div>
 
+                                            </div>
                                             </template>
                                         </Toolbar>
 

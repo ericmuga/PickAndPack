@@ -3,22 +3,39 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
 import Button from 'primevue/button';
-// import MultiSelect from 'primevue/multiselect';
 import InputText from 'primevue/inputtext';
 import { useForm } from '@inertiajs/inertia-vue3'
 import { Inertia } from '@inertiajs/inertia';
-// import {debounce} from 'lodash/debounce';
 import {watch, ref,onMounted, nextTick,reactive,computed,onUnmounted} from 'vue';
 import Swal from 'sweetalert2'
-import TabView from 'primevue/tabview';
-import TabPanel from 'primevue/tabpanel';
 import Modal from '@/Components/Modal.vue';
 import debounce from 'lodash/debounce'
 import ProgressBar from 'primevue/progressbar';
 import { useSearchArray } from '@/Composables/useSearchArray';
+import jsPDF from 'jspdf';
+  import QRCode from 'qrcode-generator';
 
+const openModal = () => {
+  if (pdfDataUrl.value) {
+    Swal.fire({
+      title: 'Packing Label',
+      html: `
+        <div id="pdf-modal">
+          <iframe src="${pdfDataUrl.value}" width="100%" height="400px"></iframe>
+        </div>`,
+      showConfirmButton: false,
+    });
+  } else {
+    Swal.fire({
+      title: 'PDF not generated',
+      text: 'Please generate the PDF first.',
+      icon: 'error',
+    });
+  }
+};
 const inputField=ref(null);
 const scanItem=ref(null);
+const pdfDataUrl = ref('');
 
 const props= defineProps({
                             orderLines:Object,
@@ -27,6 +44,85 @@ const props= defineProps({
                         });
 
 const assembledArray=ref([]);
+
+const generatePDF = (from=1,to=1) =>
+{
+
+
+    const doc = new jsPDF({
+                            orientation: "portrait",
+                            unit: "cm",
+                            format: [5, 7.5]
+                            });
+    // doc.setMargins(0.5, 0.5, 0.5, 0.5);
+
+    const center=(text)=>{
+        const textWidth = doc.getStringUnitWidth(text) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+    return (doc.internal.pageSize.width - textWidth) / 2;
+    }
+
+
+    let v=1;
+    const allPagesContent = [];
+    let fontSizeFactor=1;
+
+
+    for (let pageNum = from; pageNum <= to; pageNum++)
+    {
+            if (pageNum > from)
+            {
+                v++;
+                doc.addPage();
+            }
+
+            const qrCodeText=route('load')+'?order_no='+encodeURIComponent(props.orderLines.data[0].order.order_no)+'?part='+props.orderLines.data[0].part+'?vessel_no='+pageNum;
+            console.log(qrCodeText);
+            const lineHeight = 0.5;
+            const qrCode = new QRCode(0, 'H');
+            qrCode.addData(qrCodeText);
+            qrCode.make();
+            const qrCodeDataUrl = qrCode.createDataURL(4);
+            //12 chars is 10
+
+            if (props.orderLines.data[0].order.shp_name.length<=12)
+
+
+             doc.setFontSize(10);
+            else
+             doc.setFontSize(6);
+
+             doc.setFont("helvetica", "bold");
+            doc.text(props.orderLines.data[0].order.shp_name, center(props.orderLines.data[0].order.shp_name), 1);
+
+            doc.text(props.orderLines.data[0].order.order_no, center(props.orderLines.data[0].order.order_no), 1+lineHeight);
+            doc.text(props.orderLines.data[0].part, center(props.orderLines.data[0].part), 1+2*lineHeight);
+
+            if (props.orderLines.data[0].order.sp_search_name.length<=12)
+
+
+             doc.setFontSize(10);
+            else
+             doc.setFontSize(8);
+              doc.setFont("helvetica", "normal");
+            doc.text(props.orderLines.data[0].order.sp_search_name, center(props.orderLines.data[0].order.sp_search_name),1+ 3*lineHeight);
+            doc.text(form.vessel+'-'+pageNum, center(form.vessel+'-'+pageNum),1+ 4*lineHeight);
+            doc.addImage(qrCodeDataUrl, 'JPEG', 1.5, 5, 2, 2);
+            // const pageContent = ;
+  }          allPagesContent.push(doc.output('datauristring'));
+    pdfDataUrl.value = allPagesContent;
+    //doc.save('label.pdf')
+    openModal();
+
+};
+
+
+ const qrCodeImage=(text)=> {
+    // Create and return a QR code image using your preferred QR code library
+    // You can use a library like qrcode-generator or qrcode-svg
+    // Here's a simplified example using an SVG QR code:
+    const qrCode = new QRCode(text, 4);
+    return qrCode.getBase64();
+  };
 
 onMounted(() => {
     inputField.value.focus();
@@ -68,6 +164,7 @@ if (props.orderLines.data.length>0)
       {
         assembledArray.value.push({
                                    'item_no':result.item_no,
+                                   'item_description':result.item_description,
                                     'order_no':result.order_no,
                                     'line_no':result.line_no,
                                     'packed_qty':props.orderLines.data[i].packing[j].packed_qty,
@@ -293,6 +390,7 @@ const submitForm=()=>{
 
       assembledArray.value.push({   'order_no':form.order_no,
                                     'item_no':form.item_no,
+                                    'item_description':form.item_description,
                                     'line_no':form.line_no,
                                     'packed_qty':form.packed_qty,
                                     'packed_pcs':form.packed_pcs,
@@ -650,6 +748,9 @@ onUnmounted(() => {
                                             <Toolbar>
 
                                                 <template #center>
+
+                                                     <!-- <generate-pdf :data="assembledArray"></generate-pdf> -->
+
                                                     <Button
                                                     class="justify-end"
                                                     severity="warning"
@@ -772,6 +873,11 @@ onUnmounted(() => {
 
          </div>
 
+              <Button @click="generatePDF(form.from_vessel,form.to_vessel)"
+                v-show="((parseInt(form.from_vessel)>0)&&(form.from_batch!='')&&(form.vessel!=null))||form.empty"
+                label="Close Carton"
+                severity="warning"
+              />
             <Button  label="Pack"
              v-show="((parseInt(form.from_vessel)>0)&&(form.from_batch!='')&&(form.vessel!=null))||form.empty"
             icon="pi pi-send" class="w-md" severity="success"  type="submit" :disabled="form.processing" />
