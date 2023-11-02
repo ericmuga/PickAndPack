@@ -17,14 +17,16 @@ class LoadingSessionController extends Controller
     {
 
       //List loadingSessions
-    //    $drivers=User::role('driver')->select('id','name')->get();
-       $drivers=User::select('id','name')->get();
-       $vehicles=Vehicle::select('id','plate');
+       $drivers=User::role('driver')->select('id','name')->get();
+    //    $drivers=User::select('id','name')->get();
+       $vehicles=Vehicle::select('id','plate')->get();
+       $loaders=User::role('loader')->select('id','name')->where('id','<>',$request->user()->id)->get();
+
 
        $rows=$request->rows?:10;
        $sessions= LoadingResource::collection(LoadingSession::with('lines')->paginate($rows));
 
-      return inertia('Loading/List',compact('sessions','drivers','vehicles'));
+       return inertia('Loading/List',compact('sessions','drivers','vehicles','loaders'));
 
 
 
@@ -53,7 +55,9 @@ class LoadingSessionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // dd($request->all());
+        LoadingSession::create($request->all());
+        return redirect('loadingSession.index');
     }
 
     /**

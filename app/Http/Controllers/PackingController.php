@@ -115,7 +115,7 @@ class PackingController extends Controller
     }
 
     //print
-$this->PrintLabel($request,$session);
+//$this->PrintLabel($request,$session);
 
      if (!$request->autosave)
       return redirect(route('packing.index'));
@@ -134,7 +134,9 @@ public function PrintLabel(Request $request,PackingSession $session)
         $html = '';
 
         $html = '<h1>Session:'.$session->ID.'--Packer:'.$request->user()->name.'</h1>';
+        $html = '<h1>Session:'.$session->ID.'--Packer:'.$request->user()->name.'</h1>';
 
+        //Iterate through the data and generate HTML content
         //Iterate through the data and generate HTML content
         foreach ($request->data as $key => $value)
         {

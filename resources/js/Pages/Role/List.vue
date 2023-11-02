@@ -1,16 +1,10 @@
-
-
-
-
 <script setup>
 import SearchBox from '@/Components/SearchBox.vue'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
 import { useForm } from '@inertiajs/inertia-vue3'
-import { Inertia } from '@inertiajs/inertia';
-import debounce from 'lodash/debounce';
-import {watch, ref} from 'vue';
+import {ref} from 'vue';
 import Pagination from '@/Components/Pagination.vue'
 import Swal from 'sweetalert2'
 import Modal from '@/Components/Modal.vue'
@@ -18,30 +12,27 @@ import Drop from '@/Components/Drop.vue'
 
 
 const form= useForm({
-    name:'',
-    email:'',
-    // pass:'',
-    roles:[]
+'name':''
 })
 
 
 
 
 
-const createOrUpdateUser=()=>{
+const createOrUpdateRole=()=>{
     if (mode.state=='Create')
-          form.post(route('users.store'),
+          form.post(route('roles.store'),
                     { preserveScroll: true,
                       onSuccess: () =>{ form.reset()
-                                      Swal.fire(`User ${mode.state}d Successfully!`,'','success');
+                                      Swal.fire(`Role ${mode.state}d Successfully!`,'','success');
                                     }
                     }
                    )
         else
-     form.patch(route('users.update',form.email),
+     form.patch(route('roles.update',form.plate),
                 { preserveScroll: true,
                       onSuccess: () =>{ form.reset()
-                                      Swal.fire(`User ${mode.state}d Successfully!`,'','success');
+                                      Swal.fire(`Role ${mode.state}d Successfully!`,'','success');
                                     }
                     })
       showModal.value=false;
@@ -53,9 +44,7 @@ const createOrUpdateUser=()=>{
 let mode= { state: 'Create' };
 
 const props=  defineProps({
-       users:Object,
-       roles:Object,
-       permissions:Object,
+       roles:Object
   })
 
   let showModal=ref(false);
@@ -69,25 +58,22 @@ const showCreateModal=()=>{
 
 }
 
-const showUpdateModal=(user)=>{
-
+const showUpdateModal=(role)=>{
+// alert('here');
     mode.state='Update'
-    form.name=user.user_name
-    form.email=user.email
-    form.pass=user.pass
-    form.roles=user.roles
+    form.name=role.name;
 
-    showModal.value=true
+    showModal.value=true;
 }
 </script>
 
 
 <template>
-    <Head title="Users"/>
+    <Head title="Roles"/>
 
     <AuthenticatedLayout @add="showModal=true">
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">User {{ users.data.length }}</h2>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">Role </h2>
         </template>
 
         <div class="py-6">
@@ -103,11 +89,10 @@ const showUpdateModal=(user)=>{
                                     <!-- <Button label="New" icon="pi pi-plus" class="mr-2" />
                                         <Button label="Upload" icon="pi pi-upload" class="p-button-success" /> -->
                                         <!-- <i class="mr-2 pi pi-bars p-toolbar-separator" /> -->
-                                        <!-- <SplitButton label="Save" icon="pi pi-check" :model="users" class="p-button-warning"></SplitButton> -->
+                                        <!-- <SplitButton label="Save" icon="pi pi-check" :model="Roles" class="p-button-warning"></SplitButton> -->
                                     <Button
                                          label="Add"
                                          icon="pi pi-plus"
-                                         disabled
                                          severity="success"
                                          @click="showCreateModal()"
                                          rounded
@@ -115,7 +100,7 @@ const showUpdateModal=(user)=>{
                                 </template>
                                 <template #center>
                                     <div>
-                                        <Pagination :links="users.meta.links" />
+                                        <Pagination :links="roles.meta.links" />
                                     </div>
                                     <!-- <Modal :show="showModal.value">
                                         <FilterPane :propsData="columnListing" />
@@ -127,14 +112,14 @@ const showUpdateModal=(user)=>{
                                     <template #end>
 
 
-                                        <a :href="route('users.download')" class="">
-                                            <Button icon="pi pi-download" severity="primary" text raised rounded label="users"/>
+                                        <a :href="route('roles.download')" class="">
+                                            <Button icon="pi pi-download" severity="primary" text raised rounded label="Roles"/>
                                         </a>
 
 
 
 
-                                             <SearchBox :model="users.index" />
+                                             <SearchBox :model="roles.index" />
                                     </template>
                                         </Toolbar>
 
@@ -148,55 +133,31 @@ const showUpdateModal=(user)=>{
                                                             Barcode
                                                         </th> -->
                                                         <th scope="col" class="px-6 py-3">
-                                                           Name
+                                                           Role Name
                                                         </th>
-                                                        <th scope="col" class="px-6 py-3 text-center">
-                                                            email
-                                                        </th>
-                                                        <!-- <th scope="col" class="px-6 py-3">
 
-                                                        </th>
-                                                        <th scope="col" class="px-6 py-3">
-
-                                                        </th> -->
-                                                        <th scope="col" class="px-6 py-3">
-                                                           Actions
-                                                        </th>
 
 
 
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr v-for="user in users.data" :key="user.user_no"
+                                                    <tr v-for="role in roles.data" :key="role.id"
                                                     class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
 
                                                     <td class="px-3 py-2 text-xs">
-                                                        {{ user.user_name }}
+                                                        {{ role.name}}
                                                     </td>
 
-                                                    <td class="px-3 py-2 text-xs font-bold text-center ">
-                                                        {{ user.email }}
-                                                    </td>
-                                                    <!-- <td class="px-3 py-2 text-xs font-bold">
-                                                        {{ user.description }}
-                                                    </td>
 
-                                                    <td class="px-3 py-2 text-xs">
-
-                                                            {{user.prepacks.length}}
-
-                                                    </td> -->
                                                     <td>
                                                        <div class="flex flex-row">
-                                                          <!-- <Drop  :drop-route="route('users.destroy',{'user':user.id})"/> -->
+                                                          <Drop  :drop-route="route('roles.destroy',{'role':role.id})"/>
                                                             <Button
                                                                       icon="pi pi-pencil"
                                                                       severity="info"
                                                                       text
-
-
-                                                                      @click="showUpdateModal(user)"
+                                                                      @click="showUpdateModal(role)"
                                                                       />
                                                        </div>
                                                     </td>
@@ -210,7 +171,7 @@ const showUpdateModal=(user)=>{
                     <Toolbar>
                         <template #center>
                             <div >
-                                <Pagination :links="users.meta.links" />
+                                <Pagination :links="roles.meta.links" />
                             </div>
                         </template>
                     </Toolbar>
@@ -232,37 +193,23 @@ const showUpdateModal=(user)=>{
 
      <div class="flex flex-col p-4 rounded-sm">
 
-        <div  class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> {{mode.state}} User</div>
-        <!-- <div v-else class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> Update user</div> -->
+        <div  class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> {{mode.state}} Role</div>
+        <!-- <div v-else class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> Update Role</div> -->
 
-          <form  @submit.prevent="createOrUpdateUser()">
+          <form  @submit.prevent="createOrUpdateRole()">
 
 <div class="flex flex-col justify-center gap-3">
 
 
         <InputText
-           placeholder="Name"
+           placeholder="Role Name"
 
            v-model="form.name"
         />
-        <InputText
-           disabled="true"
-           placeholder="email"
-           v-model="form.email"
 
-        />
 
-        <!-- <Password v-model="form.Password" :feedback="true" /> -->
 
-        <MultiSelect
-         v-model="form.roles"
-         :options="roles.data"
-         optionValue="name"
-         optionLabel="name"
-         placeholder="Role"
-         filter
 
-        />
 
         <Button
           severity="info"
@@ -271,8 +218,6 @@ const showUpdateModal=(user)=>{
           :disabled="form.processing"
 
         />
-
-
         <Button label="Cancel" severity="warning" icon="pi pi-cancel" @click="showModal=false"/>
 </div>
 

@@ -156,10 +156,20 @@ const openOrCloseDropDown6Menu=()=>{dropDown6IsOpen.value=!dropDown6IsOpen.value
                    :class="dropDown3IsOpen?'block':'hidden'"
                    >Users </Link>
 
-                   <Link :href="route('items.index')" :active="route().current('items.index')"
+                   <Link :href="route('vehicles.index')" :active="route().current('vehicles.index')"
                    class="px-3 py-1 mt-1 font-semibold text-white rounded hover:bg-gray-100 md:p-0 md:mx-2 "
                    :class="dropDown3IsOpen?'block':'hidden'"
                    >Vehicles </Link>
+
+                    <Link :href="route('permissions.index')" :active="route().current('permissions.index')"
+                   class="px-3 py-1 mt-1 font-semibold text-white rounded hover:bg-gray-100 md:p-0 md:mx-2 "
+                   :class="dropDown3IsOpen?'block':'hidden'"
+                   >Permissions </Link>
+
+                   <Link :href="route('roles.index')" :active="route().current('roles.index')"
+                   class="px-3 py-1 mt-1 font-semibold text-white rounded hover:bg-gray-100 md:p-0 md:mx-2 "
+                   :class="dropDown3IsOpen?'block':'hidden'"
+                   >Roles </Link>
 
 
                    <Link :href="route('prepacks.index')" :active="route().current('prepacks.index')"

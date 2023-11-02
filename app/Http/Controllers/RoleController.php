@@ -2,23 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\PermissionResource;
-use App\Http\Resources\RoleResource;
-use App\Http\Resources\UserResource;
-use App\Models\Permission;
-use App\Models\Role;
-use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\Role;
+use App\Http\Resources\RoleResource;
 use App\Services\SearchQueryService;
 
-class UserController extends Controller
+class RoleController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-     public function download(Request $request)
+    public function download(Request $request)
     {
         dd('under maintenance');
         // return Excel::download(new ConfirmationExport([$request->from,$request->to]), 'confirmations.xlsx');
@@ -30,10 +26,10 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        //list all the users
-        $query= User::query();
+        //list all the Roles
+        $query= Role::latest();
         $searchParameter = $request->has('search')?$request->search:'';
-        $searchColumns = ['name','email'];
+        $searchColumns = ['name'];
         $strictColumns = [];
         $relatedModels = [
                             // 'relatedModel1' => ['related_column1', 'related_column2'],
@@ -44,26 +40,28 @@ class UserController extends Controller
 
         $searchService = new SearchQueryService($query, $searchParameter, $searchColumns, $strictColumns, $relatedModels);
         // dd($searchService);
-        $users = $searchService
-                ->with(['permissions','roles']) // Example of eager loading related models
+        $roles = $searchService
+                // ->with(['Roles','roles']) // Example of eager loading related models
                 ->search();
         $rows=$request->has('rows')?$request->rows:10;
 
+        $roles= RoleResource::collection($roles->paginate($rows));
 
-    //   dd($users);
-
-        $users= UserResource::collection($users->paginate($rows));
-        $roles= RoleResource::collection(Role::all());
-        $permissions=PermissionResource::collection(Permission::all());
-
-        return inertia('User/List',compact('users','roles','permissions'));
+        return inertia('Role/List',compact('roles'));
 
     }
 
-
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function store(Request $request)
     {
-        //
+
+        Role::create(['name'=>$request->name,'guard_name'=>'web']);
+        return redirect(route('roles.index'));
     }
 
     /**
@@ -76,18 +74,6 @@ class UserController extends Controller
     {
         //
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
     /**
      * Update the specified resource in storage.
      *
@@ -97,10 +83,8 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
-
-         User::firstWhere('email',$request->email)->syncRoles($request->roles);
-
+               Role::firstWhere('name',$id)?->update(['name'=>$request->name,'guard_name'=>'web']);
+        return redirect (route('roles.index'));
     }
 
     /**
@@ -111,6 +95,9 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $role=Role::find($id);
+        $role->delete();
+        return redirect(route('roles.index'));
     }
+
 }

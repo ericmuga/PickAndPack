@@ -18,6 +18,7 @@ const prop=defineProps({
     sessions:Object,
     drivers:Object,
     vehicles:Object,
+    loaders:Object,
 })
     const inputField=ref(null);
 
@@ -66,23 +67,18 @@ let mode= { state: 'Create' };
 const showCreateModal=()=>{
 
     mode.state='Create'
-    form.barcode=''
-    form.item_no=''
-    form.description=''
-    form.posting_group=''
+    form.reset();
     showModal.value=true
 
 }
 
-const showUpdateModal=(item)=>{
+const showUpdateModal=(session)=>{
 
     mode.state='Update'
-    // alert(mode.state)
+    form.vehicle=session.vehicle_id
+    form.assistant_loader_id=session.assistant_loader_id
+    form.driver_id=session.driver_id
 
-    form.barcode=item.barcode
-    form.item_no=item.item_no
-    form.description=item.description
-    form.posting_group=item.posting_group
     showModal.value=true
 }
 
@@ -158,7 +154,86 @@ const showUpdateModal=(item)=>{
                                         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
 
 <!---table comes here-->
+      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
+                                                    <tr class="bg-slate-300">
+                                                        <!-- <th scope="col" class="px-6 py-3">
+                                                            Barcode
+                                                        </th> -->
+                                                        <th scope="col" class="px-6 py-3">
+                                                           Session Id
+                                                        </th>
+                                                        <th scope="col" class="px-6 py-3 text-center">
+                                                            Loader
+                                                        </th>
+                                                        <th scope="col" class="px-6 py-3">
+                                                            Assistant Loader
+                                                        </th>
+                                                        <th scope="col" class="px-6 py-3">
+                                                            Vehicle
+                                                        </th>
+
+                                                         <th scope="col" class="px-6 py-3">
+                                                            Driver
+                                                        </th>
+                                                        <th scope="col" class="px-6 py-3">
+                                                           Actions
+                                                        </th>
+
+
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="session in sessions.data" :key="session.id"
+                                                    class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
+
+                                                    <td class="px-3 py-2 text-xs">
+                                                        {{ session.id }}
+                                                    </td>
+
+                                                    <td class="px-3 py-2 text-xs font-bold text-center ">
+                                                        {{ session.loader }}
+                                                    </td>
+                                                     <td class="px-3 py-2 text-xs font-bold">
+                                                        {{ session.assistant_loader }}
+                                                    </td>
+
+                                                    <td class="px-3 py-2 text-xs">
+
+                                                            {{session.prepacks.length}}
+
+                                                    </td>
+                                                     <td class="px-3 py-2 text-xs">
+
+                                                            {{ session.vehicle }}
+
+                                                    </td>
+
+                                                     <td class="px-3 py-2 text-xs">
+
+                                                            {{session.driver}}
+
+                                                    </td>
+                                                    <td>
+                                                       <div class="flex flex-row">
+                                                          <!-- <Drop  :drop-route="route('sessions.destroy',{'session':session.id})"/> -->
+                                                            <Button
+                                                                      icon="pi pi-pencil"
+                                                                      severity="info"
+                                                                      text
+
+
+                                                                      @click="showUpdateModal(session)"
+                                                                      />
+                                                       </div>
+                                                    </td>
+
+                                            </tr>
+
+                            </tbody>
+                        </table>
 
 
                                         </div>
@@ -195,27 +270,38 @@ const showUpdateModal=(item)=>{
 <div class="flex flex-col justify-center gap-3">
 
 
-        <InputText
-           placeholder="Item No"
-           :disabled="mode.state=='Update'"
-           v-model="form.item_no"
+        <Dropdown
+          :options="vehicles"
+          v-model="form.vehicle_id"
+          optionValue="id"
+          optionLabel="plate"
+          placeholder="Vehicle"
+          filter
         />
-        <InputText
-           placeholder="Item Description"
-           v-model="form.description"
+       <Dropdown
+          :options="loaders"
+          optionValue="id"
+          v-model="form.assistant_loader_id"
+          optionLabel="name"
+          placeholder="Assistant Loader"
+          filter
         />
-        <InputText
-           placeholder="Item Barcode"
-           v-model="form.barcode"
+
+        <Dropdown
+          :options="drivers"
+          v-model="form.driver_id"
+          optionValue="id"
+          optionLabel="name"
+          placeholder="Driver"
+          filter
         />
-        <InputText
-           placeholder="Item Posting Group"
-           v-model="form.posting_group"
-        />
+
+
         <Button
           severity="info"
           type="submit"
           :label=mode.state
+          :disabled="form.processing"
 
         />
         <Button label="Cancel" severity="warning" icon="pi pi-cancel" @click="showModal=false"/>

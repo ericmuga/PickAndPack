@@ -15,7 +15,10 @@ use App\Http\Controllers\{ConfirmationController,
                          AssignmentController,
     LoadingSessionController,
     PackingSessionController,
+    PermissionController,
+    RoleController,
     UserController,
+  VehicleController,
 };
 use Illuminate\Foundation\Application;
 use Mpdf\Mpdf;
@@ -23,7 +26,7 @@ use Illuminate\Support\Facades\{Route,Auth};
 use illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Resources\{OrderResource};
-use App\Models\{Line,LinePrepack, LoadingSession, Order,Prepack, Stock};
+use App\Models\{Line,LinePrepack, LoadingSession, Order, Permission, Prepack, Stock, Vehicle};
 
 /*
 |--------------------------------------------------------------------------
@@ -53,6 +56,18 @@ use App\Models\{Line,LinePrepack, LoadingSession, Order,Prepack, Stock};
 
 Route::middleware('auth')->group(function () {
 
+
+///////////////////////////////ACL routes/////////////////////////////////
+
+      Route::resource('permissions',PermissionController::class);
+      Route::get('permissionDownload',[PermissionController::class,'download'])->name('permissions.download');
+      Route::resource('roles',RoleController::class);
+      Route::get('roleDownload',[RoleController::class,'download'])->name('roles.download');
+
+///////////////////////end of ACL routes
+
+
+////////////////////////////////Loading Routes ///////////////////////////////////////////////////
       Route::resource('loadingSession',LoadingSessionController::class);
 
       Route::resource('users', UserController::class);
@@ -60,6 +75,11 @@ Route::middleware('auth')->group(function () {
 
       Route::get('load', [LoadingSessionController::class,'load'
       ])->name('load');
+
+      Route::resource('vehicles',VehicleController::class);
+      Route::get('vehicleDownload',[VehicleController::class,'download'])->name('vehicles.download');
+///////////////////////////end of loading routes//////////////////////////////
+
 
 
        Route::post('/generate-pdf',[PackingController::class,'printLabel'])->name('packing.printLabel');

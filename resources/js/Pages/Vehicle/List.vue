@@ -8,9 +8,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
 import { useForm } from '@inertiajs/inertia-vue3'
-import { Inertia } from '@inertiajs/inertia';
-import debounce from 'lodash/debounce';
-import {watch, ref} from 'vue';
+import {ref} from 'vue';
 import Pagination from '@/Components/Pagination.vue'
 import Swal from 'sweetalert2'
 import Modal from '@/Components/Modal.vue'
@@ -18,30 +16,34 @@ import Drop from '@/Components/Drop.vue'
 
 
 const form= useForm({
-    name:'',
-    email:'',
-    // pass:'',
-    roles:[]
+    plate:'',
+    fleet_no:'',
+    tare_weight:'',
+    load_capacity:'',
+    fuel_capacity:'',
+    status:'',
+    make:''
+
 })
 
 
 
 
 
-const createOrUpdateUser=()=>{
+const createOrUpdatevehicle=()=>{
     if (mode.state=='Create')
-          form.post(route('users.store'),
+          form.post(route('vehicles.store'),
                     { preserveScroll: true,
                       onSuccess: () =>{ form.reset()
-                                      Swal.fire(`User ${mode.state}d Successfully!`,'','success');
+                                      Swal.fire(`Vehicle ${mode.state}d Successfully!`,'','success');
                                     }
                     }
                    )
         else
-     form.patch(route('users.update',form.email),
+     form.patch(route('vehicles.update',form.plate),
                 { preserveScroll: true,
                       onSuccess: () =>{ form.reset()
-                                      Swal.fire(`User ${mode.state}d Successfully!`,'','success');
+                                      Swal.fire(`Vehicle ${mode.state}d Successfully!`,'','success');
                                     }
                     })
       showModal.value=false;
@@ -53,9 +55,9 @@ const createOrUpdateUser=()=>{
 let mode= { state: 'Create' };
 
 const props=  defineProps({
-       users:Object,
-       roles:Object,
-       permissions:Object,
+       vehicles:Object,
+       role:Object,
+       permissions:Object
   })
 
   let showModal=ref(false);
@@ -69,25 +71,27 @@ const showCreateModal=()=>{
 
 }
 
-const showUpdateModal=(user)=>{
-
+const showUpdateModal=(vehicle)=>{
+// alert('here');
     mode.state='Update'
-    form.name=user.user_name
-    form.email=user.email
-    form.pass=user.pass
-    form.roles=user.roles
-
-    showModal.value=true
+    form.plate=vehicle.plate;
+    form.fleet_no=vehicle.fleet_no;
+    form.tare_weight=vehicle.tare_weight;
+    form.load_capacity=vehicle.load_capacity;
+    form.fuel_capacity=vehicle.fuel_capacity;
+    form.status=(vehicle.status==1)?true:false
+    form.make=vehicle.make;
+    showModal.value=true;
 }
 </script>
 
 
 <template>
-    <Head title="Users"/>
+    <Head title="Vehicles"/>
 
     <AuthenticatedLayout @add="showModal=true">
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">User {{ users.data.length }}</h2>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">Vehicle </h2>
         </template>
 
         <div class="py-6">
@@ -103,11 +107,10 @@ const showUpdateModal=(user)=>{
                                     <!-- <Button label="New" icon="pi pi-plus" class="mr-2" />
                                         <Button label="Upload" icon="pi pi-upload" class="p-button-success" /> -->
                                         <!-- <i class="mr-2 pi pi-bars p-toolbar-separator" /> -->
-                                        <!-- <SplitButton label="Save" icon="pi pi-check" :model="users" class="p-button-warning"></SplitButton> -->
+                                        <!-- <SplitButton label="Save" icon="pi pi-check" :model="vehicles" class="p-button-warning"></SplitButton> -->
                                     <Button
                                          label="Add"
                                          icon="pi pi-plus"
-                                         disabled
                                          severity="success"
                                          @click="showCreateModal()"
                                          rounded
@@ -115,7 +118,7 @@ const showUpdateModal=(user)=>{
                                 </template>
                                 <template #center>
                                     <div>
-                                        <Pagination :links="users.meta.links" />
+                                        <Pagination :links="vehicles.meta.links" />
                                     </div>
                                     <!-- <Modal :show="showModal.value">
                                         <FilterPane :propsData="columnListing" />
@@ -127,14 +130,14 @@ const showUpdateModal=(user)=>{
                                     <template #end>
 
 
-                                        <a :href="route('users.download')" class="">
-                                            <Button icon="pi pi-download" severity="primary" text raised rounded label="users"/>
+                                        <a :href="route('vehicles.download')" class="">
+                                            <Button icon="pi pi-download" severity="primary" text raised rounded label="vehicles"/>
                                         </a>
 
 
 
 
-                                             <SearchBox :model="users.index" />
+                                             <SearchBox :model="vehicles.index" />
                                     </template>
                                         </Toolbar>
 
@@ -148,19 +151,25 @@ const showUpdateModal=(user)=>{
                                                             Barcode
                                                         </th> -->
                                                         <th scope="col" class="px-6 py-3">
-                                                           Name
+                                                           Plate
                                                         </th>
                                                         <th scope="col" class="px-6 py-3 text-center">
-                                                            email
-                                                        </th>
-                                                        <!-- <th scope="col" class="px-6 py-3">
-
+                                                            Fleet No.
                                                         </th>
                                                         <th scope="col" class="px-6 py-3">
-
-                                                        </th> -->
+                                                           Make
+                                                        </th>
                                                         <th scope="col" class="px-6 py-3">
-                                                           Actions
+                                                           Tare Weight (KG)
+                                                        </th>
+                                                        <th scope="col" class="px-6 py-3">
+                                                           Load Capacity (KG)
+                                                        </th>
+                                                        <th scope="col" class="px-6 py-3">
+                                                           Fuel Capacity (L)
+                                                        </th>
+                                                        <th scope="col" class="px-6 py-3">
+                                                          Active
                                                         </th>
 
 
@@ -168,35 +177,48 @@ const showUpdateModal=(user)=>{
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr v-for="user in users.data" :key="user.user_no"
+                                                    <tr v-for="vehicle in vehicles.data" :key="vehicle.id"
                                                     class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
 
                                                     <td class="px-3 py-2 text-xs">
-                                                        {{ user.user_name }}
+                                                        {{ vehicle.plate }}
                                                     </td>
 
                                                     <td class="px-3 py-2 text-xs font-bold text-center ">
-                                                        {{ user.email }}
+                                                        {{ vehicle.fleet_no }}
                                                     </td>
-                                                    <!-- <td class="px-3 py-2 text-xs font-bold">
-                                                        {{ user.description }}
+
+                                                    <td class="px-3 py-2 text-xs font-bold text-center ">
+                                                        {{ vehicle.make }}
                                                     </td>
+                                                    <td class="px-3 py-2 text-xs font-bold">
+                                                        {{ vehicle.tare_weight }}
+                                                    </td>
+
 
                                                     <td class="px-3 py-2 text-xs">
 
-                                                            {{user.prepacks.length}}
+                                                            {{vehicle.load_capacity}}
 
-                                                    </td> -->
+                                                    </td>
+                                                    <td class="px-3 py-2 text-xs">
+
+                                                            {{vehicle.fuel_capacity}}
+
+                                                    </td>
+                                                    <td class="px-3 py-2 text-xs">
+
+                                                            {{(vehicle.status==1)?'Yes':'No'}}
+
+                                                    </td>
                                                     <td>
                                                        <div class="flex flex-row">
-                                                          <!-- <Drop  :drop-route="route('users.destroy',{'user':user.id})"/> -->
+                                                          <Drop  :drop-route="route('vehicles.destroy',{'vehicle':vehicle.id})"/>
                                                             <Button
                                                                       icon="pi pi-pencil"
                                                                       severity="info"
                                                                       text
-
-
-                                                                      @click="showUpdateModal(user)"
+                                                                      @click="showUpdateModal(vehicle)"
                                                                       />
                                                        </div>
                                                     </td>
@@ -210,7 +232,7 @@ const showUpdateModal=(user)=>{
                     <Toolbar>
                         <template #center>
                             <div >
-                                <Pagination :links="users.meta.links" />
+                                <Pagination :links="vehicles.meta.links" />
                             </div>
                         </template>
                     </Toolbar>
@@ -232,37 +254,53 @@ const showUpdateModal=(user)=>{
 
      <div class="flex flex-col p-4 rounded-sm">
 
-        <div  class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> {{mode.state}} User</div>
-        <!-- <div v-else class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> Update user</div> -->
+        <div  class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> {{mode.state}} Vehicle</div>
+        <!-- <div v-else class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> Update vehicle</div> -->
 
-          <form  @submit.prevent="createOrUpdateUser()">
+          <form  @submit.prevent="createOrUpdatevehicle()">
 
 <div class="flex flex-col justify-center gap-3">
 
 
         <InputText
-           placeholder="Name"
+           placeholder="Plate No."
 
-           v-model="form.name"
+           v-model="form.plate"
         />
         <InputText
-           disabled="true"
-           placeholder="email"
-           v-model="form.email"
+           placeholder="Fleet No."
+           v-model="form.fleet_no"
+
+        />
+        <InputText
+           placeholder="Make"
+
+           v-model="form.make"
+        />
+
+         <InputText
+           placeholder="Tare Weight (KG)"
+           v-model="form.tare_weight"
+
+        />
+         <InputText
+           placeholder="Load Capacity (KG)"
+           v-model="form.load_capacity"
 
         />
 
-        <!-- <Password v-model="form.Password" :feedback="true" /> -->
-
-        <MultiSelect
-         v-model="form.roles"
-         :options="roles.data"
-         optionValue="name"
-         optionLabel="name"
-         placeholder="Role"
-         filter
+         <InputText
+           placeholder="Fuel Capacity (L)"
+           v-model="form.fuel_capacity"
 
         />
+        <div class="items-center w-full space-x-3 text-center">
+             <span>Active?</span>
+       <input type="checkbox"     v-model="form.status"    />
+        </div>
+
+
+
 
         <Button
           severity="info"
@@ -271,8 +309,6 @@ const showUpdateModal=(user)=>{
           :disabled="form.processing"
 
         />
-
-
         <Button label="Cancel" severity="warning" icon="pi pi-cancel" @click="showModal=false"/>
 </div>
 
