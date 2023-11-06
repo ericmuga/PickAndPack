@@ -9,7 +9,7 @@ import {watch, ref,onMounted} from 'vue';
 import Pagination from '@/Components/Pagination.vue';
 import { useForm } from '@inertiajs/inertia-vue3'
 import Modal from '@/Components/Modal.vue'
-
+import ProgressBar from 'primevue/progressbar';
 
 const search=ref()
 watch(search, debounce(()=>{Inertia.post('/order/all',{search:search.value}, {preserveScroll: true})}, 500));
@@ -37,7 +37,7 @@ debounce( ()=>{Inertia.get(route('packing.index'),{'search':newItem.value})})
 
 const form= useForm({
      'vehicle_id':'',
-     'assistant_loader_id':'',
+     'loader_id':'',
      'driver_id':'',
     //  'load_array':[],
 
@@ -49,13 +49,25 @@ const form= useForm({
 
 const createOrUpdateItem=()=>{
     if (mode.state=='Create')
-          form.post(route('loadingSession.store'))
+          form.post(route('loadingSession.store'),
+                    { preserveScroll: true,
+                      onSuccess: () =>{ form.reset()
+                                      Swal.fire(`Session ${mode.state}d Successfully!`,'','success');
+                                    }
+                    }
+                   )
         else
-     form.patch(route('loadingSession.update',form.id))
+     form.patch(route('loadingSession.update',form.name),
+                { preserveScroll: true,
+                      onSuccess: () =>{ form.reset()
+                                      Swal.fire(`Session ${mode.state}d Successfully!`,'','success');
+                                    }
+                    })
       showModal.value=false;
-    Swal.fire(`Load ${mode.state}ed Successfully!`,'','success');
+
 
 }
+
 
 
 let mode= { state: 'Create' };
@@ -158,26 +170,27 @@ const showUpdateModal=(session)=>{
                                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
                                                     <tr class="bg-slate-300">
-                                                        <!-- <th scope="col" class="px-6 py-3">
+                                                        <!-- <th scope="col" class="px-2 py-1">
                                                             Barcode
                                                         </th> -->
-                                                        <th scope="col" class="px-6 py-3">
+                                                        <th scope="col" class="px-2 py-1">
                                                            Session Id
                                                         </th>
-                                                        <th scope="col" class="px-6 py-3 text-center">
-                                                            Loader
+                                                        <th scope="col" class="px-2 py-1 text-center">
+                                                            Loading Date
                                                         </th>
-                                                        <th scope="col" class="px-6 py-3">
+                                                        <!--
+                                                        <th scope="col" class="px-2 py-1">
                                                             Assistant Loader
-                                                        </th>
-                                                        <th scope="col" class="px-6 py-3">
+                                                        </th>-->
+                                                        <th scope="col" class="px-2 py-1">
                                                             Vehicle
                                                         </th>
 
-                                                         <th scope="col" class="px-6 py-3">
+                                                         <th scope="col" class="px-2 py-1">
                                                             Driver
                                                         </th>
-                                                        <th scope="col" class="px-6 py-3">
+                                                        <th scope="col" class="px-2 py-1">
                                                            Actions
                                                         </th>
 
@@ -193,18 +206,18 @@ const showUpdateModal=(session)=>{
                                                         {{ session.id }}
                                                     </td>
 
-                                                    <td class="px-3 py-2 text-xs font-bold text-center ">
-                                                        {{ session.loader }}
+                                                     <td class="px-3 py-2 text-xs font-bold text-center ">
+                                                        {{ session.loading_date }}
                                                     </td>
-                                                     <td class="px-3 py-2 text-xs font-bold">
+                                                   <!--  <td class="px-3 py-2 text-xs font-bold">
                                                         {{ session.assistant_loader }}
                                                     </td>
-
+-
                                                     <td class="px-3 py-2 text-xs">
 
                                                             {{session.prepacks.length}}
 
-                                                    </td>
+                                                    </td> -->
                                                      <td class="px-3 py-2 text-xs">
 
                                                             {{ session.vehicle }}
@@ -214,6 +227,17 @@ const showUpdateModal=(session)=>{
                                                      <td class="px-3 py-2 text-xs">
 
                                                             {{session.driver}}
+
+                                                    </td>
+                                                    <td class="px-3 py-2 text-xs text-center">
+
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                                                            </svg>
+                                                             <div class="card">
+                                                                <ProgressBar :value="50"></ProgressBar>
+                                                            </div>
+
 
                                                     </td>
                                                     <td>

@@ -81,4 +81,9 @@ class User extends Authenticatable
       return $this->belongsToMany(Role::class);
     }
 
+    public function packing_checks()
+    {
+        return $this->hasMany(PackingSession::class,'checker_id','id');
+    }
+
 }

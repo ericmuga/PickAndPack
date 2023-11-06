@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Resources\{PackingOrderResource,LineResource};
+use App\Http\Resources\{PackingOrderResource,LineResource, UserResource};
 use Carbon\Carbon;
 use App\Helpers\ColumnListing;
-use App\Models\{Line,Order, Packing,PackingSession};
+use App\Models\{Line,Order, Packing,PackingSession, User};
 use Illuminate\Support\Facades\DB;
 use App\Services\MyServices;
 use Mpdf\Mpdf;
@@ -44,6 +44,7 @@ class PackingController extends Controller
     public function packOrder(Request $request)
     {
         // Get the items that belong to the order and part for packing
+       $checkers_list=User::role('checker')->select('name','id')->orderBy('name')->get();
 
 
         $orderLines = Line::query()
@@ -60,6 +61,7 @@ class PackingController extends Controller
         return inertia('Packing/PartPackLines', [
             'orderLines' => LineResource::collection($orderLines),
             'previousInput' => $request->all(),
+            'checkers_list'=>$checkers_list
         ]);
     }
 
@@ -78,6 +80,7 @@ class PackingController extends Controller
                                        ],
                                         [
                                           'packing_time'=>$request->packing_time,
+                                          'checker_id'=>$request->checker_id,
 
                                         ]
 

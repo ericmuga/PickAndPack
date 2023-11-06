@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class LoadingSessionResource extends JsonResource
@@ -18,11 +19,14 @@ class LoadingSessionResource extends JsonResource
 
             'driver_id'=>$this->driver_id,
             'vehicle_id'=>$this->vehicle_id,
-            'assistant_loader_id'=>$this->assistant_loader_id,
             'loader_id'=>$this->loader_id,
-            'driver'=>$this->driver->name,
+            // 'loader'=>$this->loader()->name,
+            'driver'=>$this->driver?->name,
             'vehicle'=>$this->vehicle->plate,
-            'loader'=>$this->loader->name,
+            'loader'=>$this->loader?->name,
+            'prepacks'=>0,
+            'id'=>$this->id,
+            'loading_date'=>Carbon::parse($this->created_at)->toDateString(),
         ];
 
     }

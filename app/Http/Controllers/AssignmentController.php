@@ -127,7 +127,14 @@ return inertia('Assignment/Create',compact('orders' ,'spcodes','assemblers','dat
     */
     public function show($id)
     {
-        //
+
+       //show the contents of the assignment
+       $assignment=AssignmentResource::make(Assignment::find($id));
+
+       return response()->json(['data'=>$assignment]);
+
+
+
     }
 
     /**

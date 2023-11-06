@@ -31,6 +31,10 @@ class PackingSession extends Model
               ->where('system_entry',$system);
     }
 
+    public function checker()
+    {
+        return $this->belongsTo(User::class,'checker_id','id');
+    }
 
 
 }

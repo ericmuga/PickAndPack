@@ -56,6 +56,19 @@ class Assignment extends Model
 
    }
 
+   public function productLineWeight()
+   {
+
+     //returns the product lines in the assignment
+     return DB::table('assignments as a')
+              ->join('assignment_lines  as b','b.assignment_id','a.id')
+              ->join('lines as c', fn($join)=>$join->on('c.order_no','b.order_no')->on('c.part','b.part'))
+              ->where('a.id',$this->id)
+              ->sum('c.qty_base');
+
+
+   }
+
 
    public function totalTime()
    {

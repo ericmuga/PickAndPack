@@ -37,10 +37,11 @@ const inputField=ref(null);
 const scanItem=ref(null);
 const pdfDataUrl = ref('');
 
+let checker_id=ref('');
+
 const props= defineProps({
                             orderLines:Object,
-
-
+                            checkers_list:Object,
                         });
 
 const assembledArray=ref([]);
@@ -95,7 +96,7 @@ const generatePDF = (from=1,to=1) =>
             doc.text(props.orderLines.data[0].order.shp_name, center(props.orderLines.data[0].order.shp_name), 1);
 
             doc.text(props.orderLines.data[0].order.order_no, center(props.orderLines.data[0].order.order_no), 1+lineHeight);
-            doc.text(props.orderLines.data[0].part, center(props.orderLines.data[0].part), 1+2*lineHeight);
+            doc.text('Part-'+props.orderLines.data[0].part, center(props.orderLines.data[0].part), 1+2*lineHeight);
 
             if (props.orderLines.data[0].order.sp_search_name.length<=12)
 
@@ -132,6 +133,7 @@ onMounted(() => {
         if (!assembledArray.value.length==0 && isRunning.value==true)
            Inertia.post(route('packing.store'),{'data':assembledArray.value,
                                                     'autosave':true,
+                                                    'checker_id':checker_id,
                                                     'packing_time':formatTime.value,
 
                                                 },{preserveScroll:true,preserveState:true}
@@ -489,6 +491,7 @@ const closeAssembly=()=>{
                           // console.log(formatTime);
                             Inertia.post(route('packing.store'),{'data':assembledArray.value,
                                                                  'packing_time':formatTime.value,
+                                                                 'checker_id':checker_id,
                                                                  'autosave':false,
                                                                 }
                                          );
@@ -591,6 +594,8 @@ onUnmounted(() => {
                                 </template>
 
                                 <template #end>
+                                    <!-- {{ dc }} -->
+
 
 
 
@@ -750,14 +755,32 @@ onUnmounted(() => {
                                                 <template #center>
 
                                                      <!-- <generate-pdf :data="assembledArray"></generate-pdf> -->
+                                                     <div class="flex flex-col items-center space-y-2 text-center">
 
+
+                                                       <div class="space-x-3">
+                                        Checker:
+                                        <Dropdown
+                                            :options="checkers_list"
+                                            optionValue="id"
+                                            optionLabel="name"
+                                             v-model="checker_id"
+                                            filter
+                                        />
+
+                                    </div>
+
+                                                  <div>
                                                     <Button
                                                     class="justify-end"
                                                     severity="warning"
                                                    label="End Packing"
+                                                   :disabled="checker_id==''"
                                                    @click="closeAssembly()"
 
                                               />
+
+                                                  </div></div>
                                                 </template>
                                             </Toolbar>
                                         </div>
@@ -878,6 +901,7 @@ onUnmounted(() => {
                 label="Close Carton"
                 severity="warning"
               />
+
             <Button  label="Pack"
              v-show="((parseInt(form.from_vessel)>0)&&(form.from_batch!='')&&(form.vessel!=null))||form.empty"
             icon="pi pi-send" class="w-md" severity="success"  type="submit" :disabled="form.processing" />

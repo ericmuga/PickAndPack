@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\LoadingResource;
+use App\Http\Resources\LoadingSessionResource;
 use App\Models\{LoadingSession,User, Vehicle};
 use Illuminate\Http\Request;
 
@@ -24,7 +24,7 @@ class LoadingSessionController extends Controller
 
 
        $rows=$request->rows?:10;
-       $sessions= LoadingResource::collection(LoadingSession::with('lines')->paginate($rows));
+       $sessions= LoadingSessionResource::collection(LoadingSession::with('lines')->paginate($rows));
 
        return inertia('Loading/List',compact('sessions','drivers','vehicles','loaders'));
 
@@ -55,8 +55,10 @@ class LoadingSessionController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
-        LoadingSession::create($request->all());
+        // dd($request->all());/
+        $details=array_merge(['user_id'=>$request->user()->id],$request->all());
+        // dd($details);
+        LoadingSession::create($details);
         return redirect('loadingSession.index');
     }
 

@@ -4,13 +4,15 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, useForm,Link} from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
-import { onMounted } from 'vue';
+import { onMounted,ref } from 'vue';
 import AssignmentCard from "@/Components/AssignmentCard.vue";
 import Swal from 'sweetalert2'
 import Modal from '@/Components/Modal.vue'
 import Pagination from '@/Components/Pagination.vue'
 import { stringify } from 'postcss';
 import { Inertia } from '@inertiajs/inertia';
+import axios from 'axios';
+
 
 
     const props = defineProps({
@@ -25,12 +27,33 @@ import { Inertia } from '@inertiajs/inertia';
         date:props.dateParam
     })
 
-    // onMounted(() => {
-    //  setInterval(() => {
-    //     Inertia.get(route('assignment.index'),{'assemblers':form.assemblers,'date':form.date},{preserveScroll:true,preserveState:true})
-    //  }, 60000);
+    let content=ref('');
 
-    // });
+    const showContents = (id) => {
+
+                        axios.get(route('assignment.show',id))
+                            .then((response)=>{
+                                            Swal.fire({
+                                                    title: 'Contents',
+                                                    html: `
+                                                        <div id="pdf-modal">
+                                                           <p> Weight: ${response.data.data.lines_weight} </p>
+                                                           <p> Orders: ${response.data.data.orders_count} </p>
+                                                           <p> Items: ${response.data.data.lines_count} </p>
+                                                           <p> Assembly Time: ${response.data.data.total_time} </p>
+                                                           <p> Assembly Time: ${response.data.data.total_time} </p>
+                                                        </div>`,
+                                                    showConfirmButton: false,
+                                                    });
+                                                    // console.log(response.data);
+                                        })
+                                .catch((error) => {
+                                    console.log(response)
+                                // Swal.fire('Error', response.data.message, 'error');
+                                    });
+
+                };
+
 
 
 </script>
@@ -127,7 +150,7 @@ import { Inertia } from '@inertiajs/inertia';
        <div v-if="assignments.data.length==0" class="p-5 text-center text-teal-500" > No assignments were found</div>
 
        <div v-for="assignment in assignments.data" :key="assignment.id">
-          <AssignmentCard :assignment="assignment"  />
+          <AssignmentCard :assignment="assignment" @click="showContents(assignment.id)" />
        </div>
 
 </div>
