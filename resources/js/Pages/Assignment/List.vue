@@ -37,7 +37,7 @@ import axios from 'axios';
                                                     title: 'Contents',
                                                     html: `
                                                         <div id="pdf-modal">
-                                                           <p> Weight: ${response.data.data.lines_weight} </p>
+                                                           <p> Weight: ${response.data.data.lines_weight} Kg </p>
                                                            <p> Orders: ${response.data.data.orders_count} </p>
                                                            <p> Items: ${response.data.data.lines_count} </p>
                                                            <p> Assembly Time: ${response.data.data.total_time} </p>
