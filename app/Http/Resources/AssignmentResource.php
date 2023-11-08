@@ -28,7 +28,8 @@ class AssignmentResource extends JsonResource
                 'lines_weight'=>round($this->productLineWeight(),2),
                 'orders_count'=>$this->orderCount(),
                 'percentage'=>$this->percentage(),
-                'total_time'=>$this->totalTime()
+                'total_time'=>$this->totalTime(),
+                'lines'=>$this->whenLoaded('lines')
 
                ];
     }

@@ -129,9 +129,9 @@ return inertia('Assignment/Create',compact('orders' ,'spcodes','assemblers','dat
     {
 
        //show the contents of the assignment
-       $assignment=AssignmentResource::make(Assignment::find($id));
+       $assignment=AssignmentResource::make(Assignment::find($id)->load('lines','lines.order'));
 
-       return response()->json(['data'=>$assignment]);
+       return response()->json($assignment);
 
 
 

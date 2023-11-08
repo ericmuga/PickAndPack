@@ -33,22 +33,32 @@ import axios from 'axios';
 
                         axios.get(route('assignment.show',id))
                             .then((response)=>{
+
+                                    let orders='';
+                                    console.log(response.data.lines)
+                                    for (let index = 0; index < response.data.lines.length; index++) {
+                                        orders+='<p>'+response.data.lines[index].order_no+'-'+response.data.lines[index].part+'-'+response.data.lines[index].order.shp_name+'</p>';
+
+                                    }
                                             Swal.fire({
                                                     title: 'Contents',
                                                     html: `
                                                         <div id="pdf-modal">
-                                                           <p> Weight: ${response.data.data.lines_weight} Kg </p>
-                                                           <p> Orders: ${response.data.data.orders_count} </p>
-                                                           <p> Items: ${response.data.data.lines_count} </p>
-                                                           <p> Assembly Time: ${response.data.data.total_time} </p>
-                                                           <p> Assembly Time: ${response.data.data.total_time} </p>
+                                                           <p> Weight: ${response.data.lines_weight} Kg </p>
+
+                                                           <p> Orders: ${response.data.orders_count} </p>
+                                                               ${orders}
+
+                                                           <p> Items: ${response.data.lines_count} </p>
+                                                           <p> Assembly Time: ${response.data.total_time} </p>
+                                                           <p> Assembly Time: ${response.data.total_time} </p>
                                                         </div>`,
                                                     showConfirmButton: false,
                                                     });
                                                     // console.log(response.data);
                                         })
                                 .catch((error) => {
-                                    console.log(response)
+                                    // console.log(response)
                                 // Swal.fire('Error', response.data.message, 'error');
                                     });
 
