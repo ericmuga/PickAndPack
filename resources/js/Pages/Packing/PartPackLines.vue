@@ -137,7 +137,7 @@ const generatePDF = (from=1,to=1) =>
 
              doc.setFontSize(12);
             else
-             doc.setFontSize(6);
+             doc.setFontSize(10);
 
              doc.setFont("helvetica", "bold");
             doc.text(props.orderLines.data[0].order.shp_name, center(props.orderLines.data[0].order.shp_name), 1);
@@ -158,7 +158,7 @@ const generatePDF = (from=1,to=1) =>
             doc.addImage(qrCodeDataUrl, 'JPEG', 1.5, 4, 2, 2);
             doc.setFontSize(12);
             doc.setFont("helvetica", "bold");
-            doc.text(props.orderLines.data[0].order.sp_search_name, center(props.orderLines.data[0].order.sp_search_name),1+ 6*lineHeight);
+            doc.text(props.orderLines.data[0].order.sp_search_name, center(props.orderLines.data[0].order.sp_search_name),1+ 7.5*lineHeight);
             // const pageContent = ;
   }
 
