@@ -35,32 +35,32 @@ import axios from 'axios';
                             .then((response)=>{
 
                                     let orders='';
-                                    console.log(response.data.lines)
+                                    // console.log(response.data)
                                     for (let index = 0; index < response.data.lines.length; index++) {
-                                        orders+='<p>'+response.data.lines[index].order_no+'-'+response.data.lines[index].part+'-'+response.data.lines[index].order.shp_name+'</p>';
+                                        orders+='<tr><td class="p-2 text-left">'+response.data.lines[index].order_no+'</td><td class="p-2 text-center">'+response.data.lines[index].part+'</td><td class="p-2 text-left">'+response.data.lines[index].order.shp_name+'</td></tr>';
 
                                     }
                                             Swal.fire({
                                                     title: 'Contents',
                                                     html: `
-                                                        <div id="pdf-modal">
-                                                           <p> Weight: ${response.data.lines_weight} Kg </p>
+                                                        <div id="pdf-modal" class="p-4 bg-orange-100 rounded-lg">
+                                                           <p class="font-bold text-center text-black bg-slate-300"> Weight: ${response.data.lines_weight} Kg </p>
+                                                           <p class="font-bold text-center text-black bg-slate-300"> Items: ${response.data.lines_count} </p>
+                                                           <p class="font-bold text-center text-black bg-slate-300"> Orders: ${response.data.orders_count} </p>
+                                                             <table class="p-1 text-sm font-semibold " >  ${orders}</table>
 
-                                                           <p> Orders: ${response.data.orders_count} </p>
-                                                               ${orders}
 
-                                                           <p> Items: ${response.data.lines_count} </p>
-                                                           <p> Assembly Time: ${response.data.total_time} </p>
+                                                           <p> Assigned ${response.data.time} </p>
                                                            <p> Assembly Time: ${response.data.total_time} </p>
                                                         </div>`,
                                                     showConfirmButton: false,
                                                     });
                                                     // console.log(response.data);
                                         })
-                                .catch((error) => {
-                                    // console.log(response)
+                                // .catch(response) => {
+                                //     // console.log(response)
                                 // Swal.fire('Error', response.data.message, 'error');
-                                    });
+                                //     });
 
                 };
 
@@ -160,7 +160,7 @@ import axios from 'axios';
        <div v-if="assignments.data.length==0" class="p-5 text-center text-teal-500" > No assignments were found</div>
 
        <div v-for="assignment in assignments.data" :key="assignment.id">
-          <AssignmentCard :assignment="assignment" @click="showContents(assignment.id)" />
+          <AssignmentCard :assignment="assignment" @click="showContents(assignment.id)" class="shadow-md hover:shadow-lg hover:cursor-pointer hover:shadow-orange-400" />
        </div>
 
 </div>

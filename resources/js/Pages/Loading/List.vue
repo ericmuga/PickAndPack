@@ -10,6 +10,7 @@ import Pagination from '@/Components/Pagination.vue';
 import { useForm } from '@inertiajs/inertia-vue3'
 import Modal from '@/Components/Modal.vue'
 import ProgressBar from 'primevue/progressbar';
+import { Link } from '@inertiajs/inertia-vue3';
 
 const search=ref()
 watch(search, debounce(()=>{Inertia.post('/order/all',{search:search.value}, {preserveScroll: true})}, 500));
@@ -19,12 +20,17 @@ const prop=defineProps({
     drivers:Object,
     vehicles:Object,
     loaders:Object,
+    spcodes:Object,
 })
     const inputField=ref(null);
 
     onMounted(() => {
     inputField.value.focus();
 });
+
+const filteredView=(id)=>{
+Inertia.get(route('loadSession')+'?id='+id)
+}
 
 //   let showModal=ref(false);
 let newItem=ref('');
@@ -39,6 +45,7 @@ const form= useForm({
      'vehicle_id':'',
      'loader_id':'',
      'driver_id':'',
+     'sp_code':''
     //  'load_array':[],
 
 })
@@ -90,6 +97,7 @@ const showUpdateModal=(session)=>{
     form.vehicle=session.vehicle_id
     form.assistant_loader_id=session.assistant_loader_id
     form.driver_id=session.driver_id
+    form.sp_code=session.sp_code
 
     showModal.value=true
 }
@@ -230,13 +238,17 @@ const showUpdateModal=(session)=>{
 
                                                     </td>
                                                     <td class="px-3 py-2 text-xs text-center">
+                                                        <Button
+                                                    @click="filteredView(session.id)"
 
+                                                        >
                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
                                                             </svg>
-                                                             <div class="card">
+                                                             <!-- <div class="card">
                                                                 <ProgressBar :value="50"></ProgressBar>
-                                                            </div>
+                                                            </div> -->
+                                                        </Button>
 
 
                                                     </td>
@@ -308,6 +320,14 @@ const showUpdateModal=(session)=>{
           v-model="form.assistant_loader_id"
           optionLabel="name"
           placeholder="Assistant Loader"
+          filter
+        />
+        <Dropdown
+          :options="spcodes"
+          optionValue="code"
+          v-model="form.sp_code"
+          optionLabel="name"
+          placeholder="Route"
           filter
         />
 

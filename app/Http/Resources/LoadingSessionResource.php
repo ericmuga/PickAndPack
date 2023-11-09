@@ -21,6 +21,7 @@ class LoadingSessionResource extends JsonResource
             'vehicle_id'=>$this->vehicle_id,
             'loader_id'=>$this->loader_id,
             // 'loader'=>$this->loader()->name,
+            'sp'=>$this->whenLoaded('SalesPerson'),
             'driver'=>$this->driver?->name,
             'vehicle'=>$this->vehicle->plate,
             'loader'=>$this->loader?->name,

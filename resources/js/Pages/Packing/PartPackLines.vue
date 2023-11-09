@@ -14,9 +14,14 @@ import ProgressBar from 'primevue/progressbar';
 import { useSearchArray } from '@/Composables/useSearchArray';
 import jsPDF from 'jspdf';
   import QRCode from 'qrcode-generator';
+  import axios from 'axios';
 
 const openModal = () => {
   if (pdfDataUrl.value) {
+
+
+
+
     Swal.fire({
       title: 'Packing Label',
       html: `
@@ -42,6 +47,7 @@ let checker_id=ref('');
 const props= defineProps({
                             orderLines:Object,
                             checkers_list:Object,
+                            user:Object,
                         });
 
 const assembledArray=ref([]);
@@ -56,6 +62,21 @@ const generatePDF = (from=1,to=1) =>
                             format: [5, 7.5]
                             });
     // doc.setMargins(0.5, 0.5, 0.5, 0.5);
+   //save the carton numbers for swiping later
+/**
+ *
+ *  $table->id();
+            $table->string('vessel_type');
+            $table->string('vessel_no');
+            $table->string('order_no');
+            $table->string('part');
+            $table->foreignIdFor(User::class);
+            $table->unsignedBigInteger('packed_by')->references('id')->on('users')->nullable();
+            $table->unsignedBigInteger('loaded_by')->references('id')->on('users')->nullable();
+            $table->dateTime('loading_time')->nullable();
+            $table->timestamps();
+ */
+
 
     const center=(text)=>{
         const textWidth = doc.getStringUnitWidth(text) * doc.internal.getFontSize() / doc.internal.scaleFactor;
@@ -66,7 +87,7 @@ const generatePDF = (from=1,to=1) =>
     let v=1;
     const allPagesContent = [];
     let fontSizeFactor=1;
-
+   let globalVesselNo=ref('');
 
     for (let pageNum = from; pageNum <= to; pageNum++)
     {
@@ -75,9 +96,35 @@ const generatePDF = (from=1,to=1) =>
                 v++;
                 doc.addPage();
             }
+        //    alert(form.vessel);
+        // console.log(form.vessel);
+
+            axios.post(route('vessels.store'),{
+                'order_no':props.orderLines.data[0].order.order_no,
+                'part':props.orderLines.data[0].part,
+                'vessel_type':form.vessel,
+                'vessel_no':pageNum,
+                // 'user_id':props.user.data.id,
+            })
+            .then((response)=>{
+                //console.log(response.data);
+                  globalVesselNo.value=response.data.id;
+
+
+
+
+            })
+            .catch((response)=>{
+                Swal.fire('Error', response.data.message, 'error')
+                // console.log(response)
+        });
+
+
+
+
 
             const qrCodeText=route('load')+'?order_no='+encodeURIComponent(props.orderLines.data[0].order.order_no)+'?part='+props.orderLines.data[0].part+'?vessel_no='+pageNum;
-            console.log(qrCodeText);
+            // console.log(qrCodeText);
             const lineHeight = 0.5;
             const qrCode = new QRCode(0, 'H');
             qrCode.addData(qrCodeText);
@@ -103,13 +150,17 @@ const generatePDF = (from=1,to=1) =>
 
              doc.setFontSize(10);
             else
-             doc.setFontSize(8);
-              doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.setFont("helvetica", "normal");
             doc.text(props.orderLines.data[0].order.sp_search_name, center(props.orderLines.data[0].order.sp_search_name),1+ 3*lineHeight);
             doc.text(form.vessel+'-'+pageNum, center(form.vessel+'-'+pageNum),1+ 4*lineHeight);
+            doc.text('Packer : '+props.user.data.user_name,center('Packer : '+props.user.data.user_name),1+ 5*lineHeight);
+            doc.text('Serial No. : '+ globalVesselNo.value,center('Serial No. : '+ globalVesselNo.value),1+ 6*lineHeight);
             doc.addImage(qrCodeDataUrl, 'JPEG', 1.5, 5, 2, 2);
             // const pageContent = ;
-  }          allPagesContent.push(doc.output('datauristring'));
+  }
+
+    allPagesContent.push(doc.output('datauristring'));
     pdfDataUrl.value = allPagesContent;
     //doc.save('label.pdf')
     openModal();

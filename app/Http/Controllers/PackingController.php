@@ -23,7 +23,7 @@ class PackingController extends Controller
                                                 ->when($request->has('search'),fn($q)=>
                                                         $q->where('order_no','like','%'.$request->search)
                                                         )
-                                                // ->whereHas('assembly_sessions',fn($q)=>$q->where('system_entry',false))
+                                                ->whereHas('assembly_sessions',fn($q)=>$q->where('system_entry',false))
                                                 ->shipcurrent()
                                                 ->orderByDesc('ending_date')
                                                 ->orderByDesc('ending_time')
@@ -61,7 +61,8 @@ class PackingController extends Controller
         return inertia('Packing/PartPackLines', [
             'orderLines' => LineResource::collection($orderLines),
             'previousInput' => $request->all(),
-            'checkers_list'=>$checkers_list
+            'checkers_list'=>$checkers_list,
+            'user'=>UserResource::make($request->user()),
         ]);
     }
 

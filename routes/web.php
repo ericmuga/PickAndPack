@@ -19,6 +19,7 @@ use App\Http\Controllers\{ConfirmationController,
     RoleController,
     UserController,
   VehicleController,
+    VesselController,
 };
 use Illuminate\Foundation\Application;
 use Mpdf\Mpdf;
@@ -69,15 +70,17 @@ Route::middleware('auth')->group(function () {
 
 ////////////////////////////////Loading Routes ///////////////////////////////////////////////////
       Route::resource('loadingSession',LoadingSessionController::class);
+      Route::get('/loadSession',[LoadingSessionController::class,'loadSession'])->name('loadSession');
 
       Route::resource('users', UserController::class);
       Route::get('userDownload',[UserController::class,'download'])->name('users.download');
 
-      Route::get('load', [LoadingSessionController::class,'load'
-      ])->name('load');
+      Route::get('load/{id}', [LoadingSessionController::class,'load'])->name('load');
 
       Route::resource('vehicles',VehicleController::class);
       Route::get('vehicleDownload',[VehicleController::class,'download'])->name('vehicles.download');
+      Route::resource('vessels',VesselController::class);
+      Route::get('vesselDownload',[VesselController::class,'download'])->name('vessels.download');
 ///////////////////////////end of loading routes//////////////////////////////
 
 

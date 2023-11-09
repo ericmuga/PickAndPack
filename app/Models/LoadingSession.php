@@ -37,4 +37,14 @@ class LoadingSession extends Model
     return $this->hasMany(LoadingLine::class);
    }
 
+
+   public function vessels()
+   {
+    return $this->hasMany(Vessel::class);
+   }
+
+   public function SalesPerson()
+   {
+    return $this->belongsTo(LoadingSession::class,'Code','sp_code');
+   }
 }

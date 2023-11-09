@@ -77,15 +77,15 @@ onMounted(() => {
 };
 
 
-    setInterval(() => {
-        if (!assembledArray.value.length==0 && isRunning.value==true)
-           Inertia.post(route('assembly.store'),{'data':assembledArray.value,
-                                                    'autosave':true,
-                                                    'assembly_time':formatTime.value
-                                                },{preserveScroll:true,preserveState:true}
-                                                )
+//     setInterval(() => {
+//         if (!assembledArray.value.length==0 && isRunning.value==true)
+//            Inertia.post(route('assembly.store'),{'data':assembledArray.value,
+//                                                     'autosave':true,
+//                                                     'assembly_time':formatTime.value
+//                                                 },{preserveScroll:true,preserveState:true}
+//                                                 )
 
-}, 60000);
+// }, 60000);
 
 });
 
@@ -639,8 +639,8 @@ onUnmounted(() => {
 
             <span>PCS </span>
 
-           <InputText
-
+           <InputNumber
+                 inputId="integeronly"
              v-model="form.assembled_pcs"
            /></div>
 
@@ -650,7 +650,8 @@ onUnmounted(() => {
             class="flex items-center space-x-2"
             >
            <span>Weight</span>
-           <InputText
+           <InputNumber
+            inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="5"
              v-model="form.assembled_qty"
            />
 </div>

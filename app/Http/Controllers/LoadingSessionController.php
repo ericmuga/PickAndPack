@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\LoadingSessionResource;
-use App\Models\{LoadingSession,User, Vehicle};
+use App\Http\Resources\VesselResource;
+use App\Models\{LoadingSession,User, Vehicle, Vessel};
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
 class LoadingSessionController extends Controller
 {
     /**
@@ -24,9 +25,10 @@ class LoadingSessionController extends Controller
 
 
        $rows=$request->rows?:10;
-       $sessions= LoadingSessionResource::collection(LoadingSession::with('lines')->paginate($rows));
+        $spcodes=DB::table('sales_people')->select('name','code')->get();
+       $sessions= LoadingSessionResource::collection(LoadingSession::with('lines','SalesPerson')->paginate($rows));
 
-       return inertia('Loading/List',compact('sessions','drivers','vehicles','loaders'));
+       return inertia('Loading/List',compact('sessions','drivers','vehicles','loaders','spcodes'));
 
 
 
@@ -37,14 +39,33 @@ class LoadingSessionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+
+
+    public function loadSession(Request $request)
     {
-        //
+        //show list of all vessels that have not been loaded
+        // dd('here');
+        $session=LoadingSession::find($request->id);
+        //filter orders based on the session route
+
+          $query= Vessel:://whereHas('order',fn($q)=>$q->where('sp_code',$session->sp_code))
+                    //    ->doesntHave('loadingSession')
+                       get();
+
+        // $vessels=VesselResource::collection(Vessel::whereDoesntHave('loadingSession')->get());
+        $vessels=VesselResource::collection($query);
+
+        // dd($vessels);
+
+        return inertia('Loading/Create',compact('vessels'));
+
     }
 
-    public function load(Request $request)
+    public function load($id)
     {
-      dd($request->all());
+       // this will link vessels to a loading session
+     dd(LoadingSession::find($id));
+
     }
 
     /**
@@ -59,7 +80,7 @@ class LoadingSessionController extends Controller
         $details=array_merge(['user_id'=>$request->user()->id],$request->all());
         // dd($details);
         LoadingSession::create($details);
-        return redirect('loadingSession.index');
+        return redirect(route('loadingSession.index'));
     }
 
     /**
