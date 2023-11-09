@@ -125,7 +125,7 @@ const generatePDF = (from=1,to=1) =>
 
             const qrCodeText=route('loadVessel')+'?order_no='+encodeURIComponent(props.orderLines.data[0].order.order_no)+'?part='+props.orderLines.data[0].part+'?vessel_no='+pageNum;
             // console.log(qrCodeText);
-            const lineHeight = 1;
+            const lineHeight = 0.75;
             const qrCode = new QRCode(0, 'H');
             qrCode.addData(qrCodeText);
             qrCode.make();
