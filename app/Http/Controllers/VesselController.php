@@ -35,7 +35,7 @@ class VesselController extends Controller
      */
     public function store(Request $request)
     {
-
+      dd($request->all());
 
 
         $vessel=Vessel::updateOrCreate([
