@@ -125,7 +125,7 @@ const generatePDF = (from=1,to=1) =>
 
             const qrCodeText=route('loadVessel')+'?order_no='+encodeURIComponent(props.orderLines.data[0].order.order_no)+'?part='+props.orderLines.data[0].part+'?vessel_no='+pageNum;
             // console.log(qrCodeText);
-            const lineHeight = 0.5;
+            const lineHeight = 1;
             const qrCode = new QRCode(0, 'H');
             qrCode.addData(qrCodeText);
             qrCode.make();
@@ -135,7 +135,7 @@ const generatePDF = (from=1,to=1) =>
             if (props.orderLines.data[0].order.shp_name.length<=12)
 
 
-             doc.setFontSize(10);
+             doc.setFontSize(12);
             else
              doc.setFontSize(6);
 
@@ -148,15 +148,17 @@ const generatePDF = (from=1,to=1) =>
             if (props.orderLines.data[0].order.sp_search_name.length<=12)
 
 
-             doc.setFontSize(10);
+             doc.setFontSize(12);
             else
             doc.setFontSize(8);
             doc.setFont("helvetica", "normal");
-            doc.text(props.orderLines.data[0].order.sp_search_name, center(props.orderLines.data[0].order.sp_search_name),1+ 3*lineHeight);
             doc.text(form.vessel+'-'+pageNum, center(form.vessel+'-'+pageNum),1+ 4*lineHeight);
             doc.text('Packer : '+props.user.data.user_name,center('Packer : '+props.user.data.user_name),1+ 5*lineHeight);
             doc.text('Serial No. : '+ globalVesselNo.value,center('Serial No. : '+ globalVesselNo.value),1+ 6*lineHeight);
             doc.addImage(qrCodeDataUrl, 'JPEG', 1.5, 5, 2, 2);
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.text(props.orderLines.data[0].order.sp_search_name, center(props.orderLines.data[0].order.sp_search_name),1+ 3*lineHeight);
             // const pageContent = ;
   }
 
