@@ -150,15 +150,15 @@ const generatePDF = (from=1,to=1) =>
 
              doc.setFontSize(12);
             else
-            doc.setFontSize(8);
+            doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
-            doc.text(form.vessel+'-'+pageNum, center(form.vessel+'-'+pageNum),1+ 4*lineHeight);
-            doc.text('Packer : '+props.user.data.user_name,center('Packer : '+props.user.data.user_name),1+ 5*lineHeight);
-            doc.text('Serial No. : '+ globalVesselNo.value,center('Serial No. : '+ globalVesselNo.value),1+ 6*lineHeight);
+            doc.text(form.vessel+'-'+pageNum, center(form.vessel+'-'+pageNum),1+ 3*lineHeight);
+            doc.text('Packer : '+props.user.data.user_name,center('Packer : '+props.user.data.user_name),1+ 4*lineHeight);
+            doc.text('Serial No. : '+ globalVesselNo.value,center('Serial No. : '+ globalVesselNo.value),1+ 5*lineHeight);
             doc.addImage(qrCodeDataUrl, 'JPEG', 1.5, 5, 2, 2);
-            doc.setFontSize(14);
+            doc.setFontSize(12);
             doc.setFont("helvetica", "bold");
-            doc.text(props.orderLines.data[0].order.sp_search_name, center(props.orderLines.data[0].order.sp_search_name),1+ 3*lineHeight);
+            doc.text(props.orderLines.data[0].order.sp_search_name, center(props.orderLines.data[0].order.sp_search_name),1+ 6*lineHeight);
             // const pageContent = ;
   }
 
