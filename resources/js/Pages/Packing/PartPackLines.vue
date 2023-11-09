@@ -186,7 +186,7 @@ onMounted(() => {
         if (!assembledArray.value.length==0 && isRunning.value==true)
            Inertia.post(route('packing.store'),{'data':assembledArray.value,
                                                     'autosave':true,
-                                                    'checker_id':checker_id,
+                                                    'checker_id':checker_id.value,
                                                     'packing_time':formatTime.value,
 
                                                 },{preserveScroll:true,preserveState:true}
@@ -544,7 +544,7 @@ const closeAssembly=()=>{
                           // console.log(formatTime);
                             Inertia.post(route('packing.store'),{'data':assembledArray.value,
                                                                  'packing_time':formatTime.value,
-                                                                 'checker_id':checker_id,
+                                                                 'checker_id':checker_id.value,
                                                                  'autosave':false,
                                                                 }
                                          );
