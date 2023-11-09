@@ -6,6 +6,7 @@ import { Head, useForm} from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
 import { onMounted,ref } from 'vue';
 import Pagination from '@/Components/Pagination.vue'
+import SearchBox from '@/Components/SearchBox.vue'
 
 // import VesselCard from '@/Components/VesselCard.vue';
 
@@ -47,6 +48,7 @@ import Pagination from '@/Components/Pagination.vue'
                                 <template #center>
                                     <div>
                                         <!-- <Pagination :links="vessels.meta.links" /> -->
+                                        <SearchBox :model="route('loadingSession.index')"/>
                                     </div>
 
 
