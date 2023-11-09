@@ -53,9 +53,9 @@ class LoadingSessionController extends Controller
         $session=LoadingSession::find($request->id);
         //filter orders based on the session route
 
-          $query= Vessel:://whereHas('order',fn($q)=>$q->where('sp_code',$session->sp_code))
+          $query= Vessel::get();//hereHas('order',fn($q)=>$q->where('sp_code',$session->sp_code))
                     //    ->doesntHave('loadingSession')
-                        >get();
+                        // >get();
 
         // $vessels=VesselResource::collection(Vessel::whereDoesntHave('loadingSession')->get());
         $vessels=VesselResource::collection($query);
