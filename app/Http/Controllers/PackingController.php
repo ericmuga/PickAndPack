@@ -69,7 +69,7 @@ class PackingController extends Controller
     public function store(Request $request)
     {
 
-     dd($request->all());
+    //  dd($request->all());
 
        $session=PackingSession::updateOrCreate([
                                        'order_no'=>$request->data[0]['order_no'],
