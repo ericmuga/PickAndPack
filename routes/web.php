@@ -76,6 +76,7 @@ Route::middleware('auth')->group(function () {
       Route::get('userDownload',[UserController::class,'download'])->name('users.download');
 
       Route::get('load/{id}', [LoadingSessionController::class,'load'])->name('load');
+      Route::get('loadVessel', [LoadingSessionController::class,'loadVessel'])->name('loadVessel');
 
       Route::resource('vehicles',VehicleController::class);
       Route::get('vehicleDownload',[VehicleController::class,'download'])->name('vehicles.download');

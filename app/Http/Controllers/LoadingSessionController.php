@@ -34,6 +34,11 @@ class LoadingSessionController extends Controller
 
     }
 
+
+   public function loadVessel()
+   {
+    dd('here');
+   }
     /**
      * Show the form for creating a new resource.
      *
@@ -50,7 +55,7 @@ class LoadingSessionController extends Controller
 
           $query= Vessel:://whereHas('order',fn($q)=>$q->where('sp_code',$session->sp_code))
                     //    ->doesntHave('loadingSession')
-                       get();
+                        >get();
 
         // $vessels=VesselResource::collection(Vessel::whereDoesntHave('loadingSession')->get());
         $vessels=VesselResource::collection($query);
