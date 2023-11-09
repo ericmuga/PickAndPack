@@ -107,7 +107,7 @@ const generatePDF = (from=1,to=1) =>
                 // 'user_id':props.user.data.id,
             })
             .then((response)=>{
-                //console.log(response.data);
+                console.log(response.data);
                   globalVesselNo.value=response.data.id;
 
 
