@@ -71,12 +71,15 @@ Route::middleware('auth')->group(function () {
 ////////////////////////////////Loading Routes ///////////////////////////////////////////////////
       Route::resource('loadingSession',LoadingSessionController::class);
       Route::get('/loadSession',[LoadingSessionController::class,'loadSession'])->name('loadSession');
+      Route::get('load/{id}', [LoadingSessionController::class,'load'])->name('load');
+      Route::get('loadVessel', [LoadingSessionController::class,'loadVessel'])->name('loadVessel');
+      Route::post('load',[LoadingSessionController::class,'load'])->name('load.add');
+
 
       Route::resource('users', UserController::class);
       Route::get('userDownload',[UserController::class,'download'])->name('users.download');
 
-      Route::get('load/{id}', [LoadingSessionController::class,'load'])->name('load');
-      Route::get('loadVessel', [LoadingSessionController::class,'loadVessel'])->name('loadVessel');
+
 
       Route::resource('vehicles',VehicleController::class);
       Route::get('vehicleDownload',[VehicleController::class,'download'])->name('vehicles.download');

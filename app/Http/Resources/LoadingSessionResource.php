@@ -19,15 +19,19 @@ class LoadingSessionResource extends JsonResource
 
             'driver_id'=>$this->driver_id,
             'vehicle_id'=>$this->vehicle_id,
-            'loader_id'=>$this->loader_id,
+            'loader_id'=>$this->user_id,
             // 'loader'=>$this->loader()->name,
             'sp'=>$this->whenLoaded('SalesPerson'),
-            'driver'=>$this->driver?->name,
-            'vehicle'=>$this->vehicle->plate,
-            'loader'=>$this->loader?->name,
+            'shp_date'=>$this->shp_date,
+            'route'=>$this->SalesPerson()->first()->name,
+            'driver'=>$this->driver()->first()?->name,
+            'vehicle'=>$this->vehicle()->first()->plate,
+            'loader'=>\App\Models\User::find($this->user_id)->name,
             'prepacks'=>0,
             'id'=>$this->id,
+            'status'=>$this->status,
             'loading_date'=>Carbon::parse($this->created_at)->toDateString(),
+            'lines'=>$this->whenLoaded('lines')
         ];
 
     }

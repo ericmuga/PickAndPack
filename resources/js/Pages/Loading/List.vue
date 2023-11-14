@@ -9,8 +9,8 @@ import {watch, ref,onMounted} from 'vue';
 import Pagination from '@/Components/Pagination.vue';
 import { useForm } from '@inertiajs/inertia-vue3'
 import Modal from '@/Components/Modal.vue'
-import ProgressBar from 'primevue/progressbar';
-import { Link } from '@inertiajs/inertia-vue3';
+import Swal from 'sweetalert2'
+
 
 const search=ref()
 watch(search, debounce(()=>{Inertia.post('/order/all',{search:search.value}, {preserveScroll: true})}, 500));
@@ -29,6 +29,7 @@ const prop=defineProps({
 });
 
 const filteredView=(id)=>{
+
 Inertia.get(route('loadSession')+'?id='+id)
 }
 
@@ -45,8 +46,10 @@ const form= useForm({
      'vehicle_id':'',
      'loader_id':'',
      'driver_id':'',
-     'sp_code':''
-    //  'load_array':[],
+     'assistant_driver_id':'',
+     'sp_code':'',
+     'shp_date':''
+
 
 })
 
@@ -97,14 +100,42 @@ const showUpdateModal=(session)=>{
     form.vehicle=session.vehicle_id
     form.assistant_loader_id=session.assistant_loader_id
     form.driver_id=session.driver_id
+    form.assistant_driver_id=session.assistant_driver_id
     form.sp_code=session.sp_code
+    form.shp_date=session.shp_date
 
     showModal.value=true
 }
 
 
 // const confirmPack=(order_no,part)=>{ Inertia.get(route('pack.order',{'order_no':order_no,'part_no':part}))}
+ const showContents = (lines) => {
 
+
+                                    let orders='';
+                                    // console.log(response.data)
+                                    for (let index = 0; index < lines.length; index++) {
+                                        orders+='<tr><td class="p-2 text-left">'+lines[index].vessel+'</td><td class="p-2 text-center">'+lines[index].vessel_no+'</td><td class="p-2 text-left">'+lines[index].vessel_qr+'</td></tr>';
+
+                                    }
+                                            Swal.fire({
+                                                    title: 'Load',
+                                                    html: `
+                                                        <div id="pdf-modal" class="p-4 bg-orange-100 rounded-lg">
+
+                                                             <table class="p-1 text-sm font-semibold " >  ${orders}</table>
+
+                                                        </div>`,
+                                                    showConfirmButton: false,
+                                                    });
+                                                    // console.log(response.data);
+
+                                // .catch(response) => {
+                                //     // console.log(response)
+                                // Swal.fire('Error', response.data.message, 'error');
+                                //     });
+
+                };
 
 
 
@@ -199,6 +230,10 @@ const showUpdateModal=(session)=>{
                                                             Driver
                                                         </th>
                                                         <th scope="col" class="px-2 py-1">
+                                                            Load
+                                                        </th>
+
+                                                        <th scope="col" class="px-2 py-1">
                                                            Actions
                                                         </th>
 
@@ -217,15 +252,7 @@ const showUpdateModal=(session)=>{
                                                      <td class="px-3 py-2 text-xs font-bold text-center ">
                                                         {{ session.loading_date }}
                                                     </td>
-                                                   <!--  <td class="px-3 py-2 text-xs font-bold">
-                                                        {{ session.assistant_loader }}
-                                                    </td>
--
-                                                    <td class="px-3 py-2 text-xs">
 
-                                                            {{session.prepacks.length}}
-
-                                                    </td> -->
                                                      <td class="px-3 py-2 text-xs">
 
                                                             {{ session.vehicle }}
@@ -237,9 +264,32 @@ const showUpdateModal=(session)=>{
                                                             {{session.driver}}
 
                                                     </td>
+
+                                                    <td class="px-3 py-2 text-xs">
+
+
+
+                                                            <Button
+                                                                v-if="session.lines.length>0"
+                                                                type="button"
+                                                                label="Load"
+                                                                icon="pi pi-gift"
+                                                                :badge="session.lines.length"
+                                                                badgeClass="p-badge-danger"
+                                                                outlined
+                                                                @click="showContents(session.lines)"
+                                                                />
+
+
+
+                                                    </td>
+
+
                                                     <td class="px-3 py-2 text-xs text-center">
                                                         <Button
-                                                    @click="filteredView(session.id)"
+                                                         @click="filteredView(session.id)"
+                                                         :disabled="(session.status==='complete')"
+                                                         :severity="(session.status==='complete')?'success':'warning'"
 
                                                         >
                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -305,8 +355,12 @@ const showUpdateModal=(session)=>{
 
 <div class="flex flex-col justify-center gap-3">
 
+     <div class="flex items-center justify-center p-1 space-x-2 ">
+     <span>Shipment Date</span>
+     <input type="date" v-model="form.shp_date" class="p-1 rounded-lg" />
+     </div>
 
-        <Dropdown
+    <Dropdown
           :options="vehicles"
           v-model="form.vehicle_id"
           optionValue="id"
@@ -314,14 +368,8 @@ const showUpdateModal=(session)=>{
           placeholder="Vehicle"
           filter
         />
-       <Dropdown
-          :options="loaders"
-          optionValue="id"
-          v-model="form.assistant_loader_id"
-          optionLabel="name"
-          placeholder="Assistant Loader"
-          filter
-        />
+
+
         <Dropdown
           :options="spcodes"
           optionValue="code"
@@ -331,12 +379,32 @@ const showUpdateModal=(session)=>{
           filter
         />
 
+
+       <Dropdown
+          :options="loaders"
+          optionValue="id"
+          v-model="form.assistant_loader_id"
+          optionLabel="name"
+          placeholder="Assistant Loader"
+          filter
+        />
+
+
         <Dropdown
           :options="drivers"
           v-model="form.driver_id"
           optionValue="id"
           optionLabel="name"
           placeholder="Driver"
+          filter
+        />
+
+        <Dropdown
+          :options="drivers"
+          v-model="form.assistant_driver_id"
+          optionValue="id"
+          optionLabel="name"
+          placeholder="Assistant Driver"
           filter
         />
 

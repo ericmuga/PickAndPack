@@ -51,12 +51,28 @@ export function useSearchArray(initialArray) {
   const searchByBarcodeOrItemNo = (input) => {
 
     const result = array.value.find((item) => {
-      return item.barcode === input || item.item_no === input || item.barcode.slice(0,12)===input;
+      return item.barcode === input || item.item_no === input || item.barcode.slice(0, 12) ===input;
     });
 
     if (result) {
       return { ...result };
     } else {
+      return 0;
+    }
+  };
+
+  const searchByQrCode = (input) => {
+
+    const result = array.value.find((item) => {
+        // console.log(item.qr_code)
+      return item.qr_code === input;
+    });
+
+    if (result) {
+        // console.log(result)
+      return { ...result };
+    }
+    else {
       return 0;
     }
   };
@@ -80,6 +96,7 @@ export function useSearchArray(initialArray) {
     searchKeyValuePair,
     searchByBarcodeOrItemNo,
     searchByMultipleKeyValues,
+    searchByQrCode,
   };
 
 

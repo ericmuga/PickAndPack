@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\LoadingResource;
 use App\Http\Resources\LoadingSessionResource;
 use App\Http\Resources\VesselResource;
-use App\Models\{LoadingSession,User, Vehicle, Vessel};
+use App\Models\{LoadingLine, LoadingSession, Order, User, Vehicle, Vessel};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 class LoadingSessionController extends Controller
@@ -48,30 +49,76 @@ class LoadingSessionController extends Controller
 
     public function loadSession(Request $request)
     {
-        //show list of all vessels that have not been loaded
-        // dd('here');
+
         $session=LoadingSession::find($request->id);
-        //filter orders based on the session route
 
-          $query= Vessel::get();//hereHas('order',fn($q)=>$q->where('sp_code',$session->sp_code))
-                    //    ->doesntHave('loadingSession')
-                        // >get();
+        //display only vessels that belong to that route
 
-        // $vessels=VesselResource::collection(Vessel::whereDoesntHave('loadingSession')->get());
+
+        $orders=Order::where('shp_date',$session->shp_date)
+                     ->where('sp_code',$session->sp_code)
+                     ->select('order_no')->get();
+
+
+        $query= Vessel::whereIn('order_no',$orders)
+                    //   ->with(['order'=>fn($q)=>$q->select('shp_name')])
+                      ->get();
+
+
         $vessels=VesselResource::collection($query);
 
-        // dd($vessels);
 
-        return inertia('Loading/Create',compact('vessels'));
+        return inertia('Loading/Create',['vessels'=>$vessels,'session'=>LoadingSessionResource::make($session)]);
 
     }
 
-    public function load($id)
+    public function load(Request $request)
     {
        // this will link vessels to a loading session
-     dd(LoadingSession::find($id));
+
+    //    dd($request->all());
+
+      $session=LoadingSession::find($request->session_id);
+
+
+    foreach($request->data as $line)
+    {
+        //update the loading lines
+
+        DB::table('loading_lines')
+          ->where('vessel_qr',$line['qr_code'])
+          ->delete();
+
+
+
+
+        LoadingLine::create([
+
+                        'loading_session_id'=>$session->id,
+                        'vessel_qr'=>$line['qr_code'],
+                        'vessel_no'=>$line['vessel_no'],
+                        'vessel'=>$line['vessel_type'],
+                        ]);
 
     }
+
+     if (!$request->autosave)
+     {
+        $session->update(['status'=>'complete']);
+        return redirect(route('loadingSession.index'));
+
+     }
+
+    else
+    {
+        $session->update(['status'=>'pending']);
+        return response('',200,[]);
+    }
+
+}
+
+
+
 
     /**
      * Store a newly created resource in storage.
@@ -81,10 +128,18 @@ class LoadingSessionController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());/
+        // dd($request->all());
         $details=array_merge(['user_id'=>$request->user()->id],$request->all());
         // dd($details);
+
+        //create if not found:same vehicle, same route, same day
+
+        if (!LoadingSession::where('sp_code',$request->sp_code)
+                      ->where('vehicle_id',$request->vehicle_id)
+                      ->where('shp_date',$request->shp_date)
+                      ->exists())
         LoadingSession::create($details);
+
         return redirect(route('loadingSession.index'));
     }
 
