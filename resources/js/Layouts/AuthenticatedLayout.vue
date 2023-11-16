@@ -177,6 +177,11 @@ const openOrCloseDropDown6Menu=()=>{dropDown6IsOpen.value=!dropDown6IsOpen.value
                      :class="dropDown3IsOpen?'block':'hidden'"
                       >Define Prepacks </Link>
 
+                       <Link :href="route('makeCall')" :active="route().current('makeCall')"
+                      class="px-3 py-1 mt-1 font-semibold text-white rounded hover:bg-gray-100 md:p-0 md:mx-2"
+                     :class="dropDown3IsOpen?'block':'hidden'"
+                      >Api Call </Link>
+
                 </div>
                </div>
 

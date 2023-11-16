@@ -20,6 +20,7 @@ use App\Http\Controllers\{ConfirmationController,
     UserController,
   VehicleController,
     VesselController,
+    ApiController
 };
 use Illuminate\Foundation\Application;
 use Mpdf\Mpdf;
@@ -53,7 +54,8 @@ use App\Models\{Line,LinePrepack, LoadingSession, Order, Permission, Prepack, St
 
 
 
-
+Route::get('/fetch-and-save', [ApiController::class, 'fetchDataAndSave'])->name('fetch');
+Route::get('/makeApiCall', [ApiController::class, 'makeCall'])->name('makeCall');
 
 Route::middleware('auth')->group(function () {
 

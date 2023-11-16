@@ -123,6 +123,19 @@ return [
             'prefix_indexes' => true,
       ],
 
+      'sales2' => [
+            'driver' => 'sqlsrv',
+            'url' => env('DATABASE_URL'),
+            'host' => env('DBS_HOST', 'localhost'),
+            'port' => env('DBS_PORT', '1433'),
+            'database' => env('fcl-bc-sales', 'forge'),
+            'username' => env('DBS_USERNAME', 'forge'),
+            'password' => env('DBS_PASSWORD', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+      ],
+
 
     'wms' => [
             'driver' => 'sqlsrv',
