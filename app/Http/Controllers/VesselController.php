@@ -65,7 +65,7 @@ class VesselController extends Controller
         $pdfDataUri = $request->input('pdfDataUri');
 
         // Save the uploaded PDF file to the storage
-        $path = $uploadedFile->storeAs('pdfs',$request->order.'pdf');
+        $path = $uploadedFile->storeAs('pdfs',$request->order.'.pdf');
 
         // You can also save additional information related to the PDF in your database if needed
 
