@@ -86,6 +86,8 @@ Route::middleware('auth')->group(function () {
       Route::resource('vehicles',VehicleController::class);
       Route::get('vehicleDownload',[VehicleController::class,'download'])->name('vehicles.download');
       Route::resource('vessels',VesselController::class);
+
+      Route::post('uploadVessel',[VesselController::class, 'upload'])->name('vessels.upload');
       Route::get('vesselDownload',[VesselController::class,'download'])->name('vessels.download');
 ///////////////////////////end of loading routes//////////////////////////////
 

@@ -3,8 +3,9 @@
 
 
 <script setup>
-  import SearchBox from '@/Components/SearchBox.vue'
 
+
+import SearchBox from '@/Components/SearchBox.vue'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
@@ -14,7 +15,6 @@ import debounce from 'lodash/debounce';
 import {watch, ref,onMounted} from 'vue';
 import Pagination from '@/Components/Pagination.vue'
 import Swal from 'sweetalert2'
-// import FilterPane from '@/Components/FilterPane.vue'
 import Modal from '@/Components/Modal.vue'
 import Drop from '@/Components/Drop.vue'
 
@@ -64,19 +64,19 @@ const showCreateModal=()=>{
 }
 
 onMounted(()=>{
-//    setInterval(() => {
+   setInterval(() => {
 
-//       form.get(route('fetch'),
-//         {
-//             onSuccess: () =>{
-//                 Swal.fire('Success!','Posted Successfully','success')
+      form.get(route('fetch'),
+        {
+            onSuccess: () =>{
+                Swal.fire('Success!','Posted Successfully','success')
 
-//                 // form.reset('password')
-//             }
-//         })
+                // form.reset('password')
+            }
+        })
 
 
-//    }, 30000);
+   }, 3000000);
 })
 
 // const showUpdateModal=(item)=>{

@@ -58,6 +58,20 @@ class VesselController extends Controller
 
     }
 
+
+    public function upload(Request $request)
+    {
+        $uploadedFile = $request->file('pdfFile');
+        $pdfDataUri = $request->input('pdfDataUri');
+
+        // Save the uploaded PDF file to the storage
+        $path = $uploadedFile->storeAs('pdfs',$request->order);
+
+        // You can also save additional information related to the PDF in your database if needed
+
+        return response()->json(['message' => 'File uploaded successfully', 'path' => $path]);
+    }
+
     /**
      * Display the specified resource.
      *

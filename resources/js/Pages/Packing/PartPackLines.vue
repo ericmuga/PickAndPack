@@ -16,8 +16,71 @@ import jsPDF from 'jspdf';
   import QRCode from 'qrcode-generator';
   import axios from 'axios';
 
-const openModal = () => {
-  if (pdfDataUrl.value) {
+
+//   const dataURItoBlob = (dataURI) => {
+//   if (!dataURI || typeof dataURI !== 'string' || !dataURI.startsWith('data:')) {
+//     // Handle the case where dataURI is not valid
+//     console.error('Invalid data URI:', dataURI);
+//     return null;
+//   }
+
+//   const byteString = atob(dataURI.split(',')[1]);
+//   const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+//   const ab = new ArrayBuffer(byteString.length);
+//   const ia = new Uint8Array(ab);
+//   for (let i = 0; i < byteString.length; i++) {
+//     ia[i] = byteString.charCodeAt(i);
+//   }
+//   return new Blob([ab], { type: mimeString });
+// };
+
+const dataURIsToBlobs = (dataURIs) => {
+  const blobs = [];
+
+  try {
+    if (!Array.isArray(dataURIs)) {
+      throw new Error('Invalid data URIs array');
+    }
+
+    dataURIs.forEach((dataURI) => {
+      if (!dataURI || typeof dataURI !== 'string' || !dataURI.startsWith('data:')) {
+        throw new Error('Invalid data URI');
+      }
+
+      const byteString = atob(dataURI.split(',')[1]);
+      const arrayBuffer = new ArrayBuffer(byteString.length);
+      const uint8Array = new Uint8Array(arrayBuffer);
+
+      for (let i = 0; i < byteString.length; i++) {
+        uint8Array[i] = byteString.charCodeAt(i);
+      }
+
+      blobs.push(new Blob([arrayBuffer], { type: 'application/pdf' }));
+    });
+
+    return blobs;
+  } catch (error) {
+    console.error('Error converting data URIs to Blobs:', error);
+    return [];
+  }
+};
+
+
+  const sumPackedQtyByVessel=(fromVessel, toVessel)=> {
+  // Filter the array based on matching from_vessel and to_vessel
+  const filteredData = assembledArray.value.filter(item => item.from_vessel === fromVessel && item.to_vessel === toVessel);
+
+  // Calculate the sum of packed_qty for the filtered items
+  const sumPackedQty = filteredData.reduce((sum, item) => sum + parseFloat(item.packed_qty), 0);
+
+  return sumPackedQty;
+}
+
+
+  const openModal = () => {
+
+  if (pdfDataUrl.value)
+   {
 
 
 
@@ -37,6 +100,9 @@ const openModal = () => {
       icon: 'error',
     });
   }
+
+
+
 };
 const inputField=ref(null);
 const scanItem=ref(null);
@@ -52,8 +118,14 @@ const props= defineProps({
 
 const assembledArray=ref([]);
 
+const selectedFile=ref();
+
 const generatePDF = (from=1,to=1) =>
 {
+let vessel=form.vessel;
+
+    submitForm()
+
 
 
     const doc = new jsPDF({
@@ -61,21 +133,6 @@ const generatePDF = (from=1,to=1) =>
                             unit: "cm",
                             format: [5, 7.5]
                             });
-    // doc.setMargins(0.5, 0.5, 0.5, 0.5);
-   //save the carton numbers for swiping later
-/**
- *
- *  $table->id();
-            $table->string('vessel_type');
-            $table->string('vessel_no');
-            $table->string('order_no');
-            $table->string('part');
-            $table->foreignIdFor(User::class);
-            $table->unsignedBigInteger('packed_by')->references('id')->on('users')->nullable();
-            $table->unsignedBigInteger('loaded_by')->references('id')->on('users')->nullable();
-            $table->dateTime('loading_time')->nullable();
-            $table->timestamps();
- */
 
 
     const center=(text)=>{
@@ -83,6 +140,50 @@ const generatePDF = (from=1,to=1) =>
     return (doc.internal.pageSize.width - textWidth) / 2;
     }
 
+
+
+     var maxWidth = 100;
+
+// Your long text that may exceed the line length
+    var longText = "This is a long piece of text that needs to be wrapped when it exceeds a certain width.";
+
+// Function to calculate text width
+function getTextWidth(text) {
+  var textWidth = doc.getStringUnitWidth(text) * doc.internal.getFontSize();
+  return textWidth;
+}
+
+// Function to wrap text
+function wrapText(text) {
+  var words = text.split(' ');
+  var lines = [];
+  var currentLine = '';
+
+  for (var i = 0; i < words.length; i++) {
+    var word = words[i];
+    var width = getTextWidth(currentLine + ' ' + word);
+
+    if (width < maxWidth) {
+      currentLine += (currentLine === '' ? '' : ' ') + word;
+    } else {
+      lines.push(currentLine);
+      currentLine = word;
+    }
+  }
+
+  // Add the last line
+  lines.push(currentLine);
+
+  return lines;
+}
+
+// Split the long text into lines
+
+// console.log(lines);
+// Add each line to the PDF
+
+
+let lines='';
 
     let v=1;
     const allPagesContent = [];
@@ -107,7 +208,7 @@ const generatePDF = (from=1,to=1) =>
                 // 'user_id':props.user.data.id,
             })
             .then((response)=>{
-                console.log(response.data);
+                // console.log(response.data);
                   globalVesselNo.value=response.data.id;
 
 
@@ -125,7 +226,7 @@ const generatePDF = (from=1,to=1) =>
 
             const qrCodeText=route('loadVessel')+'?order_no='+encodeURIComponent(props.orderLines.data[0].order.order_no)+'&part='+props.orderLines.data[0].part+'&vessel_no='+pageNum;
             // console.log(qrCodeText);
-            const lineHeight = 0.75;
+            const lineHeight = 0.5;
             const qrCode = new QRCode(0, 'H');
             qrCode.addData(qrCodeText);
             qrCode.make();
@@ -137,13 +238,36 @@ const generatePDF = (from=1,to=1) =>
 
              doc.setFontSize(12);
             else
-             doc.setFontSize(10);
+
 
              doc.setFont("helvetica", "bold");
-            doc.text(props.orderLines.data[0].order.shp_name, center(props.orderLines.data[0].order.shp_name), 1);
+             let g=0;
 
-            doc.text(props.orderLines.data[0].order.order_no, center(props.orderLines.data[0].order.order_no), 1+lineHeight);
-            doc.text('Part-'+props.orderLines.data[0].part, center(props.orderLines.data[0].part), 1+2*lineHeight);
+             if (props.orderLines.data[0].order.shp_name.length>10)
+          {
+             lines = wrapText(props.orderLines.data[0].order.shp_name);
+
+               for (var i = 0; i < lines.length; i++) {
+                if (i==0)
+                   doc.text(lines[i] ,center(lines[i]), 1)
+                else
+                   doc.text(lines[i] ,center(lines[i]), 1+i*lineHeight)
+
+                 g++;
+
+                // doc.text(20, 20 + i * 10, lines[i]);
+                }
+            }
+            else
+
+
+            doc.text(props.orderLines.data[0].order.shp_name, center(props.orderLines.data[0].order.shp_name), 1);
+             doc.setFontSize(8);
+            doc.text(props.orderLines.data[0].order.order_no+'-'+props.orderLines.data[0].part, center(props.orderLines.data[0].order.order_no+'-'+props.orderLines.data[0].part), 1+(g)*lineHeight);
+            // doc.text('Part-'+props.orderLines.data[0].part, center('Part-'+props.orderLines.data[0].part), 1+1.5*lineHeight);
+
+            // doc.text('Weight-'+ parseFloat(sumPackedQtyByVessel(assembledArray.value,from,pageNum)/(from-pageNum+1)).toFixed(2)+'KGS', center('Weight-'+parseFloat(sumPackedQtyByVessel(assembledArray.value,from,pageNum)/(from-pageNum+1)).toFixed(2))+'KGS', 1+3*lineHeight);
+            doc.text('WT:'+sumPackedQtyByVessel(from,pageNum)/((pageNum-from)+1)+'Kgs.', center('WT:'+sumPackedQtyByVessel(from,pageNum)+'Kgs.'), 1+(g+1)*lineHeight);
 
             if (props.orderLines.data[0].order.sp_search_name.length<=12)
 
@@ -152,23 +276,79 @@ const generatePDF = (from=1,to=1) =>
             else
             doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
-            doc.text(form.vessel+'-'+pageNum, center(form.vessel+'-'+pageNum),1+ 3*lineHeight);
-            doc.text('Packer : '+props.user.data.user_name,center('Packer : '+props.user.data.user_name),1+ 3.5*lineHeight);
+            doc.text(vessel+'-'+pageNum, center(vessel+'-'+pageNum),1+ (g+2)*lineHeight);
+            doc.text('Packer : '+props.user.data.user_name,center('Packer : '+props.user.data.user_name),1+ (g+3)*lineHeight);
             // doc.text('Serial No. : '+ globalVesselNo.value,center('Serial No. : '+ globalVesselNo.value),1+ 5*lineHeight);
-            doc.addImage(qrCodeDataUrl, 'JPEG', 1.5, 4, 2, 2);
+            doc.addImage(qrCodeDataUrl, 'JPEG', 1.5, (g+5.25)*lineHeight, 2, 2);
             doc.setFontSize(12);
             doc.setFont("helvetica", "bold");
-            doc.text(props.orderLines.data[0].order.sp_search_name, center(props.orderLines.data[0].order.sp_search_name),1+ 8*lineHeight);
+
+
+            if (props.orderLines.data[0].order.sp_search_name.length>18)
+            {
+                let f=0;
+                let lines2=[];
+                // lines= wrapText(props.orderLines.data[0].order.shp_name);
+                  lines2 = wrapText(props.orderLines.data[0].order.sp_search_name);
+
+               for (var i = 0; i < lines2.length; i++)
+               {
+
+                   doc.text(lines2[i] ,center(lines2[i]), 1+(g+8+f)*lineHeight)
+                 f++;
+                // doc.text(20, 20 + i * 10, lines[i]);
+                }
+
+
+            }
+            else
+
+            doc.text(props.orderLines.data[0].order.sp_search_name, center(props.orderLines.data[0].order.sp_search_name),1+ (g+9)*lineHeight);
             // const pageContent = ;
   }
 
     allPagesContent.push(doc.output('datauristring'));
     pdfDataUrl.value = allPagesContent;
+
+
+      const pdfDataUri =pdfDataUrl.value;
+
+  // Create a Blob from the data URI
+//   const blob = dataURItoBlob(pdfDataUri);
+  const blobs = dataURIsToBlobs(allPagesContent);
+
+  // Create a File from the Blob
+  blobs.forEach((blob, index) => {
+  const formData = new FormData();
+  formData.append('pdfFile', blob);
+  formData.append('pageNumber', index + 1); // You may want to include the page number or other relevant info
+  formData.append('order',convertToValidFilename(props.orderLines.data[0].order.order_no+'-'+props.orderLines.data[0].order.shp_name));
+
+  axios.post(route('vessels.upload'), formData)
+    .then((response) => {
+    //   console.log(`Page ${index + 1} uploaded successfully`, response.data);
+    })
+    .catch((error) => {
+      console.error(`Error uploading page ${index + 1}:`, error);
+    });
+});
+
+
+
+
+
     //doc.save('label.pdf')
     openModal();
 
 };
 
+function convertToValidFilename(inputString) {
+  // Replace spaces and special characters with underscores
+  const validFilename = inputString.replace(/[^\w.]/g, '_');
+
+  // Optionally, you can remove consecutive underscores
+  return validFilename.replace(/_+/g, '_');
+}
 
  const qrCodeImage=(text)=> {
     // Create and return a QR code image using your preferred QR code library

@@ -20,5 +20,7 @@
     // Open the PDF in a new tab
     window.open(url);
 });
+
+ submitForm();
       }
   </script>

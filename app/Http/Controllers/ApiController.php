@@ -28,7 +28,8 @@ class ApiController extends Controller
         $key = '412cce7c-a737-4d01-b929-534fcc80e79d';
 
 
-       $customers=[404,240,258,913,914,420,823,824];
+    //    $customers=[404,240,258,913,914,420,823,824];
+       $customers=[823,824,420,];
 
 
        for($i=0; $i<count($customers); $i++ )
@@ -47,7 +48,7 @@ class ApiController extends Controller
 
             $responseData = $response->json(); // Assuming the response is in JSON format
               ///
-            // dd($responseData);
+
 
             foreach ($responseData as $data)
             {
@@ -73,7 +74,7 @@ class ApiController extends Controller
                     'item_no' => $data['item_no'],
                     'item_spec' => $data['item_spec'],
                     'line_no' => $data['line_no'],
-                    'quantity' => floatval($data['quantity']),
+                    'quantity' => abs(floatval($data['quantity'])),
                     'shp_code' => $data['shp_code'],
                     // 'shp_date' => $data['shp_date'],
                     'shp_date' => Carbon::tomorrow()->toDateString(),
