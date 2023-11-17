@@ -322,7 +322,7 @@ let lines='';
   const formData = new FormData();
   formData.append('pdfFile', blob);
   formData.append('pageNumber', index + 1); // You may want to include the page number or other relevant info
-  formData.append('order',convertToValidFilename(props.orderLines.data[0].order.order_no+'-'+props.orderLines.data[0].order.shp_name));
+  formData.append('order',convertToValidFilename(props.orderLines.data[0].order.order_no+props.orderLines.data[0].part+'-'+props.orderLines.data[0].order.shp_name));
 
   axios.post(route('vessels.upload'), formData)
     .then((response) => {
