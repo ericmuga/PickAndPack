@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Vessel;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class VesselController extends Controller
@@ -63,9 +64,10 @@ class VesselController extends Controller
     {
         $uploadedFile = $request->file('pdfFile');
         $pdfDataUri = $request->input('pdfDataUri');
+        $timestamp = preg_replace('/[-:]/', '',Carbon::now()->toDateTimeString());
 
         // Save the uploaded PDF file to the storage
-        $path = $uploadedFile->storeAs('pdfs',$request->order.'.pdf');
+        $path = $uploadedFile->storeAs('pdfs',$timestamp.$request->order.'.pdf');
 
         // You can also save additional information related to the PDF in your database if needed
 
