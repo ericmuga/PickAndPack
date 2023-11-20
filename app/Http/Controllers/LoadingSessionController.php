@@ -58,12 +58,12 @@ class LoadingSessionController extends Controller
         $orders=Order::where('shp_date',$session->shp_date)
                      ->where('sp_code',$session->sp_code)
                      ->select('order_no')->get();
-dd($orders->pluck('order_no'));
+// dd($orders->pluck('order_no'));
 
         $query= Vessel::whereIn('order_no',$orders->pluck('order_no'))
                     //   ->with(['order'=>fn($q)=>$q->select('shp_name')])
                       ->get();
-dd($query);
+// dd($query);
 
         $vessels=VesselResource::collection($query);
 

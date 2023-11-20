@@ -17,22 +17,7 @@ import jsPDF from 'jspdf';
   import axios from 'axios';
 
 
-//   const dataURItoBlob = (dataURI) => {
-//   if (!dataURI || typeof dataURI !== 'string' || !dataURI.startsWith('data:')) {
-//     // Handle the case where dataURI is not valid
-//     console.error('Invalid data URI:', dataURI);
-//     return null;
-//   }
 
-//   const byteString = atob(dataURI.split(',')[1]);
-//   const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-//   const ab = new ArrayBuffer(byteString.length);
-//   const ia = new Uint8Array(ab);
-//   for (let i = 0; i < byteString.length; i++) {
-//     ia[i] = byteString.charCodeAt(i);
-//   }
-//   return new Blob([ab], { type: mimeString });
-// };
 
 const dataURIsToBlobs = (dataURIs) => {
   const blobs = [];
@@ -120,75 +105,56 @@ const assembledArray=ref([]);
 
 const selectedFile=ref();
 
-const generatePDF = (from=1,to=1) =>
+const generatePDF = (from=1,to=1,vessel='') =>
 {
-let vessel=form.vessel;
+
+
+
 
     submitForm()
-
-
-
-    const doc = new jsPDF({
+     const doc = new jsPDF({
                             orientation: "portrait",
                             unit: "cm",
                             format: [5, 7.5]
                             });
 
-
-    const center=(text)=>{
-        const textWidth = doc.getStringUnitWidth(text) * doc.internal.getFontSize() / doc.internal.scaleFactor;
-    return (doc.internal.pageSize.width - textWidth) / 2;
-    }
-
-
-
+     const center=(text)=>{
+                const textWidth = doc.getStringUnitWidth(text) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+            return (doc.internal.pageSize.width - textWidth) / 2;
+            }
      var maxWidth = 100;
+     const  getTextWidth=(text)=> {
+                var textWidth = doc.getStringUnitWidth(text) * doc.internal.getFontSize();
+                return textWidth;
+                }
 
-// Your long text that may exceed the line length
-    var longText = "This is a long piece of text that needs to be wrapped when it exceeds a certain width.";
+     const  wrapText=(text)=> {
+                        var words = text.split(' ');
+                        var lines = [];
+                        var currentLine = '';
 
-// Function to calculate text width
-function getTextWidth(text) {
-  var textWidth = doc.getStringUnitWidth(text) * doc.internal.getFontSize();
-  return textWidth;
-}
+                        for (var i = 0; i < words.length; i++) {
+                            var word = words[i];
+                            var width = getTextWidth(currentLine + ' ' + word);
 
-// Function to wrap text
-function wrapText(text) {
-  var words = text.split(' ');
-  var lines = [];
-  var currentLine = '';
+                            if (width < maxWidth) {
+                            currentLine += (currentLine === '' ? '' : ' ') + word;
+                            } else {
+                            lines.push(currentLine);
+                            currentLine = word;
+                            }
+                        }
+            // Add the last line
+            lines.push(currentLine);
+            return lines;
+            }
+     let lines='';
 
-  for (var i = 0; i < words.length; i++) {
-    var word = words[i];
-    var width = getTextWidth(currentLine + ' ' + word);
-
-    if (width < maxWidth) {
-      currentLine += (currentLine === '' ? '' : ' ') + word;
-    } else {
-      lines.push(currentLine);
-      currentLine = word;
-    }
-  }
-
-  // Add the last line
-  lines.push(currentLine);
-
-  return lines;
-}
-
-// Split the long text into lines
-
-// console.log(lines);
-// Add each line to the PDF
-
-
-let lines='';
-
-    let v=1;
-    const allPagesContent = [];
-    let fontSizeFactor=1;
-   let globalVesselNo=ref('');
+     let v=1;
+     const allPagesContent = [];
+     let fontSizeFactor=1;
+     let globalVesselNo=ref('');
+     let lineHeight=0.5;
 
     for (let pageNum = from; pageNum <= to; pageNum++)
     {
@@ -197,36 +163,27 @@ let lines='';
                 v++;
                 doc.addPage();
             }
-        //    alert(form.vessel);
-        // console.log(form.vessel);
-
+    // alert(form.vessel)
             axios.post(route('vessels.store'),{
-                'order_no':props.orderLines.data[0].order.order_no,
-                'part':props.orderLines.data[0].part,
-                'vessel_type':form.vessel,
-                'vessel_no':pageNum,
-                // 'user_id':props.user.data.id,
-            })
+                                                    'order_no':props.orderLines.data[0].order.order_no,
+                                                    'part':props.orderLines.data[0].part,
+                                                    'vessel_type':vessel,
+                                                    'vessel_no':pageNum,
+
+                                                })
             .then((response)=>{
-                // console.log(response.data);
-                  globalVesselNo.value=response.data.id;
-
-
-
-
+                 console.log(response)
+                 console.log('here2')
+                //   globalVesselNo.value=response.data.id;
             })
             .catch((response)=>{
-                Swal.fire('Error', response.data.message, 'error')
-                // console.log(response)
-        });
+                console.log(response)
+                // Swal.fire('Error', response.data.message, 'error')
 
-
-
-
+            });
 
             const qrCodeText=route('loadVessel')+'?order_no='+encodeURIComponent(props.orderLines.data[0].order.order_no)+'&part='+props.orderLines.data[0].part+'&vessel_no='+pageNum;
-            // console.log(qrCodeText);
-            const lineHeight = 0.5;
+
             const qrCode = new QRCode(0, 'H');
             qrCode.addData(qrCodeText);
             qrCode.make();
@@ -244,25 +201,24 @@ let lines='';
              let g=0;
 
              if (props.orderLines.data[0].order.shp_name.length>10)
-          {
-             lines = wrapText(props.orderLines.data[0].order.shp_name);
+                {
+                    lines = wrapText(props.orderLines.data[0].order.shp_name);
 
-               for (var i = 0; i < lines.length; i++) {
-                if (i==0)
-                   doc.text(lines[i] ,center(lines[i]), 1)
-                else
-                   doc.text(lines[i] ,center(lines[i]), 1+i*lineHeight)
+                    for (var i = 0; i < lines.length; i++) {
+                        if (i==0)
+                         doc.text(lines[i] ,center(lines[i]), 1)
+                        else
+                        doc.text(lines[i] ,center(lines[i]), 1+(i*lineHeight))
 
-                 g++;
+                        g++;
 
-                // doc.text(20, 20 + i * 10, lines[i]);
-                }
-            }
-            else
+                        // doc.text(20, 20 + i * 10, lines[i]);
+                        }
+                    }
+            //else
+                  doc.text(props.orderLines.data[0].order.shp_name, center(props.orderLines.data[0].order.shp_name), 1);
 
-
-            doc.text(props.orderLines.data[0].order.shp_name, center(props.orderLines.data[0].order.shp_name), 1);
-             doc.setFontSize(8);
+            doc.setFontSize(8);
             doc.text(props.orderLines.data[0].order.order_no+'-'+props.orderLines.data[0].part, center(props.orderLines.data[0].order.order_no+'-'+props.orderLines.data[0].part), 1+(g)*lineHeight);
             // doc.text('Part-'+props.orderLines.data[0].part, center('Part-'+props.orderLines.data[0].part), 1+1.5*lineHeight);
 
@@ -288,8 +244,7 @@ let lines='';
             {
                 let f=0;
                 let lines2=[];
-                // lines= wrapText(props.orderLines.data[0].order.shp_name);
-                  lines2 = wrapText(props.orderLines.data[0].order.sp_search_name);
+                lines2 = wrapText(props.orderLines.data[0].order.sp_search_name);
 
                for (var i = 0; i < lines2.length; i++)
                {
@@ -305,7 +260,7 @@ let lines='';
 
             doc.text(props.orderLines.data[0].order.sp_search_name, center(props.orderLines.data[0].order.sp_search_name),1+ (g+9)*lineHeight);
             // const pageContent = ;
-  }
+    }
 
     allPagesContent.push(doc.output('datauristring'));
     pdfDataUrl.value = allPagesContent;
@@ -1129,7 +1084,7 @@ onUnmounted(() => {
 
          </div>
 
-              <Button @click="generatePDF(form.from_vessel,form.to_vessel)"
+              <Button @click="generatePDF(form.from_vessel,form.to_vessel,form.vessel)"
                 v-show="((parseInt(form.from_vessel)>0)&&(form.from_batch!='')&&(form.vessel!=null))||form.empty"
                 label="Close Carton"
                 severity="warning"
