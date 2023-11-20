@@ -28,8 +28,8 @@ class ApiController extends Controller
         $key = '412cce7c-a737-4d01-b929-534fcc80e79d';
 
 
-    //    $customers=[404,240,258,913,914,420,823,824];
-       $customers=[404];
+       $customers=[404,240,258,913,914,420,823,824];
+    //    $customers=[404,824,420,823];
 
 
        for($i=0; $i<count($customers); $i++ )
