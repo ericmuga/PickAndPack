@@ -29,7 +29,7 @@ class ApiController extends Controller
 
 
     //    $customers=[404,240,258,913,914,420,823,824];
-       $customers=[823,824,420,];
+       $customers=[404];
 
 
        for($i=0; $i<count($customers); $i++ )
@@ -85,14 +85,16 @@ class ApiController extends Controller
 
 
 
-           // return response()->json(['message' => 'Data saved successfully']);
+
 
       //  } else {
             // Handle the case when the request was not successful
             //return response()->json(['error' => 'Failed to fetch data from the external API'], $response->status());
         }
 
-       return inertia('API/Create');
+     //  return inertia('API/Create');
+
+       return response()->json(['message' => 'Data saved successfully']);
    }
 
   }
