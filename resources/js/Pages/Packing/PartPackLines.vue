@@ -200,8 +200,8 @@ const generatePDF = (from=1,to=1,vessel='') =>
              doc.setFont("helvetica", "bold");
              let g=0;
 
-             if (props.orderLines.data[0].order.shp_name.length>10)
-                {
+            //  if (props.orderLines.data[0].order.shp_name.length>)
+                // {
                     lines = wrapText(props.orderLines.data[0].order.shp_name);
 
                     for (var i = 0; i < lines.length; i++) {
@@ -214,9 +214,9 @@ const generatePDF = (from=1,to=1,vessel='') =>
 
                         // doc.text(20, 20 + i * 10, lines[i]);
                         }
-                    }
+                    // }
             //else
-                  doc.text(props.orderLines.data[0].order.shp_name, center(props.orderLines.data[0].order.shp_name), 1);
+                //   doc.text(props.orderLines.data[0].order.shp_name, center(props.orderLines.data[0].order.shp_name), 1);
 
             doc.setFontSize(8);
             doc.text(props.orderLines.data[0].order.order_no+'-'+props.orderLines.data[0].part, center(props.orderLines.data[0].order.order_no+'-'+props.orderLines.data[0].part), 1+(g)*lineHeight);
