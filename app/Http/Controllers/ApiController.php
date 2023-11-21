@@ -46,21 +46,21 @@ class ApiController extends Controller
         $response = Http::get('https://fchoice-endpoint-prod.docwyn.com/?api_key='.$key.'&company='.$company.'&recieved_date='.$receivedDate.'&cust_no='.$customers[$i]);
         $responseData = $response->json(); // Assuming the response is in JSON format
         $extdocItem='';
+
         //make collection
-        $collection = collect(json_decode($responseData, true));
+        $collection = collect($responseData);
         //sort by columns
-        $sortedData = $collection->orderBy('ext_doc_no')->orderBy('item_no')->values();
+        $sortedData = $collection->sortBy('ext_doc_no')->sortBy('item_no')->values();
         $array_to_insert=[];
         $extdocItem='';
         foreach ($sortedData as $data)
             {
-              if (is_array($data))
-                if (array_key_exists('ext_doc_no',$data))
-                 if ($data['uom_code']!='nan')
-                  if($extdocItem!= $data['ext_doc_no'].$data['item_no'])
-                       $extdocItem= $data['ext_doc_no'].$data['item_no'];
-                  else continue;
-                   array_push($array_to_insert,
+
+              if (!is_array($data)) continue;
+                if (!array_key_exists('ext_doc_no',$data)) continue;
+
+                  if($extdocItem==$data['ext_doc_no'].$data['item_no']) continue;
+                    array_push($array_to_insert,
                                 [
                                     'company' => $data['company'],
                                     'cust_no' => $data['cust_no'],
@@ -75,7 +75,7 @@ class ApiController extends Controller
                                     'sp_code' => $data['sp_code'],
                                     // 'uom_code' =>$data['uom_code']
                                 ]);
-
+                                $extdocItem= $data['ext_doc_no'].$data['item_no'];
             }
             ImportedOrder::upsert($array_to_insert,['item_no','ext_doc_no']);
          return response()->json(['message' => 'Data saved successfully']);
