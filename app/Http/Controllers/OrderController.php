@@ -184,6 +184,17 @@ public function filter(Request $request)
 }
 
 
+public function getOrderPart(Request $request)
+{
+    // dd('here');
+    $order=Order::firstWhere('order_no',$request->order_no)
+        //  ->with(['lines'=>fn($q)=>$q->ofPart($request->part)])
+         ->get();
+    return response()->json(compact('order'));
+
+}
+
+
 
 
 public function assemble(Request $request)
@@ -274,7 +285,7 @@ $sp_codes = DB::table('orders')
 
 
 
-    
+
 
 
 

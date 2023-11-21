@@ -173,6 +173,7 @@ Route::middleware('auth')->group(function () {
 
         Route::post('/order/all', [OrderController::class, 'pack'])->name('order.listing');
         Route::post('/order/scanItems', [OrderController::class, 'scanItems'])->name('order.scanItems');
+        Route::post('getOrderPart',[OrderController::class,'getOrderPart'])->name('getOrderPart');
 
 
         // Route::get('pick',[OrderController::class,'pick'])->name('order.pick');

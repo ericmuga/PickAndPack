@@ -58,7 +58,7 @@ class ApiController extends Controller
                 if (array_key_exists('ext_doc_no',$data))
                  if ($data['uom_code']!='nan')
                   if($extdocItem!= $data['ext_doc_no'].$data['item_no'])
-                    $extdocItem!= $data['ext_doc_no'].$data['item_no'];
+                       $extdocItem= $data['ext_doc_no'].$data['item_no'];
                   else continue;
                    array_push($array_to_insert,
                                 [
@@ -73,7 +73,7 @@ class ApiController extends Controller
                                     'shp_code' => $data['shp_code'],
                                     'shp_date' => Carbon::tomorrow()->toDateString(),
                                     'sp_code' => $data['sp_code'],
-                                    'uom_code' =>$data['uom_code']
+                                    // 'uom_code' =>$data['uom_code']
                                 ]);
 
             }
