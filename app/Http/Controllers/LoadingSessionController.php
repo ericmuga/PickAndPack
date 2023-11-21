@@ -36,9 +36,20 @@ class LoadingSessionController extends Controller
     }
 
 
-   public function loadVessel()
+   public function loadVessel(Request $request)
    {
-    dd('here');
+      //check if there's a loading session for the current user
+
+      $lds=LoadingSession::where('user_id',$request->user()->id)
+                    ->latest();
+    dd($lds);
+
+
+
+
+
+
+
    }
     /**
      * Show the form for creating a new resource.
