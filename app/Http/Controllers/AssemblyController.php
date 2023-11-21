@@ -69,18 +69,17 @@ public function store(Request $request)
 
     //get assignment
    $user=Auth::user()->id;
-//    dd($user);
+
+
     $part=Line::where('order_no',$request->data[0]['order_no'])
-                                   ->where('line_no',$request->data[0]['line_no'])
-                                   ->first()->part;
+              ->where('line_no',$request->data[0]['line_no'])
+              ->first()->part;
 
     $ass_id=AssignmentLine::where('order_no',$request->data[0]['order_no'])
-                       ->where('part',$part)
-                       ->first()->assignment_id;
+                          ->where('part',$part)
+                          ->first()->assignment_id;
 
-    //create assembly session
-
-
+   
      $session=AssemblySession::updateOrCreate([
                                                     'order_no'=>$request->data[0]['order_no'],
                                                     'part'=>$part,

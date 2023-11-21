@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::create('assignments', function (Blueprint $table) {
             $table->id();
-
             $table->unsignedBigInteger('assignee_id')->references('user_id')->on('users');
             $table->unsignedBigInteger('assignor_id')->references('user_id')->on('users');
             $table->timestamps();

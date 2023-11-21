@@ -27,7 +27,12 @@ class PackingOrderResource extends JsonResource
             // 'assembled_c'=>$this->assembly_sessions()->OfPart('C')->count()==1,
             // 'assembled_d'=>$this->assembly_sessions()->OfPart('D')->count()==1,
 
-             'assembled_a'=>Order::checkConfirmation($this->order_no,'A'),
+            'part_a'=>$this->lines()->OfPart('A')->count(),
+            'part_b'=>$this->lines()->OfPart('B')->count(),
+            'part_c'=>$this->lines()->OfPart('C')->count(),
+            'part_d'=>$this->lines()->OfPart('D')->count(),
+
+            'assembled_a'=>Order::checkConfirmation($this->order_no,'A'),
             'assembled_b'=>Order::checkConfirmation($this->order_no,'B'),//$this->assembly_sessions()->OfPart('B')->count()==1,
             'assembled_c'=>Order::checkConfirmation($this->order_no,'C'),//$this->assembly_sessions()->OfPart('C')->count()==1,
             'assembled_d'=>Order::checkConfirmation($this->order_no,'D'),//$this->assembly_sessions()->OfPart('D')->count()==1,

@@ -33,6 +33,7 @@ class AssemblyOrderResource extends JsonResource
             'assembled_b'=>$this->assembly_sessions()->OfPart('B')->count()==1,
             'assembled_c'=>$this->assembly_sessions()->OfPart('C')->count()==1,
             'assembled_d'=>$this->assembly_sessions()->OfPart('D')->count()==1,
+            
 
 
             'assigned_a'=>$this->assignmentLines()->where('part','=','A')->exists(),

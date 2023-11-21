@@ -11,7 +11,7 @@ class SalesPerson extends Model
 
    public function LoadingSessions()
    {
-    return $this->hasMany (SalesPerson::class,'sp_code','code');
+    return $this->hasMany (SalesPerson::class,'sp_code','Code');
    }
 
 }

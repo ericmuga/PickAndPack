@@ -21,5 +21,7 @@ class Vessel extends Model
         return $this->belongsTo(Order::class,'order_no','order_no');
     }
 
+    
+
 
 }

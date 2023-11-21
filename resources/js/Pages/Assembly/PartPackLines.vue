@@ -462,21 +462,7 @@ onUnmounted(() => {
                                                 <div class="col-span-1">
                                                     <div  class="w-full p-3 m-2 text-center text-white bg-orange-200"> Ordered</div>
                                                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 ">
-                                                        <!-- <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-
-                                                            <tr class="bg-slate-300">
-                                                                <th  scope="col" class="px-6 py-3">Item No.</th>
-                                                                <th  scope="col" class="px-6 py-3">Item</th>
-
-                                                                <th  scope="col" class="px-6 py-3">Barcode</th>
-                                                                <th  scope="col" class="px-6 py-3">Ordered qty</th>
-                                                                <th  scope="col" class="px-6 py-3">Prepack qty</th>
-                                                                <th  scope="col" class="px-6 py-3">Assembled qty</th>
-                                                            </tr>
-
-                                                        </thead> -->
-
-
+                                                      
                                                         <tbody>
                                                             <tr
                                                               @click="newItem=line.item_no"
@@ -518,22 +504,7 @@ onUnmounted(() => {
                                                 <div class="col-span-1"  >
                                              <div  class="w-full p-3 m-2 text-center text-white bg-slate-400"> Assembled</div>
                                                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 ">
-                                                        <!-- <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-
-                                                            <tr class="bg-slate-300">
-                                                                <th  scope="col" class="px-6 py-3">Item No.</th>
-                                                                <th  scope="col" class="px-6 py-3">Item</th>
-
-                                                                <th  scope="col" class="px-6 py-3">Barcode</th>
-                                                                <th  scope="col" class="px-6 py-3">Ordered qty</th>
-                                                                <th  scope="col" class="px-6 py-3">Prepack qty</th>
-                                                                <th  scope="col" class="px-6 py-3">Assembled qty</th>
-                                                            </tr>
-
-                                                        </thead> -->
-
-
-                                                        <tbody>
+                                                                                                               <tbody>
 
                                                             <tr v-for="line in assembledArray" :key="line.item_description"
                                                             @click="newItem=line.item_no"
@@ -555,17 +526,6 @@ onUnmounted(() => {
                                                                     {{ line.assembled_qty }}
                                                                 </td>
 
-                                                                <!-- <td class="px-3 py-2 text-xs">
-                                                                    {{ line.prepacks_total_quantity}}
-                                                                </td> -->
-
-                                                                <!-- <td class="px-3 py-2 text-xs text-center text-black bg-yellow-300 rounded-sm">
-                                                                    <input
-                                                                      class="text-center rounded"
-                                                                      v-model="order.ass_qty"
-                                                                      :disabled="order.prepacks_total_quantity==order.order_qty"
-                                                                    />
-                                                                </td> -->
                                                                 </div>
                                                             </tr>
 

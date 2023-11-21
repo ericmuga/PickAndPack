@@ -38,7 +38,7 @@ class LineController extends Controller
          return inertia('Line\List',compact('lines'));
 
     }
-
+        
 
 
 

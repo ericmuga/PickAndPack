@@ -29,7 +29,9 @@ return new class extends Migration
     public function down()
     {
         Schema::table('loading_sessions', function (Blueprint $table) {
-            //
+            $table->dropColumn('system_entry');
+            $table->dropColumn('loading_time');
+            $table->dropColumn('status');
         });
     }
 };
