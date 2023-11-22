@@ -40,9 +40,11 @@ class LoadingSessionController extends Controller
    {
       //check if there's a loading session for the current user
 
-      $lds=LoadingSession::where('user_id',$request->user()->id)
-                    ->latest();
-    dd($lds);
+      dd($request->all());
+
+    //   $lds=LoadingSession::where('user_id',$request->user()->id)
+    //                      ->latest();
+    // dd($lds);
 
 
 
