@@ -13,8 +13,8 @@ import debounce from 'lodash/debounce'
 import ProgressBar from 'primevue/progressbar';
 import { useSearchArray } from '@/Composables/useSearchArray';
 import jsPDF from 'jspdf';
-  import QRCode from 'qrcode-generator';
-  import axios from 'axios';
+import QRCode from 'qrcode-generator';
+import axios from 'axios';
 
 
 
@@ -172,9 +172,9 @@ const generatePDF = (from=1,to=1,vessel='') =>
 
                                                 })
             .then((response)=>{
-                 console.log(response)
-                 console.log('here2')
-                //   globalVesselNo.value=response.data.id;
+                //  console.log(response)
+                //  console.log('here2')
+                //   globalVesselNo.value=response.vessel.id;
             })
             .catch((response)=>{
                 console.log(response)
@@ -182,7 +182,8 @@ const generatePDF = (from=1,to=1,vessel='') =>
 
             });
 
-            const qrCodeText=route('loadVessel')+'?order_no='+encodeURIComponent(props.orderLines.data[0].order.order_no)+'&part='+props.orderLines.data[0].part+'&vessel_no='+pageNum;
+            // const qrCodeText=route('loadVessel')+'?order_no='+encodeURIComponent(props.orderLines.data[0].order.order_no)+'&part='+props.orderLines.data[0].part+'&vessel_no='+pageNum;
+            const qrCodeText=props.orderLines.data[0].order.order_no+'_'+props.orderLines.data[0].part+'_'+vessel+'_'+pageNum
 
             const qrCode = new QRCode(0, 'H');
             qrCode.addData(qrCodeText);
@@ -287,10 +288,6 @@ const generatePDF = (from=1,to=1,vessel='') =>
       console.error(`Error uploading page ${index + 1}:`, error);
     });
 });
-
-
-
-
 
     //doc.save('label.pdf')
     openModal();
