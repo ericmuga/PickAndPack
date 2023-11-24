@@ -194,6 +194,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        env('APP_ENV') == 'local' ? Barryvdh\Debugbar\ServiceProvider::class : null,
 
     ],
 
@@ -207,6 +208,7 @@ return [
     | the aliases are "lazy" loaded so they don't hinder performance.
     |
     */
+    'Debugbar' => env('APP_ENV') == 'local' ? Barryvdh\Debugbar\Facades\Debugbar::class : null,
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,

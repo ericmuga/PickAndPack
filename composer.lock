@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "62d5a9fa05bc1da63061f7ab15bccc97",
+    "content-hash": "10e954acd7fc704b7b6e4f52d9859085",
     "packages": [
         {
             "name": "awobaz/compoships",
@@ -7025,16 +7025,16 @@
     "packages-dev": [
         {
             "name": "barryvdh/laravel-debugbar",
-            "version": "v3.8.1",
+            "version": "v3.9.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/barryvdh/laravel-debugbar.git",
-                "reference": "aff3235fecb4104203b1e62c32239c56530eee32"
+                "reference": "bfd0131c146973cab164e50f5cdd8a67cc60cab1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/barryvdh/laravel-debugbar/zipball/aff3235fecb4104203b1e62c32239c56530eee32",
-                "reference": "aff3235fecb4104203b1e62c32239c56530eee32",
+                "url": "https://api.github.com/repos/barryvdh/laravel-debugbar/zipball/bfd0131c146973cab164e50f5cdd8a67cc60cab1",
+                "reference": "bfd0131c146973cab164e50f5cdd8a67cc60cab1",
                 "shasum": ""
             },
             "require": {
@@ -7093,7 +7093,7 @@
             ],
             "support": {
                 "issues": "https://github.com/barryvdh/laravel-debugbar/issues",
-                "source": "https://github.com/barryvdh/laravel-debugbar/tree/v3.8.1"
+                "source": "https://github.com/barryvdh/laravel-debugbar/tree/v3.9.2"
             },
             "funding": [
                 {
@@ -7105,7 +7105,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-02-21T14:21:02+00:00"
+            "time": "2023-08-25T18:43:57+00:00"
         },
         {
             "name": "doctrine/instantiator",
