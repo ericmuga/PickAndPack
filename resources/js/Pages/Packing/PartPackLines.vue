@@ -153,8 +153,15 @@ const generatePDF = (from=1,to=1,vessel='') =>
      let v=1;
      const allPagesContent = [];
      let fontSizeFactor=1;
-     let globalVesselNo=ref('');
+     let globalVesselNo='';
      let lineHeight=0.5;
+     const processGlobalVesselNo=(no)=>{
+       return globalVesselNo=no;
+     }
+
+     const getPDFContent=()=>{
+
+     }
 
     for (let pageNum = from; pageNum <= to; pageNum++)
     {
@@ -172,9 +179,8 @@ const generatePDF = (from=1,to=1,vessel='') =>
 
                                                 })
             .then((response)=>{
-                //  console.log(response)
-                //  console.log('here2')
-                //   globalVesselNo.value=response.vessel.id;
+               processGlobalVesselNo(response.data.data);
+
             })
             .catch((response)=>{
                 console.log(response)
@@ -183,84 +189,7 @@ const generatePDF = (from=1,to=1,vessel='') =>
             });
 
             // const qrCodeText=route('loadVessel')+'?order_no='+encodeURIComponent(props.orderLines.data[0].order.order_no)+'&part='+props.orderLines.data[0].part+'&vessel_no='+pageNum;
-            const qrCodeText=props.orderLines.data[0].order.order_no+'_'+props.orderLines.data[0].part+'_'+vessel+'_'+pageNum
 
-            const qrCode = new QRCode(0, 'H');
-            qrCode.addData(qrCodeText);
-            qrCode.make();
-            const qrCodeDataUrl = qrCode.createDataURL(4);
-            //12 chars is 10
-
-            if (props.orderLines.data[0].order.shp_name.length<=12)
-
-
-             doc.setFontSize(12);
-            else
-
-
-             doc.setFont("helvetica", "bold");
-             let g=0;
-
-            //  if (props.orderLines.data[0].order.shp_name.length>)
-                // {
-                    lines = wrapText(props.orderLines.data[0].order.shp_name);
-
-                    for (var i = 0; i < lines.length; i++) {
-                        if (i==0)
-                         doc.text(lines[i] ,center(lines[i]), 1)
-                        else
-                        doc.text(lines[i] ,center(lines[i]), 1+(i*lineHeight))
-
-                        g++;
-
-                        // doc.text(20, 20 + i * 10, lines[i]);
-                        }
-                    // }
-            //else
-                //   doc.text(props.orderLines.data[0].order.shp_name, center(props.orderLines.data[0].order.shp_name), 1);
-
-            doc.setFontSize(8);
-            doc.text(props.orderLines.data[0].order.order_no+'-'+props.orderLines.data[0].part, center(props.orderLines.data[0].order.order_no+'-'+props.orderLines.data[0].part), 1+(g)*lineHeight);
-            // doc.text('Part-'+props.orderLines.data[0].part, center('Part-'+props.orderLines.data[0].part), 1+1.5*lineHeight);
-
-            // doc.text('Weight-'+ parseFloat(sumPackedQtyByVessel(assembledArray.value,from,pageNum)/(from-pageNum+1)).toFixed(2)+'KGS', center('Weight-'+parseFloat(sumPackedQtyByVessel(assembledArray.value,from,pageNum)/(from-pageNum+1)).toFixed(2))+'KGS', 1+3*lineHeight);
-            doc.text('WT:'+sumPackedQtyByVessel(from,pageNum)/((pageNum-from)+1)+'Kgs.', center('WT:'+sumPackedQtyByVessel(from,pageNum)+'Kgs.'), 1+(g+1)*lineHeight);
-
-            if (props.orderLines.data[0].order.sp_search_name.length<=12)
-
-
-             doc.setFontSize(12);
-            else
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "normal");
-            doc.text(vessel+'-'+pageNum, center(vessel+'-'+pageNum),1+ (g+2)*lineHeight);
-            doc.text('Packer : '+props.user.data.user_name,center('Packer : '+props.user.data.user_name),1+ (g+3)*lineHeight);
-            // doc.text('Serial No. : '+ globalVesselNo.value,center('Serial No. : '+ globalVesselNo.value),1+ 5*lineHeight);
-            doc.addImage(qrCodeDataUrl, 'JPEG', 1.5, (g+5.25)*lineHeight, 2, 2);
-            doc.setFontSize(12);
-            doc.setFont("helvetica", "bold");
-
-
-            if (props.orderLines.data[0].order.sp_search_name.length>18)
-            {
-                let f=0;
-                let lines2=[];
-                lines2 = wrapText(props.orderLines.data[0].order.sp_search_name);
-
-               for (var i = 0; i < lines2.length; i++)
-               {
-
-                   doc.text(lines2[i] ,center(lines2[i]), 1+(g+8+f)*lineHeight)
-                 f++;
-                // doc.text(20, 20 + i * 10, lines[i]);
-                }
-
-
-            }
-            else
-
-            doc.text(props.orderLines.data[0].order.sp_search_name, center(props.orderLines.data[0].order.sp_search_name),1+ (g+9)*lineHeight);
-            // const pageContent = ;
     }
 
     allPagesContent.push(doc.output('datauristring'));

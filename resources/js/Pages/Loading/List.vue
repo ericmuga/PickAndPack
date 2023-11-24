@@ -9,8 +9,14 @@ import {watch, ref,onMounted} from 'vue';
 import Pagination from '@/Components/Pagination.vue';
 import { useForm } from '@inertiajs/inertia-vue3'
 import Modal from '@/Components/Modal.vue'
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
+import useExcel from '@/Composables/useExcel.js';
+const { exportToExcel } = useExcel();
+const fileName = 'LoadingSheet';
+const exportData = (jsonData, columns) => {
+ exportToExcel(jsonData, columns, fileName);
 
+};
 
 const search=ref()
 watch(search, debounce(()=>{Inertia.post('/order/all',{search:search.value}, {preserveScroll: true})}, 500));
@@ -107,35 +113,38 @@ const showUpdateModal=(session)=>{
     showModal.value=true
 }
 
+const showContents = (lines) => {
 
-// const confirmPack=(order_no,part)=>{ Inertia.get(route('pack.order',{'order_no':order_no,'part_no':part}))}
- const showContents = (lines) => {
+    //get lines that should be loaded for the route and check status
 
 
-                                    let orders='';
-                                    // console.log(response.data)
-                                    for (let index = 0; index < lines.length; index++) {
-                                        orders+='<tr><td class="p-2 text-left">'+lines[index].vessel+'</td><td class="p-2 text-center">'+lines[index].vessel_no+'</td><td class="p-2 text-left">'+lines[index].vessel_qr+'</td></tr>';
+  let orders = '';
 
-                                    }
-                                            Swal.fire({
-                                                    title: 'Load',
-                                                    html: `
-                                                        <div id="pdf-modal" class="p-4 bg-orange-100 rounded-lg">
+  for (let index = 0; index < lines.length; index++) {
+    orders += '<tr><td class="p-2 text-left">' + lines[index].vessel + '</td><td class="p-2 text-center">' + lines[index].vessel_no + '</td><td class="p-2 text-left">';
+  }
 
-                                                             <table class="p-1 text-sm font-semibold " >  ${orders}</table>
+  const modalContent = `
+    <div id="pdf-modal" class="p-4 bg-gray-100 rounded-lg">
+      <table class="p-1 text-sm font-semibold">  ${orders}</table>
+    </div>
+    <button id="excel-button" class="swal2-confirm swal2-styled" style="float: right;">Excel</button>
+  `;
 
-                                                        </div>`,
-                                                    showConfirmButton: false,
-                                                    });
-                                                    // console.log(response.data);
+  Swal.fire({
+    title: 'Load',
+    html: modalContent,
+    showConfirmButton: false,
+    showCancelButton: false,
+    didRender: () => {
+      document.getElementById('excel-button').addEventListener('click', () => {
 
-                                // .catch(response) => {
-                                //     // console.log(response)
-                                // Swal.fire('Error', response.data.message, 'error');
-                                //     });
-
-                };
+        exportData(lines, null);
+        Swal.close();
+      });
+    },
+  });
+};
 
 
 

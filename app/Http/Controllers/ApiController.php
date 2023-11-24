@@ -55,11 +55,10 @@ class ApiController extends Controller
         $extdocItem='';
         foreach ($sortedData as $data)
             {
-
-              if (!is_array($data)) continue;
-                if (!array_key_exists('ext_doc_no',$data)) continue;
-
-                  if($extdocItem==$data['ext_doc_no'].$data['item_no']) continue;
+              if (!is_array($data)) break;
+                if (!array_key_exists('ext_doc_no',$data))continue;
+                 if (!$data['uom_code']!='nan')continue;
+                  if(!$extdocItem!= $data['ext_doc_no'].$data['item_no']) continue;
                     array_push($array_to_insert,
                                 [
                                     'company' => $data['company'],
@@ -73,9 +72,9 @@ class ApiController extends Controller
                                     'shp_code' => $data['shp_code'],
                                     'shp_date' => Carbon::tomorrow()->toDateString(),
                                     'sp_code' => $data['sp_code'],
-                                    // 'uom_code' =>$data['uom_code']
+                                    'uom_code' =>$data['']
                                 ]);
-                                $extdocItem= $data['ext_doc_no'].$data['item_no'];
+
             }
             ImportedOrder::upsert($array_to_insert,['item_no','ext_doc_no']);
          return response()->json(['message' => 'Data saved successfully']);

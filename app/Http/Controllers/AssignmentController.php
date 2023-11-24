@@ -38,7 +38,9 @@ class AssignmentController extends Controller
 
 
         $assemblers=DB::table('users')->select('name','id')->orderBy('name')->get();
-return inertia('Assignment/Create',compact('orders' ,'spcodes','assemblers','date'));
+    //  return response('',200,[]);
+
+        return inertia('Assignment/Create',compact('orders' ,'spcodes','assemblers','date'));
 
     }
 
@@ -115,7 +117,25 @@ return inertia('Assignment/Create',compact('orders' ,'spcodes','assemblers','dat
                 'order_no'=>$p['order_no'],
             ]);
         }
-        return redirect(route('assignment.index'));
+        // return redirect(route('assignment.index'));
+            $date=$request->has('shp_date')?$request->shp_date:Carbon::tomorrow()->toDateString();
+
+
+        if($request->records=='ALL')$records=500;
+        else         $records=$request->records?:5;
+
+            $orders = AssignmentOrderResource::collection(Order::shipcurrent()
+                                                            ->when($request->has('spcodes')&&($request->spcodes<>''),fn($q)=>$q->whereIn('sp_code',$request->spcodes))
+                                                            ->where('shp_date',$date)
+                                                            ->select('shp_name', 'order_no', 'shp_date', 'sp_code')
+                                                            ->with(['lines','assignmentLines'])
+                                                            ->withCount(['assignmentLines','confirmations'])
+                                                            ->paginate($records)
+                                                            ->appends($request->all())
+                                                            // ->withQueryString();
+                                                                );
+
+        return response()->json(['data'=>$orders]);
 
     }
 
