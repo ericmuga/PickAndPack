@@ -117,7 +117,7 @@ class AssignmentController extends Controller
             ]);
         }
 
-
+ $records=$request->records;
        $date=$request->has('shp_date')?$request->shp_date:Carbon::tomorrow()->toDateString();
         $orders = AssignmentOrderResource::collection(Order::shipcurrent()
                                                             ->when($request->has('selected_spcodes')&&($request->selected_spcodes<>''),fn($q)=>$q->whereIn('sp_code',$request->selected_spcodes))
@@ -147,7 +147,7 @@ class AssignmentController extends Controller
         $assemblersParam=$request->has('assemblers')?$request->assemblers:[];
         $assemblers=DB::table('users')->select('name','id')->orderBy('name')->get();
 
-        $records=$request->records;
+
         $selected_spcodes=$request->selected_spcodes?:'';
          $spcodes=DB::table('sales_people')->select('name','code')->get();
 

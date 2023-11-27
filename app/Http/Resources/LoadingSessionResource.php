@@ -40,7 +40,9 @@ class LoadingSessionResource extends JsonResource
             'loader_id'=>$this->user_id,
             'sp'=>DB::table('sales_people')->select('Name')->where('code',$this->sp_code)->get(),
             'shp_date'=>$this->shp_date,
-            'route'=>$this->SalesPerson()->first()->name,
+            'route'=>\App\Models\Order::whereIn('order_no', $this->orderArrayInSession())
+                                     ->select('orders.sp_name')
+                                      ->first()?->sp_name,
             'driver'=>$this->driver()->first()?->name,
             'vehicle'=>$this->vehicle()->first()->plate,
             'loader'=>\App\Models\User::find($this->user_id)->name,
