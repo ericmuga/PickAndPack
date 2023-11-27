@@ -225,7 +225,7 @@ const showContents = (lines) => {
                                                            Session Id
                                                         </th>
                                                         <th scope="col" class="px-2 py-1 text-center">
-                                                            Loading Date
+                                                            Route
                                                         </th>
                                                         <!--
                                                         <th scope="col" class="px-2 py-1">
@@ -259,7 +259,7 @@ const showContents = (lines) => {
                                                     </td>
 
                                                      <td class="px-3 py-2 text-xs font-bold text-center ">
-                                                        {{ session.loading_date }}
+                                                        {{ session.route }}
                                                     </td>
 
                                                      <td class="px-3 py-2 text-xs">
@@ -320,7 +320,7 @@ const showContents = (lines) => {
                                                                       text
 
 
-                                                                      @click="showUpdateModal(session)"
+                                                                      @click="showUpdateModal(session.id)"
                                                                       />
                                                        </div>
                                                     </td>
