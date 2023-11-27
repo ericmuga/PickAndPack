@@ -16,5 +16,10 @@ class LoadingLine extends Model
     return $this->belongsTo(LoadingSession::class);
  }
 
+//  public function order()
+//  {
+//     return
+//  }
+
 
 }

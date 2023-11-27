@@ -13,6 +13,7 @@ import Swal from 'sweetalert2';
 import useExcel from '@/Composables/useExcel.js';
 const { exportToExcel } = useExcel();
 const fileName = 'LoadingSheet';
+
 const exportData = (jsonData, columns) => {
  exportToExcel(jsonData, columns, fileName);
 
@@ -113,15 +114,20 @@ const showUpdateModal=(session)=>{
     showModal.value=true
 }
 
-const showContents = (lines) => {
+const showContents = (lines,load) => {
 
     //get lines that should be loaded for the route and check status
 
-
+  console.log(lines);
   let orders = '';
 
   for (let index = 0; index < lines.length; index++) {
-    orders += '<tr><td class="p-2 text-left">' + lines[index].vessel + '</td><td class="p-2 text-center">' + lines[index].vessel_no + '</td><td class="p-2 text-left">';
+
+    orders += '<tr>'+
+                 '<td class="p-1 text-left">' +lines[index].vessel +'</td>'+
+                 '<td class="p-1 text-left">' +lines[index].vessel_qr +'</td>'+
+                 '<td class="p-1 text-left">' +lines[index].shp_name+'</td>'+
+                '<td class="p-1 text-center">';
   }
 
   const modalContent = `
