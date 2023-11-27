@@ -11,246 +11,8 @@ import Modal from '@/Components/Modal.vue'
 import { useStorage } from '@/Composables/useStorage';
 import { useDates } from '@/Composables/useDates';
 import DownloadButton from '@/Components/DownloadButton.vue';
-
-import jsPDF from 'jspdf';
-// import QRCode from 'qrcode-generator';
-import axios from 'axios';
-import Swal from 'sweetalert2';
-
 // import SearchBox from '@/Components/SearchBox.vue';
 // import InputSwitch from 'primevue/inputswitch';
-
-
-const openModal = () => {
-
-  if (pdfDataUrl.value)
-   {
-
-
-
-
-    Swal.fire({
-      title: 'Packing List',
-      html: `
-        <div id="pdf-modal">
-          <iframe src="${pdfDataUrl.value}" width="100%" height="400px"></iframe>
-        </div>`,
-      showConfirmButton: false,
-    });
-  } else {
-    Swal.fire({
-      title: 'PDF not generated',
-      text: 'Please generate the PDF first.',
-      icon: 'error',
-    });
-  }
-
-
-
-};
-
-const pdfDataUrl = ref('');
-
-
-
-const generatePDF = (order_no,part) =>
-{
-
-    //get order part
-    let order={};
-    // console.log(order_no);
-
-    axios.post(route('getOrderPart'),{order_no,part})
-         .then((response)=>{console.log(response.data)})
-         .catch((response)=>{
-            console.log(response)
-         })
-
-
-//      const doc = new jsPDF({
-//                             orientation: "portrait",
-//                             unit: "cm",
-//                             format: [21,  29.7]
-//                             });
-
-
-//      const center=(text)=>{
-//                 const textWidth = doc.getStringUnitWidth(text) * doc.internal.getFontSize() / doc.internal.scaleFactor;
-//             return (doc.internal.pageSize.width - textWidth) / 2;
-//             }
-
-//      var maxWidth = 100;
-//      const  getTextWidth=(text)=> {
-//                 var textWidth = doc.getStringUnitWidth(text) * doc.internal.getFontSize();
-//                 return textWidth;
-//                 }
-
-//      const  wrapText=(text)=> {
-//                         var words = text.split(' ');
-//                         var lines = [];
-//                         var currentLine = '';
-
-//                         for (var i = 0; i < words.length; i++) {
-//                             var word = words[i];
-//                             var width = getTextWidth(currentLine + ' ' + word);
-
-//                             if (width < maxWidth) {
-//                             currentLine += (currentLine === '' ? '' : ' ') + word;
-//                             } else {
-//                             lines.push(currentLine);
-//                             currentLine = word;
-//                             }
-//                         }
-//             // Add the last line
-//             lines.push(currentLine);
-//             return lines;
-//             }
-
-//      let lines='';
-
-//      let v=1;
-//      const allPagesContent = [];
-//      let fontSizeFactor=1;
-//      let globalVesselNo=ref('');
-//      let lineHeight=0.5;
-
-//     for (let pageNum = from; pageNum <= to; pageNum++)
-//     {
-//             if (pageNum > from)
-//             {
-//                 v++;
-//                 doc.addPage();
-//             }
-
-
-//             if (props.orderLines.data[0].order.shp_name.length<=12)
-
-
-//              doc.setFontSize(12);
-//             else
-
-
-//              doc.setFont("helvetica", "bold");
-//              let g=0;
-
-//             //  if (props.orderLines.data[0].order.shp_name.length>)
-//                 // {
-//                     lines = wrapText(props.orderLines.data[0].order.shp_name);
-
-//                     for (var i = 0; i < lines.length; i++) {
-//                         if (i==0)
-//                          doc.text(lines[i] ,center(lines[i]), 1)
-//                         else
-//                         doc.text(lines[i] ,center(lines[i]), 1+(i*lineHeight))
-
-//                         g++;
-
-//                         // doc.text(20, 20 + i * 10, lines[i]);
-//                         }
-//                     // }
-//             //else
-//                 //   doc.text(props.orderLines.data[0].order.shp_name, center(props.orderLines.data[0].order.shp_name), 1);
-
-//             doc.setFontSize(8);
-//             doc.text(props.orderLines.data[0].order.order_no+'-'+props.orderLines.data[0].part, center(props.orderLines.data[0].order.order_no+'-'+props.orderLines.data[0].part), 1+(g)*lineHeight);
-//             // doc.text('Part-'+props.orderLines.data[0].part, center('Part-'+props.orderLines.data[0].part), 1+1.5*lineHeight);
-
-//             // doc.text('Weight-'+ parseFloat(sumPackedQtyByVessel(assembledArray.value,from,pageNum)/(from-pageNum+1)).toFixed(2)+'KGS', center('Weight-'+parseFloat(sumPackedQtyByVessel(assembledArray.value,from,pageNum)/(from-pageNum+1)).toFixed(2))+'KGS', 1+3*lineHeight);
-//             doc.text('WT:'+sumPackedQtyByVessel(from,pageNum)/((pageNum-from)+1)+'Kgs.', center('WT:'+sumPackedQtyByVessel(from,pageNum)+'Kgs.'), 1+(g+1)*lineHeight);
-
-//             if (props.orderLines.data[0].order.sp_search_name.length<=12)
-
-
-//              doc.setFontSize(12);
-//             else
-//             doc.setFontSize(10);
-//             doc.setFont("helvetica", "normal");
-//             doc.text(vessel+'-'+pageNum, center(vessel+'-'+pageNum),1+ (g+2)*lineHeight);
-//             doc.text('Packer : '+props.user.data.user_name,center('Packer : '+props.user.data.user_name),1+ (g+3)*lineHeight);
-//             // doc.text('Serial No. : '+ globalVesselNo.value,center('Serial No. : '+ globalVesselNo.value),1+ 5*lineHeight);
-//             doc.addImage(qrCodeDataUrl, 'JPEG', 1.5, (g+5.25)*lineHeight, 2, 2);
-//             doc.setFontSize(12);
-//             doc.setFont("helvetica", "bold");
-
-
-//             if (props.orderLines.data[0].order.sp_search_name.length>18)
-//             {
-//                 let f=0;
-//                 let lines2=[];
-//                 lines2 = wrapText(props.orderLines.data[0].order.sp_search_name);
-
-//                for (var i = 0; i < lines2.length; i++)
-//                {
-
-//                    doc.text(lines2[i] ,center(lines2[i]), 1+(g+8+f)*lineHeight)
-//                  f++;
-//                 // doc.text(20, 20 + i * 10, lines[i]);
-//                 }
-
-
-//             }
-//             else
-
-//             doc.text(props.orderLines.data[0].order.sp_search_name, center(props.orderLines.data[0].order.sp_search_name),1+ (g+9)*lineHeight);
-//             // const pageContent = ;
-//     }
-
-//     allPagesContent.push(doc.output('datauristring'));
-//     pdfDataUrl.value = allPagesContent;
-
-
-//       const pdfDataUri =pdfDataUrl.value;
-
-//   // Create a Blob from the data URI
-// //   const blob = dataURItoBlob(pdfDataUri);
-//   const blobs = dataURIsToBlobs(allPagesContent);
-
-//   // Create a File from the Blob
-//   blobs.forEach((blob, index) => {
-//   const formData = new FormData();
-//   formData.append('pdfFile', blob);
-//   formData.append('pageNumber', index + 1); // You may want to include the page number or other relevant info
-//   formData.append('order',convertToValidFilename(props.orderLines.data[0].order.order_no+props.orderLines.data[0].part+'-'+props.orderLines.data[0].order.shp_name));
-
-//   axios.post(route('vessels.upload'), formData)
-//     .then((response) => {
-//     //   console.log(`Page ${index + 1} uploaded successfully`, response.data);
-//     })
-//     .catch((error) => {
-//       console.error(`Error uploading page ${index + 1}:`, error);
-//     });
-// });
-
-
-
-
-
-//     //doc.save('label.pdf')
-//     openModal();
-
-};
-
-function convertToValidFilename(inputString) {
-  // Replace spaces and special characters with underscores
-  const validFilename = inputString.replace(/[^\w.]/g, '_');
-
-  // Optionally, you can remove consecutive underscores
-  return validFilename.replace(/_+/g, '_');
-}
-
- const qrCodeImage=(text)=> {
-    // Create and return a QR code image using your preferred QR code library
-    // You can use a library like qrcode-generator or qrcode-svg
-    // Here's a simplified example using an SVG QR code:
-    const qrCode = new QRCode(text, 4);
-    return qrCode.getBase64();
-  };
-
-
-
-
-
-
 
  let searchKey=ref('')
 //   const getRoute=computed(()=>route(`${props.model}'.index'`))
@@ -303,7 +65,7 @@ const props= defineProps({
     spcodes:Object,
 })
 
-// watch(selectedParts,console.log(selectedParts));
+watch(selectedParts,console.log(selectedParts));
 
 const  updateCheckedItems=()=>{
     selectedParts.value = selectedParts.value.filter(item => items.some(i => i.id === item));
@@ -328,12 +90,7 @@ const CheckPrinted=(Order,Part)=>{
 }
 
 const ConfirmPrint=(order_no,part_no)=>{
-   //print PDF
-
-     generatePDF(order_no,part_no);
-
-
-   // Inertia.post(route('confirmations.store'),{order_no,part_no},{preserveScroll:true});
+    Inertia.post(route('confirmations.store'),{order_no,part_no},{preserveScroll:true});
 }
 
 const dynamicObject=ref({});
@@ -363,7 +120,7 @@ function removeNullAndBlankKeys(obj) {
   );
 }
 const dateKeys = getKeysWithDateType(props);
-// console.log(dateKeys);
+console.log(dateKeys);
 
 
 const dateDynamicObject = dateKeys.map((key) => ({
