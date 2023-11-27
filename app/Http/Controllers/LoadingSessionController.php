@@ -28,7 +28,7 @@ class LoadingSessionController extends Controller
        $rows=$request->rows?:10;
         $spcodes=DB::table('sales_people')->select('name','code')->get();
 
-        $sessions= LoadingSessionResource::collection(LoadingSession::with('lines','SalesPerson')->paginate($rows));
+        $sessions= LoadingSessionResource::collection(LoadingSession::with('lines','SalesPerson')->latest()->paginate($rows));
 // dd($sessions);
        return inertia('Loading/List',compact('sessions','drivers','vehicles','loaders','spcodes'));
 
