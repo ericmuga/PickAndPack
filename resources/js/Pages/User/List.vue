@@ -134,7 +134,7 @@ const showUpdateModal=(user)=>{
 
 
 
-                                             <SearchBox :model="users.index" />
+                                             <SearchBox  :model="route('users.index')" />
                                     </template>
                                         </Toolbar>
 

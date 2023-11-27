@@ -14,12 +14,12 @@ import  debounce  from "lodash/debounce";
 import {Inertia} from '@inertiajs/inertia'
 
   const props=defineProps({model:String})
-//   const {model}= toRefs(props)
+  const {model}= toRefs(props)
 //   const emit =defineEmits('loadMembers');
 //   let items=null
   let searchKey=ref('')
   watch(searchKey,debounce((value)=>{
-                                    Inertia.get(model,{'search':value},{preserveState:true,replace:true})
+                                    Inertia.get(model.value,{'search':value},{preserveState:true,replace:true})
                                     },300));
 
 </script>
