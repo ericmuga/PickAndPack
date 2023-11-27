@@ -93,12 +93,9 @@ class AssignmentController extends Controller
 
         // dd($request->all());
 
-       if ($request->has('records'))
-       {
-         if ($request->records=='ALL') $record=300;
-         else $records=$request->records;
-       }
-       else $records=5;
+
+        if($request->records=='ALL')$records=500;
+        else         $records=$request->records?:5;
        $ass=Assignment::create([
                 'assignee_id'=>$request->assignee,
                 'assignor_id'=>$request->user()->id,
@@ -117,7 +114,7 @@ class AssignmentController extends Controller
             ]);
         }
 
- $records=$request->records?:100;
+//  $records=$request->records?:100;
        $date=$request->has('shp_date')?$request->shp_date:Carbon::tomorrow()->toDateString();
         $orders = AssignmentOrderResource::collection(Order::shipcurrent()
                                                             ->when($request->has('selected_spcodes')&&($request->selected_spcodes<>''),fn($q)=>$q->whereIn('sp_code',$request->selected_spcodes))
