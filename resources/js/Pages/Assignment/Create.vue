@@ -15,6 +15,10 @@ const searchKey=ref('');
 
 let filteredOrders=ref({});
 
+let assignedLocal =ref([]);
+
+
+
 
 watch(searchKey,debounce((value)=>{
                                     if (searchKey.value!='')

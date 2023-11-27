@@ -89,7 +89,8 @@ class AssignmentController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
+
+         // dd($request->all());
 
       // create the assignment
         //$batchNo
@@ -100,14 +101,7 @@ class AssignmentController extends Controller
 
        ]);
 
-
-
-      //create the lines
-
-
-
-
-        foreach($request->selectedParts as $p)
+     foreach($request->selectedParts as $p)
         {
 
             AssignmentLine::updateOrCreate([
@@ -117,25 +111,7 @@ class AssignmentController extends Controller
                 'order_no'=>$p['order_no'],
             ]);
         }
-        // return redirect(route('assignment.index'));
-            $date=$request->has('shp_date')?$request->shp_date:Carbon::tomorrow()->toDateString();
-
-
-        if($request->records=='ALL')$records=500;
-        else         $records=$request->records?:5;
-
-            $orders = AssignmentOrderResource::collection(Order::shipcurrent()
-                                                            ->when($request->has('spcodes')&&($request->spcodes<>''),fn($q)=>$q->whereIn('sp_code',$request->spcodes))
-                                                            ->where('shp_date',$date)
-                                                            ->select('shp_name', 'order_no', 'shp_date', 'sp_code')
-                                                            ->with(['lines','assignmentLines'])
-                                                            ->withCount(['assignmentLines','confirmations'])
-                                                            ->paginate($records)
-                                                            ->appends($request->all())
-                                                            // ->withQueryString();
-                                                                );
-
-        return response()->json(['data'=>$orders]);
+        return redirect(route('assignment.index'));
 
     }
 
