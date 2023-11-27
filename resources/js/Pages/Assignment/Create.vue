@@ -48,11 +48,7 @@ const refreshSearch=()=>{
                        'assignee': assignee.value,
                        'records':records.value
                       },
-                      {preserveScroll:true,
-                        preserveState:true,
-                        replace:true
-
-                    }
+                      {preserveScroll:true,preserveState:true,replace:true}
 
                );
       if (searchKey.value!='')
@@ -65,20 +61,17 @@ const refreshSearch=()=>{
 
 const assign=()=>{
 
-axios.post(route('assignment.store'),
+Inertia.post(route('assignment.store'),
              { 'selectedParts': selectedOrderParts.value,
                'assignee': assignee.value
-             })
-             .then(
-                (response)=>{
-
-                            // console.log(response);
-                            filteredOrders.value=response.data.data.filter(item => item.confirmations_count !== item.assignments_count);
-                                selectedOrderParts.value=[];
-                                assignee.value='';
-                                Swal.fire('Assignment created Successfully!','','success');
-
-                            });
+             },
+             {
+                  onSuccess:()=>{selectedOrderParts.value=[]; assignee.value='';  Swal.fire('Assignment created Successfully!','','success')},
+                 preserveScroll:true,
+                  preserveState:true,
+                        replace:true
+             }
+             );
 
 
 
