@@ -153,6 +153,11 @@ const showUpdateModal=(user)=>{
                                                         <th scope="col" class="px-6 py-3 text-center">
                                                             email
                                                         </th>
+                                                         <th scope="col" class="px-6 py-3 text-center">
+                                                            roles
+                                                        </th>
+
+
                                                         <!-- <th scope="col" class="px-6 py-3">
 
                                                         </th>
@@ -177,6 +182,11 @@ const showUpdateModal=(user)=>{
 
                                                     <td class="px-3 py-2 text-xs font-bold text-center ">
                                                         {{ user.email }}
+                                                    </td>
+                                                    <td class="px-3 py-2 text-xs font-bold text-center ">
+                                                        <div v-for="item in user.roles" :key="item.id">
+                                                          {{ item.name }}
+                                                        </div>
                                                     </td>
                                                     <!-- <td class="px-3 py-2 text-xs font-bold">
                                                         {{ user.description }}
@@ -245,12 +255,18 @@ const showUpdateModal=(user)=>{
 
            v-model="form.name"
         />
+
+
         <InputText
            disabled="true"
            placeholder="email"
            v-model="form.email"
 
         />
+
+        <table>
+            <!-- <tr v-for="role in props.user.roles"></tr> -->
+        </table>
 
         <!-- <Password v-model="form.Password" :feedback="true" /> -->
 
