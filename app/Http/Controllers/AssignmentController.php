@@ -117,7 +117,7 @@ class AssignmentController extends Controller
             ]);
         }
 
- $records=$request->records;
+ $records=$request->records?:100;
        $date=$request->has('shp_date')?$request->shp_date:Carbon::tomorrow()->toDateString();
         $orders = AssignmentOrderResource::collection(Order::shipcurrent()
                                                             ->when($request->has('selected_spcodes')&&($request->selected_spcodes<>''),fn($q)=>$q->whereIn('sp_code',$request->selected_spcodes))
