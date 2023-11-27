@@ -13,8 +13,8 @@ import debounce from 'lodash/debounce'
 import ProgressBar from 'primevue/progressbar';
 import { useSearchArray } from '@/Composables/useSearchArray';
 import jsPDF from 'jspdf';
-import QRCode from 'qrcode-generator';
-import axios from 'axios';
+  import QRCode from 'qrcode-generator';
+  import axios from 'axios';
 
 
 
@@ -52,11 +52,11 @@ const dataURIsToBlobs = (dataURIs) => {
 
 
   const sumPackedQtyByVessel=(fromVessel, toVessel)=> {
-  // Filter the array based on matching from_vessel and to_vessel
-  const filteredData = assembledArray.value.filter(item => item.from_vessel === fromVessel && item.to_vessel === toVessel);
+    // Filter the array based on matching from_vessel and to_vessel
+    const filteredData = assembledArray.value.filter(item => item.from_vessel === fromVessel && item.to_vessel === toVessel);
 
-  // Calculate the sum of packed_qty for the filtered items
-  const sumPackedQty = filteredData.reduce((sum, item) => sum + parseFloat(item.packed_qty), 0);
+    // Calculate the sum of packed_qty for the filtered items
+    const sumPackedQty = filteredData.reduce((sum, item) => sum + parseFloat(item.packed_qty), 0);
 
   return sumPackedQty;
 }
@@ -105,13 +105,17 @@ const assembledArray=ref([]);
 
 const selectedFile=ref();
 
-const generatePDF = (from=1,to=1,vessel='') =>
+const generatePDF = (from=1,to=1,vessel='',weight) =>
 {
 
 
 
 
     submitForm()
+
+
+
+
      const doc = new jsPDF({
                             orientation: "portrait",
                             unit: "cm",
@@ -147,21 +151,17 @@ const generatePDF = (from=1,to=1,vessel='') =>
             // Add the last line
             lines.push(currentLine);
             return lines;
-            }
+      }
+
+
+
      let lines='';
 
      let v=1;
      const allPagesContent = [];
      let fontSizeFactor=1;
-     let globalVesselNo='';
+     let globalVesselNo=ref('');
      let lineHeight=0.5;
-     const processGlobalVesselNo=(no)=>{
-       return globalVesselNo=no;
-     }
-
-     const getPDFContent=()=>{
-
-     }
 
     for (let pageNum = from; pageNum <= to; pageNum++)
     {
@@ -171,25 +171,88 @@ const generatePDF = (from=1,to=1,vessel='') =>
                 doc.addPage();
             }
     // alert(form.vessel)
-            axios.post(route('vessels.store'),{
-                                                    'order_no':props.orderLines.data[0].order.order_no,
-                                                    'part':props.orderLines.data[0].part,
-                                                    'vessel_type':vessel,
-                                                    'vessel_no':pageNum,
+           axios.post(route('vessels.store'),{
+											'order_no':props.orderLines.data[0].order.order_no,
+											'part':props.orderLines.data[0].part,
+											'vessel_type':vessel,
+											'vessel_no':pageNum,
 
-                                                })
-            .then((response)=>{
-               processGlobalVesselNo(response.data.data);
-
-            })
-            .catch((response)=>{
-                console.log(response)
-                // Swal.fire('Error', response.data.message, 'error')
+                                            })
+               .catch((response)=>{
+                // console.log(response)
 
             });
 
-            // const qrCodeText=route('loadVessel')+'?order_no='+encodeURIComponent(props.orderLines.data[0].order.order_no)+'&part='+props.orderLines.data[0].part+'&vessel_no='+pageNum;
+            const qrCodeText=props.orderLines.data[0].order.order_no+'_'+props.orderLines.data[0].part+'_'+pageNum;
 
+            const qrCode = new QRCode(0, 'H');
+            qrCode.addData(qrCodeText);
+            qrCode.make();
+            const qrCodeDataUrl = qrCode.createDataURL(4);
+            //12 chars is 10
+
+            if (props.orderLines.data[0].order.shp_name.length<=12)
+
+
+             doc.setFontSize(12);
+            else
+
+
+             doc.setFont("helvetica", "bold");
+             let g=0;
+
+            //  if (props.orderLines.data[0].order.shp_name.length>)
+                // {
+                    lines = wrapText(props.orderLines.data[0].order.shp_name);
+
+                    for (var i = 0; i < lines.length; i++) {
+                        if (i==0)
+                         doc.text(lines[i] ,center(lines[i]), 1)
+                        else
+                        doc.text(lines[i] ,center(lines[i]), 1+(i*lineHeight))
+
+                        g++;
+
+                        // doc.text(20, 20 + i * 10, lines[i]);
+                        }
+                    // }
+            //else
+                //   doc.text(props.orderLines.data[0].order.shp_name, center(props.orderLines.data[0].order.shp_name), 1);
+
+            doc.setFontSize(8);
+            doc.text(props.orderLines.data[0].order.order_no+'-'+props.orderLines.data[0].part, center(props.orderLines.data[0].order.order_no+'-'+props.orderLines.data[0].part), 1+(g)*lineHeight);
+            doc.text('WT:'+weight+'Kgs.', center('WT:'+weight+'Kgs.'), 1+(g+1)*lineHeight);
+
+            if (props.orderLines.data[0].order.sp_search_name.length<=12)
+             doc.setFontSize(12);
+            else
+              doc.setFontSize(10);
+
+            doc.setFont("helvetica", "normal");
+            doc.text(vessel+'-'+pageNum +'-Of-'+to, center(vessel+'-'+pageNum +'-Of-'+to),1+ (g+2)*lineHeight);
+            doc.addImage(qrCodeDataUrl, 'JPEG', 1.5, (g+5.25)*lineHeight, 2, 2);
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+
+
+            if (props.orderLines.data[0].order.sp_search_name.length>18)
+            {
+                let f=0;
+                let lines2=[];
+                lines2 = wrapText(props.orderLines.data[0].order.sp_search_name);
+
+               for (var i = 0; i < lines2.length; i++)
+               {
+                 doc.text(lines2[i] ,center(lines2[i]), 1+(g+8+f)*lineHeight)
+                 f++;
+               }
+
+
+            }
+            else
+
+            doc.text(props.orderLines.data[0].order.sp_search_name, center(props.orderLines.data[0].order.sp_search_name),1+ (g+9)*lineHeight);
+            // const pageContent = ;
     }
 
     allPagesContent.push(doc.output('datauristring'));
@@ -217,6 +280,10 @@ const generatePDF = (from=1,to=1,vessel='') =>
       console.error(`Error uploading page ${index + 1}:`, error);
     });
 });
+
+
+
+
 
     //doc.save('label.pdf')
     openModal();
@@ -746,19 +813,6 @@ onUnmounted(() => {
                                                 <div class="col-span-1">
                                                     <div  class="w-full p-3 m-2 text-center text-white bg-orange-200"> Ordered</div>
                                                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 ">
-                                                        <!-- <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-
-                                                            <tr class="bg-slate-300">
-                                                                <th  scope="col" class="px-6 py-3">Item No.</th>
-                                                                <th  scope="col" class="px-6 py-3">Item</th>
-
-                                                                <th  scope="col" class="px-6 py-3">Barcode</th>
-                                                                <th  scope="col" class="px-6 py-3">Ordered qty</th>
-                                                                <th  scope="col" class="px-6 py-3">Prepack qty</th>
-                                                                <th  scope="col" class="px-6 py-3">Assembled qty</th>
-                                                            </tr>
-
-                                                        </thead> -->
 
 
                                                         <tbody>
@@ -781,17 +835,7 @@ onUnmounted(() => {
                                                                     {{ line.order_qty }}
                                                                 </td>
 
-                                                                <!-- <td class="px-3 py-2 text-xs">
-                                                                    {{ line.prepacks_total_quantity}}
-                                                                </td> -->
 
-                                                                <!-- <td class="px-3 py-2 text-xs text-center text-black bg-yellow-300 rounded-sm">
-                                                                    <input
-                                                                      class="text-center rounded"
-                                                                      v-model="order.ass_qty"
-                                                                      :disabled="order.prepacks_total_quantity==order.order_qty"
-                                                                    />
-                                                                </td> -->
                                                                 </div>
                                                             </tr>
 
@@ -1010,7 +1054,7 @@ onUnmounted(() => {
 
          </div>
 
-              <Button @click="generatePDF(form.from_vessel,form.to_vessel,form.vessel)"
+              <Button @click="generatePDF(form.from_vessel,form.to_vessel,form.vessel,form.packed_qty)"
                 v-show="((parseInt(form.from_vessel)>0)&&(form.from_batch!='')&&(form.vessel!=null))||form.empty"
                 label="Close Carton"
                 severity="warning"

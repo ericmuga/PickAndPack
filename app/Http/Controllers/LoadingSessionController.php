@@ -36,23 +36,20 @@ class LoadingSessionController extends Controller
     }
 
 
-   public function loadVessel(Request $request)
-   {
-      //check if there's a loading session for the current user
+//    public function loadVessel(Request $request)
+//    {
+//       //check if there's a loading session for the current user
 
-      dd($request->all());
+//      $lds=LoadingSession::where('user_id',$request->user()->id)->latest()->first();
 
-    //   $lds=LoadingSession::where('user_id',$request->user()->id)
-    //                      ->latest();
-    // dd($lds);
+//      if ($lds->count()>0)
+//      {
 
-
-
-
-
-
-
-   }
+//         //associate the load to the session
+//         $srd= $request->order_no
+//         Vessel::
+//      }
+// }
     /**
      * Show the form for creating a new resource.
      *
@@ -74,9 +71,7 @@ class LoadingSessionController extends Controller
 // dd($orders->pluck('order_no'));
 
         $query= Vessel::whereIn('order_no',$orders->pluck('order_no'))
-                    //   ->with(['order'=>fn($q)=>$q->select('shp_name')])
                       ->get();
-// dd($query);
 
         $vessels=VesselResource::collection($query);
 

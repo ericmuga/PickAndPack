@@ -15,7 +15,37 @@ const searchKey=ref('');
 
 let filteredOrders=ref({});
 
-let assignedLocal =ref([]);
+
+onMounted(()=>{
+    selected_spcodes.value=props.selected_spcodes;
+    shipmentDate.value=props.date
+    records.value=props.records
+    filteredOrders.value=props.orders.data.filter(item => item.confirmations_count !== item.assignments_count);
+
+})
+
+const assign=()=>{
+
+   Inertia.post(route('assignment.store'),
+                    {'selectedParts': selectedOrderParts.value,
+                    'assignee': assignee.value,
+                    'selected_spcodes':selected_spcodes.value,
+                    'records':records.value,
+                    'date':shipmentDate.value,
+                    },
+                    {
+                        onSuccess:()=>{
+                            selectedOrderParts.value=[];
+                            assignee.value='';
+                             filteredOrders.value=props.orders.data.filter(item => item.confirmations_count !== item.assignments_count);
+                            Swal.fire('Assignment created Successfully!','','success')
+                        },
+                        preserveScroll:true,
+                        preserveState:true,
+                                replace:true
+                    });
+
+}
 
 
 
@@ -41,45 +71,41 @@ const tomorrow = new Date(today);
 
 tomorrow.setDate(today.getDate() + 1);
 
-const refreshSearch=()=>{
 
+const refreshSearch=(sps,rec,shp_date)=>{
+
+//  alert(selected_spcodes.value);
 
   Inertia.get(route('assignment.create'),
                       {
-                        'spcodes':selected_spcodes.value,
-                       'shp_date':shipmentDate.value,
-                       'selectedParts': selectedOrderParts.value,
-                       'assignee': assignee.value,
-                       'records':records.value
+                        'spcodes':sps,
+                        'shp_date':shp_date,
+                        'selectedParts': selectedOrderParts.value,
+                        'records':rec
                       },
-                      {preserveScroll:true,preserveState:true,replace:true}
 
-               );
-      if (searchKey.value!='')
+                      {
+                        preserveScroll:true,
+                        preserveState:true,
+                        replace:true,
+                        onSuccess:()=>{
+
+                                    if (searchKey.value!='')
                                     filteredOrders.value=props.orders.data.filter(item => item.confirmations_count !== item.assignments_count)
                                                                           .filter(item=>item.order_no.endsWith(searchKey.value));
                                     else
                                     filteredOrders.value=props.orders.data.filter(item => item.confirmations_count !== item.assignments_count);
-}
+                        }
+                       }
 
-
-const assign=()=>{
-
-Inertia.post(route('assignment.store'),
-             { 'selectedParts': selectedOrderParts.value,
-               'assignee': assignee.value
-             },
-             {
-                  onSuccess:()=>{selectedOrderParts.value=[]; assignee.value='';  Swal.fire('Assignment created Successfully!','','success')},
-                 preserveScroll:true,
-                  preserveState:true,
-                        replace:true
-             }
-             );
-
+                    );
 
 
 }
+
+
+
+
 
 
 
@@ -88,9 +114,6 @@ Inertia.post(route('assignment.store'),
 const parts=['A','B','C','D'];
 
 
-onMounted(()=>{
-            filteredOrders.value=props.orders.data.filter(item => item.confirmations_count !== item.assignments_count);
-       });
 
 const props=defineProps({
          order_parts:Object,
@@ -102,7 +125,9 @@ const props=defineProps({
          orderParts:Object,
          shp_date:'',
          sp:Object,
-         date:''
+         date:'',
+         records:'',
+         selected_spcodes:''
 
   })
 
@@ -110,6 +135,7 @@ const props=defineProps({
 let filterPart=ref({})
 
 let assignee=ref('');
+let selected_spcodes=ref([]);
 
 const createOrUpdateItem=()=>{
 
@@ -193,7 +219,7 @@ const sumLines=()=>{ totalOrderQty.value=0; totalLines.value=0
 
 
 
-let selected_spcodes=ref([]);
+
 
 
 let filteredLines=ref([])
@@ -313,7 +339,7 @@ const removePart=(newObj)=>
                                    :class="showFilters?'block':'hidden'"
                                  >
 
-                                   <form @submit.prevent="refreshSearch()">
+                                   <form @submit.prevent="refreshSearch(selected_spcodes,records,shipmentDate)">
                                       <div class="flex flex-col items-center justify-between space-x-3 overflow-x-auto text-center">
 
                                         Sales Codes:

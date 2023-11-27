@@ -13,17 +13,6 @@ class VesselResource extends JsonResource
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     /**
-     *
-     * $table->id();
-            $table->string('vessel_type');
-            $table->string('vessel_no');
-            $table->string('order_no');
-            $table->string('part');
-            $table->foreignIdFor(User::class);
-            $table->unsignedBigInteger('packed_by')->references('id')->on('users')->nullable();
-            $table->unsignedBigInteger('loaded_by')->references('id')->on('users')->nullable();
-            $table->dateTime('loading_time')->nullable();
-            $table->timestamps();
      */
 
 
@@ -36,7 +25,7 @@ class VesselResource extends JsonResource
              'order_no'=>$this->order_no,
              'part'=>$this->part,
              'shp_name'=>$this->order()->first()->shp_name,
-             'qr_code'=>route('loadVessel').'?order_no='.urlencode($this->order_no).'?part='.$this->part.'?vessel_no='.$this->vessel_no
+             'qr_code'=>$this->order_no.'_'.$this->part.'_'.$this->vessel_no
 
         ];
     }
