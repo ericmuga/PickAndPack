@@ -229,7 +229,7 @@ const generatePDF = (from=1,to=1,vessel='',weight) =>
               doc.setFontSize(10);
 
             doc.setFont("helvetica", "normal");
-            doc.text(vessel+'-'+pageNum +'/'+to, center(vessel+'-'+pageNum +'/'+to),1+ (g+2)*lineHeight);
+            doc.text(vessel+'-'+pageNum ,center(vessel+'-'+pageNum),1+ (g+2)*lineHeight);
             doc.addImage(qrCodeDataUrl, 'JPEG', 1.5, (g+5.25)*lineHeight, 2, 2);
             doc.setFontSize(12);
             doc.setFont("helvetica", "bold");
