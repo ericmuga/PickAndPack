@@ -118,7 +118,7 @@ const showContents = (lines,load) => {
 
     //get lines that should be loaded for the route and check status
 
-  console.log(lines);
+//   console.log(lines);
   let orders = '';
 
   for (let index = 0; index < lines.length; index++) {
@@ -144,8 +144,8 @@ const showContents = (lines,load) => {
     showCancelButton: false,
     didRender: () => {
       document.getElementById('excel-button').addEventListener('click', () => {
-
-        exportData(lines, null);
+       console.log(lines)
+        exportData(lines,null);
         Swal.close();
       });
     },

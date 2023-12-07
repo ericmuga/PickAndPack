@@ -37,7 +37,7 @@ class ApiController extends Controller
         $key = '412cce7c-a737-4d01-b929-534fcc80e79d';
 
 
-       $customers=[404,240,258,913,914,420,823,824];
+       $customers=[824,913,404,240,258,914,420,823];
 
        for($i=0; $i<count($customers); $i++ )
        {
@@ -55,6 +55,7 @@ class ApiController extends Controller
         $extdocItem='';
         foreach ($sortedData as $data)
             {
+                // dd($data);
               if (!is_array($data)) break;
                 if (!array_key_exists('ext_doc_no',$data))continue;
                  if (!$data['uom_code']!='nan')continue;
