@@ -76,6 +76,7 @@ Route::middleware('auth')->group(function () {
       Route::get('load/{id}', [LoadingSessionController::class,'load'])->name('load');
       Route::get('loadVessel', [LoadingSessionController::class,'loadVessel'])->name('loadVessel');
       Route::post('load',[LoadingSessionController::class,'load'])->name('load.add');
+      Route::post('loadingSheet',[LoadingSessionController::class,'loadingSheet'])->name('loadingSheet');
 
 
       Route::resource('users', UserController::class);

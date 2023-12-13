@@ -8,6 +8,8 @@ use App\Http\Resources\VesselResource;
 use App\Models\{LoadingLine, LoadingSession, Order, User, Vehicle, Vessel};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+// use Illuminate\Support\Js;
+
 class LoadingSessionController extends Controller
 {
     /**
@@ -32,6 +34,20 @@ class LoadingSessionController extends Controller
 // dd($sessions);
        return inertia('Loading/List',compact('sessions','drivers','vehicles','loaders','spcodes'));
 
+
+
+    }
+
+    public function loadingSheet(Request $request)
+    {
+    //get excel data for the session
+
+    // dd($request);
+
+
+     $session= LoadingSessionResource::make(LoadingSession::find($request->id));
+
+     return response()->json($session);
 
 
     }
