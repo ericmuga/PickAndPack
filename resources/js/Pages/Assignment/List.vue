@@ -12,7 +12,7 @@ import Pagination from '@/Components/Pagination.vue'
 import { stringify } from 'postcss';
 import { Inertia } from '@inertiajs/inertia';
 import axios from 'axios';
-
+import ProgressBar from 'primevue/progressbar';
 
 
     const props = defineProps({
@@ -101,6 +101,12 @@ import axios from 'axios';
                                 </template>
                                 <template #center>
                                     <div>
+
+
+
+
+
+
                                         <Pagination :links="assignments.meta.links" />
                                     </div>
                                     <!-- <Modal :show="showModal.value">
@@ -155,15 +161,98 @@ import axios from 'axios';
 
 
 
- <div class="grid sm:grid-cols-1 md:grid-cols-4">
+ <!-- <div class="grid sm:grid-cols-1 md:grid-cols-4"> -->
 
        <div v-if="assignments.data.length==0" class="p-5 text-center text-teal-500" > No assignments were found</div>
+ <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
+                                                    <tr class="bg-slate-300">
+                                                        <th scope="col" class="px-2 py-1">
+                                                            #
+                                                        </th>
+                                                        <th scope="col" class="px-2 py-1">
+                                                            Assignee
+                                                        </th>
+                                                        <th scope="col" class="px-2 py-1">
+                                                           Assignor
+                                                        </th>
+                                                        <th scope="col" class="px-2 py-1 text-center">
+                                                            Assignment Time
+                                                        </th>
+                                                        <th scope="col" class="px-2 py-1 text-center">
+                                                            Total Time
+                                                        </th>
+
+                                                        <th scope="col" class="px-2 py-1">
+                                                            Orders Count
+                                                        </th>
+                                                        <th scope="col" class="px-2 py-1">
+                                                            Lines Count
+                                                        </th>
+
+                                                         <th scope="col" class="px-2 py-1">
+                                                            Percentage
+                                                        </th>
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                     <tr  v-for="assignment in assignments.data" :key="assignment.id"
+                                                      class="bg-white border-b dark:bg-gray-900 dark:border-gray-700 hover:bg-slate-100 hover:text-black"
+                                                      @click="showContents(assignment.id)"
+
+                                                      >
+
+                                                    <td class="px-3 py-2 text-xs">
+                                                        {{assignment.id }}
+                                                    </td>
+
+                                                     <td class="px-3 py-2 text-xs font-bold text-center ">
+                                                        {{ assignment.assignee }}
+                                                    </td>
+
+                                                     <td class="px-3 py-2 text-xs">
+
+                                                            {{ assignment.assignor }}
+
+                                                    </td>
+                                                    <td class="px-3 py-2 text-xs">
+
+                                                            {{ assignment.time }}
+
+                                                    </td>
+                                                    <td class="px-3 py-2 text-xs">
+
+                                                            {{ assignment.total_time }}
+
+                                                    </td>
+                                                    <td class="px-3 py-2 text-xs">
+
+                                                            {{ assignment.orders_count }}
+
+                                                    </td>
+                                                    <td class="px-3 py-2 text-xs">
+
+                                                            {{ assignment.lines_count }}
+
+                                                    </td>
+                                                    <td class="items-center p-3 m-2 text-center text-white" :class="(assignment.percentage==100)? 'bg-lime-800 rounded-full':'bg-rose-900   rounded-full'" >
+                                                        {{assignment.percentage}} {{ (assignment.percentage==100)?'Complete!':'In Progress...' }}
+                                                    </td>
+
+                                                  </tr>
+
+                                                </tbody>
+ </table>
+<!-- </div>
        <div v-for="assignment in assignments.data" :key="assignment.id">
           <AssignmentCard :assignment="assignment" @click="showContents(assignment.id)" class="shadow-md hover:shadow-lg hover:cursor-pointer hover:shadow-orange-400" />
        </div>
 
-</div>
+</div> -->
+
                                       </div>
                                       </div>
                                       </div>
@@ -176,6 +265,7 @@ import axios from 'axios';
 
        </Toolbar>
                                       </div>
+    </div>
     </div>
     </AuthenticatedLayout>
 </template>
