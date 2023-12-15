@@ -14,8 +14,10 @@ import useExcel from '@/Composables/useExcel.js';
 import axios from 'axios';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+// import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 
+// import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "@/Composables/pdfFonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 const currentDate = moment().format('DD/MM/YYYY'); // Format the current date
 
