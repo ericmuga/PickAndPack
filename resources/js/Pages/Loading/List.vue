@@ -18,7 +18,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 
 // import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "@/Composables/pdfFonts";
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+pdfMake.vfs = pdfFonts;
 const currentDate = moment().format('DD/MM/YYYY'); // Format the current date
 
 
