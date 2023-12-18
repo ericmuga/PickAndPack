@@ -100,6 +100,10 @@ class Order extends Model
             });
         }
 
+     public function assembly_lines()
+     {
+        return $this->hasMany(AssemblyLine::class,'order_no','order_no');
+     }
 
 
     public function confirmations()

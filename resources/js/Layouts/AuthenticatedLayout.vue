@@ -89,6 +89,11 @@ const openOrCloseDropDown6Menu=()=>{dropDown6IsOpen.value=!dropDown6IsOpen.value
                    :class="dropDown5IsOpen?'block':'hidden'"
                    >Pack Order </Link>
 
+                   <Link :href="route('vessels.index')" :active="route().current('vessels.index')"
+                   class="px-3 py-1 mt-1 font-semibold text-white rounded hover:bg-gray-100 md:p-0 md:mx-2 "
+                   :class="dropDown5IsOpen?'block':'hidden'"
+                   >Packing Vessel </Link>
+
                    <Link :href="route('packingSession.index')" :active="route().current('packingSession.index')"
                    class="px-3 py-1 mt-1 font-semibold text-white rounded hover:bg-gray-100 md:p-0 md:mx-2 "
                    :class="dropDown5IsOpen?'block':'hidden'"

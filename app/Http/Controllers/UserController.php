@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\PermissionResource;
 use App\Http\Resources\RoleResource;
-use App\Http\Resources\UserResource;
+use App\Http\Resources\{UserResource,UserApiResource};
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
@@ -26,6 +26,15 @@ class UserController extends Controller
     }
 
 
+    public function fetchUsers()
+    {
+
+        ///this will responc to an API call and return users with name,email,and roles object
+       $users= UserApiResource::collection(User::with(['roles','permissions'])->get());
+
+       return response(compact('users'),200,[]);
+
+    }
 
 
     public function index(Request $request)

@@ -5,6 +5,9 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\UserController;
+use App\Models\User;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -21,3 +24,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 });
+
+Route::middleware('auth')->group(function () {
+
+
+
+});
+Route::get('/fetchUsers',[UserController::class, 'fetchUsers'])->name('fetchUsers');

@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\VesselOrderResource;
+use App\Models\AssemblyLine;
+use App\Models\Order;
+use App\Models\User;
 use App\Models\Vessel;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -15,7 +19,17 @@ class VesselController extends Controller
      */
     public function index()
     {
-        //
+        //show a list of all vessels
+        //get orders that have been assembled
+        $orders=VesselOrderResource::collection(Order::shipCurrent()
+                    ->whereHas('assembly_lines')
+                    ->with('lines')
+                    ->get() );
+       $packers=User::select('name','id')->role('packer')->get();
+       $checkers=User::select('name','id')->role('checker')->get();
+
+       return inertia('Vessel/VesselForm',compact('orders','packers','checkers'));
+
     }
 
     /**
@@ -36,7 +50,7 @@ class VesselController extends Controller
      */
     public function store(Request $request)
     {
-    //   dd($request->all());
+      dd($request->all());
 
 
         $vessel=Vessel::updateOrCreate([
