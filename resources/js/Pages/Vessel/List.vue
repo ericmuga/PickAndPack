@@ -13,16 +13,16 @@ import {useUserStore} from '@/Services/useUserStore'
 import { ref,onMounted } from 'vue';
 
 
-const userStore = useUserStore();
+// const userStore = useUserStore();
 
- let showModal=ref(false);
- onMounted(() => {
-  userStore.fetchData();
- });
+// //  let showModal=ref(false);
+// //  onMounted(() => {
+// //   userStore.fetchData();
+// //  });
 
- const showCreateModal=()=>{
-    showModal.value=true;
- }
+//  const showCreateModal=()=>{
+//     showModal.value=true;
+//  }
 
 
 
@@ -129,7 +129,7 @@ const userStore = useUserStore();
                                                         </div>
                                                     </div> -->
 
-
+<!--
                                                     <tr v-for="vessel in vessels.data" :key="vessel.vessel_no"
                                                     class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
 
@@ -166,7 +166,7 @@ const userStore = useUserStore();
                                                        </div>
                                                     </td>
 
-                                            </tr>
+                                            </tr> -->
 
                             </tbody>
                         </table>
