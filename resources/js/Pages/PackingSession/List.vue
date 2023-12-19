@@ -1,34 +1,107 @@
+
+
+
+
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head,useForm} from '@inertiajs/inertia-vue3';
+  import SearchBox from '@/Components/SearchBox.vue'
 import Toolbar from 'primevue/toolbar';
-import Pagination from '@/Components/Pagination.vue';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { Head } from '@inertiajs/inertia-vue3';
+import { useForm } from '@inertiajs/inertia-vue3'
+import {ref} from 'vue';
+import Pagination from '@/Components/Pagination.vue'
+import Swal from 'sweetalert2'
+import Modal from '@/Components/Modal.vue'
+import Drop from '@/Components/Drop.vue'
+import axios from 'axios';
 
 const props=defineProps({
+    checkers:Object,
     sessions:Object,
-    packersList:Object,
-    date:String,
+    orders:Object,
+    rows:String
+});
+
+
+const getParts=(order_no)=>{
+    axios.post(route('packingSession.getOrderParts'),{order_no})
+         .then(response=>{
+             parts.value=response.data
+         })
+         .catch(error=>{
+           Swal.fire('Error','An Error occurred'+error.message,'error')
+         })
+}
+
+let parts=ref([]);
+const form= useForm({
+
+   checker_id:'',
+   order_no:'',
+   part:'',
+
 })
 
- const form = useForm({
-        packers:props.packers,
-        date:props.date,
-        rows:'5'
-    })
 
 
 
 
+const createOrUpdatesession=()=>{
+    if (mode.state=='Create')
+          form.post(route('packingSession.store'),
+                    {
+
+                        onSuccess:()=>{
+                                        form.reset();
+                                        Swal.fire(`Session ${mode.state}ed Successfully!`,'','success');
+                                      }
+                    }
+                   )
+        else
+     form.patch(route('packingSession.update',form.session_no),
+                {
+                    onSuccess:()=>{ form.reset();
+                                    Swal.fire(`Session ${mode.state}ed Successfully!`,'','success');
+                                }
+                });
+      showModal.value=false;
+
+
+}
+
+
+let mode= { state: 'Create' };
+
+
+
+  let showModal=ref(false);
+
+
+const showCreateModal=()=>{
+
+    mode.state='Create'
+   form.reset();
+    showModal.value=true
+
+}
+
+const showUpdateModal=(session)=>{
+
+    mode.state='Update'
+    form.checker_id=session.checker_id
+    form.order_no=session.order_no
+    form.part=session.part
+
+}
 </script>
+
+
 <template>
-    <div>
+    <Head title="Packing Sessions"/>
 
-        <Head title="Packing Sessions"/>
-
-    <AuthenticatedLayout>
-
+    <AuthenticatedLayout @add="showModal=true">
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">Packing Sessions </h2>
+            <h2 class="text-xl font-semibold leading-tight text-indigo-400">Packing Sessions{{ sessions.meta.total }}</h2>
         </template>
 
         <div class="py-6">
@@ -41,11 +114,22 @@ const props=defineProps({
                         <div>
                             <Toolbar>
                                 <template #start>
-
-
+                                    <!-- <Button label="New" icon="pi pi-plus" class="mr-2" />
+                                        <Button label="Upload" icon="pi pi-upload" class="p-button-success" /> -->
+                                        <!-- <i class="mr-2 pi pi-bars p-toolbar-separator" /> -->
+                                        <!-- <SplitButton label="Save" icon="pi pi-check" :model="sessions" class="p-button-warning"></SplitButton> -->
+                                    <Button
+                                         label="Add"
+                                         icon="pi pi-plus"
+                                         severity="success"
+                                         @click="showCreateModal()"
+                                         rounded
+                                    ></Button>
                                 </template>
                                 <template #center>
-
+                                    <div>
+                                        <Pagination :links="sessions.meta.links" />
+                                    </div>
                                     <!-- <Modal :show="showModal.value">
                                         <FilterPane :propsData="columnListing" />
                                     </Modal> -->
@@ -56,164 +140,190 @@ const props=defineProps({
                                     <template #end>
 
 
-
-                                 <form @submit.prevent="form.get(route('packingSession.index'))">
-                                    <span class="mx-3">Rows</span>
-                                    <Dropdown
-
-
-                                          v-model="form.rows"
-                                          :options="['10','20','50','100','200','1000']"
-                                         />
-
-                                    <MultiSelect
-
-
-                                          v-model="form.packers"
-                                          :options="packersList"
-                                          optionLabel="name"
-                                          optionValue="id"
-                                          filter
-                                        />
-
-                                         <input
-                                           type="date"
-                                           class="p-3 mx-2 rounded-md"
-                                           v-model="form.date"
-
-                                         />
-
-                                        <Button
-                                          severity="success"
-                                          icon="pi pi-search"
-                                          label="Go!"
-                                          type="submit"
-                                          :disabled="form.processing"
-                                          class="mx-2"
-                                        />
+                                        <!-- <a :href="route('sessions.download')" class="">
+                                            <Button icon="pi pi-download" severity="primary" text raised rounded label="sessions"/>
+                                        </a> -->
 
 
 
-                                    </form>
 
-                          <SearchBox model="packingSession.index" />
+                                       <SearchBox model="packingSessions.index" />
                                     </template>
                                         </Toolbar>
+                                        <div v-if="sessions.data.length==0" class="mt-2 text-center p-3 w-full">
+                                                 No Sessions were found.
+                                                </div>
+                                        <div class="relative overflow-x-auto shadow-md sm:rounded-lg" v-else>
+
+                                            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+
+                                                    <tr class="bg-slate-300">
+                                                        <!-- <th scope="col" class="px-6 py-3">
+                                                            Barcode
+                                                        </th> -->
+                                                        <th scope="col" class="px-6 py-3">
+                                                           #
+                                                        </th>
+                                                        <th scope="col" class="px-6 py-3 text-center">
+                                                           Order
+                                                        </th>
+                                                        <th scope="col" class="px-6 py-3">
+                                                            Packer
+                                                        </th>
+                                                        <th scope="col" class="px-6 py-3">
+                                                           Checker
+                                                        </th>
+                                                        <th scope="col" class="px-6 py-3">
+                                                            Start Time
+                                                        </th>
+                                                        <th scope="col" class="px-6 py-3">
+                                                            End Time
+                                                        </th>
+                                                        <th scope="col" class="px-6 py-3">
+                                                           Start
+                                                        </th>
+                                                        <th scope="col" class="px-6 py-3">
+                                                           Actions
+                                                        </th>
+
+
+
+                                                    </tr>
+                                                </thead>
+
+
+                                                <tbody>
+                                                    <tr v-for="session in sessions.data" :key="session.id"
+                                                    class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
+
+                                                    <td class="px-3 py-2 text-xs">
+                                                        {{ session.id }}
+                                                    </td>
+                                                     <td class="px-3 py-2  flex flex-col items-center text-sm ">
+                                                        <div>{{ session.order_no }}</div>
+                                                        <div>{{ session.part }}</div>
+                                                        <div>{{ session.order.shp_name }}</div>
+                                                    </td>
+
+                                                    <td class="px-3 py-2 text-xs font-bold text-center ">
+                                                        {{ session.packer.user_name }}
+                                                    </td>
+                                                    <td class="px-3 py-2 text-xs font-bold">
+                                                        {{ session.checker?.user_name }}
+                                                    </td>
+                                                    <td class="px-3 py-2 text-xs font-bold">
+                                                        {{ session.start_time }}
+                                                    </td>
+                                                    <td class="px-3 py-2 text-xs font-bold">
+                                                        {{ session.end_time }}
+                                                    </td>
+                                                     <td class="px-3 py-2 text-xs font-bold">
+                                                        <Button
+                                                         label="Start"
+                                                         severity="success"
+                                                         icon="pi pi-send"
+                                                    />
+                                                    </td>
 
 
 
 
+                                                    <td>
+                                                       <div class="flex flex-row">
+                                                          <Drop  :drop-route="route('packingSession.destroy',{'id':session.id})"/>
+                                                            <Button
+                                                                      icon="pi pi-pencil"
+                                                                      severity="info"
+                                                                      text
+                                                                        @click="showUpdateModal(session)"
+                                                                      />
+                                                       </div>
+                                                    </td>
 
- <div class="">
- <div  class="relative overflow-x-auto shadow-md sm:rounded-lg">
-       <div v-if="sessions.data.length==0" class="p-5 text-center text-teal-500" > No sessions were found</div>
+                                            </tr>
 
+                            </tbody>
+                        </table>
+                    </div>
 
-
-<table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-
-        <tr class="text-white bg-gray-700 ">
-            <!-- <th scope="col" class="px-2 py-2">
-                Barcode
-            </th> -->
-            <th scope="col" class="px-2 py-2">
-                Order No.
-            </th>
-            <th scope="col" class="px-2 py-2 text-center">
-                Sales Person
-            </th>
-            <th scope="col" class="px-2 py-2">
-                Ship-to Name
-            </th>
-            <th scope="col" class="px-2 py-2">
-                Shipment Date
-            </th>
-
-
-            <th scope="col" class="px-6 py-3 text-center">
-                Part
-            </th>
-
-            <th scope="col" class="px-6 py-3 text-center">
-                Packer
-            </th>
-
-            <th scope="col" class="px-6 py-3 text-center">
-                Packing Time
-            </th>
-
-            <th scope="col" class="px-6 py-3 text-center">
-                Packed at
-            </th>
+                    <Toolbar>
+                        <template #center>
+                            <div >
+                                <Pagination :links="sessions.meta.links" />
+                            </div>
+                        </template>
+                    </Toolbar>
 
 
-
-        </tr>
-    </thead>
-    <tbody>
-        <tr v-for="session in sessions.data" :key="session.id"
-        class="font-semibold text-black bg-white hover:bg-gray-300">
-
-        <td class="px-2 py-2 text-xs break-all">
-            {{ session.order.order_no }}
-        </td>
-        <td class="flex flex-col px-2 py-2 text-xs text-center">
-            <span class="text-xs font-bold">{{session.order.sp_code}}</span>
-            <span class="text-xs font-thin">{{session.order.sp_name}}</span>
-        </td>
-        <td class="px-2 py-2 text-xs font-bold text-center capitalize bg-yellow-200 rounded-full">
-            {{ session.order.shp_name }}
-        </td>
-        <td class="px-2 py-2 text-xs font-bold">
-            {{ session.order.shp_date }}
-        </td>
-         <td class="items-center px-2 py-2 text-xs font-bold text-center">
-            {{ session.part }}
-        </td>
-         <td class="px-2 py-2 text-xs font-bold">
-            {{ session.user.user_name }}
-        </td>
-         <td class="px-2 py-2 text-xs font-bold text-blue-500">
-            {{ session.packing_time }}
-        </td>
-         <td class="px-2 py-2 text-xs font-bold text-blue-500">
-            {{ session.packed_at }}
-        </td>
+                </div>
 
 
 
 
-</tr>
+                <!--end of stats bar-->
 
-</tbody>
-</table>
-
-
-
-                                        </div>
-
-
-
-
-
+            </div>
+        </div>
+    </div>
 </div>
-                                      </div>
-                                      <div class="w-full text-center">
-                                        <Pagination :links="sessions.meta.links" />
-                                    </div>
-                                      </div>
-                                      </div>
-                                      </div>
 
-    </div>
-    </AuthenticatedLayout>
+   <Modal :show="showModal" @close="showModal=false" >
 
-    </div>
+     <div class="flex flex-col p-4 rounded-sm">
+
+        <div  class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> {{mode.state}} Session</div>
+        <!-- <div v-else class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> Update session</div> -->
+
+          <form  @submit.prevent="createOrUpdatesession()">
+
+<div class="flex flex-col justify-center gap-3">
+
+       <Dropdown
+          v-model="form.order_no"
+          :options="props.orders.data"
+          optionLabel="orderNo"
+          optionValue="order_no"
+          filter=""
+          placeholder="Select Order"
+          @change="getParts(form.order_no)"
+       />
+       <Dropdown
+          v-model="form.part"
+          :options="parts"
+          optionLabel="part"
+          optionValue="part"
+          placeholder="Select Order Part"
+        />
+        <Dropdown
+          v-model="form.checker_id"
+          :options="props.checkers.data"
+          optionLabel="user_name"
+          optionValue="id"
+          filter=""
+          placeholder="Select Checker"
+       />
+
+
+
+        <Button
+          severity="info"
+          type="submit"
+          :label=mode.state
+          :disabled="form.checker_id==''||form.order_no==''||form.part==''||form.processing"
+
+        />
+        <Button label="Cancel" severity="warning" icon="pi pi-cancel" @click="showModal=false"/>
+</div>
+
+    </form>
+
+     </div>
+
+  </Modal>
+</AuthenticatedLayout>
+
 </template>
-
-
-
 <style lang="scss" scoped>
 
 </style>

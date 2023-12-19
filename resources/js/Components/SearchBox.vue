@@ -1,6 +1,6 @@
 <template>
     <div>
-        <span class="p-input-icon-left">
+        <span class="p-input-icon-right">
             <i class="pi pi-search" />
 
             <InputText type="text" v-model="searchKey" placeholder="Search" />

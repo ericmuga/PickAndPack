@@ -16,14 +16,20 @@ class PackingSessionResource extends JsonResource
      */
     public function toArray($request)
     {
+        $carbonTime=Carbon::parse($this->packing_time);
+        $originalTime=Carbon::parse($this->created_at);
       return [
                'order'=>OrderSummaryResource::make($this->whenLoaded('order')),
                'id'=>$this->id,
-               'user'=>UserResource::make($this->whenLoaded('user')),
+               'order_no'=>$this->order_no,
+               'packer'=>UserResource::make($this->whenLoaded('user')),
                'part'=>$this->part,
                'packing_time'=>$this->packing_time,
-               'packed_at'=>Carbon::parse($this->created_at)->toDateTimeString(),
+               'start_time'=>Carbon::parse($this->created_at)->toDateTimeString(),
+               'end_time'=>$originalTime->addHours($carbonTime->hour)->addMinutes($carbonTime->minute)->addSeconds($carbonTime->second)->toDateTimeString(),
                'checker'=>UserResource::make($this->whenLoaded('checker'))
+
+
 
       ];
 

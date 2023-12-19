@@ -3,8 +3,8 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Models\Order;
-class VesselOrderResource extends JsonResource
+
+class VesselLineResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,12 +14,6 @@ class VesselOrderResource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
-            'order_no'=>$this->order_no,
-            'shp_name'=>$this->shp_name,
-            'orderNo'=>$this->order_no.'|'.$this->shp_name,
-            'lines'=>LineResource::collection($this->whenLoaded('lines')),
-
-        ];
+        return parent::toArray($request);
     }
 }

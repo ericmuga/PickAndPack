@@ -116,6 +116,7 @@ Route::middleware('auth')->group(function () {
 
         ////////////////packing session routes/////////////////////////////
         Route::resource('packingSession',PackingSessionController::class);
+        Route::post('getOrderParts',[PackingSessionController::class,'getOrderParts'])->name('packingSession.getOrderParts');
 
 
         Route::get('/dashboard',[DashboardController::class,'dashboard'] )->name('dashboard');
