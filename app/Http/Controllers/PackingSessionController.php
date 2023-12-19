@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\{PackingSessionResource,PackingOrderResource, UserResource, VesselOrderResource};
+use App\Http\Resources\{PackingOrderLineResource, PackingSessionResource,PackingOrderResource, UserResource, VesselOrderResource};
 use App\Models\{Line, PackingSession,Order,User};
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -87,7 +87,18 @@ class PackingSessionController extends Controller
      */
     public function show($id)
     {
-        //
+        //show a page with the session details and the vessels with lines
+        $s=PackingSession::find($id);
+        $session= PackingSessionResource::make($s->load('lines','order','user'));
+        // dd($session->order_no);
+        $OrderLines=PackingOrderLineResource::collection(Line::where('order_no',$session->order_no)
+                   ->where('part',$session->part)
+                   ->get());
+
+
+        return inertia('PackingSession/SessionCard',compact('session','OrderLines'));
+
+
     }
 
     /**

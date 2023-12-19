@@ -28,4 +28,9 @@ class Item extends Model
     {
         return $this->hasMany(Line::class,'item_no','item_no');
     }
+
+    public function packing_session_lines()
+    {
+        return $this->hasMany(PackingSessionLine::class,'item_no','item_no');
+    }
 }

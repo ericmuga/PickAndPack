@@ -3,44 +3,32 @@
 
 
 <script setup>
-  import SearchBox from '@/Components/SearchBox.vue'
 import Toolbar from 'primevue/toolbar';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
 import { useForm } from '@inertiajs/inertia-vue3'
 import {ref} from 'vue';
-import Pagination from '@/Components/Pagination.vue'
 import Swal from 'sweetalert2'
 import Modal from '@/Components/Modal.vue'
 import Drop from '@/Components/Drop.vue'
-import axios from 'axios';
-import { Link } from '@inertiajs/inertia-vue3';
+// import axios from 'axios';
 
 const props=defineProps({
-    checkers:Object,
-    sessions:Object,
-    orders:Object,
-    rows:String
+    OrderLines:Object,
+    session:Object
 });
 
 
-const getParts=(order_no)=>{
-    axios.post(route('packingSession.getOrderParts'),{order_no})
-         .then(response=>{
-             parts.value=response.data
-         })
-         .catch(error=>{
-           Swal.fire('Error','An Error occurred'+error.message,'error')
-         })
-}
-
-let parts=ref([]);
 const form= useForm({
 
-   checker_id:'',
-   order_no:'',
-   part:'',
-
+    item_no:'',
+    vessel:'',
+    from_vessel:'',
+    to_vessel:'',
+    qty:'',
+    weight:'',
+    packing_session_id:props.session.data.id,
+    order_no:props.session.order_no,
 })
 
 
@@ -49,20 +37,20 @@ const form= useForm({
 
 const createOrUpdatesession=()=>{
     if (mode.state=='Create')
-          form.post(route('packingSession.store'),
+          form.post(route('packingSessionLine.store'),
                     {
 
                         onSuccess:()=>{
                                         form.reset();
-                                        Swal.fire(`Session ${mode.state}ed Successfully!`,'','success');
+                                        Swal.fire(`Line ${mode.state}ed Successfully!`,'','success');
                                       }
                     }
                    )
         else
-     form.patch(route('packingSession.update',form.session_no),
+     form.patch(route('packingSessionLine.update',form.session_no),
                 {
                     onSuccess:()=>{ form.reset();
-                                    Swal.fire(`Session ${mode.state}ed Successfully!`,'','success');
+                                    Swal.fire(`Lines ${mode.state}ed Successfully!`,'','success');
                                 }
                 });
       showModal.value=false;
@@ -86,23 +74,32 @@ const showCreateModal=()=>{
 
 }
 
-const showUpdateModal=(session)=>{
+const showUpdateModal=(line)=>{
 
     mode.state='Update'
-    form.checker_id=session.checker_id
-    form.order_no=session.order_no
-    form.part=session.part
+    form.vessel=line.vessel
+    form.item_no=line.item_no
+    form.from_vessel=line.from_vessel
+    form.to_vessel=line.to_vessel
+    form.qty=line.qty
+    form.weight=line.weight
+    form.order_no=line.order_no
+    form.part=line.part
+    form.packing_session_id=prop.session.data.id
 
 }
 </script>
 
 
 <template>
-    <Head title="Packing Sessions"/>
+    <Head title="Packing Session"/>
 
     <AuthenticatedLayout @add="showModal=true">
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-indigo-400">Packing Sessions{{ sessions.meta.total }}</h2>
+            <h2 class="text-xl font-semibold leading-tight text-indigo-400">
+            {{ session.order }}
+
+            </h2>
         </template>
 
         <div class="py-6">
@@ -128,31 +125,15 @@ const showUpdateModal=(session)=>{
                                     ></Button>
                                 </template>
                                 <template #center>
-                                    <div>
-                                        <Pagination :links="sessions.meta.links" />
-                                    </div>
-                                    <!-- <Modal :show="showModal.value">
-                                        <FilterPane :propsData="columnListing" />
-                                    </Modal> -->
-                                      <!-- <FilterPane :propsData="columnListing" /> -->
-
+                                    {{ session.data.order }}|
+                                    {{ session.data.packer }}
                                 </template>
 
                                     <template #end>
-
-
-                                        <!-- <a :href="route('sessions.download')" class="">
-                                            <Button icon="pi pi-download" severity="primary" text raised rounded label="sessions"/>
-                                        </a> -->
-
-
-
-
-                                       <SearchBox model="packingSessions.index" />
-                                    </template>
+                                </template>
                                         </Toolbar>
-                                        <div v-if="sessions.data.length==0" class="mt-2 text-center p-3 w-full">
-                                                 No Sessions were found.
+                                        <div v-if="session.data.lines.length==0" class="mt-2 text-center p-3 w-full">
+                                                 No Lines were found.
                                                 </div>
                                         <div class="relative overflow-x-auto shadow-md sm:rounded-lg" v-else>
 
@@ -164,25 +145,25 @@ const showUpdateModal=(session)=>{
                                                             Barcode
                                                         </th> -->
                                                         <th scope="col" class="px-6 py-3">
-                                                           #
+                                                           Item No.
                                                         </th>
                                                         <th scope="col" class="px-6 py-3 text-center">
-                                                           Order
+                                                           Description
                                                         </th>
                                                         <th scope="col" class="px-6 py-3">
-                                                            Packer
+                                                            Order Qty
                                                         </th>
                                                         <th scope="col" class="px-6 py-3">
-                                                           Checker
+                                                           Weight
                                                         </th>
                                                         <th scope="col" class="px-6 py-3">
-                                                            Start Time
+                                                            Vessel
                                                         </th>
                                                         <th scope="col" class="px-6 py-3">
-                                                            End Time
+                                                            From Vessel
                                                         </th>
                                                         <th scope="col" class="px-6 py-3">
-                                                           Start
+                                                            To Vessel
                                                         </th>
                                                         <th scope="col" class="px-6 py-3">
                                                            Actions
@@ -195,51 +176,39 @@ const showUpdateModal=(session)=>{
 
 
                                                 <tbody>
-                                                    <tr v-for="session in sessions.data" :key="session.id"
+                                                    <tr v-for="line in sessions.data.lines" :key="session.id"
                                                     class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
 
                                                     <td class="px-3 py-2 text-xs">
-                                                        {{ session.id }}
+                                                        {{ line.item_no }}
                                                     </td>
                                                      <td class="px-3 py-2  flex flex-col items-center text-sm ">
-                                                        <div>{{ session.order_no }}</div>
-                                                        <div>{{ session.part }}</div>
-                                                        <div>{{ session.order.shp_name }}</div>
+                                                        {{ line.item_description }}
                                                     </td>
 
                                                     <td class="px-3 py-2 text-xs font-bold text-center ">
-                                                        {{ session.packer.user_name }}
+                                                        {{ line.qty }}
                                                     </td>
                                                     <td class="px-3 py-2 text-xs font-bold">
-                                                        {{ session.checker?.user_name }}
+                                                        {{ line.weight}}
                                                     </td>
                                                     <td class="px-3 py-2 text-xs font-bold">
-                                                        {{ session.start_time }}
+                                                        {{ line.vessel }}
                                                     </td>
                                                     <td class="px-3 py-2 text-xs font-bold">
-                                                        {{ session.end_time }}
+                                                        {{ line.from_vessel}}
                                                     </td>
-                                                     <td class="px-3 py-2 text-xs font-bold">
-                                                        <Link  :href="route('packingSession.show',session.id)">
-                                                            <Button
-                                                            label="Start"
-                                                            severity="success"
-                                                            icon="pi pi-send"
-                                                        />
-                                                        </Link>
+                                                    <td class="px-3 py-2 text-xs font-bold">
+                                                        {{ line.to_vessel}}
                                                     </td>
-
-
-
-
-                                                    <td>
+                                                     <td>
                                                        <div class="flex flex-row">
-                                                          <Drop  :drop-route="route('packingSession.destroy',{'id':session.id})"/>
+                                                          <Drop  :drop-route="route('packingSessionLines.destroy',{'id':line.id})"/>
                                                             <Button
                                                                       icon="pi pi-pencil"
                                                                       severity="info"
                                                                       text
-                                                                        @click="showUpdateModal(session)"
+                                                                        @click="showUpdateModal(line)"
                                                                       />
                                                        </div>
                                                     </td>
@@ -252,9 +221,9 @@ const showUpdateModal=(session)=>{
 
                     <Toolbar>
                         <template #center>
-                            <div >
+                            <!-- <div >
                                 <Pagination :links="sessions.meta.links" />
-                            </div>
+                            </div> -->
                         </template>
                     </Toolbar>
 
@@ -275,37 +244,45 @@ const showUpdateModal=(session)=>{
 
      <div class="flex flex-col p-4 rounded-sm">
 
-        <div  class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> {{mode.state}} Session</div>
+        <div  class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> {{mode.state}} Packing Line</div>
         <!-- <div v-else class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> Update session</div> -->
 
           <form  @submit.prevent="createOrUpdatesession()">
 
-<div class="flex flex-col justify-center gap-3">
+       <div class="flex flex-col justify-center gap-3">
 
        <Dropdown
-          v-model="form.order_no"
-          :options="props.orders.data"
-          optionLabel="orderNo"
-          optionValue="order_no"
+          v-model="form.item_no"
+          :options="props.OrderLines.data"
+          optionLabel="item_description"
+          optionValue="item_no"
           filter=""
-          placeholder="Select Order"
-          @change="getParts(form.order_no)"
+          placeholder="Select Item"
        />
+
        <Dropdown
-          v-model="form.part"
-          :options="parts"
-          optionLabel="part"
-          optionValue="part"
-          placeholder="Select Order Part"
+          v-model="form.vessel"
+          :options="['Crate','Carton']"
+
+          placeholder="Select Vessel"
         />
-        <Dropdown
-          v-model="form.checker_id"
-          :options="props.checkers.data"
-          optionLabel="user_name"
-          optionValue="id"
-          filter=""
-          placeholder="Select Checker"
-       />
+        <InputText
+          placeholder="Qty"
+          v-model="form.qty"
+        />
+        <InputText
+          placeholder="Weight"
+          v-model="form.weight"
+        />
+        <InputText
+          placeholder="From Vessel"
+          v-model="form.from_vessel"
+        />
+
+        <InputText
+          placeholder="To Vessel"
+          v-model="form.to_vessel"
+        />
 
 
 
@@ -313,7 +290,7 @@ const showUpdateModal=(session)=>{
           severity="info"
           type="submit"
           :label=mode.state
-          :disabled="form.checker_id==''||form.order_no==''||form.part==''||form.processing"
+          :disabled="form.item_no==''||form.vessel==''||form.qty==''||form.weight==''||form.from_vessel==''||form.to_vessel==''||form.processing"
 
         />
         <Button label="Cancel" severity="warning" icon="pi pi-cancel" @click="showModal=false"/>

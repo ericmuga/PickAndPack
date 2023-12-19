@@ -36,5 +36,9 @@ class PackingSession extends Model
         return $this->belongsTo(User::class,'checker_id','id');
     }
 
+    public function lines()
+    {
+        return $this->hasMany(PackingSessionLine::class);
+    }
 
 }

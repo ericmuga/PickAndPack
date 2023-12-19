@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\PackingSession;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -27,7 +28,8 @@ class PackingSessionResource extends JsonResource
                'packing_time'=>$this->packing_time,
                'start_time'=>Carbon::parse($this->created_at)->toDateTimeString(),
                'end_time'=>$originalTime->addHours($carbonTime->hour)->addMinutes($carbonTime->minute)->addSeconds($carbonTime->second)->toDateTimeString(),
-               'checker'=>UserResource::make($this->whenLoaded('checker'))
+               'checker'=>UserResource::make($this->whenLoaded('checker')),
+               'lines'=>PackingSessionLineResource::collection($this->whenLoaded('lines')),
 
 
 

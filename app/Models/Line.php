@@ -58,7 +58,7 @@ use Compoships;
            return $this->hasManyThrough(Prepack::class,Item::class,'item_no','item_no','item_no','item_no');
    }
 
-   
+
   public function packing_sessions()
   {
       return $this->hasMany(PackingSession::class,'line_no','line_no');
@@ -67,6 +67,11 @@ use Compoships;
   public function assembly_sessions()
   {
       return $this->hasMany(AssemblySession::class,'line_no','line_no');
+  }
+
+  public function packing_session_lines()
+  {
+    return $this->hasMany(PackingSessionLine::class,'order_no','item_no');
   }
 
 
