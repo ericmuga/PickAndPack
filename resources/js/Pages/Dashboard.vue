@@ -38,6 +38,8 @@ const cdata = ref({
                     ],
                 });
 
+// let percent = parseFloat(pending*100/todays).toFixed(2);
+
 </script>
 
 <template>
@@ -81,7 +83,7 @@ const cdata = ref({
     <div class="card">
                     <span class="text-xs">Pending Confirmation {{ pending}}/{{ todays }}</span>
                      <div class="card">
-                                <ProgressBar :value="pending*100/todays"> </ProgressBar>
+                                <ProgressBar :value="parseFloat(pending*100/todays).toFixed(0)"> </ProgressBar>
                     </div>
                     <div class="my-5">
                                     <Link :href="route('refresh')" class="w-5 h-10 m-10 mx-auto text-center ">
