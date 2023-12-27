@@ -8,9 +8,17 @@ import DataTable from '@/Components/DataTable.vue';
 import PieChart from '@/Components/PieChart.vue';
 import {ref} from 'vue'
 import ProgressBar from 'primevue/progressbar';
+const  formatNumber=(value)=> {
+      return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
 
 defineProps({
                todays:Number,
+               sectorTonnage:Object,
+               assembled:Number,
+               packed:Number,
+               loaded:Number,
+               tonnage:Number,
                pending:Number,
                refreshError:String,
                stocks:Object,
@@ -49,40 +57,78 @@ const cdata = ref({
                         <div v-if="refreshError!=null">
                             {{ refreshError }}
                         </div>
-                        <div class="items-center justify-between w-full md:grid md:grid-cols-3 md:space-x-1 md:gap-1 sm:space-y-2 md:flex-row">
-
-                            <!-- <Link :href="route('order.list')" :active="route().current('order.list')">
-
-                               <StatsTile :Qty=todays tile="Todays" class="text-black bg-cyan-100" />
-                            </Link>
-                            <StatsTile tile="Confirmed" :Qty=todays-pending  class="text-white bg-teal-600 " />
-                            <StatsTile :Qty=pending tile="Pending"  class="text-white bg-rose-700 md:mt-2" /> -->
-
-
-                                <div class="card">
-                                    <span class="text-xs">Pending Confirmation {{ pending}}/{{ todays }}</span>
-                                <div class="card">
-                                <ProgressBar :value="pending"
-
-                                            >{{ pending}}/{{ todays }} </ProgressBar>
-                                        </div>
+                        <div class="items-center justify-between w-full flex flex-row">
 
 
 
+                             <div class="flex flex-wrap items-center justify-around text-center">
+    <!-- Sales Today Card -->
+    <div class="flex flex-col justify-between p-4 mx-2 my-4 bg-white rounded-md shadow-md">
+      <div>
+        <h2 class="mb-2 text-xl font-semibold">Tonnage</h2>
+        <!-- Your sales today data goes here -->
+        <div class="text-3xl font-bold">{{ formatNumber(tonnage) }}T</div>
+         <table>
+            <tr class="card" v-for="(value, groupName) in sectorTonnage" :key="groupName"  >
 
-                                </div>
-                                <Link :href="route('refresh')" class="w-5 h-10 m-10 mx-auto text-center ">
+            <td class="px-4">{{ groupName }}</td><td class="flex justify-end"><strong>{{value}}T</strong></td>
+        </tr>
+         </table>
+
+      </div>
+      <!-- <div class="mt-4 text-sm text-gray-500">+5% from yesterday</div> -->
+    </div>
+    <div class="card">
+                    <span class="text-xs">Pending Confirmation {{ pending}}/{{ todays }}</span>
+                     <div class="card">
+                                <ProgressBar :value="pending*100/todays"> </ProgressBar>
+                    </div>
+                    <div class="my-5">
+                                    <Link :href="route('refresh')" class="w-5 h-10 m-10 mx-auto text-center ">
                                         <!-- <span class="text-xs">Refresh</span> -->
                                        <!-- <img src="/img/refresh.png" /> -->
                                        <Button icon="pi pi-refresh" severity="warning" aria-label="Filter" />
 
                                     </Link>
+                                </div>
+     </div>
 
 
 
+    <!-- Top 10 Items Card -->
+    <div class="flex flex-col justify-between p-4 mx-2 my-4 bg-white rounded-md shadow-md">
+      <div>
+        <h2 class="mb-2 text-xl font-semibold text-indigo-600">Assembled</h2>
+        <!-- Your top 10 items data goes here -->
+        <div class="text-3xl font-bold">{{ assembled }} T</div>
+      </div>
+      <!-- <div class="mt-4 text-sm text-gray-500">Best-selling items</div> -->
+    </div>
+
+    <!-- Top 10 Customers Card -->
+    <div class="flex flex-col justify-between p-4 mx-2 my-4 bg-white rounded-md shadow-md">
+      <div>
+        <h2 class="mb-2 text-xl font-semibold text-red-600">Packed</h2>
+        <!-- Your top 10 customers data goes here -->
+        <div class="text-3xl font-bold">{{ packed }} T</div>
+      </div>
+      <!-- <div class="mt-4 text-sm text-gray-500">Loyal customers</div> -->
+    </div>
+
+    <!-- Setups Card -->
+    <div class="flex flex-col justify-between p-4 mx-2 my-4 bg-white rounded-md shadow-md">
+      <div>
+        <h2 class="mb-2 text-xl font-semibold text-lime-500">Loaded</h2>
+        <!-- Your setups data goes here -->
+        <div class="text-3xl font-bold">{{ loaded }}</div>
+      </div>
+      <!-- <div class="mt-4 text-sm text-gray-500">Currently active setups</div> -->
+    </div>
+
+  </div>
 
 
-                         </div>
+                        </div>
 
                         <!--end of stats bar-->
 

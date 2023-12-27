@@ -36,8 +36,10 @@ class PackingSessionLineController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        dd($request->all());
+        $line=PackingSessionLine::updateOrCreate($request->all());
+
+        return redirect(route('packingSession.show',['packingSession'=>$request->packing_session_id]));
+
     }
 
     /**
@@ -72,7 +74,9 @@ class PackingSessionLineController extends Controller
     public function update(Request $request, $id)
     {
         //
-        dd($request);
+        $line=PackingSessionLine::find($id);
+        $line->update($request->all());
+        return redirect(route('packingSession.show',$line->packing_session_id));
     }
 
     /**
@@ -83,6 +87,9 @@ class PackingSessionLineController extends Controller
      */
     public function destroy(PackingSessionLine $packingSessionLine)
     {
-        //
+        $line=$packingSessionLine;
+        $packingSessionLine->delete();
+        return redirect(route('packingSession.show',$line->packing_session_id));
+
     }
 }

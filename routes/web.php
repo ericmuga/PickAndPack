@@ -21,7 +21,8 @@ use App\Http\Controllers\{ConfirmationController,
   VehicleController,
     VesselController,
     ApiController,
-    PackingSessionLineController
+    PackingSessionLineController,
+    PackingVesselController
 };
 use Illuminate\Foundation\Application;
 use Mpdf\Mpdf;
@@ -117,6 +118,7 @@ Route::middleware('auth')->group(function () {
 
         ////////////////packing session routes/////////////////////////////
         Route::resource('packingSession',PackingSessionController::class);
+        Route::resource('packingVessel',PackingVesselController::class);
         Route::post('getOrderParts',[PackingSessionController::class,'getOrderParts'])->name('packingSession.getOrderParts');
 
 

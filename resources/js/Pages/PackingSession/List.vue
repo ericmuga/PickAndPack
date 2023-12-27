@@ -120,7 +120,7 @@ const showUpdateModal=(session)=>{
                                         <!-- <i class="mr-2 pi pi-bars p-toolbar-separator" /> -->
                                         <!-- <SplitButton label="Save" icon="pi pi-check" :model="sessions" class="p-button-warning"></SplitButton> -->
                                     <Button
-                                         label="Add"
+                                         label="New"
                                          icon="pi pi-plus"
                                          severity="success"
                                          @click="showCreateModal()"
@@ -148,10 +148,10 @@ const showUpdateModal=(session)=>{
 
 
 
-                                       <SearchBox model="packingSessions.index" />
+                                       <SearchBox :model="route('packingSession.index')" />
                                     </template>
                                         </Toolbar>
-                                        <div v-if="sessions.data.length==0" class="mt-2 text-center p-3 w-full">
+                                        <div v-if="sessions.data.length==0" class="w-full p-3 mt-2 text-center">
                                                  No Sessions were found.
                                                 </div>
                                         <div class="relative overflow-x-auto shadow-md sm:rounded-lg" v-else>
@@ -163,9 +163,9 @@ const showUpdateModal=(session)=>{
                                                         <!-- <th scope="col" class="px-6 py-3">
                                                             Barcode
                                                         </th> -->
-                                                        <th scope="col" class="px-6 py-3">
+                                                        <!-- <th scope="col" class="px-6 py-3">
                                                            #
-                                                        </th>
+                                                        </th> -->
                                                         <th scope="col" class="px-6 py-3 text-center">
                                                            Order
                                                         </th>
@@ -198,10 +198,10 @@ const showUpdateModal=(session)=>{
                                                     <tr v-for="session in sessions.data" :key="session.id"
                                                     class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
 
-                                                    <td class="px-3 py-2 text-xs">
+                                                    <!-- <td class="px-3 py-2 text-xs">
                                                         {{ session.id }}
-                                                    </td>
-                                                     <td class="px-3 py-2  flex flex-col items-center text-sm ">
+                                                    </td> -->
+                                                     <td class="flex flex-col items-center px-3 py-2 text-sm ">
                                                         <div>{{ session.order_no }}</div>
                                                         <div>{{ session.part }}</div>
                                                         <div>{{ session.order.shp_name }}</div>

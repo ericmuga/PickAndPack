@@ -79,7 +79,7 @@ public function store(Request $request)
                           ->where('part',$part)
                           ->first()->assignment_id;
 
-   
+
      $session=AssemblySession::updateOrCreate([
                                                     'order_no'=>$request->data[0]['order_no'],
                                                     'part'=>$part,

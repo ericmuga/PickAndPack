@@ -14,6 +14,11 @@ class PackingVesselResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'id'=>$this->id,
+            'code'=>$this->code,
+            'tare_weight'=>$this->tare_weight,
+            'description'=>$this->description,
+        ];
     }
 }

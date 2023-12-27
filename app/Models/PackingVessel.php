@@ -9,8 +9,10 @@ class PackingVessel extends Model
 {
     use HasFactory;
 
-   public function packing_session()
+   protected $guarded =['id'];
+
+   public function packing_session_line()
    {
-    return $this->belongsTo(PackingSession::class);
+    return $this->hasMany(PackingSessionLine::class);
    }
 }

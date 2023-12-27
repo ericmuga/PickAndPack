@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\{PackingOrderLineResource, PackingSessionResource,PackingOrderResource, UserResource, VesselOrderResource};
-use App\Models\{Line, PackingSession,Order,User};
+use App\Http\Resources\{PackingOrderLineResource, PackingSessionResource,PackingOrderResource, PackingVesselResource, UserResource, VesselOrderResource};
+use App\Models\{Line, PackingSession,Order, PackingVessel, User};
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\SearchQueryService;
 
 class PackingSessionController extends Controller
 {
@@ -22,22 +23,17 @@ class PackingSessionController extends Controller
 
 
          $rows=$request->has('rows')?$request->row:10;
+         $searchParameter=$request->search?:'';
+        //  dd($searchParameter);
 
          $date=$request->has('date')?$request->date:Carbon::today()->toDateString();
          $nextDay=$request->has('date')?Carbon::parse($request->date)->addDay(1):Carbon::tomorrow()->toDateString();
-
-         $sessions=PackingSessionResource::collection(
-                               PackingSession::query()
-                                //  ->where('created_at','>=',$date)
-                                //  ->where('created_at','<=',$nextDay)
-                                 ->with('order','user','checker')
-                                 ->latest()
-                                //  ->where('system_entry',0)
-                                 ->paginate($rows)
-
-                                );
-            // dd($sessions);
-           $checkers=UserResource::collection(User::role('checker')->orderBy('name')->get());
+         $packingSessionQuery=  PackingSession::query()
+                                 ->when((!$request->user()->hasRole('admin'))||(!$request->user()->hasRole('supervisor')),fn($q)=>$q->where('user_id',$request->user()->id))
+                                 ->latest();
+         $searchService=new SearchQueryService($packingSessionQuery,$searchParameter,['order_no'],[],['order'=>['shp_name','customer_name']]);
+         $sessions= PackingSessionResource::collection($searchService->with(['order','user','checker'])->search()->paginate($rows));
+         $checkers=UserResource::collection(User::role('checker')->orderBy('name')->get());
 
           $orders= VesselOrderResource::collection(Order::query()
 
@@ -48,7 +44,6 @@ class PackingSessionController extends Controller
                                                 );
 
 
-
         return inertia('PackingSession/List',compact('rows','checkers','sessions','orders'));
 
     }
@@ -56,22 +51,35 @@ class PackingSessionController extends Controller
 
     public function store(Request $request)
     {
+
         if(Line::where('order_no',$request->order_no)
                ->where('part',$request->part)
                ->whereHas('order',fn($q)=>$q->whereHas('assembly_lines'))
                ->exists()
           )
-        if(!PackingSession::where('order_no',$request->order_no)
-               ->where('part',$request->part)
-               ->exists()
-          )
-        PackingSession::create(array_merge($request->all(),['user_id'=>$request->user()->id,
-                                                            'packing_time'=>Carbon::createFromTime(0, 0, 0)
-                                                        ]
-                                         )
-                              );
+          {
+                if(!PackingSession::where('order_no',$request->order_no)
+                    ->where('part',$request->part)
+                    ->exists()
+                    )
+                    {
+                        $session=PackingSession::create(array_merge($request->all(),['user_id'=>$request->user()->id,
+                                                                            'packing_time'=>Carbon::createFromTime(0, 0, 0)
+                                                                        ]
+                                                        )
+                                            );
 
-        return redirect(route('packingSession.index'));
+
+                        return redirect(route('packingSession.show',$session->id));
+                    }
+                    else{
+                        //order doesn't have that part
+                    }
+            }
+            else{
+                //order has no assembly lines error
+            }
+
     }
 
     public function getOrderParts(Request $request )
@@ -89,14 +97,24 @@ class PackingSessionController extends Controller
     {
         //show a page with the session details and the vessels with lines
         $s=PackingSession::find($id);
-        $session= PackingSessionResource::make($s->load('lines','order','user'));
+        $lastVessel=1;
+        if($s->lines->count()>0)
+        {
+            $lastVessel=$s->lines->sortByDesc('to_vessel')->first()->to_vessel+1;
+        }
+
+        $session= PackingSessionResource::make($s->load('lines','order','user','lines.packing_vessel'));
+        // dd($session);
         // dd($session->order_no);
+        $lines=$session->lines;
+
+
         $OrderLines=PackingOrderLineResource::collection(Line::where('order_no',$session->order_no)
                    ->where('part',$session->part)
                    ->get());
 
-
-        return inertia('PackingSession/SessionCard',compact('session','OrderLines'));
+         $packingVessels=PackingVesselResource::collection(PackingVessel::latest()->get());
+        return inertia('PackingSession/SessionCard',compact('session','OrderLines','lastVessel','packingVessels','lines'));
 
 
     }

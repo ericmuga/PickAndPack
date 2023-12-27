@@ -27,4 +27,13 @@ class PackingSessionLine extends Model
     {
         return $this->belongsTo(Item::class,'item_no','item_no');
     }
+
+    public function packing_vessel()
+    {
+        return $this->belongsTo(PackingVessel::class);
+    }
+    public function order()
+    {
+        return $this->belongsTo(Order::class,'order_no','order_no');
+    }
 }
