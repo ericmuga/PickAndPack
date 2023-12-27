@@ -50,8 +50,10 @@ const drop=(dropRoute)=>Swal.fire({
                                         cancelButtonColor: '#d33',
                                         confirmButtonText: 'Yes, delete it!'
                                         })
-                                          .then((result) => {if (result.isConfirmed) {Inertia.delete(dropRoute)}})
-                                        //   .then(()=>{ window.location.reload()})
+                                          .then( (result) => {if (result.isConfirmed) {Inertia.delete(dropRoute)}
+                                        window.location.reload()
+                                        })
+
 
 
 const calculatedSum = ref([]);
@@ -582,6 +584,7 @@ const createOrUpdatesession=()=>{
                                         form.reset();
                                         Swal.fire(`Line ${mode.state}ed Successfully!`,'','success');
                                         selectedItem.value=''
+                                        location.reload()
                                     }
                     }
                    )
@@ -591,7 +594,7 @@ const createOrUpdatesession=()=>{
                     onSuccess:()=>{ form.reset();
                                     Swal.fire(`Lines ${mode.state}ed Successfully!`,'','success');
                                     // resultArray.value = Object.values(groupedData);
-                                    //  window.location.reload();
+                                     window.location.reload();
                                 }
                 });
       showModal.value=false;
