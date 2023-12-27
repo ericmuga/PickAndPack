@@ -182,7 +182,7 @@ const showUpdateModal=(session)=>{
                                                             End Time
                                                         </th>
                                                         <th scope="col" class="px-6 py-3">
-                                                           Start
+                                                           Pack/Print
                                                         </th>
                                                         <th scope="col" class="px-6 py-3">
                                                            Actions
@@ -219,12 +219,21 @@ const showUpdateModal=(session)=>{
                                                     <td class="px-3 py-2 text-xs font-bold">
                                                         {{ session.end_time }}
                                                     </td>
-                                                     <td class="px-3 py-2 text-xs font-bold">
+                                                     <td class="px-3 py-2 text-xs font-bold" v-if="session.system_entry==1">
                                                         <Link  :href="route('packingSession.show',session.id)">
                                                             <Button
-                                                            label="Start"
-                                                            severity="success"
+                                                            label="Pack"
+                                                            severity="primary"
                                                             icon="pi pi-send"
+                                                        />
+                                                        </Link>
+                                                    </td>
+                                                    <td class="px-3 py-2 text-xs font-bold" v-else>
+                                                        <Link  :href="route('packingSession.show',session.id)">
+                                                            <Button
+                                                            label="Labels"
+                                                            severity="success"
+                                                            icon="pi pi-print"
                                                         />
                                                         </Link>
                                                     </td>
@@ -232,7 +241,7 @@ const showUpdateModal=(session)=>{
 
 
 
-                                                    <td>
+                                                    <td v-show="session.system_entry==1">
                                                        <div class="flex flex-row">
                                                           <Drop  :drop-route="route('packingSession.destroy',{'id':session.id})"/>
                                                             <Button

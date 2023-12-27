@@ -30,7 +30,7 @@ use Illuminate\Support\Facades\{Route,Auth};
 use illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Resources\{OrderResource};
-use App\Models\{Line,LinePrepack, LoadingSession, Order, Permission, Prepack, Stock, Vehicle};
+use App\Models\{Line,LinePrepack, LoadingSession, Order, PackingSession, Permission, Prepack, Stock, Vehicle};
 
 /*
 |--------------------------------------------------------------------------
@@ -118,7 +118,9 @@ Route::middleware('auth')->group(function () {
 
         ////////////////packing session routes/////////////////////////////
         Route::resource('packingSession',PackingSessionController::class);
+        Route::post('closePackingSession',[PackingSessionController::class,'closePacking'])->name('packingSession.close');
         Route::resource('packingVessel',PackingVesselController::class);
+
         Route::post('getOrderParts',[PackingSessionController::class,'getOrderParts'])->name('packingSession.getOrderParts');
 
 

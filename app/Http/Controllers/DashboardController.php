@@ -6,14 +6,14 @@ namespace App\Http\Controllers;
 use App\Models\{AssemblyLine, Line, Transfer,Order, PackingSessionLine, Stock};
 use Illuminate\Http\Request;
 use App\Services\SearchQueryService;
-use Inertia\Inertia;
-use PhpParser\Node\Expr\Cast\Array_;
+// use Inertia\Inertia;
+// use PhpParser\Node\Expr\Cast\Array_;
 
 class DashboardController extends Controller
 {
 
 
-    public static function getSectorTonnage()
+    public static function getSectorTonnage($confirmed=false)
      {
         $codeMap = [
                         'HORECA' => ['052', '053', '054', '055', '056', '057','061', '001', '002', 'B010', 'B016', 'B025', 'B026'],
@@ -26,6 +26,7 @@ class DashboardController extends Controller
 
          $ordersWithSum = Order::select('sp_code', 'order_no')
                                 ->shipCurrent()
+                                ->when($confirmed,fn($q)=>$q->confirmed())
                                 ->groupBy('sp_code', 'order_no')
                                 ->withSum('lines', 'qty_base')
                                 ->get();
@@ -66,6 +67,8 @@ class DashboardController extends Controller
          $loaded=round(PackingSessionLine::whereHas('order',fn($q)=>$q->shipCurrent())->sum('weight')/1000,2);
 
 
+
+
         $queryBuilder = (new Transfer())->stockSummary(); // You can also use `Order::firstWhere('no', 2)` here
         $searchParameter = $request->has('search')?$request->search:'';
         $searchColumns = ['Transfers.item_no'];
@@ -78,7 +81,7 @@ class DashboardController extends Controller
         $searchService = new SearchQueryService($queryBuilder, $searchParameter, $searchColumns, [], $relatedModels);
 
         $stocks = $searchService->search()
-                                ->orderByDesc('Inventory_Kgs')
+                                ->orderByDesc('Today_and_Tomorrow')
                                 ->paginate(15)
                                 ->withQueryString();
 
@@ -89,20 +92,20 @@ class DashboardController extends Controller
             $orders=Order::current()->select('confirmed')->get();
 
 
-        //   dd($stocks->take(5)->pluck('description'));
+        //   dd($stocks->take(5)->pluck('Today_and_Tomorrow'));
 
 
                 $data=[
-                    'tonnage'=>$tonnage,
-                    'sectorTonnage'=>\App\Http\Controllers\DashboardController::getSectorTonnage(),
-                    'assembled'=>$assembled,
-                    'packed'=>$packed,
-                    'loaded'=>$loaded,
-                       'todays'=>$orders->count(),
-                       'pending'=>$orders->where('confirmed',false)->count(),
-                       'stocks'=>$stocks,
+                        'tonnage'=>$tonnage,
+                        'sectorTonnage'=>\App\Http\Controllers\DashboardController::getSectorTonnage(),
+                        'assembled'=>$assembled,
+                        'packed'=>$packed,
+                        'loaded'=>$loaded,
+                        'todays'=>$orders->count(),
+                        'pending'=>$orders->where('confirmed',false)->count(),
+                        'stocks'=>$stocks,
                         'top5Labels'=>$stocks->take(5)->pluck('description'),
-                        'top5Weights'=>$stocks->take(5)->pluck('closing_pieces'),
+                        'top5Weights'=>$stocks->take(5)->pluck('Today_and_Tomorrow'),
                         'headers'=>$stocks->count()>0?array_keys($stocks->first()->toArray()):[],
                         // $headings = $collection->count() > 0 ? array_keys($collection->first()->toArray()) : [];
                       ];

@@ -8,6 +8,9 @@ import DataTable from '@/Components/DataTable.vue';
 import PieChart from '@/Components/PieChart.vue';
 import {ref} from 'vue'
 import ProgressBar from 'primevue/progressbar';
+import Time from '@/Components/Time.vue'
+import TopFiveBarChart from '@/Components/TopFiveBarChart.vue';
+
 const  formatNumber=(value)=> {
       return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
@@ -24,7 +27,7 @@ defineProps({
                stocks:Object,
                headers:Object,
                top5Labels:Object,
-               top5Weights:Object,
+               top5Weights:Array,
           })
 
 const cdata = ref({
@@ -59,18 +62,21 @@ const cdata = ref({
                         <div v-if="refreshError!=null">
                             {{ refreshError }}
                         </div>
-                        <div class="items-center justify-between w-full flex flex-row">
+  <div class="items-center justify-between w-full flex flex-row">
 
 
 
-                             <div class="flex flex-wrap items-center justify-around text-center">
+    <div class="grid lg:grid-cols-5 md:grid-cols-2 sm:grid-cols-1 text-center w-full">
     <!-- Sales Today Card -->
     <div class="flex flex-col justify-between p-4 mx-2 my-4 bg-white rounded-md shadow-md">
       <div>
         <h2 class="mb-2 text-xl font-semibold">Tonnage</h2>
         <!-- Your sales today data goes here -->
         <div class="text-3xl font-bold">{{ formatNumber(tonnage) }}T</div>
-         <table>
+        <div>
+
+        </div>
+        <table  class=" w-full">
             <tr class="card" v-for="(value, groupName) in sectorTonnage" :key="groupName"  >
 
             <td class="px-4">{{ groupName }}</td><td class="flex justify-end"><strong>{{value}}T</strong></td>
@@ -80,7 +86,44 @@ const cdata = ref({
       </div>
       <!-- <div class="mt-4 text-sm text-gray-500">+5% from yesterday</div> -->
     </div>
-    <div class="card">
+
+
+
+
+    <!-- Top 10 Items Card -->
+    <div class="flex flex-col justify-between p-4 mx-2 my-4 bg-white rounded-md shadow-md">
+      <div>
+        <h2 class="mb-2 text-xl font-semibold text-indigo-600">Assembled</h2>
+        <!-- Your top 10 items data goes here -->
+        <div class="text-3xl font-bold">{{ assembled }}T</div>
+      </div>
+      <!-- <div class="mt-4 text-sm text-gray-500">Best-selling items</div> -->
+    </div>
+
+    <!-- Top 10 Customers Card -->
+    <div class="flex flex-col justify-between p-4 mx-2 my-4 bg-white rounded-md shadow-md">
+      <div>
+        <h2 class="mb-2 text-xl font-semibold text-red-600">Packed</h2>
+        <!-- Your top 10 customers data goes here -->
+        <div class="text-3xl font-bold">{{ packed }}T</div>
+      </div>
+      <!-- <div class="mt-4 text-sm text-gray-500">Loyal customers</div> -->
+    </div>
+
+    <!-- Setups Card -->
+    <div class="flex flex-col justify-between p-4 mx-2 my-4 bg-white rounded-md shadow-md">
+      <div>
+        <h2 class="mb-2 text-xl font-semibold text-lime-500">Loaded</h2>
+        <!-- Your setups data goes here -->
+        <div class="text-3xl font-bold">{{ loaded }}T</div>
+      </div>
+      <!-- <div class="mt-4 text-sm text-gray-500">Currently active setups</div> -->
+    </div>
+     <div class=" flex flex-col gap-5">
+      <div>
+       <Time class=" mx-2  rounded-md shadow-md p-5 bg-slate-400 text-black font-bold items-center my-4 text-center"/>
+        <!-- Your top 10 items data goes here -->
+        <div class="card">
                     <span class="text-xs">Pending Confirmation {{ pending}}/{{ todays }}</span>
                      <div class="card">
                                 <ProgressBar :value="parseFloat(pending*100/todays).toFixed(0)"> </ProgressBar>
@@ -95,36 +138,8 @@ const cdata = ref({
                                 </div>
      </div>
 
-
-
-    <!-- Top 10 Items Card -->
-    <div class="flex flex-col justify-between p-4 mx-2 my-4 bg-white rounded-md shadow-md">
-      <div>
-        <h2 class="mb-2 text-xl font-semibold text-indigo-600">Assembled</h2>
-        <!-- Your top 10 items data goes here -->
-        <div class="text-3xl font-bold">{{ assembled }} T</div>
       </div>
       <!-- <div class="mt-4 text-sm text-gray-500">Best-selling items</div> -->
-    </div>
-
-    <!-- Top 10 Customers Card -->
-    <div class="flex flex-col justify-between p-4 mx-2 my-4 bg-white rounded-md shadow-md">
-      <div>
-        <h2 class="mb-2 text-xl font-semibold text-red-600">Packed</h2>
-        <!-- Your top 10 customers data goes here -->
-        <div class="text-3xl font-bold">{{ packed }} T</div>
-      </div>
-      <!-- <div class="mt-4 text-sm text-gray-500">Loyal customers</div> -->
-    </div>
-
-    <!-- Setups Card -->
-    <div class="flex flex-col justify-between p-4 mx-2 my-4 bg-white rounded-md shadow-md">
-      <div>
-        <h2 class="mb-2 text-xl font-semibold text-lime-500">Loaded</h2>
-        <!-- Your setups data goes here -->
-        <div class="text-3xl font-bold">{{ loaded }}</div>
-      </div>
-      <!-- <div class="mt-4 text-sm text-gray-500">Currently active setups</div> -->
     </div>
 
   </div>
@@ -147,6 +162,9 @@ const cdata = ref({
 
 
 
+                        </div>
+                        <div>
+                            <TopFiveBarChart :labels="top5Labels" :values="top5Weights" />
                         </div>
 
                         <div class="grid grid-cols-1 ">

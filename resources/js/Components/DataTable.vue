@@ -67,8 +67,8 @@ import Toolbar from 'primevue/toolbar';
 
 
                                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                    <tr class="text-xs text-center break-all bg-slate-300">
+                                    <thead class="text-xs text-indigo-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                    <tr class="text-xs text-center break-all bg-orange-200 text-wrap">
                                         <th v-for="(header, key) in headers" :key="key" scope="col" class="px-2 py-1">{{ header }}</th>
                                     </tr>
                                     </thead>

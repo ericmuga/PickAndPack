@@ -8,6 +8,7 @@ use App\Traits\ExcelExportTrait;
 use Illuminate\Http\Request;
 use App\Services\{SearchQueryService,ExcelExportService};
 use Carbon\Carbon;
+use App\Http\Controllers\DashboardController;
 
 use Illuminate\Support\Facades\DB;
 
@@ -23,7 +24,7 @@ public function index(Request $request)
 
 
     $records=$request->records?:10;
-     
+
       $spcodes=DB::table('sales_people')->select('name','code')->get();
     $columns = ['customer_name', 'shp_name', 'order_no', 'shp_date', 'sp_code', 'ending_date','ended_by'];
 
@@ -66,7 +67,8 @@ public function index(Request $request)
         'columnListing' => $columns,
         'items' => $prepackItems,
         'previousInput'=>$request->all(),
-        'spcodes'=>$spcodes
+        'spcodes'=>$spcodes,
+        // 'sectorTonnage'=>DashboardController::getSectorTonnage(true),
     ]);
 }
 

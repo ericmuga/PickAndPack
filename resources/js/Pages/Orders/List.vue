@@ -63,6 +63,7 @@ const props= defineProps({
     columnListing:Object,
     previousInput:Object,
     spcodes:Object,
+    sectorTonnage:Object,
 })
 
 watch(selectedParts,console.log(selectedParts));

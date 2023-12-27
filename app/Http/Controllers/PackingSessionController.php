@@ -82,6 +82,17 @@ class PackingSessionController extends Controller
 
     }
 
+    public function closePacking(Request $request)
+    {
+        // dd($request->all());
+        $packingSession=PackingSession::find($request->id);
+        $packingSession->system_entry=0;
+        $packingSession->save();
+        return redirect(route('packingSession.index'));
+    }
+
+
+
     public function getOrderParts(Request $request )
     {
         return response()->json(DB::table('lines')->where('order_no',$request->order_no)->select('part')->distinct()->get(),200);

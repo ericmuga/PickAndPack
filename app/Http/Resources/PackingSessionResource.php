@@ -32,6 +32,7 @@ class PackingSessionResource extends JsonResource
                'checker'=>UserResource::make($this->whenLoaded('checker')),
                'lines'=>PackingSessionLineResource::collection($this->lines()->with('packing_vessel')->get()),
                'order'=>OrderResource::make($this->whenLoaded('order')),
+               'system_entry'=>$this->system_entry
 
 
 

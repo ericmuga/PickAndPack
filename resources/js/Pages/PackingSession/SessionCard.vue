@@ -12,9 +12,33 @@ import jsPDF from 'jspdf';
 import QRCode from 'qrcode-generator';
 import axios from 'axios';
 import { watch,computed,toRefs } from 'vue';
+import { Link } from '@inertiajs/inertia-vue3';
 import Button from 'primevue/button';
 
+const closePacking=()=>{
 
+     //if the assembled quantity is not equal to the ordered quantity
+
+     Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Packed orders may not be undone!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'End Session!'
+                    }).then((result) => {
+                        if (result.isConfirmed)
+                        {
+                          Inertia.post(route('packingSession.close'),{'id':props.session.data.id},{
+                               onSuccess:()=>Swal.fire('Success!','Session Ended Successfully!','success'),
+                             onError:(error)=>Swal.fire('Error',error.message,'error')
+                          }
+
+                          )
+                        }
+    })
+}
 
 
 const drop=(dropRoute)=>Swal.fire({
@@ -671,6 +695,7 @@ const groupedData = computed(() => {
                                          label="New"
                                          icon="pi pi-plus"
                                          severity="success"
+                                         :disabled="session.data.system_entry==0"
                                          @click="showCreateModal()"
                                          rounded
                                     ></Button>
@@ -754,7 +779,7 @@ const groupedData = computed(() => {
                                                     <td class="px-3 text-xs font-bold">
                                                         {{ line.to_vessel}}
                                                     </td>
-                                                     <td class="flex flex-row px-3 mr-5 text-xs">
+                                                     <td class="flex flex-row px-3 mr-5 text-xs"  v-if="session.data.system_entry!=0">
 
                                                           <!-- <Drop  :drop-route="route('packingSessionLine.destroy',{'id':line.id})" /> -->
 
@@ -770,6 +795,7 @@ const groupedData = computed(() => {
                                                                       />
 
                                                     </td>
+                                                    <td v-else></td>
 
                                             </tr>
 
@@ -794,13 +820,13 @@ const groupedData = computed(() => {
                                 <td>{{ sum.from_vessel +'-'+sum.to_vessel }}</td>
                                 <td>{{ sum.to_vessel-sum.from_vessel+1 }}</td>
                                 <td>{{ sum.packing_vessel_id }}</td>
-                                <td>{{ sum.tare_weight }}</td>
+                                <td>{{ sum.tare_weight*(sum.to_vessel-sum.from_vessel+1) }}</td>
                                 <td>{{ sum.weight }}</td>
                                 <td> <Button icon="pi pi-print" severity="success"
                                        @click="generatePDF(sum.from_vessel,
                                                             sum.to_vessel,
                                                             sum.packing_vessel_id,
-                                                            (sum.tare_weight+sum.weight)/(sum.to_vessel-sum.from_vessel+1))"
+                                                            (sum.tare_weight*(sum.to_vessel-sum.from_vessel+1)+sum.weight)/(sum.to_vessel-sum.from_vessel+1))"
                                     /> </td>
                                 </tr>
                             </tbody>
@@ -825,9 +851,22 @@ const groupedData = computed(() => {
 
                     <Toolbar>
                         <template #center>
-                            <!-- <div >
-                                <Pagination :links="sessions.meta.links" />
-                            </div> -->
+
+                           <Button
+                            v-if="session.data.system_entry==1"
+                            label="End Packing"
+                            severity="warning"
+                            @click="closePacking()"
+                           />
+
+                           <Link v-else :href="route('packingSession.index')">
+                            <Button
+
+                                label="Back"
+                                 severity="info"
+
+                            />
+                           </Link>
                         </template>
                     </Toolbar>
 
