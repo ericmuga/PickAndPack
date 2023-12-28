@@ -8,7 +8,7 @@ import Toolbar from 'primevue/toolbar';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
 import { useForm } from '@inertiajs/inertia-vue3'
-import {ref} from 'vue';
+import {ref,computed} from 'vue';
 import Pagination from '@/Components/Pagination.vue'
 import Swal from 'sweetalert2'
 import Modal from '@/Components/Modal.vue'
@@ -16,13 +16,21 @@ import Drop from '@/Components/Drop.vue'
 import axios from 'axios';
 import { Link } from '@inertiajs/inertia-vue3';
 
+
+
 const props=defineProps({
     checkers:Object,
     sessions:Object,
     orders:Object,
-    rows:String
+    rows:String,
+    todaysPackedTonnage:Number,
+    packingTime:String,
+    roles:Array,
 });
 
+const adminArray = ['supervisor', 'admin'];
+
+const adminOrSupervisor = computed(() => props.roles.some(value => adminArray.includes(value)));
 
 const getParts=(order_no)=>{
     axios.post(route('packingSession.getOrderParts'),{order_no})
@@ -98,11 +106,45 @@ const showUpdateModal=(session)=>{
 
 
 <template>
-    <Head title="Packing Sessions"/>
+    <Head title="My Packing Sessions"/>
 
     <AuthenticatedLayout @add="showModal=true">
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-indigo-400">Packing Sessions{{ sessions.meta.total }}</h2>
+            <div class="flex items-center justify-center gap-4 text-xl font-semibold leading-tight text-center text-indigo-400 place-items-center">
+               <h2>
+                 {{!adminOrSupervisor?'My':''}} Packing Sessions
+               </h2>
+
+            </div>
+            <div class="grid w-full text-center lg:grid-cols-5 md:grid-cols-2 sm:grid-cols-1">
+    <!-- Sales Today Card -->
+    <div class="flex flex-col justify-between p-4 mx-2 my-4 bg-white rounded-md shadow-md">
+      <div>
+        <h2 class="mb-2 text-xl font-semibold">{{!adminOrSupervisor?'My':''}} Packing Today</h2>
+        <!-- Your sales today data goes here -->
+        <div class="text-3xl font-bold">{{ todaysPackedTonnage }}T</div>
+        <div>
+
+        </div>
+
+
+      </div>
+      <!-- <div class="mt-4 text-sm text-gray-500">+5% from yesterday</div> -->
+    </div>
+    <div class="flex flex-col justify-between p-4 mx-2 my-4 bg-white rounded-md shadow-md">
+      <div>
+        <h2 class="mb-2 text-xl font-semibold">{{!adminOrSupervisor?'My':''}} Packing Time</h2>
+        <!-- Your sales today data goes here -->
+        <div class="text-3xl font-bold">{{ packingTime }} Mins</div>
+        <div>
+
+        </div>
+
+
+      </div>
+      <!-- <div class="mt-4 text-sm text-gray-500">+5% from yesterday</div> -->
+    </div>
+    </div>
         </template>
 
         <div class="py-6">
@@ -201,10 +243,9 @@ const showUpdateModal=(session)=>{
                                                     <!-- <td class="px-3 py-2 text-xs">
                                                         {{ session.id }}
                                                     </td> -->
-                                                     <td class="flex flex-col items-center px-3 py-2 text-sm ">
-                                                        <div>{{ session.order_no }}</div>
-                                                        <div>{{ session.part }}</div>
-                                                        <div>{{ session.order.shp_name }}</div>
+                                                     <td class="flex flex-col items-center px-3 py-2 text-xs ">
+                                                        <div>{{ session.order_no }}-{{ session.part }}</div>
+                                                        <div class="p-1 text-black bg-orange-100 rounded-md">{{ session.order.shp_name }}</div>
                                                     </td>
 
                                                     <td class="px-3 py-2 text-xs font-bold text-center ">

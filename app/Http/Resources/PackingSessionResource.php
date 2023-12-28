@@ -28,7 +28,7 @@ class PackingSessionResource extends JsonResource
                'part'=>$this->part,
                'packing_time'=>$this->packing_time,
                'start_time'=>Carbon::parse($this->created_at)->toDateTimeString(),
-               'end_time'=>$originalTime->addHours($carbonTime->hour)->addMinutes($carbonTime->minute)->addSeconds($carbonTime->second)->toDateTimeString(),
+               'end_time'=>Carbon::parse($this->updated_at)->toDateTimeString(),
                'checker'=>UserResource::make($this->whenLoaded('checker')),
                'lines'=>PackingSessionLineResource::collection($this->lines()->with('packing_vessel')->get()),
                'order'=>OrderResource::make($this->whenLoaded('order')),

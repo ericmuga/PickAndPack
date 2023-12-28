@@ -20,10 +20,7 @@ class PackingSession extends Model
         return $this->belongsTo(Order::class,'order_no','order_no');
     }
 
-    public function line()
-    {
-        return $this->belongsTo(Line::class,'line_no','line_no');
-    }
+
 
     public function scopeOfPart(Builder $query, $part,$system=false) :void
     {
@@ -40,5 +37,11 @@ class PackingSession extends Model
     {
         return $this->hasMany(PackingSessionLine::class);
     }
+
+    public function OrderLines()
+    {
+        return $this->hasMany(Line::class, 'order_no', 'order_no')->whereColumn('part', 'lines.part');
+    }
+
 
 }

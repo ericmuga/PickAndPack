@@ -74,9 +74,9 @@ class DashboardController extends Controller
         $searchColumns = ['Transfers.item_no'];
         $strictColumns = [];
         $relatedModels = [
-            'item' => ['description'],
-            // 'relatedModel2' => ['related_column3'],
-        ];
+                                'item' => ['description'],
+
+                         ];
 
         $searchService = new SearchQueryService($queryBuilder, $searchParameter, $searchColumns, [], $relatedModels);
 

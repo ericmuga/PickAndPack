@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\{PackingOrderLineResource, PackingSessionResource,PackingOrderResource, PackingVesselResource, UserResource, VesselOrderResource};
-use App\Models\{Line, PackingSession,Order, PackingVessel, User};
+use App\Models\{Assembly, AssemblySession, Line, PackingSession,Order, PackingVessel, User};
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +21,35 @@ class PackingSessionController extends Controller
         //display the sessions
         // dd('here');
 
+         $todaysPackedTonnage= PackingSession::whereDate('created_at',Carbon::today())
+                                            ->when((!$request->user()->hasRole('admin'))||(!$request->user()->hasRole('supervisor')),fn($q)=>$q->where('user_id',$request->user()->id))
+                                            ->withSum('lines','weight')->get()->sum('lines_sum_weight')/1000;
+
+         $packingStartTime=PackingSession::whereDate('created_at',Carbon::today())
+                                         ->select('created_at')
+                                         ->when((!$request->user()->hasRole('admin'))||(!$request->user()->hasRole('supervisor')),fn($q)=>$q->where('user_id',$request->user()->id))
+                                         ->orderBy('created_at')->first();
+
+        $packingEndTime=PackingSession::whereDate('created_at',Carbon::today())
+                                         ->select('updated_at')
+                                         ->when((!$request->user()->hasRole('admin'))||(!$request->user()->hasRole('supervisor')),fn($q)=>$q->where('user_id',$request->user()->id))
+                                         ->orderByDesc('updated_at')->first();
+//    dd($packingEndTime);
+        if ($packingEndTime) {
+
+
+                          $packingTime = Carbon::parse($packingEndTime->updated_at)
+                                    ->diffInMinutes(Carbon::parse($packingStartTime->created_at));
+
+                            } else {
+                                $packingTime = null; // Handle the case when no result is found
+                            }
+
+
+
+
+
+        $roles=$request->user()->roles()->get()->pluck('name');
 
          $rows=$request->has('rows')?$request->row:10;
          $searchParameter=$request->search?:'';
@@ -44,7 +73,7 @@ class PackingSessionController extends Controller
                                                 );
 
 
-        return inertia('PackingSession/List',compact('rows','checkers','sessions','orders'));
+        return inertia('PackingSession/List',compact('rows','checkers','sessions','orders','todaysPackedTonnage','packingTime','roles'));
 
     }
 
@@ -95,7 +124,19 @@ class PackingSessionController extends Controller
 
     public function getOrderParts(Request $request )
     {
-        return response()->json(DB::table('lines')->where('order_no',$request->order_no)->select('part')->distinct()->get(),200);
+        //only assembled part
+        $assembledParts=AssemblySession::where('order_no',$request->order_no)->select('part')->get();
+        // dd($assembledParts);
+        $packedParts=PackingSession::where('order_no',$request->order_no)->select('part')->get();
+
+        return response()->json(DB::table('lines')
+                                  ->where('order_no',$request->order_no)
+                                  ->select('part')
+                                  ->whereNotIn('part',$packedParts)
+                                  ->whereIn('part',$assembledParts)
+                                  ->get()
+                                ,200
+                                );
     }
 
     /**
