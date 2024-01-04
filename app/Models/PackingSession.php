@@ -42,6 +42,9 @@ class PackingSession extends Model
     {
         return $this->hasMany(Line::class, 'order_no', 'order_no')->whereColumn('part', 'lines.part');
     }
-
+     public function session_lines()
+    {
+        return $this->hasMany(PackingSessionLine::class);
+    }
 
 }

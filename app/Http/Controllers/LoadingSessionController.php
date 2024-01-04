@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\LoadingResource;
+use App\Http\Resources\{LoadingResource,LoadingSummaryResource, OrderPackingResource};
 use App\Http\Resources\LoadingSessionResource;
+// use App\Http\Resources\LoadingOrderResource;
 use App\Http\Resources\VesselResource;
-use App\Models\{LoadingLine, LoadingSession, Order, User, Vehicle, Vessel};
+use App\Models\{LoadingLine, LoadingSession, Order, PackingSessionLine, User, Vehicle, Vessel,Line};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 // use Illuminate\Support\Js;
@@ -80,20 +81,24 @@ class LoadingSessionController extends Controller
         $session=LoadingSession::find($request->id);
 
         //display only vessels that belong to that route
+        $orders=OrderPackingResource::collection(Order::where('shp_date', $session->shp_date)
+                            ->where('sp_code', $session->sp_code)
+                            ->whereHas('packing_sessions')
+                            ->get());
 
 
-        $orders=Order::where('shp_date',$session->shp_date)
-                     ->where('sp_code',$session->sp_code)
-                     ->select('order_no')->get();
-// dd($orders->pluck('order_no'));
-
-        $query= Vessel::whereIn('order_no',$orders->pluck('order_no'))
-                      ->get();
-
-        $vessels=VesselResource::collection($query);
 
 
-        return inertia('Loading/Create',['vessels'=>$vessels,'session'=>LoadingSessionResource::make($session)]);
+
+
+        $packingLines=PackingSessionLine::whereHas('session',fn($q)=>$q->whereHas('order',fn($q)=>$q->where('sp_code',$session->sp_code)))
+                                        ->with('session','packing_vessel');
+
+
+
+        return inertia('Loading/Create',['packingLines'=>$packingLines,
+                                         'session'=>LoadingSessionResource::make($session),
+                                        'orders'=>$orders]);
 
     }
 

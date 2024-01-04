@@ -7,6 +7,7 @@ use App\Models\AssemblyLine;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\Vessel;
+use App\Models\VesselLog;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -50,26 +51,42 @@ class VesselController extends Controller
      */
     public function store(Request $request)
     {
-      dd($request->all());
+    //   dd($request->all());
 
 
-        $vessel=Vessel::updateOrCreate([
-                                        'part'=>$request->part,
-                                        'order_no'=>$request->order_no,
-                                        'vessel_type'=>$request->vessel_type,
-                                        'vessel_no'=>$request->vessel_no,
-                                       ],
+        //check if vessel already exists
+       $vessel=Vessel::findRecord([ 'part'=>$request->part,
+                                    'order_no'=>$request->order_no,
+                                    'vessel_type'=>$request->vessel_type,
+                                    'vessel_no'=>$request->vessel_no,
+                                 ]);
+
+        if (!$vessel)
+          {$vessel=Vessel::Create(
                                        ['part'=>$request->part,
                                         'order_no'=>$request->order_no,
                                         'vessel_type'=>$request->vessel_type,
                                         'user_id'=>$request->user()->id,
-                                        'vessel_no'=>$request->vessel_no
+                                        'vessel_no'=>$request->vessel_no,
+                                        'range_start'=>$request->range_start,
+                                        'range_end'=>$request->range_end,
                                         ]
-
-
                                     );
+          }
+        else
+        {
+            if (!($request->user()->hasRole('admin')|| $request->user()->hasRole('supervisor')))
+              return response()->json(['error'=>'Label reprints must me initiated by an admin or supervisor'],'401');
+        }
+        //log the printing
+        VesselLog::create(['user_id'=>$request->user()->id,'vessel_id'=>$vessel->id]);
 
-       return response()->json(['data'=>$vessel->id]);
+
+       //get vessel ranges for that part
+
+       $printed=Vessel::where('part',$request->part)->where('order_no',$request->order_no)->whereHas('logs')->get();
+
+       return response()->json(['data'=>$printed]);
 
 
     }

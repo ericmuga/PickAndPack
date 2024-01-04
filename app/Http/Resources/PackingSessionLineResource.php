@@ -23,6 +23,7 @@ class PackingSessionLineResource extends JsonResource
             'qty'=>$this->qty,
             'weight'=>$this->weight,
             'packing_vessel'=>$this->whenLoaded('packing_vessel'),
+            'session'=>$this->whenLoaded('session'),
             'from_vessel'=>$this->from_vessel,
             'to_vessel'=>$this->to_vessel,
         ];

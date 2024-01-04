@@ -211,6 +211,10 @@ const showUpdateModal=(session)=>{
                                                         <th scope="col" class="px-6 py-3 text-center">
                                                            Order
                                                         </th>
+
+                                                        <th scope="col" class="px-6 py-3 text-center">
+                                                           Route
+                                                        </th>
                                                         <th scope="col" class="px-6 py-3">
                                                             Packer
                                                         </th>
@@ -246,6 +250,9 @@ const showUpdateModal=(session)=>{
                                                      <td class="flex flex-col items-center px-3 py-2 text-xs ">
                                                         <div>{{ session.order_no }}-{{ session.part }}</div>
                                                         <div class="p-1 text-black bg-orange-100 rounded-md">{{ session.order.shp_name }}</div>
+                                                    </td>
+                                                    <td class="px-3 py-2 text-xs font-bold text-center ">
+                                                        {{ session.order.sp_search_name }}
                                                     </td>
 
                                                     <td class="px-3 py-2 text-xs font-bold text-center ">

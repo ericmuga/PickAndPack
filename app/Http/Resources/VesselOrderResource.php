@@ -18,6 +18,7 @@ class VesselOrderResource extends JsonResource
             'order_no'=>$this->order_no,
             'shp_name'=>$this->shp_name,
             'orderNo'=>$this->order_no.'|'.$this->shp_name,
+            'sp'=>$this->sp_code.'|'.$this->sp_name,
             'lines'=>LineResource::collection($this->whenLoaded('lines')),
 
         ];

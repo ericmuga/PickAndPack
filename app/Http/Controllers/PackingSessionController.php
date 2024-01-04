@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\{PackingOrderLineResource, PackingSessionResource,PackingOrderResource, PackingVesselResource, UserResource, VesselOrderResource};
-use App\Models\{Assembly, AssemblySession, Line, PackingSession,Order, PackingVessel, User};
+use App\Models\{Assembly, AssemblySession, Line, PackingSession,Order, PackingVessel, User,Vessel};
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Services\SearchQueryService;
+use Illuminate\Support\Facades\Auth;
 
 class PackingSessionController extends Controller
 {
@@ -67,6 +68,7 @@ class PackingSessionController extends Controller
           $orders= VesselOrderResource::collection(Order::query()
 
                                                 ->whereHas('assembly_sessions',fn($q)=>$q->where('system_entry',false))
+
                                                 ->orderByDesc('ending_date')
                                                 ->orderByDesc('ending_time')
                                                 ->paginate(5)
@@ -166,7 +168,10 @@ class PackingSessionController extends Controller
                    ->get());
 
          $packingVessels=PackingVesselResource::collection(PackingVessel::latest()->get());
-        return inertia('PackingSession/SessionCard',compact('session','OrderLines','lastVessel','packingVessels','lines'));
+         $roles=auth()->user()->roles->pluck('name');
+
+         $printedArray=Vessel::where('part',$session->part)->where('order_no',$session->order_no)->whereHas('logs')->get();
+        return inertia('PackingSession/SessionCard',compact('session','OrderLines','lastVessel','packingVessels','lines','printedArray','roles'));
 
 
     }
