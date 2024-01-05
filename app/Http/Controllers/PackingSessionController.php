@@ -71,7 +71,7 @@ class PackingSessionController extends Controller
 
                                                 ->orderByDesc('ending_date')
                                                 ->orderByDesc('ending_time')
-                                                ->paginate(5)
+                                                ->paginate(100)
                                                 );
 
 
