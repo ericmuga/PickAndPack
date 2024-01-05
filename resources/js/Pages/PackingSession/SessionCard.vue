@@ -106,26 +106,16 @@ const drop=(dropRoute)=>Swal.fire({
 })
 .then( (result) => {if (result.isConfirmed) {
 
-    axios.delete(dropRoute)
-    .then(()=> {
-         calculateSum();
-    printedArray.value=props.printedArray
-    Swal.fire('Success!','Action Successful','success')
-        //   console.log(props.session.data.id);
-            axios.post(route('packingSession.getLines',{'id':props.session.data.id}))
-             .then((response)=>{
-                        //    lines.value=response.data
-                        console.log(response)
-                        calculateSum()
-                        })
-                 .catch(error=>Swal.fire('Error',error.message,'error'))
-        }
-        );
-
-
-
-    }
-});
+    Inertia.delete(dropRoute,
+                    {onSuccess:()=>{
+                                        form.reset();
+                                            Swal.fire('Action Successful!','Item deleted successfully','success');
+                                            selectedItem.value=''
+                                            calculateSum();
+                                    printedArray.value=props.printedArray
+                                    }
+                     })
+                    }});
 
 
 

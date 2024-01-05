@@ -151,10 +151,8 @@ class PackingSessionController extends Controller
     public function getLines(Request $request)
     {
         $s=PackingSessionLine::where('packing_session_id',$request->id)->get();
-        if($s->count>0)
-            return response()->json($s->lines,200,[]);
-        else
-            return response()->json([],200,[]);
+
+            return response()->json($s,200,[]);
 
 
 
