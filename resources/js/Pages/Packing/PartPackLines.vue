@@ -13,7 +13,7 @@ import debounce from 'lodash/debounce'
 import ProgressBar from 'primevue/progressbar';
 import { useSearchArray } from '@/Composables/useSearchArray';
 import jsPDF from 'jspdf';
-  import QRCode from 'qrcode-generator';
+import QRCode from 'qrcode-generator';
   import axios from 'axios';
 
 

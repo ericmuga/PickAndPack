@@ -28,11 +28,12 @@ class AssemblyController extends Controller
                                                             ->whereHas('assignmentLines', fn($q)=>$q->whereHas('assignment', fn($q)=>$q->where(
 
                                                                 'assignee_id',$request->user()->id)))
+                                                        // ->where('')
                                                         ->shipcurrent()
                                                         ->orderByDesc('ending_date')
                                                         ->orderByDesc('ending_time')
                                                         // ->with('confirmations','assignmentLines')
-                                                        ->paginate(5)
+                                                        ->paginate(100)
                                                         ->withQuerystring()
 
                                                     );

@@ -14,14 +14,49 @@ import axios from 'axios';
 import { watch,computed,toRefs } from 'vue';
 import { Link } from '@inertiajs/inertia-vue3';
 import Button from 'primevue/button';
-
+import { useSearchArray } from '@/Composables/useSearchArray';
+import debounce from 'lodash/debounce'
+const {searchByBarcodeOrItemNo,searchByMultipleKeyValues } = useSearchArray(props.OrderLines.data)
+let scanError = ref('');
+const searchResult = ref(0);
 const searchItem=()=>{
 
 
 
 }
 
-let search=ref();
+let newItem=ref();
+
+watch( newItem,
+ debounce(
+            function () {
+                // alert(newItem.value);
+
+                // startTimer();
+                if (newItem.value.trim()!='' ){
+                            scanError.value = '';
+
+                       searchResult.value= searchByBarcodeOrItemNo((newItem.value.toUpperCase()).trim())
+                       if (searchResult.value!=0)
+                        {
+
+                            // console.log(searchResult.value)
+                            showModal.value=true
+
+                            form.item_no=searchResult.value.item_no
+                            getSelectedItem(form.item_no)
+
+
+
+                        }
+                        else scanError.value=`Item Not found!`;
+                    }
+                     newItem.value=''
+                        }
+            ,300)
+
+        );
+
 
 const closePacking=()=>{
 
@@ -80,6 +115,7 @@ const drop=(dropRoute)=>Swal.fire({
 const calculatedSum = ref([]);
 let printedArray=ref();
 onMounted(() => {
+     inputField.value.focus();
     calculateSum();
     printedArray.value=props.printedArray
 });
@@ -772,21 +808,26 @@ const resultArray=computed(()=>Object.values(groupedData));
                                     @click="showCreateModal()"
                                     rounded
                                     ></Button>
+
+                                    <div v-show="newArray.length>0">
+                                     <ul>
+                                        <li v-for="item in newArray" :key="item.item_no" @click="updateSelected(item.item_no)">
+                                            {{ item.item_description  }}
+
+                                        </li>
+
+                                     </ul>
+                                    </div>
                                 </template>
+
                                 <template #center>
 
                                     <div class="flex flex-col font-bold tracking-wide text-center">
                                         {{ session.data.order.order_no }}|
                                         {{ session.data.order.shp_name }}|
                                         {{ session.data.part }}
-                                        <input
-                                       type="text"
-                                       placeholder="Search Item"
-                                       v-model="search"
-                                       class="p-3 mt-1 text-center rounded bg-slate-400"
-
-                                       @change="searchItem()"
-                                     />
+                                     <input type="text" v-model="newItem"  ref="inputField" placeholder="Scan Item" class="m-2 rounded-lg bg-slate-300 text-md">
+                                                                <p v-if="scanError" class="p-3 m-3 font-bold text-black bg-red-400 rounded">{{ scanError }}</p>
                                     </div>
 
                                 </template>
