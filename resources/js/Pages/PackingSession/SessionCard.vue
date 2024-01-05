@@ -27,6 +27,14 @@ const searchItem=()=>{
 
 let newItem=ref();
 
+const updateSelected=(item_no)=>{
+ showModal.value=true
+
+    form.item_no=item_no
+    getSelectedItem(item_no)
+
+
+}
 watch( newItem,
  debounce(
             function () {
@@ -800,9 +808,13 @@ const resultArray=computed(()=>Object.values(groupedData));
                         <div>
                             <Toolbar>
                                 <template #start>
+                                    <div class="flex flex-col text-center ">
+
+
                                     <Button
                                     label="New"
                                     icon="pi pi-plus"
+                                    class="max-w-sm"
                                     severity="success"
                                     :disabled="session.data.system_entry==0"
                                     @click="showCreateModal()"
@@ -810,14 +822,18 @@ const resultArray=computed(()=>Object.values(groupedData));
                                     ></Button>
 
                                     <div v-show="newArray.length>0">
-                                     <ul>
-                                        <li v-for="item in newArray" :key="item.item_no" @click="updateSelected(item.item_no)">
-                                            {{ item.item_description  }}
+                                    <div class="p-2 m-1 text-black bg-orange-200"> Pending List</div>
+                                       <input type="text" v-model="newItem"  ref="inputField" placeholder="Scan Item" class="m-2 rounded-lg bg-slate-300 text-md">
+                                                                <p v-if="scanError" class="p-3 m-3 font-bold text-black bg-red-400 rounded">{{ scanError }}</p>
+                                    <ul>
+                                        <li v-for="item in newArray" :key="item.item_no" @click="updateSelected(item.item_no)" class="p-2 hover:cursor-pointer">
+                                            {{ item.item_desc  }}
 
                                         </li>
 
                                      </ul>
                                     </div>
+                                </div>
                                 </template>
 
                                 <template #center>
@@ -826,8 +842,7 @@ const resultArray=computed(()=>Object.values(groupedData));
                                         {{ session.data.order.order_no }}|
                                         {{ session.data.order.shp_name }}|
                                         {{ session.data.part }}
-                                     <input type="text" v-model="newItem"  ref="inputField" placeholder="Scan Item" class="m-2 rounded-lg bg-slate-300 text-md">
-                                                                <p v-if="scanError" class="p-3 m-3 font-bold text-black bg-red-400 rounded">{{ scanError }}</p>
+
                                     </div>
 
                                 </template>
