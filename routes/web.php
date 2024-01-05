@@ -118,6 +118,7 @@ Route::middleware('auth')->group(function () {
 
         ////////////////packing session routes/////////////////////////////
         Route::resource('packingSession',PackingSessionController::class);
+        Route::post('getLines/packingSessions',[PackingSessionController::class,'getLines'])->name('packingSession.getLines');
         Route::post('closePackingSession',[PackingSessionController::class,'closePacking'])->name('packingSession.close');
         Route::resource('packingVessel',PackingVesselController::class);
 

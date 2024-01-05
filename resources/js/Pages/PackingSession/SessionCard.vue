@@ -15,9 +15,15 @@ import { watch,computed,toRefs } from 'vue';
 import { Link } from '@inertiajs/inertia-vue3';
 import Button from 'primevue/button';
 
-const closePacking=()=>{
+const searchItem=()=>{
 
-    //if the assembled quantity is not equal to the ordered quantity
+
+
+}
+
+let search=ref();
+
+const closePacking=()=>{
 
     Swal.fire({
         title: 'Are you sure?',
@@ -50,9 +56,24 @@ const drop=(dropRoute)=>Swal.fire({
     cancelButtonColor: '#d33',
     confirmButtonText: 'Yes, delete it!'
 })
-.then( (result) => {if (result.isConfirmed) {Inertia.delete(dropRoute)}
-window.location.reload()
-})
+.then( (result) => {if (result.isConfirmed) {
+
+    axios.delete(dropRoute)
+         .then(()=> {
+                    //   console.log(props.session.data.id);
+                    //     axios.post(route('packingSession.getLines',{'id':props.session.data.id}))
+                    //      .then((response)=>{lines.value=response.data
+                    //             console.log(lines.value)
+                    //             calculateSum()
+                    //             })
+                    //      .catch(error=>Swal.fire('Error',error.message,'error'))
+                    }
+            );
+
+
+
+}
+});
 
 
 
@@ -504,7 +525,9 @@ const props=defineProps({
 
 const { lines} = toRefs(props);
 
-watch(() => props.lines, calculateSum());
+
+
+watch(() => lines.value, calculateSum());
 
 const newArray = computed(() => {
     // Create a dictionary to store cumulative quantities for each item_no
@@ -560,17 +583,10 @@ const getSelectedItem = (item_no) => {
     if(selectedItem.value.ass_qty!=null){
         form.weight=selectedItem.value.ass_qty
         if (selectedItem.value.ass_pcs!=null)form.qty=selectedItem.value.ass_pcs
+        form.qty= getItemOrderQty(item_no)-getItemPackedQty(item_no)
+        form.weight=selectedItem.value.qty_base-getItemPackedWt(item_no)
     }
-    else
-    {
-        if (selectedItem.value.ass_pcs!=null)form.qty=selectedItem.value.ass_pcs
-        else
-        if (selectedItem.value.order_qty!=null)form.qty= getItemOrderQty(selectedItem.value.item_no)-getItemPackedQty(selectedItem.value.item_no)
 
-        if (selectedItem.value.qty_base!=null)form.weight=selectedItem.value.qty_base-getItemPackedWt(selectedItem.value.item_no)
-
-
-    }
     //   console.log(selectedItem.value)
 };
 
@@ -621,6 +637,7 @@ const getItemQtyPer=(itemNo='')=> {
 const createOrUpdatesession=()=>{
 
     if (mode.state=='Create')
+
     form.post(route('packingSessionLine.store'),
     {
 
@@ -628,8 +645,10 @@ const createOrUpdatesession=()=>{
             form.reset();
             Swal.fire(`Line ${mode.state}ed Successfully!`,'','success');
             selectedItem.value=''
-            location.reload()
+
+
         }
+
     }
     )
     else
@@ -638,12 +657,19 @@ const createOrUpdatesession=()=>{
         onSuccess:()=>{ form.reset();
             Swal.fire(`Lines ${mode.state}ed Successfully!`,'','success');
             // resultArray.value = Object.values(groupedData);
-            window.location.reload();
+
         }
     });
     showModal.value=false;
 
-
+//    axios.post(route('packingSession.getLines',{'id':props.session.data.id}))
+//         .then((response) => {
+//             console.log(response);
+//             lines.value = response.data;
+//         })
+//         .catch((error) => {
+//             console.error('Error fetching data:', error);
+//         });
 }
 
 
@@ -749,10 +775,18 @@ const resultArray=computed(()=>Object.values(groupedData));
                                 </template>
                                 <template #center>
 
-                                    <div class="font-bold tracking-wide">
+                                    <div class="flex flex-col font-bold tracking-wide text-center">
                                         {{ session.data.order.order_no }}|
                                         {{ session.data.order.shp_name }}|
                                         {{ session.data.part }}
+                                        <input
+                                       type="text"
+                                       placeholder="Search Item"
+                                       v-model="search"
+                                       class="p-3 mt-1 text-center rounded bg-slate-400"
+
+                                       @change="searchItem()"
+                                     />
                                     </div>
 
                                 </template>

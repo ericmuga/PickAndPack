@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\{PackingOrderLineResource, PackingSessionResource,PackingOrderResource, PackingVesselResource, UserResource, VesselOrderResource};
-use App\Models\{Assembly, AssemblySession, Line, PackingSession,Order, PackingVessel, User,Vessel};
+use App\Models\{Assembly, AssemblySession, Line, PackingSession,Order, PackingSessionLine, PackingVessel, User,Vessel};
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -136,7 +136,7 @@ class PackingSessionController extends Controller
                                   ->select('part')
                                   ->whereNotIn('part',$packedParts)
                                   ->whereIn('part',$assembledParts)
-                                  ->get()
+                                  ->get()->unique('part')
                                 ,200
                                 );
     }
@@ -147,6 +147,19 @@ class PackingSessionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+    public function getLines(Request $request)
+    {
+        $s=PackingSessionLine::where('packing_session_id',$request->id)->get();
+        if($s->count>0)
+            return response()->json($s->lines,200,[]);
+        else
+            return response()->json([],200,[]);
+
+
+
+
+    }
     public function show($id)
     {
         //show a page with the session details and the vessels with lines
