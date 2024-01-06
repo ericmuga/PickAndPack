@@ -38,33 +38,7 @@ class Transfer extends Model
 
     public  function stockSummary($date=null)
      {
-    //    $salesSubQuery= Line::whereHas('order',fn($q)=>$q->invoice()->current())
-    //                        ->select('item_no','ass_qty')
-    //                        ->addSelect(['prepacked_qty' => LinePrepack::selectRaw('sum(line_prepacks.total_quantity) as prepacked_qty')
-    //                                                                   ->whereColumn('line_prepacks.order_no','lines.order_no')
-    //                                                                   ->whereColumn('line_prepacks.line_no','lines.line_no')]);
-
-
-                    //assembly line is anything under execute with a shipment date later than today
-
-    //    $assemblySubQuery= Line::whereHas('order',fn($q)=>$q->shipCurrent())
-    //                           ->selectRaw('item_no,order_qty,
-    //                              (select sum(line_prepacks.total_quantity)
-    //                               from line_prepacks
-    //                               inner join lines as a  on a.line_no=line_prepacks.line_no
-    //                               inner join orders as b on a.order_no=b.order_no and b.shp_date>=DATEADD(d,0,DATEDIFF(d,0,GETDATE()))
-    //                               where
-    //                                 line_prepacks.line_no=lines.line_no
-    //                                 and line_prepacks.order_no=lines.order_no
-    //                             ) as prepacked_qty
-    //                           ');
-                            //   ->addSelect(['prepacked_qty' => LinePrepack::selectRaw('sum(line_prepacks.total_quantity) as prepacked_qty')
-                            //                                           ->whereColumn('line_prepacks.order_no','lines.order_no')
-                            //                                           ->whereColumn('line_prepacks.line_no','lines.line_no')])
-                            //                                           ->havingRaw('sum(line_prepacks.total_quantity)>0');
-    //    dd($assemblySubQuery->orderByDesc('prepacked_qty')->first());
-
-        return $this->query()
+           return $this->query()
                 ->dispatch()
                 ->received()
                 ->finished()
@@ -72,7 +46,8 @@ class Transfer extends Model
                 ->join('items','items.item_no','Transfers.item_no')
                 // ->leftJoinSub($salesSubQuery,'sales',fn(JoinClause $join)=>$join->on('sales.item_no','Transfers.item_no'))
                 // ->leftJoinSub($assemblySubQuery,'assembly',fn(JoinClause $join)=>$join->on('assembly.item_no','Transfers.item_no'))
-                ->selectRaw('Transfers.item_no,
+                ->selectRaw('
+                             Transfers.item_no,
                              items.description,
                              SUM(receiver_total_weight) as Inventory_Kgs,
                              (select sum(a.order_qty) from lines as a

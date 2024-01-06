@@ -62,11 +62,11 @@ const cdata = ref({
                         <div v-if="refreshError!=null">
                             {{ refreshError }}
                         </div>
-  <div class="items-center justify-between w-full flex flex-row">
+  <div class="flex flex-row items-center justify-between w-full">
 
 
 
-    <div class="grid lg:grid-cols-5 md:grid-cols-2 sm:grid-cols-1 text-center w-full">
+    <div class="grid w-full text-center lg:grid-cols-5 md:grid-cols-2 sm:grid-cols-1">
     <!-- Sales Today Card -->
     <div class="flex flex-col justify-between p-4 mx-2 my-4 bg-white rounded-md shadow-md">
       <div>
@@ -76,7 +76,7 @@ const cdata = ref({
         <div>
 
         </div>
-        <table  class=" w-full">
+        <table  class="w-full ">
             <tr class="card" v-for="(value, groupName) in sectorTonnage" :key="groupName"  >
 
             <td class="px-4">{{ groupName }}</td><td class="flex justify-end"><strong>{{value}}T</strong></td>
@@ -119,9 +119,9 @@ const cdata = ref({
       </div>
       <!-- <div class="mt-4 text-sm text-gray-500">Currently active setups</div> -->
     </div>
-     <div class=" flex flex-col gap-5">
+     <div class="flex flex-col gap-5 ">
       <div>
-       <Time class=" mx-2  rounded-md shadow-md p-5 bg-slate-400 text-black font-bold items-center my-4 text-center"/>
+       <Time class="items-center p-5 mx-2 my-4 font-bold text-center text-black rounded-md shadow-md bg-slate-400"/>
         <!-- Your top 10 items data goes here -->
         <div class="card">
                     <span class="text-xs">Pending Confirmation {{ pending}}/{{ todays }}</span>
@@ -163,22 +163,22 @@ const cdata = ref({
 
 
                         </div>
-                        <div>
+                        <div class="grid grid-cols-3">
                             <TopFiveBarChart :labels="top5Labels" :values="top5Weights" />
-                        </div>
-
-                        <div class="grid grid-cols-1 ">
-
                             <div class="col-span-2 mx-2 my-2">
                                 <DataTable
                                   class="text-xs"
                                   :searchUrl="route('dashboard')"
                                   :items="stocks"
                                   :headers="headers"
-
                                 />
 
                             </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 ">
+
+
 
                             <!-- <div class="col-span-1">
 
