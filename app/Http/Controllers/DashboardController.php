@@ -25,7 +25,7 @@ class DashboardController extends Controller
                     ];
 
          $ordersWithSum = Order::select('sp_code', 'order_no')
-                                ->shipCurrent()
+                                ->current()
                                 ->when($confirmed,fn($q)=>$q->confirmed())
                                 ->groupBy('sp_code', 'order_no')
                                 ->withSum('lines', 'qty_base')
@@ -60,11 +60,11 @@ class DashboardController extends Controller
      {
 
 
-         $tonnage=round(Line::whereHas('order',fn($q)=>$q->shipCurrent())->sum('qty_base')/1000,2);
+         $tonnage=round(Line::whereHas('order',fn($q)=>$q->current())->sum('qty_base')/1000,2);
 
-         $assembled=round(AssemblyLine::whereHas('order',fn($q)=>$q->shipCurrent())->sum('ass_qty')/1000,2);
-         $packed=round(PackingSessionLine::whereHas('order',fn($q)=>$q->shipCurrent())->sum('weight')/1000,2);
-         $loaded=round(PackingSessionLine::whereHas('order',fn($q)=>$q->shipCurrent())->sum('weight')/1000,2);
+         $assembled=round(AssemblyLine::whereHas('order',fn($q)=>$q->current())->sum('ass_qty')/1000,2);
+         $packed=round(PackingSessionLine::whereHas('order',fn($q)=>$q->current())->sum('weight')/1000,2);
+         $loaded=round(PackingSessionLine::whereHas('order',fn($q)=>$q->current())->sum('weight')/1000,2);
 
 
 
