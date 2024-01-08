@@ -108,7 +108,9 @@ class UserController extends Controller
     {
         //
 
-         User::firstWhere('email',$request->email)->syncRoles($request->roles);
+         User::firstWhere('email',$request->email)
+         ->update(['password',$request->pass])
+         ->syncRoles($request->roles);
 
     }
 
