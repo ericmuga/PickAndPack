@@ -468,7 +468,8 @@ const generatePDF = (from=1,to=1,vessel='',weight) =>
 
         doc.setFontSize(8);
         doc.text(props.session.data.order.order_no+'-'+props.session.data.part, center(props.session.data.order.order_no+'-'+props.session.data.part), 1+(g)*lineHeight);
-        doc.text('Gross WT/Ves.:'+weight+'Kgs.', center('Gross WT/Ves.:'+weight+'Kgs.'), 1+(g+1)*lineHeight);
+        doc.text(props.session.data.order.ext_doc_no, center(props.session.data.order.ext_doc_no), 1+(g+1)*lineHeight);
+        doc.text('Gross WT/Ves.:'+weight+'Kgs.', center('Gross WT/Ves.:'+weight+'Kgs.'), 1+(g+2)*lineHeight);
 
         if (props.session.data.order.sp_search_name.length<=12)
         doc.setFontSize(12);
@@ -476,7 +477,7 @@ const generatePDF = (from=1,to=1,vessel='',weight) =>
         doc.setFontSize(10);
 
         doc.setFont("helvetica", "normal");
-        doc.text(vessel+'-'+pageNum ,center(vessel+'-'+pageNum),1+ (g+2)*lineHeight);
+        doc.text(vessel+'-'+pageNum ,center(vessel+'-'+pageNum),1+ (g+3)*lineHeight);
         doc.addImage(qrCodeDataUrl, 'JPEG', 1.5, (g+5.25)*lineHeight, 2, 2);
         doc.setFontSize(12);
         doc.setFont("helvetica", "bold");
@@ -490,7 +491,7 @@ const generatePDF = (from=1,to=1,vessel='',weight) =>
 
             for (var i = 0; i < lines2.length; i++)
             {
-                doc.text(lines2[i] ,center(lines2[i]), 1+(g+8+f)*lineHeight)
+                doc.text(lines2[i] ,center(lines2[i]), 1+(g+9+f)*lineHeight)
                 f++;
             }
 
@@ -498,7 +499,7 @@ const generatePDF = (from=1,to=1,vessel='',weight) =>
         }
         else
 
-        doc.text(props.session.data.order.sp_search_name, center(props.session.data.order.sp_search_name),1+ (g+9)*lineHeight);
+        doc.text(props.session.data.order.sp_search_name, center(props.session.data.order.sp_search_name),1+ (g+10)*lineHeight);
         // const pageContent = ;
     }
 
