@@ -20,7 +20,7 @@ import Drop from '@/Components/Drop.vue'
 const form= useForm({
     name:'',
     email:'',
-    // pass:'',
+    pass:'',
     roles:[]
 })
 

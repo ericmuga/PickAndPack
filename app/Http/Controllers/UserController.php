@@ -107,10 +107,11 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         //
-
-         User::firstWhere('email',$request->email)
-         ->update(['password',$request->pass])
-         ->syncRoles($request->roles);
+        //  dd($request->all());
+         $user=User::firstWhere('email',$request->email);
+         $user->password=bcrypt($request->pass);
+         $user->save();
+        $user->syncRoles($request->roles);
 
     }
 
