@@ -91,8 +91,14 @@ class DashboardController extends Controller
 
             $orders=Order::current()->select('confirmed')->get();
 
-
-        //   dd($stocks->take(5)->pluck('Today_and_Tomorrow'));
+            $top5=Line::whereHas('order', function ($q) {
+                                            $q->current();
+                                        })
+                                        ->selectRaw('item_description,SUM(qty_base)/1000 as Tonnage')
+                                        ->groupBy('item_description')
+                                        ->orderByDesc('Tonnage')
+                                        ->take(5)
+                                        ->get();
 
 
                 $data=[
@@ -104,8 +110,8 @@ class DashboardController extends Controller
                         'todays'=>$orders->count(),
                         'pending'=>$orders->where('confirmed',false)->count(),
                         'stocks'=>$stocks,
-                        'top5Labels'=>$stocks->take(5)->pluck('description'),
-                        'top5Weights'=>$stocks->take(5)->pluck('Today_and_Tomorrow'),
+                        'top5Labels'=>$top5->pluck('item_description'),
+                        'top5Weights'=>$top5->pluck('Tonnage'),
                         'headers'=>$stocks->count()>0?array_keys($stocks->first()->toArray()):[],
                         // $headings = $collection->count() > 0 ? array_keys($collection->first()->toArray()) : [];
                       ];

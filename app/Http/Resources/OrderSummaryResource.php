@@ -18,6 +18,7 @@ class OrderSummaryResource extends JsonResource
     {
        return [
                 'order_no'=>$this->order_no,
+                'ext_doc_no'=>$this->ext_doc_no,
              'shp_name'=>$this->shp_name,
              'sp_name'=>$this->sp_name,
             'sp_code'=>$this->sp_code,
