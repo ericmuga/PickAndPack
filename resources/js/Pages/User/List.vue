@@ -256,6 +256,13 @@ const showUpdateModal=(user)=>{
            v-model="form.name"
         />
 
+        <input
+           placeholder="password"
+           type="password"
+           v-model="form.pass"
+        />
+
+
 
         <InputText
            disabled="true"
