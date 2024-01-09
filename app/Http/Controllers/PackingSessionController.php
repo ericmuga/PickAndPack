@@ -74,8 +74,8 @@ class PackingSessionController extends Controller
                                                 ->paginate(100)
                                                 );
 
-
-        return inertia('PackingSession/List',compact('rows','checkers','sessions','orders','todaysPackedTonnage','packingTime','roles'));
+         $checker_id=$request->session()->get('checker_id')?:null;
+        return inertia('PackingSession/List',compact('rows','checkers','sessions','orders','todaysPackedTonnage','packingTime','roles','checker_id'));
 
     }
 
@@ -99,6 +99,13 @@ class PackingSessionController extends Controller
                                                                         ]
                                                         )
                                             );
+
+                        //save checker in session
+                        if(!$request->session()->has('checker_id'))
+                          {
+                            if ($request->has('checker_id'))
+                            $request->session()->put('checker_id', $request->checker_id);
+                          }
 
 
                         return redirect(route('packingSession.show',$session->id));
@@ -147,6 +154,9 @@ class PackingSessionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+
+
 
     public function getLines(Request $request)
     {

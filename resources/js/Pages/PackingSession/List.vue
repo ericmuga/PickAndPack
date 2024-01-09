@@ -8,7 +8,7 @@ import Toolbar from 'primevue/toolbar';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
 import { useForm } from '@inertiajs/inertia-vue3'
-import {ref,computed} from 'vue';
+import {ref,computed,onMounted} from 'vue';
 import Pagination from '@/Components/Pagination.vue'
 import Swal from 'sweetalert2'
 import Modal from '@/Components/Modal.vue'
@@ -18,14 +18,20 @@ import { Link } from '@inertiajs/inertia-vue3';
 
 
 
+
 const props=defineProps({
     checkers:Object,
+    checker_id:String,
     sessions:Object,
     orders:Object,
     rows:String,
     todaysPackedTonnage:Number,
     packingTime:String,
     roles:Array,
+});
+
+onMounted(() => {
+    if (props.checker_id!=null) form.checker_id=props.checker_id
 });
 
 const adminArray = ['supervisor', 'admin'];
@@ -361,6 +367,7 @@ const showUpdateModal=(session)=>{
           optionLabel="user_name"
           optionValue="id"
           filter=""
+          v-show="!props.checker_id"
           placeholder="Select Checker"
        />
 
