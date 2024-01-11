@@ -108,10 +108,7 @@ const selectedFile=ref();
 const generatePDF = (from=1,to=1,vessel='',weight) =>
 {
 
-
-
-
-    submitForm()
+submitForm()
 
 
 
@@ -430,7 +427,6 @@ const searchResult = ref(0);
 
 
 */
-
 
 
 

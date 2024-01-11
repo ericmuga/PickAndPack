@@ -128,7 +128,7 @@ const showUpdateModal=(session)=>{
       <div>
         <h2 class="mb-2 text-xl font-semibold">{{!adminOrSupervisor?'My':''}} Packing Today</h2>
         <!-- Your sales today data goes here -->
-        <div class="text-3xl font-bold">{{ todaysPackedTonnage }}T</div>
+        <div class="text-3xl font-bold">{{ todaysPackedTonnage.toFixed(2) }}T</div>
         <div>
 
         </div>

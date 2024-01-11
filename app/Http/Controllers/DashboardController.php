@@ -6,6 +6,8 @@ namespace App\Http\Controllers;
 use App\Models\{AssemblyLine, Line, Transfer,Order, PackingSessionLine, Stock};
 use Illuminate\Http\Request;
 use App\Services\SearchQueryService;
+use Carbon\Carbon;
+
 // use Inertia\Inertia;
 // use PhpParser\Node\Expr\Cast\Array_;
 
@@ -60,7 +62,7 @@ class DashboardController extends Controller
      {
 
 
-         $tonnage=round(Line::whereHas('order',fn($q)=>$q->current())->sum('qty_base')/1000,2);
+         $tonnage=round(Line::whereHas('order',fn($q)=>$q->where('shp_date',Carbon::tomorrow()->toDateString()))->sum('qty_base')/1000,2);
 
          $assembled=round(AssemblyLine::whereHas('order',fn($q)=>$q->current())->sum('ass_qty')/1000,2);
          $packed=round(PackingSessionLine::whereHas('order',fn($q)=>$q->current())->sum('weight')/1000,2);

@@ -185,8 +185,10 @@ class PackingSessionController extends Controller
 
 
         $OrderLines=PackingOrderLineResource::collection(Line::where('order_no',$session->order_no)
-                   ->where('part',$session->part)
-                   ->get());
+                                                            ->where('part',$session->part)
+
+                                                            ->get()
+                                                        );
 
          $packingVessels=PackingVesselResource::collection(PackingVessel::latest()->get());
          $roles=auth()->user()->roles->pluck('name');

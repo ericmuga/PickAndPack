@@ -153,7 +153,7 @@ import ProgressBar from 'primevue/progressbar';
 
                                     </form>
 
-                          <SearchBox model="assignments.index" />
+                          <SearchBox :model="route('assignment.index')" />
                                     </template>
                                         </Toolbar>
 
@@ -171,6 +171,16 @@ import ProgressBar from 'primevue/progressbar';
                                                     <tr class="bg-slate-300">
                                                         <th scope="col" class="px-2 py-1">
                                                             #
+                                                        </th>
+
+                                                        <th scope="col" class="px-2 py-1">
+                                                            Order No.
+                                                        </th>
+                                                        <th scope="col" class="px-2 py-1">
+                                                            Ship-to
+                                                        </th>
+                                                         <th scope="col" class="px-2 py-1">
+                                                            Route
                                                         </th>
                                                         <th scope="col" class="px-2 py-1">
                                                             Assignee
@@ -209,6 +219,15 @@ import ProgressBar from 'primevue/progressbar';
                                                         {{assignment.id }}
                                                     </td>
 
+                                                     <td class="px-3 py-2 text-xs font-bold text-center ">
+                                                        {{ assignment.lines[0].order.order_no }}
+                                                    </td>
+                                                     <td class="px-3 py-2 text-xs font-bold text-center ">
+                                                        {{ assignment.lines[0].order.shp_name }}
+                                                    </td>
+                                                    <td class="px-3 py-2 text-xs font-bold text-center ">
+                                                        {{ assignment.lines[0].order.sp_code+'|'+assignment.lines[0].order.sp_name }}
+                                                    </td>
                                                      <td class="px-3 py-2 text-xs font-bold text-center ">
                                                         {{ assignment.assignee }}
                                                     </td>

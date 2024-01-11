@@ -16,6 +16,7 @@ class VesselOrderResource extends JsonResource
     {
         return [
             'order_no'=>$this->order_no,
+                'ext_doc_no'=>$this->ext_doc_no,
             'shp_name'=>$this->shp_name,
             'orderNo'=>$this->order_no.'|'.$this->shp_name,
             'sp'=>$this->sp_code.'|'.$this->sp_name,

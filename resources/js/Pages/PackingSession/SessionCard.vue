@@ -255,8 +255,8 @@ const validateWeight=(itemNo)=>{
     // Filter the array based on matching from_vessel and to_vessel
     //  console.log(itemNo);
 
-    let max=getItemQtyPer(itemNo)*1.15*form.qty
-    let min=getItemQtyPer(itemNo)*0.85*form.qty
+    let max=(getItemQtyPer(itemNo)*1.15*form.qty).toFixed(2)
+    let min=(getItemQtyPer(itemNo)*0.85*form.qty).toFixed(2)
 
     if (form.weight>max||form.weight<min){
         Swal.fire('Caution!','The packed weight is not within the expected range!','warning')
@@ -674,7 +674,7 @@ const getItemQtyPer=(itemNo='')=> {
     // Filter the array based on matching from_vessel and to_vessel
     const filteredData = props.OrderLines.data.filter(item => item.item_no ===itemNo);
     // console.log(filteredData)
-    if (filteredData.length>0) return filteredData[0].order_qty/filteredData[0].qty_base; else return 0;
+    if (filteredData.length>0) return (filteredData[0].order_qty/filteredData[0].qty_base).toFixed(2); else return 0;
 
 }
 
@@ -829,7 +829,7 @@ const createOrUpdatesession=()=>{
                                                 <input type="text" v-model="newItem"  ref="inputField" placeholder="Scan Item" class="m-2 rounded-lg bg-slate-300 text-md">
                                                 <p v-if="scanError" class="p-3 m-3 font-bold text-black bg-red-400 rounded">{{ scanError }}</p>
                                                 <ul v-if="newArray.length>0">
-                                                    <li v-for="item in newArray" :key="item.item_no" @click="updateSelected(item.item_no)" class="p-2 hover:cursor-pointer">
+                                                    <li v-for="item in newArray" v-show="newArray.length>0" :key="item.item_no" @click="updateSelected(item.item_no)" class="p-2 hover:cursor-pointer">
                                                         {{ item.item_desc  }}
 
                                                     </li>

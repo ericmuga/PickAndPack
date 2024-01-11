@@ -65,20 +65,36 @@ class AssignmentController extends Controller
     public function index(Request $request)
     {
         //list all the assignments that are on going
-
-        $assignments= AssignmentResource::collection(Assignment::with('assignee','assignor')
-                                                               ->when($request->has('assemblers'),fn($q)=>$q->whereIn('assignee_id',$request->assemblers))
+       $queryBuilder=Assignment::when($request->has('assemblers'),fn($q)=>$q->whereIn('assignee_id',$request->assemblers))
                                                                ->when($request->has('date')&&($request->date<>''),
                                                                            fn($q)=>$q->where('created_at','>=',Carbon::parse($request->date)->toDateString())
                                                                                      ->where('created_at','<=',Carbon::parse($request->date)->addDay(1)->toDateString()))
                                                                ->when(!$request->has('date')||($request->date==''),
                                                                            fn($q)=>$q->where('created_at','>=',Carbon::today()->toDateString())
-                                                                                     ->where('created_at','<=',Carbon::tomorrow(1)->toDateString()))
-                                                               ->withCount('lines')
-                                                               ->latest()
-                                                               ->paginate(15)
-                                                               ->appends($request->all())
-                                                                );
+                                                                                     ->where('created_at','<=',Carbon::tomorrow(1)->toDateString()));
+
+
+        $searchParameter = $request->has('search')?$request->search:'';
+        $searchColumns = ['id'];
+        $strictColumns = [];
+        $relatedModels = [
+                            'lines' => ['order_no'],
+                            'assignee' => ['name'],
+                        ];
+
+
+
+        $searchService = new SearchQueryService($queryBuilder, $searchParameter, $searchColumns, $strictColumns,$relatedModels);
+        // dd($searchService);
+        $assignments = $searchService
+                        ->with(['lines','assignee','assignor','lines.order']) // Example of eager loading related models
+                        ->search()
+                        ->withCount('lines')
+                        ->latest()
+                        ->paginate(15)
+                        ->appends($request->all());
+
+        $assignments= AssignmentResource::collection($assignments);
 
         //list of assemblers
         $dateParam=$request->has('date')?$request->date:Carbon::today()->toDateString();

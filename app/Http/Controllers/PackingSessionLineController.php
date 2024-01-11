@@ -36,7 +36,13 @@ class PackingSessionLineController extends Controller
      */
     public function store(Request $request)
     {
-        $line=PackingSessionLine::updateOrCreate($request->all());
+        if ($request->id == null) {
+                $line = PackingSessionLine::create($request->all());
+            } else {
+                $line = PackingSessionLine::find($request->id);
+                $line->update($request->except('id'));
+            }
+
 
         return redirect(route('packingSession.show',['packingSession'=>$request->packing_session_id]));
 

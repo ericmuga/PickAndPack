@@ -400,7 +400,7 @@ const closeAssembly=()=>{
 
 
 
-                            <!--end of stats bar-->
+                            <!--end of stats bar--1220C1>
 
                         </div>
                     </div>

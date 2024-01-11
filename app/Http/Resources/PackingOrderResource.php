@@ -19,7 +19,7 @@ class PackingOrderResource extends JsonResource
             'order_no'=>$this->order_no,
              'shp_name'=>$this->shp_name,
              'sp_name'=>$this->sp_name,
-            'sp_code'=>$this->sp_code,
+             'sp_code'=>$this->sp_code,
              'shp_date'=>Carbon::parse($this->shp_date)->toDateString(),
 
             // 'assembled_a'=>$this->assembly_sessions()->OfPart('A')->count()==1,
