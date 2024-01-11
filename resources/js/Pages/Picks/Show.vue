@@ -400,7 +400,6 @@ const closeAssembly=()=>{
 
 
 
-                            <!--end of stats bar--1220C1>
 
                         </div>
                     </div>
@@ -417,4 +416,3 @@ const closeAssembly=()=>{
         cursor: pointer;
     }
 </style>
-@/services/OrderStore
