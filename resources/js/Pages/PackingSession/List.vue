@@ -377,7 +377,7 @@ const showUpdateModal=(session)=>{
           severity="info"
           type="submit"
           :label=mode.state
-          :disabled="form.checker_id==''||form.order_no==''||form.part==''||form.processing"
+          :disabled="form.order_no==''||form.part==''||form.processing"
 
         />
         <Button label="Cancel" severity="warning" icon="pi pi-cancel" @click="showModal=false"/>
