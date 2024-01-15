@@ -266,7 +266,7 @@ const showUpdateModal=(user)=>{
 
 
         <InputText
-           disabled="true"
+
            placeholder="email"
            v-model="form.email"
 
