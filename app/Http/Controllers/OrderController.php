@@ -175,7 +175,7 @@ public function filter(Request $request)
                             ->orderByDesc('ending_date')
                             ->orderByDesc('ending_time')
                             ->with('confirmations')
-                            ->paginate(10)
+                            ->paginate(5)
                             ->withQueryString()
 
                             );
@@ -245,7 +245,7 @@ $query = Line::query()
                 ->with(['order'])
                 ->orderByDesc('order_no');
 
-$orderLines = LineResource::collection($lines->paginate(15)->appends($request->all())->withQueryString());
+$orderLines = LineResource::collection($lines->paginate(5)->appends($request->all())->withQueryString());
 
 
 

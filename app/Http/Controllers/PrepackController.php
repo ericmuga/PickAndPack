@@ -32,7 +32,7 @@ class PrepackController extends Controller
                                     )
                                 ->with('item')
                                 ->withCount('linePrepacks')
-                                ->paginate(15)
+                                ->paginate(5)
                                 ->withQueryString());
 
 
