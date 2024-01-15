@@ -91,7 +91,7 @@ class AssignmentController extends Controller
                         ->search()
                         ->withCount('lines')
                         ->latest()
-                        ->paginate(15)
+                        ->paginate(5)
                         ->appends($request->all());
 
         $assignments= AssignmentResource::collection($assignments);

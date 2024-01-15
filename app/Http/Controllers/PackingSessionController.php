@@ -52,7 +52,7 @@ class PackingSessionController extends Controller
 
         $roles=$request->user()->roles()->get()->pluck('name');
 
-         $rows=$request->has('rows')?$request->row:10;
+         $rows=$request->has('rows')?$request->row:5;
          $searchParameter=$request->search?:'';
         //  dd($searchParameter);
 

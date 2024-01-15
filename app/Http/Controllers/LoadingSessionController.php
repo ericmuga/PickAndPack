@@ -28,7 +28,7 @@ class LoadingSessionController extends Controller
        $loaders=User::role('loader')->select('id','name')->where('id','<>',$request->user()->id)->get();
 
 
-       $rows=$request->rows?:10;
+       $rows=$request->rows?:5;
         $spcodes=DB::table('sales_people')->select('name','code')->get();
 
         $sessions= LoadingSessionResource::collection(LoadingSession::with('lines','SalesPerson')->latest()->paginate($rows));

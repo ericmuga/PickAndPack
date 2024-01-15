@@ -38,7 +38,7 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('assemble.order',{'order_
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">Assembly</h2>
+            <h2 class="text-xl font-semibold leading-tight text-center text-gray-800">Assembly</h2>
         </template>
 
         <div class="py-6">

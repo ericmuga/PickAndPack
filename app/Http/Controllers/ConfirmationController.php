@@ -23,7 +23,7 @@ public function index(Request $request)
     // dd($request->all());
 
 
-    $records=$request->records?:10;
+    $records=$request->records?:5;
 
       $spcodes=DB::table('sales_people')->select('name','code')->get();
     $columns = ['customer_name', 'shp_name', 'order_no', 'shp_date', 'sp_code', 'ending_date','ended_by'];
