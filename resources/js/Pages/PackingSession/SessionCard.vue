@@ -430,6 +430,17 @@ const generatePDF = (from=1,to=1,vessel='',weight) =>
         //    console.log(error)
     })
 
+///////////////////// buffer lines in and array ////////////////////
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -916,7 +927,7 @@ const createOrUpdatesession=()=>{
                                                         {{ getItemOrderQty(line.item_no)}}
                                                     </td>
                                                     <td class="px-3 py-2 text-xs font-bold">
-                                                        {{ line.weight}}
+                                                        {{ parseFloat(line.weight).toFixed(2)}}
                                                     </td>
                                                     <td class="px-3 text-xs font-bold">
                                                         {{ line.packing_vessel.code }}
