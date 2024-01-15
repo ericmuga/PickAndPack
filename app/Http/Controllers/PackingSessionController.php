@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\{PackingOrderLineResource, PackingSessionResource,PackingOrderResource, PackingVesselResource, UserResource, VesselOrderResource};
-use App\Models\{Assembly, AssemblySession, Line, PackingSession,Order, PackingSessionLine, PackingVessel, User,Vessel};
+use App\Models\{Assembly, AssemblySession, Line, PackingSession,Order, Packing, PackingSessionLine, PackingVessel, User,Vessel};
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -65,14 +65,15 @@ class PackingSessionController extends Controller
          $sessions= PackingSessionResource::collection($searchService->with(['order','user','checker'])->search()->paginate($rows));
          $checkers=UserResource::collection(User::role('checker')->orderBy('name')->get());
 
-          $orders= VesselOrderResource::collection(Order::query()
-
+         $searchOrder=$request->has('searchOrder')?:'';
+          $orders= PackingOrderResource::collection(Order::query()
+                                                ->when($searchOrder!='',fn($q)=>$q->where('order_no','like','%'.$searchOrder))
                                                 ->whereHas('assembly_sessions',fn($q)=>$q->where('system_entry',false))
-
                                                 ->orderByDesc('ending_date')
                                                 ->orderByDesc('ending_time')
-                                                ->paginate(100)
+                                                ->paginate(1)
                                                 );
+
 
          $checker_id=$request->session()->get('checker_id')?:null;
         return inertia('PackingSession/List',compact('rows','checkers','sessions','orders','todaysPackedTonnage','packingTime','roles','checker_id'));
