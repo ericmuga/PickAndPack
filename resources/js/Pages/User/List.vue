@@ -107,10 +107,11 @@ const showUpdateModal=(user)=>{
                                     <Button
                                          label="Add"
                                          icon="pi pi-plus"
-                                         disabled
+
                                          severity="success"
                                          @click="showCreateModal()"
                                          rounded
+
                                     ></Button>
                                 </template>
                                 <template #center>
