@@ -65,9 +65,9 @@ class PackingSessionController extends Controller
          $sessions= PackingSessionResource::collection($searchService->with(['order','user','checker'])->search()->paginate($rows));
          $checkers=UserResource::collection(User::role('checker')->orderBy('name')->get());
 
-         $searchOrder=$request->has('searchOrder')?:'';
+        //  $searchOrder=?:null;
           $orders= PackingOrderResource::collection(Order::query()
-                                                ->when($searchOrder!='',fn($q)=>$q->where('order_no','like','%'.$searchOrder))
+                                                ->when($request->has('searchOrder'),fn($q)=>$q->where('order_no','like','%'.$request->searchOrder))
                                                 ->whereHas('assembly_sessions',fn($q)=>$q->where('system_entry',false))
                                                 ->orderByDesc('ending_date')
                                                 ->orderByDesc('ending_time')

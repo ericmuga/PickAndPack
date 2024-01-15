@@ -198,7 +198,7 @@ const showUpdateModal=(session)=>{
                                      <input type="text" v-model="newItem"  ref="inputField" placeholder="Search Order" class="justify-center max-w-sm m-2 text-center rounded-lg bg-slate-300 ">
 
                                      <div v-if="orders.data.length==0" class="w-full p-3 mt-2 text-center">
-                                                 No Sessions were found.
+                                                 No Orders were found.
                                                 </div>
                                         <div class="relative overflow-x-auto shadow-md sm:rounded-lg" v-else>
                                     <table class="w-full text-xs text-left text-gray-500 dark:text-gray-400">
