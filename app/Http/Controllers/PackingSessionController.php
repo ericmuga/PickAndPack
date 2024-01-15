@@ -67,8 +67,11 @@ class PackingSessionController extends Controller
 
         //  $searchOrder=?:null;
           $orders= PackingOrderResource::collection(Order::query()
-                                                ->when($request->has('searchOrder'),fn($q)=>$q->where('order_no','like','%'.$request->searchOrder))
+                                                ->when($request->has('searchOrder'),fn($q)=>$q->where('order_no','like','%'.$request->searchOrder)
+                                                                                               ->orWhere('customer_name','like','%'.$request->searchOrder.'%')
+                                                                                               )
                                                 ->whereHas('assembly_sessions',fn($q)=>$q->where('system_entry',false))
+                                                ->shipcurrent()
                                                 ->orderByDesc('ending_date')
                                                 ->orderByDesc('ending_time')
                                                 ->paginate(1)
