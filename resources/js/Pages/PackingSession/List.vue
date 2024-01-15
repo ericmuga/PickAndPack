@@ -153,10 +153,10 @@ const showUpdateModal=(session)=>{
                </h2>
 
             </div>
-            <div class="grid w-full text-center lg:grid-cols-5 md:grid-cols-2 sm:grid-cols-1">
+            <div class="flex flex-row justify-center w-full mt-3 text-center ">
     <!-- Sales Today Card -->
-    <div class="flex flex-col justify-between p-4 mx-2 my-4 bg-white rounded-md shadow-md">
-      <div>
+    <div class="flex flex-col justify-center p-4 mx-2 bg-red-300 rounded-md shadow-md my-">
+      <div class="">
         <h2 class="mb-2 text-xl font-semibold">{{!adminOrSupervisor?'My':''}} Packing Today</h2>
         <!-- Your sales today data goes here -->
         <div class="text-3xl font-bold">{{ todaysPackedTonnage.toFixed(2) }}T</div>
@@ -168,7 +168,7 @@ const showUpdateModal=(session)=>{
       </div>
       <!-- <div class="mt-4 text-sm text-gray-500">+5% from yesterday</div> -->
     </div>
-    <div class="flex flex-col justify-between p-4 mx-2 my-4 bg-white rounded-md shadow-md">
+    <div class="flex flex-col justify-between max-h-screen p-4 mx-2 bg-teal-300 rounded-md shadow-md">
       <div>
         <h2 class="mb-2 text-xl font-semibold">{{!adminOrSupervisor?'My':''}} Packing Time</h2>
         <!-- Your sales today data goes here -->
