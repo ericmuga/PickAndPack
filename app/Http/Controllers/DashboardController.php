@@ -84,7 +84,7 @@ class DashboardController extends Controller
 
         $stocks = $searchService->search()
                                 ->orderByDesc('Today_and_Tomorrow')
-                                ->paginate(15)
+                                ->paginate(5)
                                 ->withQueryString();
 
 
