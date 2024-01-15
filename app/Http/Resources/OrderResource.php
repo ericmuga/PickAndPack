@@ -22,7 +22,7 @@ class OrderResource extends JsonResource
         return [
 
             'order_no'=>$this->order_no,
-                'ext_doc_no'=>$this->ext_doc_no,
+                'ext_doc_no'=>$this->ext_doc_no?:'',
             'ended_by'=>Str::replace('FARMERSCHOICE\\','',$this->ended_by),
             'customer_no'=>$this->customer_no,
             'customer_name'=>$this->customer_name,

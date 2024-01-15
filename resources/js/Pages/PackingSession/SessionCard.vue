@@ -354,8 +354,12 @@ const generatePDF = (from=1,to=1,vessel='',weight) =>
     });
 
     const center=(text)=>{
+        if(text){
         const textWidth = doc.getStringUnitWidth(text) * doc.internal.getFontSize() / doc.internal.scaleFactor;
         return (doc.internal.pageSize.width - textWidth) / 2;
+        }
+        else return doc.internal.pageSize.width/2;
+
     }
 
     var maxWidth = 100;
@@ -468,6 +472,7 @@ const generatePDF = (from=1,to=1,vessel='',weight) =>
 
         doc.setFontSize(8);
         doc.text(props.session.data.order.order_no+'-'+props.session.data.part, center(props.session.data.order.order_no+'-'+props.session.data.part), 1+(g)*lineHeight);
+        if(props.session.data.order&& props.session.data.order.ext_doc_no!='')
         doc.text(props.session.data.order.ext_doc_no, center(props.session.data.order.ext_doc_no), 1+(g+1)*lineHeight);
         doc.text('Gross WT/Ves.:'+weight+'Kgs.', center('Gross WT/Ves.:'+weight+'Kgs.'), 1+(g+2)*lineHeight);
 
