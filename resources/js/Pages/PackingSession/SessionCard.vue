@@ -32,8 +32,8 @@ const updateSelected=(item_no)=>{
 
     form.item_no=item_no
     // form.item_no=searchResult.value.item_no
-            form.from_vessel=props.lastVessel
-            form.to_vessel=props.lastVessel
+            //form.from_vessel=props.lastVessel
+            //form.to_vessel=props.lastVessel
     getSelectedItem(item_no)
 
 
@@ -55,8 +55,8 @@ function () {
             showModal.value=true
 
             form.item_no=searchResult.value.item_no
-            form.from_vessel=props.lastVessel
-            form.to_vessel=props.lastVessel
+            form.from_vessel=lastVessel.value
+            form.to_vessel=lastVessel.value
             getSelectedItem(form.item_no)
 
 
@@ -126,6 +126,11 @@ onMounted(() => {
     inputField.value.focus();
     calculateSum();
     printedArray.value=props.printedArray
+
+    axios.get(`getLastVessel/${props.session.data.id}`)
+        .then((response)=>{
+            lastVessel.value=response.data
+        })
 });
 
 
@@ -548,9 +553,11 @@ const generatePDF = (from=1,to=1,vessel='',weight) =>
 
 
 
+  axios.get(`getLastVessel/${props.session.data.id}`)
+        .then((response)=>{
+            lastVessel.value=response.data
+        })
 
-
-    //doc.save('label.pdf')
     openModal();
 
 };
@@ -572,12 +579,12 @@ const qrCodeImage=(text)=> {
 };
 
 
-
+let lastVessel=ref(1);
 
 const props=defineProps({
     OrderLines:Object,
     session:Object,
-    lastVessel:String,
+    // lastVessel:String,
     packingVessels:Object,
     lines:Object,
     printedArray:Object,
@@ -617,8 +624,8 @@ const form= useForm({
 
     item_no:'',
     packing_vessel_id:'',
-    from_vessel:props.lastVessel,
-    to_vessel:props.lastVessel,
+    from_vessel:lastVessel.value,
+    to_vessel:lastVessel.value,
     qty:'',
     weight:'',
     packing_session_id:props.session.data.id,
@@ -707,7 +714,7 @@ const createOrUpdatesession=()=>{
             Swal.fire(`Line ${mode.state}ed Successfully!`,'','success');
             selectedItem.value=''
              calculateSum();
-    printedArray.value=props.printedArray
+             printedArray.value=props.printedArray
 
         }
 

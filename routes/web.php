@@ -139,15 +139,9 @@ Route::middleware('auth')->group(function () {
         Route::get('allocate/orders',[OrderController::class, 'assemble'])->name('orders.lines');
         Route::post('orders/prepack',[OrderController::class,'prepack'])->name('orders.prepack');
 
-        // Route::get('orders/prepacked',[OrderController::class,'orderPrepacks'])->name('orders.prepacks');
 
-        //Prepacked Orders
+        Route::get('packingSession/getLastVessel/{id}',[PackingSessionController::class, 'getLastVessel'])->name('session.getLastVessel');
 
-
-
-        // Route::get('orders/assemble',[OrderController::class, 'assemble'])->name('orders.lines');
-
-        // Route::get('/order/{id}', [OrderController::class, 'show'])->name('order.show');
         Route::get('/order/{id}/{part}', [OrderController::class, 'show'])->name('order.show');
         Route::get('/confirmations', [OrderController::class, 'index'])->name('order.list');
 

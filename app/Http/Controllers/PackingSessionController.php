@@ -172,6 +172,18 @@ class PackingSessionController extends Controller
 
 
     }
+
+    public function getLastVessel($id)
+    {
+        $s=PackingSession::find($id);
+        $lastVessel=1;
+        if($s->lines->count()>0)
+        {
+            $lastVessel=$s->lines->sortByDesc('to_vessel')->first()->to_vessel+1;
+        }
+        return response()->json($lastVessel,200,[]);
+    }
+
     public function show($id)
     {
         //show a page with the session details and the vessels with lines
