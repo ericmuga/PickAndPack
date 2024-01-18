@@ -111,7 +111,7 @@ class AssignmentController extends Controller
 
 
         if($request->records=='ALL')$records=100;
-        else         $records=$request->records?:5;
+        else         $records=$request->records?:15;
        $ass=Assignment::create([
                 'assignee_id'=>$request->assignee,
                 'assignor_id'=>$request->user()->id,
