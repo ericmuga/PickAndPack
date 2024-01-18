@@ -91,7 +91,7 @@ class AssignmentController extends Controller
                         ->search()
                         ->withCount('lines')
                         ->latest()
-                        ->paginate(5)
+                        ->paginate(20)
                         ->appends($request->all());
 
         $assignments= AssignmentResource::collection($assignments);
@@ -110,7 +110,7 @@ class AssignmentController extends Controller
         // dd($request->all());
 
 
-        if($request->records=='ALL')$records=100;
+        if($request->records=='ALL')$records=200;
         else         $records=$request->records?:15;
        $ass=Assignment::create([
                 'assignee_id'=>$request->assignee,
