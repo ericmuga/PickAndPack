@@ -30,7 +30,7 @@ class AssemblyController extends Controller
                                                         ->shipcurrent()
                                                         ->orderByDesc('ending_date')
                                                         ->orderByDesc('ending_time')
-                                                        ->paginate(50)
+                                                        ->paginate(100)
                                                         ->withQuerystring()
 
                                                     );
