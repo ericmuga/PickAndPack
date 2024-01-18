@@ -429,6 +429,7 @@ const generatePDF = (from=1,to=1,vessel='',weight) =>
         .then(response=>{
             printedArray.value=response.data.data;
 
+
         })
 
         .catch(error=>{ Swal.fire('Error',error.response.data.message,'error')
@@ -710,11 +711,13 @@ const createOrUpdatesession=()=>{
     {
 
         onSuccess:()=>{
+            lastVessel.value=form.to_vessel
             form.reset();
             Swal.fire(`Line ${mode.state}ed Successfully!`,'','success');
             selectedItem.value=''
              calculateSum();
              printedArray.value=props.printedArray
+
 
         }
 

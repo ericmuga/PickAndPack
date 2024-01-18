@@ -51,7 +51,7 @@
 
           <!-- <div class="py-2 pl-8 cursor-pointer">Submenu 2</div> -->
         </div>
-        <div @click="toggleSubMenu('admin')" class="px-4 py-2 cursor-pointer" v-show="user">
+        <div @click="toggleSubMenu('admin')" class="px-4 py-2 cursor-pointer">
           <span class="text-white">Admin</span>
           <span v-if="subMenuOpen['admin']" class="ml-2 text-white">&#9660;</span>
           <span v-else class="ml-2 text-white">&#9654;</span>
