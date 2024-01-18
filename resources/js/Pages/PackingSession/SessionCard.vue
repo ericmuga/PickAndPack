@@ -32,8 +32,8 @@ const updateSelected=(item_no)=>{
 
     form.item_no=item_no
     // form.item_no=searchResult.value.item_no
-            //form.from_vessel=props.lastVessel
-            //form.to_vessel=props.lastVessel
+            form.from_vessel=lastVessel
+            form.to_vessel=lastVessel
     getSelectedItem(item_no)
 
 
@@ -754,7 +754,10 @@ const createOrUpdatesession=()=>{
             //   selectedItem.value=null
             mode.state='Create'
             form.reset();
+            form.from_vessel=lastVessel.value
+            form.to_vessel=lastVessel.value
             showModal.value=true
+
 
         }
 
