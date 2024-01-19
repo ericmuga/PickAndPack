@@ -74,7 +74,7 @@ class PackingSessionController extends Controller
                                                 ->shipcurrent()
                                                 ->orderByDesc('ending_date')
                                                 ->orderByDesc('ending_time')
-                                                ->paginate(1)
+                                                ->paginate(5)
                                                 );
 
 
