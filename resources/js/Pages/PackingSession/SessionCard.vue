@@ -32,8 +32,8 @@ const updateSelected=(item_no)=>{
 
     form.item_no=item_no
     // form.item_no=searchResult.value.item_no
-            form.from_vessel=lastVessel
-            form.to_vessel=lastVessel
+            // form.from_vessel=lastVessel
+            // form.to_vessel=lastVessel
     getSelectedItem(item_no)
 
 
@@ -757,8 +757,8 @@ const createOrUpdatesession=()=>{
             //   selectedItem.value=null
             mode.state='Create'
             form.reset();
-            form.from_vessel=lastVessel.value
-            form.to_vessel=lastVessel.value
+            // // form.from_vessel=lastVessel.value
+            // form.to_vessel=lastVessel.value
             showModal.value=true
 
 
@@ -842,7 +842,7 @@ const createOrUpdatesession=()=>{
                                         <div class="flex flex-col text-center ">
 
 
-                                            <Button
+                                            <!-- <Button
                                             label="Pack Item"
 
                                             icon="pi pi-plus"
@@ -851,7 +851,7 @@ const createOrUpdatesession=()=>{
                                             :disabled="session.data.system_entry==0||newArray.length==0"
                                             @click="showCreateModal()"
                                             rounded
-                                            ></Button>
+                                            ></Button> -->
 
                                             <div v-show="newArray.length>0">
                                                 <div class="p-2 m-1 text-black bg-orange-200"> Pending List</div>
