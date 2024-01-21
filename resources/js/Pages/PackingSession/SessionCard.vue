@@ -30,10 +30,10 @@ function resolveDescriptionById(id) {
 }
 
 function findMatchingObjects(array,targetValue) {
-   let vesselType=resolveDescriptionById(form.packing_vessel_id)
+    let vesselType=resolveDescriptionById(form.packing_vessel_id)
     const matchingObjects = array.filter(obj =>
-        obj.vessel_type == vesselType &&
-        (obj.range_start == targetValue || obj.range_end == targetValue)
+    obj.vessel_type == vesselType &&
+    (obj.range_start == targetValue || obj.range_end == targetValue)
     );
 
     return matchingObjects;
@@ -41,8 +41,8 @@ function findMatchingObjects(array,targetValue) {
 
 const matchingRangesError=()=>{
     Swal.fire('Error!', 'The vessel range must not be withing a closed vessel range!','error');
-     form.from_vessel='';
-     form.to_vessel='';
+    form.from_vessel='';
+    form.to_vessel='';
 }
 
 const validateLimits=()=>{
@@ -56,7 +56,7 @@ const validateLimits=()=>{
     // console.log(obj)
     if (obj.length>0)matchingRangesError();
 
-      obj=findMatchingObjects(printedArray.value,form.to_vessel);
+    obj=findMatchingObjects(printedArray.value,form.to_vessel);
     if (obj.length>0)matchingRangesError();
 
 }
@@ -111,8 +111,8 @@ function findHighestToVesselInfo() {
             const toVesselValue = computedObject[key]?.to_vessel;
 
             if (
-                highestToVesselInfo.to_vessel === null ||
-                (toVesselValue !== undefined && toVesselValue > highestToVesselInfo.to_vessel)
+            highestToVesselInfo.to_vessel === null ||
+            (toVesselValue !== undefined && toVesselValue > highestToVesselInfo.to_vessel)
             ) {
                 highestToVesselInfo.to_vessel = toVesselValue;
                 highestToVesselInfo.packing_vessel_code = computedObject[key]?.packing_vessel_code;
@@ -145,29 +145,29 @@ const updateSelected=(item_no)=>{
     // console.log(findIdByCode(props.packingVessels.data,highestToVesselInfo.packing_vessel_code));
 
     if (highestToVessel!=0)
-   {
-      let obj=findMatchingObjects(printedArray.value,highestToVessel)
-
-      console.log(obj)
-
-    if (obj.length>0)
     {
-        form.from_vessel=parseInt(highestToVessel)+1;
-        form.to_vessel=parseInt(highestToVessel)+1;
+        let obj=findMatchingObjects(printedArray.value,highestToVessel)
 
-    }
-    else
-    {
-        form.from_vessel=highestToVessel;
-        form.to_vessel=highestToVessel;
+        console.log(obj)
 
+        if (obj.length>0)
+        {
+            form.from_vessel=parseInt(highestToVessel)+1;
+            form.to_vessel=parseInt(highestToVessel)+1;
+
+        }
+        else
+        {
+            form.from_vessel=highestToVessel;
+            form.to_vessel=highestToVessel;
+
+        }
     }
-   }
-   else{
+    else{
 
         form.from_vessel=1;
         form.to_vessel=1;
-   }
+    }
 
 
 
@@ -177,7 +177,7 @@ const updateSelected=(item_no)=>{
 
     getSelectedItem(item_no)
 
-showModal.value=true;
+    showModal.value=true;
 }
 
 
@@ -266,6 +266,7 @@ const drop=(dropRoute)=>Swal.fire({
 
 
 onMounted(() => {
+    // console.log(attrs.auth.user)
     inputField.value.focus();
     calculateSum();
     printedArray.value=props.printedArray
@@ -477,7 +478,7 @@ const selectedFile=ref();
 
 
 function checkMatchingRanges(secondObject) {
-      validateLimits()
+    validateLimits()
     let firstArray=printedArray.value;
     // console.log(Array.isArray(firstArray))
     if (Array.isArray(firstArray) && firstArray.length > 0) {
@@ -1101,246 +1102,250 @@ const createOrUpdatesession=()=>{
                                                         <td class="px-3 text-xs font-bold">
                                                             {{ line.to_vessel}}
                                                         </td>
-                                                        <td class="flex flex-row px-3 mr-5 text-xs"  v-if="(session.data.system_entry!=0)&&(!checkMatchingRanges({'from_vessel':line.from_vessel,'to_vessel':line.to_vessel}))">
+                                                        <td class="flex flex-row px-3 mr-5 text-xs"  v-if="((session.data.system_entry!=0)
+                                                        &&(!checkMatchingRanges({'from_vessel':line.from_vessel,'to_vessel':line.to_vessel})))
+                                                        ||(($page.props.auth.roles.includes('admin'))||(($page.props.auth.roles.includes('supervisor'))))
 
-                                                            <!-- <Drop  :drop-route="route('packingSessionLine.destroy',{'id':line.id})" /> -->
+                                                        ">
 
-                                                            <Button icon="pi pi-times" class="justify-end p-button-danger"
-                                                            text rounded
-                                                            @click="drop(route('packingSessionLine.destroy',{'id':line.id}))"
-                                                            />
-                                                            <Button
-                                                            icon="pi pi-pencil"
-                                                            severity="info"
-                                                            text
-                                                            @click="showUpdateModal(line)"
-                                                            />
+                                                        <!-- <Drop  :drop-route="route('packingSessionLine.destroy',{'id':line.id})" /> -->
 
-                                                        </td>
-                                                        <td v-else></td>
+                                                        <Button icon="pi pi-times" class="justify-end p-button-danger"
+                                                        text rounded
+                                                        @click="drop(route('packingSessionLine.destroy',{'id':line.id}))"
+                                                        />
+                                                        <Button
+                                                        icon="pi pi-pencil"
+                                                        severity="info"
+                                                        text
+                                                        @click="showUpdateModal(line)"
+                                                        />
 
-                                                    </tr>
+                                                    </td>
+                                                    <td v-else></td>
 
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <div class="items-center p-3 text-center rounded-lg">
-                                            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                                    <tr class="">
-                                                        <th>Vessel Range</th>
-                                                        <th>Vessel Count</th>
-                                                        <th>Vessel</th>
-                                                        <th>Tare Weight</th>
-                                                        <th>Weight</th>
-                                                        <th>Label</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr v-for="(sum, index) in calculatedSum" :key="index" class="text-center bg-white border-b dark:bg-gray-900 dark:border-gray-700">
-                                                        <td>{{ sum.from_vessel +'-'+sum.to_vessel }}</td>
-                                                        <td>{{ sum.to_vessel-sum.from_vessel+1 }}</td>
-                                                        <td>{{ sum.packing_vessel_id }}</td>
-                                                        <td>{{ sum.tare_weight*(sum.to_vessel-sum.from_vessel+1) }}</td>
-                                                        <td>{{ sum.weight }}</td>
-                                                        <td> <Button icon="pi pi-print" severity="success"
-                                                            :disabled="checkMatchingRanges(sum)"
-                                                            @click="generatePDF(sum.from_vessel,
-                                                            sum.to_vessel,
-                                                            sum.packing_vessel_id,
-                                                            (sum.tare_weight*(sum.to_vessel-sum.from_vessel+1)+sum.weight)/(sum.to_vessel-sum.from_vessel+1))"
-                                                            /> </td>
-                                                        </tr>
-                                                    </tbody>
-                                                    <!-- Table footer with totals -->
-                                                    <tr class="font-bold text-center bg-white border-b dark:bg-gray-900 dark:border-gray-700">
-                                                        <td >Total</td>
-                                                        <td>{{ calculateTotals[2] }}</td>
-                                                        <td></td>
+                                                </tr>
 
-                                                        <td></td>
-                                                        <td>{{ calculateTotals[0] }}</td>
-
-                                                    </tr>
-
-                                                </table>
-
-
-                                            </div>
-
-                                        </div>
+                                            </tbody>
+                                        </table>
                                     </div>
+                                    <div class="items-center p-3 text-center rounded-lg">
+                                        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                                <tr class="">
+                                                    <th>Vessel Range</th>
+                                                    <th>Vessel Count</th>
+                                                    <th>Vessel</th>
+                                                    <th>Tare Weight</th>
+                                                    <th>Weight</th>
+                                                    <th>Label</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="(sum, index) in calculatedSum" :key="index" class="text-center bg-white border-b dark:bg-gray-900 dark:border-gray-700">
+                                                    <td>{{ sum.from_vessel +'-'+sum.to_vessel }}</td>
+                                                    <td>{{ sum.to_vessel-sum.from_vessel+1 }}</td>
+                                                    <td>{{ sum.packing_vessel_id }}</td>
+                                                    <td>{{ sum.tare_weight*(sum.to_vessel-sum.from_vessel+1) }}</td>
+                                                    <td>{{ sum.weight }}</td>
+                                                    <td> <Button icon="pi pi-print" severity="success"
+                                                        :disabled="checkMatchingRanges(sum)"
+                                                        @click="generatePDF(sum.from_vessel,
+                                                        sum.to_vessel,
+                                                        sum.packing_vessel_id,
+                                                        (sum.tare_weight*(sum.to_vessel-sum.from_vessel+1)+sum.weight)/(sum.to_vessel-sum.from_vessel+1))"
+                                                        /> </td>
+                                                    </tr>
+                                                </tbody>
+                                                <!-- Table footer with totals -->
+                                                <tr class="font-bold text-center bg-white border-b dark:bg-gray-900 dark:border-gray-700">
+                                                    <td >Total</td>
+                                                    <td>{{ calculateTotals[2] }}</td>
+                                                    <td></td>
 
-                                    <Toolbar>
-                                        <template #center>
+                                                    <td></td>
+                                                    <td>{{ calculateTotals[0] }}</td>
 
-                                            <Button
-                                            v-if="session.data.system_entry==1"
-                                            label="End Packing"
-                                            severity="warning"
-                                            @click="closePacking()"
-                                            />
+                                                </tr>
 
-                                            <Link v-else :href="route('packingSession.index')">
-                                                <Button
-
-                                                label="Back"
-                                                severity="info"
-
-                                                />
-                                            </Link>
-                                        </template>
-                                    </Toolbar>
+                                            </table>
 
 
+                                        </div>
+
+                                    </div>
                                 </div>
 
+                                <Toolbar>
+                                    <template #center>
 
+                                        <Button
+                                        v-if="session.data.system_entry==1"
+                                        label="End Packing"
+                                        severity="warning"
+                                        @click="closePacking()"
+                                        />
 
+                                        <Link v-else :href="route('packingSession.index')">
+                                            <Button
 
-                                <!--end of stats bar-->
+                                            label="Back"
+                                            severity="info"
+
+                                            />
+                                        </Link>
+                                    </template>
+                                </Toolbar>
+
 
                             </div>
+
+
+
+
+                            <!--end of stats bar-->
+
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <Modal :show="showModal" @close="showModal=false" >
+            <Modal :show="showModal" @close="showModal=false" >
 
-                    <div class="flex flex-col p-4 rounded-sm">
+                <div class="flex flex-col p-4 rounded-sm">
 
-                        <div  class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> {{mode.state}} Packing Line</div>
-                        <!-- <div v-else class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> Update session</div> -->
+                    <div  class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> {{mode.state}} Packing Line</div>
+                    <!-- <div v-else class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> Update session</div> -->
 
-                        <form  @submit.prevent="createOrUpdatesession()">
+                    <form  @submit.prevent="createOrUpdatesession()">
 
-                            <div class="flex flex-col justify-center gap-3">
+                        <div class="flex flex-col justify-center gap-3">
 
-                                <Dropdown
-                                v-if="mode.state=='Create'"
-                                v-model="form.item_no"
-                                :options="newArray"
-                                optionLabel="item_description"
-                                optionValue="item_no"
-                                filter=""
-                                placeholder="Select Item"
-                                @change="getSelectedItem(form.item_no)"
-                                />
-                                <div v-else>
-                                    {{getItemDescription(form.item_no)}}
-                                </div>
-
-                                <div class="p-3 text-black bg-slate-200 " v-show="selectedItem!==null">
-                                    <div class="p-2 text-center text-white bg-lime-700"> Order Qty : {{ (mode.state=='Create')?selectedItem.order_qty: getItemOrderQty(form.item_no) }}</div>
-                                    <div class="p-2 text-center text-white bg-slate-500">Packed Qty : {{  getItemPackedQty(form.item_no) }} </div>
-                                </div>
-                                <div class="flex flex-row justify-between">
-                                    <span class="mt-4 p-float-label">
-                                        <InputText
-                                        v-show="selectedItem!==''"
-                                        @change="validateQty(form.item_no)"
-                                        v-model="form.qty"
-
-                                        />
-                                        <label for="Qty">Qty</label>
-                                    </span>
-
-
-                                    <span class="mt-4 p-float-label">
-                                        <InputText id="weight"
-                                        v-model="form.weight"
-                                        placeholder="Weight"
-                                        @change="validateWeight(form.item_no)"
-
-
-                                        />
-                                        <label for="weight">Weight</label>
-                                    </span>
-
-                                    <!-- <span class="mt-4 p-float-label">
-
-
-                                        <InputText
-                                        placeholder="Weight Calculator"
-                                        v-model="calc"
-                                        @change="evaluateExpression()"
-
-                                        />
-                                        <label for="Weight Calculator">Weight Calculator</label>
-                                    </span> -->
-                                </div>
-                                <div>
-                                    <div class="flex flex-row justify-between gap-3 my-1 ">
-
-                                        <span class="mt-6 p-float-label">
-                                            <Dropdown
-                                            v-model="form.packing_vessel_id"
-                                            :options="props.packingVessels.data"
-                                            option-label="code"
-                                            option-value="id"
-                                            placeholder="Select Vessel"
-                                            @change="validateLimits()"
-                                            />
-                                            <label for="Vessel">Vessel</label>
-                                        </span>
-
-
-
-                                        <span class="mt-6 p-float-label">
-
-                                            <InputText
-                                             :disabled="form.packing_vessel_id==''"
-                                              v-model="form.from_vessel"
-                                              @change="validateLimits()"
-                                            />
-                                            <label for="From Vessel">From Vessel</label>
-                                        </span>
-
-                                        <span class="mt-6 p-float-label">
-
-
-                                            <InputText
-                                            :disabled="form.packing_vessel_id==''"
-                                                placeholder="To Vessel"
-                                                v-model="form.to_vessel"
-                                                @change="validateLimits()"
-
-                                            />
-                                            <label for="To Vessel">To Vessel</label>
-                                        </span>
-
-                                    </div>
-
-                                </div>
-
-
-
-
-                                <Button
-                                severity="info"
-                                type="submit"
-                                :label=mode.state
-                                :disabled="form.packing_vessel_id==''||
-                                           form.item_no==''||
-                                           form.qty==''||
-                                           form.weight==''||
-                                           form.from_vessel==''||
-                                           form.to_vessel==''||
-                                           form.processing||
-                                           checkMatchingRanges({'from_vessel':form.from_vessel,'to_vessel':form.to_vessel})"
-
-                                />
-                                <Button label="Cancel" severity="warning" icon="pi pi-cancel" @click="showModal=false"/>
+                            <Dropdown
+                            v-if="mode.state=='Create'"
+                            v-model="form.item_no"
+                            :options="newArray"
+                            optionLabel="item_description"
+                            optionValue="item_no"
+                            filter=""
+                            placeholder="Select Item"
+                            @change="getSelectedItem(form.item_no)"
+                            />
+                            <div v-else>
+                                {{getItemDescription(form.item_no)}}
                             </div>
 
-                        </form>
+                            <div class="p-3 text-black bg-slate-200 " v-show="selectedItem!==null">
+                                <div class="p-2 text-center text-white bg-lime-700"> Order Qty : {{ (mode.state=='Create')?selectedItem.order_qty: getItemOrderQty(form.item_no) }}</div>
+                                <div class="p-2 text-center text-white bg-slate-500">Packed Qty : {{  getItemPackedQty(form.item_no) }} </div>
+                            </div>
+                            <div class="flex flex-row justify-between">
+                                <span class="mt-4 p-float-label">
+                                    <InputText
+                                    v-show="selectedItem!==''"
+                                    @change="validateQty(form.item_no)"
+                                    v-model="form.qty"
 
-                    </div>
+                                    />
+                                    <label for="Qty">Qty</label>
+                                </span>
 
-                </Modal>
-            </AuthenticatedLayout>
 
-        </template>
-        <style lang="scss" scoped>
+                                <span class="mt-4 p-float-label">
+                                    <InputText id="weight"
+                                    v-model="form.weight"
+                                    placeholder="Weight"
+                                    @change="validateWeight(form.item_no)"
 
-    </style>
+
+                                    />
+                                    <label for="weight">Weight</label>
+                                </span>
+
+                                <!-- <span class="mt-4 p-float-label">
+
+
+                                    <InputText
+                                    placeholder="Weight Calculator"
+                                    v-model="calc"
+                                    @change="evaluateExpression()"
+
+                                    />
+                                    <label for="Weight Calculator">Weight Calculator</label>
+                                </span> -->
+                            </div>
+                            <div>
+                                <div class="flex flex-row justify-between gap-3 my-1 ">
+
+                                    <span class="mt-6 p-float-label">
+                                        <Dropdown
+                                        v-model="form.packing_vessel_id"
+                                        :options="props.packingVessels.data"
+                                        option-label="code"
+                                        option-value="id"
+                                        placeholder="Select Vessel"
+                                        @change="validateLimits()"
+                                        />
+                                        <label for="Vessel">Vessel</label>
+                                    </span>
+
+
+
+                                    <span class="mt-6 p-float-label">
+
+                                        <InputText
+                                        :disabled="form.packing_vessel_id==''"
+                                        v-model="form.from_vessel"
+                                        @change="validateLimits()"
+                                        />
+                                        <label for="From Vessel">From Vessel</label>
+                                    </span>
+
+                                    <span class="mt-6 p-float-label">
+
+
+                                        <InputText
+                                        :disabled="form.packing_vessel_id==''"
+                                        placeholder="To Vessel"
+                                        v-model="form.to_vessel"
+                                        @change="validateLimits()"
+
+                                        />
+                                        <label for="To Vessel">To Vessel</label>
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+
+
+                            <Button
+                            severity="info"
+                            type="submit"
+                            :label=mode.state
+                            :disabled="form.packing_vessel_id==''||
+                            form.item_no==''||
+                            form.qty==''||
+                            form.weight==''||
+                            form.from_vessel==''||
+                            form.to_vessel==''||
+                            form.processing||
+                            checkMatchingRanges({'from_vessel':form.from_vessel,'to_vessel':form.to_vessel})"
+
+                            />
+                            <Button label="Cancel" severity="warning" icon="pi pi-cancel" @click="showModal=false"/>
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </Modal>
+        </AuthenticatedLayout>
+
+    </template>
+    <style lang="scss" scoped>
+
+</style>
