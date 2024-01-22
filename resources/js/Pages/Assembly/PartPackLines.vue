@@ -300,29 +300,42 @@ const updateScannedItem =(item)=>{
 
 
 
-const closeAssembly=()=>{
+const closeAssembly = () => {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "Assembled orders may not be undone!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Close Assembly!',
+        allowOutsideClick: () => !Swal.isLoading(), // Prevent interaction when loading
+    }).then((result) => {
+        stopTimer();
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Posting..',
+                html: '<div class="flex items-center justify-center"><img src="/img/loading.gif" style="width: 100px; height: 100px;"/></div>',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+            });
 
-     //if the assembled quantity is not equal to the ordered quantity
+            Inertia.post(
+                route('assembly.store'),
+                {
+                    'data': assembledArray.value,
+                    'autosave': false,
+                    'assembly_time': formatTime.value,
+                },
+                {
+                    onSuccess: () => Swal.fire('Success!', 'Assembly Closed Successfully!', 'success'),
+                    onError: (error) => Swal.fire('Error', error.message, 'error')
+                }
+            );
+        }
+    });
+};
 
-
-
-     Swal.fire({
-                                        title: 'Are you sure?',
-                                        text: "Assembled orders may not be undone!",
-                                        icon: 'warning',
-                                        showCancelButton: true,
-                                        confirmButtonColor: '#3085d6',
-                                        cancelButtonColor: '#d33',
-                                        confirmButtonText: 'Close Assembly!'
-                                        }).then((result) => {
-                                            stopTimer();
-                                            if (result.isConfirmed) {Inertia.post(route('assembly.store'),{'data':assembledArray.value,
-                                                                                                            'autosave':false,
-                                                                                                         'assembly_time':formatTime.value
-                                                                                                        });
-                                                                    }
-                                                           })
-}
 
 
 
@@ -462,7 +475,7 @@ onUnmounted(() => {
                                                 <div class="col-span-1">
                                                     <div  class="w-full p-3 m-2 text-center text-white bg-orange-200"> Ordered</div>
                                                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 ">
-                                                      
+
                                                         <tbody>
                                                             <tr
                                                               @click="newItem=line.item_no"
