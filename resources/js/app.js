@@ -61,4 +61,7 @@ createInertiaApp({
     },
 });
 
-InertiaProgress.init({ color: '#ebde34' });
+InertiaProgress.init({
+    color: '#ebde34', // Set your desired color
+    height: 20, // Set your desired height
+});

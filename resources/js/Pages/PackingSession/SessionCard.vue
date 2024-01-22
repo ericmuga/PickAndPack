@@ -16,6 +16,7 @@ import { Link } from '@inertiajs/inertia-vue3';
 import Button from 'primevue/button';
 import { useSearchArray } from '@/Composables/useSearchArray';
 import debounce from 'lodash/debounce'
+import { SearchCircleIcon } from '@vue-hero-icons/solid';
 let printedArray=ref([]);
 const calculatedSum=ref([]);
 
@@ -217,24 +218,34 @@ function () {
 const closePacking=()=>{
 
     Swal.fire({
-        title: 'Are you sure?',
-        text: "Packed orders may not be undone!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'End Session!'
-    }).then((result) => {
-        if (result.isConfirmed)
-        {
-            Inertia.post(route('packingSession.close'),{'id':props.session.data.id},{
-                onSuccess:()=>Swal.fire('Success!','Session Ended Successfully!','success'),
-                onError:(error)=>Swal.fire('Error',error.message,'error')
-            }
+    title: 'Are you sure?',
+    text: "Packed orders may not be undone!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'End Session!',
+    allowOutsideClick: () => !Swal.isLoading() // Prevent interaction when loading
+}).then((result) => {
+    if (result.isConfirmed) {
+        Swal.fire({
+            title: 'Posting..',
+            html: '<div class="flex items-center justify-center"><img src="/img/loading.gif" style="width: 100px; height: 100px;"/></div>',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+        });
 
-            )
-        }
-    })
+        Inertia.post(
+            route('packingSession.close'),
+            { 'id': props.session.data.id },
+            {
+                onSuccess: () => Swal.fire('Success!', 'Session Ended Successfully!', 'success'),
+                onError: (error) => Swal.fire('Error', error.message, 'error')
+            }
+        );
+    }
+});
+
 }
 
 
@@ -576,7 +587,7 @@ const generatePDF = (from=1,to=1,vessel='',weight) =>
 
         })
 
-        .catch(error=>{ Swal.fire('Error',error.response.data.message,'error')
+        .catch(error=>{ Swal.fire('Error',error.data.message,'error')
         //    console.log(error)
     })
 
@@ -847,53 +858,51 @@ const getItemQtyPer=(itemNo='')=> {
 }
 
 
-const createOrUpdatesession=()=>{
-
-
-    if (form.packing_vessel_id=='') {
-        Swal.fire('Error!','Please select a vessel','error')
-        return
+const createOrUpdateSession = () => {
+    if (form.packing_vessel_id == '') {
+        Swal.fire('Error!', 'Please select a vessel', 'error');
+        return;
     }
-    validateLimits()
 
-    if (mode.state=='Create')
+    validateLimits();
 
-    form.post(route('packingSessionLine.store'),
-    {
+    if (mode.state == 'Create') {
+        Swal.fire({
+            title: 'Creating Session Line...',
+            html: '<div class="flex items-center justify-center"><img src="/img/loading.gif" style="width: 100px; height: 100px;"/></div>',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+        });
 
-        onSuccess:()=>{
-            lastVessel.value=form.to_vessel
-            form.reset();
-            Swal.fire(`Line ${mode.state}ed Successfully!`,'','success');
-            selectedItem.value=''
-            calculateSum();
-            printedArray.value=props.printedArray
+        form.post(route('packingSessionLine.store'), {
+            onSuccess: () => {
+                lastVessel.value = form.to_vessel;
+                form.reset();
+                Swal.fire(`Line ${mode.state}ed Successfully!`, '', 'success');
+                selectedItem.value = '';
+                calculateSum();
+                printedArray.value = props.printedArray;
+            }
+        });
+    } else {
+        Swal.fire({
+            title: 'Updating Session Line...',
+            html: '<div class="flex items-center justify-center"><img src="/img/loading.gif" style="width: 100px; height: 100px;"/></div>',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+        });
 
-
-        }
-
+        form.patch(route('packingSessionLine.update', { 'packingSessionLine': form.id }), {
+            onSuccess: () => {
+                form.reset();
+                Swal.fire(`Lines ${mode.state}ed Successfully!`, '', 'success');
+                // resultArray.value = Object.values(groupedData);
+            }
+        });
     }
-    )
-    else
-    form.patch(route('packingSessionLine.update',{'packingSessionLine':form.id}),
-    {
-        onSuccess:()=>{ form.reset();
-            Swal.fire(`Lines ${mode.state}ed Successfully!`,'','success');
-            // resultArray.value = Object.values(groupedData);
 
-        }
-    });
-    showModal.value=false;
-
-    //    axios.post(route('packingSession.getLines',{'id':props.session.data.id}))
-    //         .then((response) => {
-        //             console.log(response);
-        //             lines.value = response.data;
-        //         })
-        //         .catch((error) => {
-            //             console.error('Error fetching data:', error);
-            //         });
-        }
+    showModal.value = false;
+};
 
 
 
@@ -1217,7 +1226,7 @@ const createOrUpdatesession=()=>{
                     <div  class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> {{mode.state}} Packing Line</div>
                     <!-- <div v-else class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> Update session</div> -->
 
-                    <form  @submit.prevent="createOrUpdatesession()">
+                    <form  @submit.prevent="createOrUpdateSession()">
 
                         <div class="flex flex-col justify-center gap-3">
 
