@@ -121,6 +121,7 @@ Route::middleware('auth')->group(function () {
         Route::post('getLines/packingSessions',[PackingSessionController::class,'getLines'])->name('packingSession.getLines');
         Route::post('closePackingSession',[PackingSessionController::class,'closePacking'])->name('packingSession.close');
         Route::resource('packingVessel',PackingVesselController::class);
+        Route::get('packingSessionExport', [PackingSessionController::class, 'export'])->name('packingSessions.export');
 
         Route::post('getOrderParts',[PackingSessionController::class,'getOrderParts'])->name('packingSession.getOrderParts');
 

@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Services\SearchQueryService;
 use Illuminate\Support\Facades\Auth;
+use App\Exports\PackingSessionExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PackingSessionController extends Controller
 {
@@ -17,6 +19,13 @@ class PackingSessionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+
+    public function export()
+    {
+        return Excel::download(new PackingSessionExport, 'Sessions.xlsx');
+    }
+
     public function index(Request $request)
     {
         //display the sessions

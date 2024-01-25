@@ -195,6 +195,7 @@ const showUpdateModal=(session)=>{
                             <Toolbar>
                                  <template #center>
                                    <div class="flex flex-col items-center gap-2">
+
                                      <input type="text" v-model="newItem"  ref="inputField" placeholder="Search Order" class="justify-center max-w-sm m-2 text-center rounded-lg bg-slate-300 ">
 
                                      <div v-if="orders.data.length==0" class="w-full p-3 mt-2 text-center">
@@ -340,6 +341,7 @@ const showUpdateModal=(session)=>{
                                 <template #center>
                                     <div>
                                         <Pagination :links="sessions.meta.links" />
+
                                     </div>
 
 
@@ -353,7 +355,9 @@ const showUpdateModal=(session)=>{
                                         </a> -->
 
 
-
+                                            <a :href="route('packingSessions.export')" class="">
+                                                <Button icon="pi pi-download" severity="primary" text raised rounded label="Download"/>
+                                            </a>
 
                                        <SearchBox :model="route('packingSession.index')" />
                                     </template>
