@@ -26,23 +26,23 @@ onMounted(()=>{
 
 const assign=()=>{
 
-  Swal.fire({
-    title: 'Are you sure?',
-    text: 'Do you want to create this assignment?',
-    icon: 'question',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Yes',
-    allowOutsideClick: () => !Swal.isLoading() // Prevent interaction when loading
-}).then((result) => {
-    if (result.isConfirmed) {
-        Swal.fire({
-            title: 'Creating Assignment...',
-            html: '<div class="flex items-center justify-center"><img src="/img/loading.gif" style="width: 100px; height: 100px;"/></div>',
-            allowOutsideClick: false,
-            showConfirmButton: false,
-        });
+//   Swal.fire({
+//     title: 'Are you sure?',
+//     text: 'Do you want to create this assignment?',
+//     icon: 'question',
+//     showCancelButton: true,
+//     confirmButtonColor: '#3085d6',
+//     cancelButtonColor: '#d33',
+//     confirmButtonText: 'Yes',
+//     allowOutsideClick: () => !Swal.isLoading() // Prevent interaction when loading
+// }).then((result) => {
+//     if (result.isConfirmed) {
+//         Swal.fire({
+//             title: 'Creating Assignment...',
+//             html: '<div class="flex items-center justify-center"><img src="/img/loading.gif" style="width: 100px; height: 100px;"/></div>',
+//             allowOutsideClick: false,
+//             showConfirmButton: false,
+//         });
 
         Inertia.post(route('assignment.store'), {
             'selectedParts': selectedOrderParts.value,
@@ -61,8 +61,8 @@ const assign=()=>{
             preserveState: true,
             replace: true
         });
-    }
-});
+//     }
+// });
 
 
 }

@@ -9,19 +9,25 @@ use App\Models\Order;
 class AssignmentOrderResource extends JsonResource
 {
     /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
-     */
+    * Transform the resource into an array.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+    */
     public function toArray($request)
     {
+        $cust='';
+
+        // dd($this->shp_name);
+        // if($this->shp_name==''||$this->shp_name==null) $cust=$this->customer_name;
+        // else $cust=$this->shp_name;
+
         return [
             'order_no'=>$this->order_no,
-            // 'customer_name'=>$this->customer_name,
-             'shp_name'=>$this->shp_name,
+            // 'customer_name'=>$this->shp_name,
+            'shp_name'=>$this->shp_name,
             'sp_code'=>$this->sp_code,
-             'shp_date'=>Carbon::parse($this->shp_date)->toDateString(),
+            'shp_date'=>Carbon::parse($this->shp_date)->toDateString(),
             'part_a'=>$this->lines()->OfPart('A')->count(),
             'part_b'=>$this->lines()->OfPart('B')->count(),
             'part_c'=>$this->lines()->OfPart('C')->count(),
