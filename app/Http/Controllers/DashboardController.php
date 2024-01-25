@@ -66,7 +66,8 @@ class DashboardController extends Controller
 
          $assembled=round(AssemblyLine::whereHas('order',fn($q)=>$q->current())->sum('ass_qty')/1000,2);
          $packed=round(PackingSessionLine::whereHas('order',fn($q)=>$q->current())->sum('weight')/1000,2);
-         $loaded=round(PackingSessionLine::whereHas('order',fn($q)=>$q->current())->sum('weight')/1000,2);
+        //  $loaded=round(PackingSessionLine::whereHas('order',fn($q)=>$q->current())->sum('weight')/1000,2);
+         $loaded=0;
 
 
 

@@ -127,6 +127,20 @@ class PackingSessionController extends Controller
     public function closePacking(Request $request)
     {
         // dd($request->all());
+        //save lines
+        foreach ($request->lines as $line) {
+
+            PackingSessionLine::create($line);
+
+        }
+
+
+
+
+        //
+
+
+
         $packingSession=PackingSession::find($request->id);
         $packingSession->system_entry=0;
         $packingSession->save();

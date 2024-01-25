@@ -8,6 +8,7 @@ use App\Models\{Assignment,AssignmentLine,Order};
 use Illuminate\Support\Facades\DB;
 use App\Services\SearchQueryService;
 use Illuminate\Support\Str;
+use App\Services\ExcelService;
 class AssignmentController extends Controller
 {
     /**
@@ -15,6 +16,12 @@ class AssignmentController extends Controller
     *
     * @return \Illuminate\Http\Response
     */
+
+    public function export()
+    {
+
+    }
+
     public function create(Request $request)
     {
         if($request->records=='ALL')$records=500;

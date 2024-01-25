@@ -41,7 +41,7 @@ function findMatchingObjects(array,targetValue) {
 }
 
 const matchingRangesError=()=>{
-    Swal.fire('Error!', 'The vessel range must not be withing a closed vessel range!','error');
+    Swal.fire('Error!', 'The vessel range must not be within a closed vessel range!','error');
     form.from_vessel='';
     form.to_vessel='';
 }
@@ -50,15 +50,15 @@ const validateLimits=()=>{
 
 
 
-    if (form.to_vessel<form.from_vessel)
-    Swal.fire('Error!','The beginning range must be lower than the concluding range','error')
+    // if (form.to_vessel<form.from_vessel)
+    // Swal.fire('Error!','The beginning range must be lower than the concluding range','error')
 
-    let obj=findMatchingObjects(printedArray.value,form.from_vessel);
-    // console.log(obj)
-    if (obj.length>0)matchingRangesError();
+    // let obj=findMatchingObjects(printedArray.value,form.from_vessel);
+    // // console.log(obj)
+    // if (obj.length>0)matchingRangesError();
 
-    obj=findMatchingObjects(printedArray.value,form.to_vessel);
-    if (obj.length>0)matchingRangesError();
+    // obj=findMatchingObjects(printedArray.value,form.to_vessel);
+    // if (obj.length>0)matchingRangesError();
 
 }
 
@@ -237,7 +237,7 @@ const closePacking=()=>{
 
         Inertia.post(
             route('packingSession.close'),
-            { 'id': props.session.data.id },
+            { 'id': props.session.data.id ,lines:lines.value},
             {
                 onSuccess: () => Swal.fire('Success!', 'Session Ended Successfully!', 'success'),
                 onError: (error) => Swal.fire('Error', error.message, 'error')
@@ -278,6 +278,8 @@ const drop=(dropRoute)=>Swal.fire({
 
 onMounted(() => {
     // console.log(attrs.auth.user)
+
+    lines.value=props.lines
     inputField.value.focus();
     calculateSum();
     printedArray.value=props.printedArray
@@ -286,6 +288,8 @@ onMounted(() => {
     .then((response)=>{
         lastVessel.value=response.data
     })
+    groupAndSumWeight();
+    lookupAndAddProperties();
 });
 
 
@@ -293,7 +297,9 @@ const calculateSum = () => {
     const sumsMap = new Map();
 
     lines.value.forEach((item, index) => {
-        const key = `${item.packing_vessel.code}-${item.from_vessel}-${item.to_vessel}`;
+
+
+        const key = `${item.packing_vessel_id}-${item.from_vessel}-${item.to_vessel}`;
 
         if (!sumsMap.has(key)) {
             sumsMap.set(key, {
@@ -308,19 +314,19 @@ const calculateSum = () => {
         sum.qty += parseFloat(item.qty);
 
         // Sum tare_weight only when the key changes
-        if (index === 0 || key !== `${lines.value[index - 1].packing_vessel.code}-${lines.value[index - 1].from_vessel}-${lines.value[index - 1].to_vessel}`) {
+        if (index === 0 || key !== `${lines.value[index - 1].packing_vessel_id}-${lines.value[index - 1].from_vessel}-${lines.value[index - 1].to_vessel}`) {
             sum.tare_weight += parseFloat(item.packing_vessel.tare_weight);
         }
     });
 
     const result = Array.from(sumsMap, ([key, sum]) => ({
-        packing_vessel_id: key.split('-')[0],
-        from_vessel: key.split('-')[1],
-        to_vessel: key.split('-')[2],
-        weight: sum.weight,
-        tare_weight: sum.tare_weight,
-        qty: sum.qty,
-    }));
+                                                            packing_vessel_id: key.split('-')[0],
+                                                            from_vessel: key.split('-')[1],
+                                                            to_vessel: key.split('-')[2],
+                                                            weight: sum.weight,
+                                                            tare_weight: sum.tare_weight,
+                                                            qty: sum.qty,
+                                                        }));
 
     calculatedSum.value = result;
 };
@@ -588,6 +594,11 @@ const generatePDF = (from=1,to=1,vessel='',weight) =>
         })
 
         .catch(error=>{ Swal.fire('Error',error.data.message,'error')
+
+        axios.get(`getLastVessel/${props.session.data.id}`)
+            .then((response)=>{
+                lastVessel.value=response.data
+            })
         //    console.log(error)
     })
 
@@ -606,7 +617,7 @@ const generatePDF = (from=1,to=1,vessel='',weight) =>
 
 
 
-    const qrCodeText=props.lines[0].order_no+'_'+props.OrderLines.data[0].part+'_'+pageNum;
+    const qrCodeText=props.session.data.order_no+'_'+props.session.data.part+'_'+pageNum;
 
     const qrCode = new QRCode(0, 'H');
     qrCode.addData(qrCodeText);
@@ -747,18 +758,22 @@ const props=defineProps({
     roles:Object,
 });
 
-const { lines} = toRefs(props);
+// const { lines} = toRefs(props);
+let lines=ref([]);
+
 
 
 
 watch(() => lines.value, calculateSum());
+
+
 
 const newArray = computed(() => {
     // Create a dictionary to store cumulative quantities for each item_no
     const cumulativeQty = {};
 
     // Iterate through additionalData to calculate cumulative quantities
-    props.lines.forEach((item) => {
+    lines.value.forEach((item) => {
         const itemNo = item.item_no;
         const qty = parseFloat(item.qty);
         cumulativeQty[itemNo] = (cumulativeQty[itemNo] || 0) + qty;
@@ -830,7 +845,7 @@ const getItemDescription=(itemNo)=> {
 }
 
 const getItemPackedQty=(itemNo)=> {
-    const filteredData = props.lines.filter(item => item.item_no ===itemNo);
+    const filteredData = lines.value.filter(item => item.item_no ===itemNo);
     if (filteredData.length>0) return filteredData[0].qty; else return 0;
 
 }
@@ -858,6 +873,76 @@ const getItemQtyPer=(itemNo='')=> {
 }
 
 
+const { packingVessels } = toRefs(props.packingVessels)
+
+const items=ref([]);
+
+
+const groupedItems = computed(() => {
+  const vesselLookup = packingVessels.reduce((lookup, vessel) => {
+    lookup[vessel.id] = vessel.code;
+    return lookup;
+  }, {});
+
+  return items.value.reduce((acc, item) => {
+    const key = `${item.from_vessel}-${item.to_vessel}-${item.packing_vessel_id}`;
+    if (!acc[key]) {
+      acc[key] = {
+        from_vessel: item.from_vessel,
+        to_vessel: item.to_vessel,
+        packing_vessel_code: vesselLookup[item.packing_vessel_id],
+        totalWeight: 0,
+      };
+    }
+    acc[key].totalWeight += item.weight;
+    return acc;
+  }, {});
+});
+
+
+
+
+// const array1 = ref([
+//     {"id":5,"code":"Small Carton","tare_weight":"0.5","description":"Small Carton"},
+//     {"id":4,"code":"Carton","tare_weight":"1.0","description":"Normal Carton"},
+//     {"id":3,"code":"Crate","tare_weight":"1.8","description":"Normal Crate"}
+// ]);
+
+// const array2 = ref([
+//     {"item_no":"J31031806","packing_vessel_id":5,"from_vessel":1,"to_vessel":1,"qty":15,"weight":15,"packing_session_id":797,"order_no":"S+ORD0000392013"}
+// ]);
+
+const groupedArray = ref([]);
+
+function groupAndSumWeight() {
+    groupedArray.value = lines.value.reduce((acc, obj) => {
+        const key = `${obj.packing_vessel_id}_${obj.to_vessel}_${obj.from_vessel}`;
+        acc[key] = acc[key] || { packing_vessel_id: obj.packing_vessel_id, to_vessel: obj.to_vessel, from_vessel: obj.from_vessel, total_weight: 0 };
+        acc[key].total_weight += obj.weight;
+        return acc;
+    }, {});
+}
+
+
+
+function lookupAndAddProperties() {
+    for (const key in groupedArray.value) {
+
+            // console.log(groupedArray.value[key])
+        const { packing_vessel_id, to_vessel, from_vessel, total_weight } = groupedArray.value[key];
+        const vessel = props.packingVessels.data.find(v => v.id == packing_vessel_id);
+        const gross_weight = eval(parseFloat(total_weight) + ((parseFloat(to_vessel) - parseFloat(from_vessel) + 1) * parseFloat(vessel.tare_weight)));
+        groupedArray.value[key].code = vessel.code;
+        groupedArray.value[key].gross_weight = gross_weight;}
+
+}
+
+// Call the functions
+
+
+
+
+
 const createOrUpdateSession = () => {
     if (form.packing_vessel_id == '') {
         Swal.fire('Error!', 'Please select a vessel', 'error');
@@ -866,40 +951,32 @@ const createOrUpdateSession = () => {
 
     validateLimits();
 
-    if (mode.state == 'Create') {
-        Swal.fire({
-            title: 'Creating Session Line...',
-            html: '<div class="flex items-center justify-center"><img src="/img/loading.gif" style="width: 100px; height: 100px;"/></div>',
-            allowOutsideClick: false,
-            showConfirmButton: false,
+
+        lastVessel.value = form.to_vessel;
+
+        items.value.push({
+            item_no:form.item_no,
+            packing_vessel_id:form.packing_vessel_id,
+            from_vessel:form.from_vessel,
+            to_vessel:form.to_vessel,
+            qty:form.qty,
+            weight:form.weight,
+            packing_session_id:props.session.data.id,
+            order_no:props.session.data.order_no,
         });
 
-        form.post(route('packingSessionLine.store'), {
-            onSuccess: () => {
-                lastVessel.value = form.to_vessel;
-                form.reset();
-                Swal.fire(`Line ${mode.state}ed Successfully!`, '', 'success');
-                selectedItem.value = '';
-                calculateSum();
-                printedArray.value = props.printedArray;
-            }
-        });
-    } else {
-        Swal.fire({
-            title: 'Updating Session Line...',
-            html: '<div class="flex items-center justify-center"><img src="/img/loading.gif" style="width: 100px; height: 100px;"/></div>',
-            allowOutsideClick: false,
-            showConfirmButton: false,
-        });
+        lines.value=items.value;
 
-        form.patch(route('packingSessionLine.update', { 'packingSessionLine': form.id }), {
-            onSuccess: () => {
-                form.reset();
-                Swal.fire(`Lines ${mode.state}ed Successfully!`, '', 'success');
-                // resultArray.value = Object.values(groupedData);
-            }
-        });
-    }
+        // reduce the quantity of that line in the main array, if its zero, hide
+
+        form.reset()
+
+        lastVessel.value = form.to_vessel;
+        selectedItem.value = '';
+        printedArray.value = props.printedArray;
+
+groupAndSumWeight();
+lookupAndAddProperties();
 
     showModal.value = false;
 };
@@ -1018,7 +1095,11 @@ const createOrUpdateSession = () => {
                                                     <input type="text" v-model="newItem"  ref="inputField" placeholder="Scan Item" class="m-2 rounded-lg bg-slate-300 text-md">
                                                     <p v-if="scanError" class="p-3 m-3 font-bold text-black bg-red-400 rounded">{{ scanError }}</p>
                                                     <ul v-if="newArray.length>0">
-                                                        <li v-for="item in newArray" v-show="newArray.length>0" :key="item.item_no" @click="updateSelected(item.item_no)" class="p-2 hover:cursor-pointer">
+                                                        <li v-for="item in newArray"
+                                                                    v-show="newArray.length>0"
+                                                                    :key="item.item_no"
+                                                                     @click="updateSelected(item.item_no)"
+                                                                     class="p-2 hover:cursor-pointer">
                                                             {{ item.item_desc  }}
 
                                                         </li>
@@ -1103,7 +1184,7 @@ const createOrUpdateSession = () => {
                                                             {{ parseFloat(line.weight).toFixed(2)}}
                                                         </td>
                                                         <td class="px-3 text-xs font-bold">
-                                                            {{ line.packing_vessel.code }}
+                                                            {{ line.packing_vessel_code }}
                                                         </td>
                                                         <td class="px-3 text-xs font-bold">
                                                             {{ line.from_vessel}}
@@ -1139,35 +1220,34 @@ const createOrUpdateSession = () => {
                                         </table>
                                     </div>
                                     <div class="items-center p-3 text-center rounded-lg">
+
+                                        <!-- {{ groupedArray }} -->
                                         <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                                             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                                 <tr class="">
                                                     <th>Vessel Range</th>
                                                     <th>Vessel Count</th>
                                                     <th>Vessel</th>
-                                                    <th>Tare Weight</th>
+                                                    <!-- <th>Tare Weight</th> -->
                                                     <th>Weight</th>
                                                     <th>Label</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr v-for="(sum, index) in calculatedSum" :key="index" class="text-center bg-white border-b dark:bg-gray-900 dark:border-gray-700">
+                                                <tr v-for="(sum, index) in groupedArray" :key="index" class="text-center bg-white border-b dark:bg-gray-900 dark:border-gray-700">
                                                     <td>{{ sum.from_vessel +'-'+sum.to_vessel }}</td>
                                                     <td>{{ sum.to_vessel-sum.from_vessel+1 }}</td>
-                                                    <td>{{ sum.packing_vessel_id }}</td>
-                                                    <td>{{ sum.tare_weight*(sum.to_vessel-sum.from_vessel+1) }}</td>
-                                                    <td>{{ sum.weight }}</td>
+                                                    <td>{{ sum.code }}</td>
+                                                    <!-- <td>{{ sum.tare_weight*(sum.to_vessel-sum.from_vessel+1) }}</td> -->
+                                                    <td>{{ sum.gross_weight }}</td>
                                                     <td> <Button icon="pi pi-print" severity="success"
                                                         :disabled="checkMatchingRanges(sum)"
-                                                        @click="generatePDF(sum.from_vessel,
-                                                        sum.to_vessel,
-                                                        sum.packing_vessel_id,
-                                                        (sum.tare_weight*(sum.to_vessel-sum.from_vessel+1)+sum.weight)/(sum.to_vessel-sum.from_vessel+1))"
+                                                        @click="generatePDF(sum.from_vessel,sum.to_vessel,sum.code,sum.gross_weight)"
                                                         /> </td>
                                                     </tr>
                                                 </tbody>
                                                 <!-- Table footer with totals -->
-                                                <tr class="font-bold text-center bg-white border-b dark:bg-gray-900 dark:border-gray-700">
+                                                <!-- <tr class="font-bold text-center bg-white border-b dark:bg-gray-900 dark:border-gray-700">
                                                     <td >Total</td>
                                                     <td>{{ calculateTotals[2] }}</td>
                                                     <td></td>
@@ -1175,7 +1255,7 @@ const createOrUpdateSession = () => {
                                                     <td></td>
                                                     <td>{{ calculateTotals[0] }}</td>
 
-                                                </tr>
+                                                </tr> -->
 
                                             </table>
 

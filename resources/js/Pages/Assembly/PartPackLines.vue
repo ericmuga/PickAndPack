@@ -77,15 +77,15 @@ onMounted(() => {
 };
 
 
-//     setInterval(() => {
-//         if (!assembledArray.value.length==0 && isRunning.value==true)
-//            Inertia.post(route('assembly.store'),{'data':assembledArray.value,
-//                                                     'autosave':true,
-//                                                     'assembly_time':formatTime.value
-//                                                 },{preserveScroll:true,preserveState:true}
-//                                                 )
+    setInterval(() => {
+        if (!assembledArray.value.length==0 && isRunning.value==true)
+           Inertia.post(route('assembly.store'),{'data':assembledArray.value,
+                                                    'autosave':true,
+                                                    'assembly_time':formatTime.value
+                                                },{preserveScroll:true,preserveState:true}
+                                                )
 
-// }, 60000);
+}, 60000);
 
 });
 
