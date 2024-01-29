@@ -77,15 +77,15 @@ onMounted(() => {
 };
 
 
-    setInterval(() => {
-        if (!assembledArray.value.length==0 && isRunning.value==true)
-           Inertia.post(route('assembly.store'),{'data':assembledArray.value,
-                                                    'autosave':true,
-                                                    'assembly_time':formatTime.value
-                                                },{preserveScroll:true,preserveState:true}
-                                                )
+//     setInterval(() => {
+//         if (!assembledArray.value.length==0 && isRunning.value==true)
+//            Inertia.post(route('assembly.store'),{'data':assembledArray.value,
+//                                                     'autosave':true,
+//                                                     'assembly_time':formatTime.value
+//                                                 },{preserveScroll:true,preserveState:true}
+//                                                 )
 
-}, 60000);
+// }, 60000);
 
 });
 
@@ -328,7 +328,7 @@ const closeAssembly = () => {
                     'assembly_time': formatTime.value,
                 },
                 {
-                    onSuccess: () => Swal.fire('Success!', 'Assembly Closed Successfully!', 'success'),
+                    // onSuccess: () => Swal.fire('Success!', 'Assembly Closed Successfully!', 'success'),
                     onError: (error) => Swal.fire('Error', error.message, 'error')
                 }
             );
