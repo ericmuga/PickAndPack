@@ -3,22 +3,21 @@
 
 
 <script setup>
-  import SearchBox from '@/Components/SearchBox.vue'
+
 import Toolbar from 'primevue/toolbar';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Inertia } from '@inertiajs/inertia';
+
 import { Head } from '@inertiajs/inertia-vue3';
 import { useForm } from '@inertiajs/inertia-vue3'
 import {ref,computed,onMounted,watch} from 'vue';
-import Pagination from '@/Components/Pagination.vue'
+
 import Swal from 'sweetalert2'
 import Modal from '@/Components/Modal.vue'
-import Drop from '@/Components/Drop.vue'
+
 import axios from 'axios';
-import { Link } from '@inertiajs/inertia-vue3';
+
 import debounce from 'lodash/debounce';
-import Accordion from 'primevue/accordion';
-import AccordionTab from 'primevue/accordiontab';
+
 
 
 
@@ -26,22 +25,30 @@ import AccordionTab from 'primevue/accordiontab';
 const props=defineProps({
     checkers:Object,
     checker_id:String,
-    sessions:Object,
     orders:Object,
     rows:String,
     todaysPackedTonnage:Number,
     packingTime:String,
     roles:Array,
 });
-
+let orderArray=ref([]);
 onMounted(() => {
+
     if (props.checker_id!=null) form.checker_id=props.checker_id
+    orderArray.value=props.orders;
 });
 
 
 let newItem=ref('');
+
+
 watch( newItem,
- debounce( ()=>{Inertia.get(route('packingSession.index'),{'searchOrder':newItem.value})})
+ debounce( ()=>{
+
+    if (newItem.value=='') orderArray.value=props.orders
+    else
+    orderArray.value=props.orders.filter(item => item.order_part.includes(newItem.value));
+ })
 
 ,500);
 const adminArray = ['supervisor', 'admin'];
@@ -198,7 +205,7 @@ const showUpdateModal=(session)=>{
 
                                      <input type="text" v-model="newItem"  ref="inputField" placeholder="Search Order" class="justify-center max-w-sm m-2 text-center rounded-lg bg-slate-300 ">
 
-                                     <div v-if="orders.data.length==0" class="w-full p-3 mt-2 text-center">
+                                     <div v-if="orderArray.length==0" class="w-full p-3 mt-2 text-center">
                                                  No Orders were found.
                                                 </div>
                                         <div class="relative overflow-x-auto shadow-md sm:rounded-lg" v-else>
@@ -209,111 +216,87 @@ const showUpdateModal=(session)=>{
                                                 <!-- <th scope="col" class="px-2 py-2">
                                                     Barcode
                                                 </th> -->
-                                                <th scope="col" class="py-2 md:px-1">
-                                                    Order No.
+
+                                                <th scope="col" class="py-2 text-center md:px-1">
+                                                   Order
                                                 </th>
                                                 <th scope="col" class="py-2 text-center md:px-1">
-                                                    Sales Person
+                                                   Details
                                                 </th>
-                                                <th scope="col" class="py-2 md:px-1">
-                                                    Ship-to Name
+                                                <th scope="col" class="py-2 text-center md:px-1">
+                                                    A
                                                 </th>
-                                                <th scope="col" class="py-2 md:px-1">
-                                                    Shipment Date
+                                                 <th scope="col" class="py-2 text-center md:px-1">
+                                                    B
+                                                </th>
+                                                 <th scope="col" class="py-2 text-center md:px-1">
+                                                    C
+                                                </th>
+                                                 <th scope="col" class="py-2 text-center md:px-1">
+                                                    D
                                                 </th>
 
-
-                                                <th scope="col" class="py-3 text-center md:px-1">
-                                                    Part A Items
-                                                </th>
-                                                <th scope="col" class="py-2 text-center md:px-1">
-                                                    Part B Items
-                                                </th>
-                                                <th scope="col" class="py-2 text-center md:px-1">
-                                                    Part C Items
-                                                </th>
-                                                <th scope="col" class="py-2 text-center md:px-1">
-                                                    Part D Items
-                                                </th>
 
 
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr v-for="order in orders.data" :key="order.order_no"
+                                            <tr v-for="order in orderArray" :key="order.order_no"
                                             class="font-semibold text-black bg-white hover:bg-gray-300">
 
-                                            <td class="px-2 py-2 text-xs break-all">
+                                           <td class="px-2 py-2 text-xs break-all">
                                                 {{ order.order_no }}
                                             </td>
-                                            <td class="flex flex-col px-2 py-2 text-xs text-center">
-                                                <span class="text-xs font-bold">{{order.sp_code}}</span>
-                                                <span class="text-xs font-thin">{{order.sp_name}}</span>
-                                            </td>
-                                            <td class="px-2 py-2 text-xs font-bold text-center capitalize bg-yellow-200 rounded-full">
+
+                                            <td class="px-2 py-2 text-xs break-all">
                                                 {{ order.shp_name }}
                                             </td>
-                                            <td class="px-2 py-2 text-xs font-bold">
-                                                {{ order.shp_date }}
-                                            </td>
 
 
-                                            <td class="p-1 px-2 py-2 text-xs text-center " v-if="order.part_a!=0">
 
-                                                <Button v-show="order.assembled_a"
-                                                        :disabled="order.packed_a"
-                                                        :icon="order.packed_a?'pi pi-check':'pi pi-gift'"
-                                                        :severity="order.packed_a?'success':'danger'"
+                                            <td class="p-1 px-2 py-2 text-xs text-center">
+
+                                                <Button
+                                                 v-show="order.A==1"
+                                                icon="pi pi-gift"
+                                                        severity="danger"
                                                         rounded
 
-                                                        @click="selectOrderPart(order.order_no,'A')"
+                                                         @click="selectOrderPart(order.order_no,'A')"
                                                         />
-                                    <!--
-                                                <Button  v-show="!order.assembled_a" icon="pi pi-bell" severity="warning" :badge=order.part_a text raised rounded aria-label="Notification" @click="ConfirmPrint(order.order_no,'A')"/>
-                                            -->
-                                            </td>
-                                            <td v-else  class="bg-slat-200">
-
-                                            </td>
-                                            <td class="p-1 px-2 py-2 text-xs text-center " v-if="order.part_b!=0">
-                                                <Button v-show="order.assembled_b"
-                                                        :disabled="order.packed_b"
-                                                        :icon="order.packed_b?'pi pi-check':'pi pi-gift'"
-                                                        :severity="order.packed_b?'success':'danger'"
+                                                </td>
+                                                <td>
+                                               <Button
+                                                 v-show="order.B==1"
+                                                icon="pi pi-gift"
+                                                        severity="danger"
                                                         rounded
 
-                                                        @click="selectOrderPart(order.order_no,'B')"
+                                                         @click="selectOrderPart(order.order_no,'B')"
                                                         />
-                                            </td>
-                                            <td v-else  class="bg-slat-200">
-
-                                            </td>
-                                            <td class="p-1 px-2 py-2 text-xs text-center " v-if="order.part_c!=0">
-                                            <Button v-show="order.assembled_c"
-                                                        :disabled="order.packed_c"
-                                                        :icon="order.packed_c?'pi pi-check':'pi pi-gift'"
-                                                        :severity="order.packed_c?'success':'danger'"
+                                                </td>
+                                                <td>
+                                                <Button
+                                                 v-show="order.C==1"
+                                                icon="pi pi-gift"
+                                                        severity="danger"
                                                         rounded
 
-                                                        @click="selectOrderPart(order.order_no,'C')"
+                                                         @click="selectOrderPart(order.order_no,'C')"
                                                         />
-                                            </td>
-                                            <td v-else  class="bg-slat-200">
-
-                                            </td>
-                                            <td class="p-1 px-2 py-2 text-xs text-center " v-if="order.part_d!=0">
-                                            <Button v-show="order.assembled_d"
-                                                        :disabled="order.packed_d"
-                                                        :icon="order.packed_d?'pi pi-check':'pi pi-gift'"
-                                                        :severity="order.packed_d?'success':'danger'"
+                                                </td>
+                                                <td>
+                                                <Button
+                                                 v-show="order.D==1"
+                                                icon="pi pi-gift"
+                                                        severity="danger"
                                                         rounded
 
-                                                        @click="selectOrderPart(order.order_no,'D')"
+                                                         @click="selectOrderPart(order.order_no,'D')"
                                                         />
-                                            </td>
-                                            <td v-else  class="bg-slat-200">
+                                                </td>
 
-                                            </td>
+
                                     </tr>
 
                                     </tbody>
@@ -323,36 +306,33 @@ const showUpdateModal=(session)=>{
                                  </template>
 
                             </Toolbar>
-                            <Toolbar>
+                            <!-- <Toolbar> -->
 
 
-                                <template #start>
+                                <!-- <template #start>
 
-                                  <!--
+
                                         <Button
                                          label="New"
                                          icon="pi pi-plus"
                                          severity="success"
                                          @click="showCreateModal()"
                                          rounded
-                                    ></Button> -->
+                                    ></Button>
                                     Session History
-                                </template>
-                                <template #center>
+                                </template> -->
+                                <!-- <template #center>
                                     <div>
                                         <Pagination :links="sessions.meta.links" />
 
                                     </div>
 
 
-                                </template>
+                                </template> -->
 
-                                    <template #end>
+                                    <!-- <template #end>
 
 
-                                        <!-- <a :href="route('sessions.download')" class="">
-                                            <Button icon="pi pi-download" severity="primary" text raised rounded label="sessions"/>
-                                        </a> -->
 
 
                                             <a :href="route('packingSessions.export')" class="">
@@ -360,9 +340,9 @@ const showUpdateModal=(session)=>{
                                             </a>
 
                                        <SearchBox :model="route('packingSession.index')" />
-                                    </template>
-                                        </Toolbar>
-                                        <div v-if="sessions.data.length==0" class="w-full p-3 mt-2 text-center">
+                                    </template> -->
+                                        <!-- </Toolbar> -->
+                                        <!-- <div v-if="sessions.data.length==0" class="w-full p-3 mt-2 text-center">
                                                  No Sessions were found.
                                                 </div>
                                         <div class="relative overflow-x-auto shadow-md sm:rounded-lg" v-else>
@@ -374,12 +354,7 @@ const showUpdateModal=(session)=>{
                                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
                                                     <tr class="bg-slate-300">
-                                                        <!-- <th scope="col" class="px-6 py-3">
-                                                            Barcode
-                                                        </th> -->
-                                                        <!-- <th scope="col" class="px-6 py-3">
-                                                           #
-                                                        </th> -->
+
                                                         <th scope="col" class="px-6 py-3 text-center">
                                                            Order
                                                         </th>
@@ -416,9 +391,7 @@ const showUpdateModal=(session)=>{
                                                     <tr v-for="session in sessions.data" :key="session.id"
                                                     class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
 
-                                                    <!-- <td class="px-3 py-2 text-xs">
-                                                        {{ session.id }}
-                                                    </td> -->
+
                                                      <td class="flex flex-col items-center px-3 py-2 text-xs ">
                                                         <div>{{ session.order_no }}-{{ session.part }}</div>
                                                         <div class="p-1 text-black bg-orange-100 rounded-md">{{ session.order.shp_name }}</div>
@@ -488,7 +461,7 @@ const showUpdateModal=(session)=>{
                                 <Pagination :links="sessions.meta.links" />
                             </div>
                         </template>
-                    </Toolbar>
+                    </Toolbar> -->
 
 
                 </div>

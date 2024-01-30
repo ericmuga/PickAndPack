@@ -23,17 +23,23 @@ class AssemblyOrderResource extends JsonResource
              'sp_name'=>$this->sp_name,
             'sp_code'=>$this->sp_code,
              'shp_date'=>Carbon::parse($this->shp_date)->toDateString(),
-            'part_a'=>$this->lines()->OfPart('A')->count(),
-            'part_b'=>$this->lines()->OfPart('B')->count(),
-            'part_c'=>$this->lines()->OfPart('C')->count(),
-            'part_d'=>$this->lines()->OfPart('D')->count(),
 
-            //return only manually concluded assemblies
+            'part_a'=>true,//$this->lines()->OfPart('A')->count(),
+            'part_b'=>true,//$this->lines()->OfPart('B')->count(),
+            'part_c'=>true,//$this->lines()->OfPart('C')->count(),
+            'part_d'=>true,//$this->lines()->OfPart('D')->count(),
+
+           // return only manually concluded assemblies
             'assembled_a'=>$this->assembly_sessions()->OfPart('A')->count()==1,
             'assembled_b'=>$this->assembly_sessions()->OfPart('B')->count()==1,
             'assembled_c'=>$this->assembly_sessions()->OfPart('C')->count()==1,
             'assembled_d'=>$this->assembly_sessions()->OfPart('D')->count()==1,
-            
+
+            // 'assembled_a'=>true,
+            // 'assembled_b'=>true,
+            // 'assembled_c'=>true,
+            // 'assembled_d'=>true,
+
 
 
             'assigned_a'=>$this->assignmentLines()->where('part','=','A')->exists(),
@@ -42,10 +48,10 @@ class AssemblyOrderResource extends JsonResource
             'assigned_d'=>$this->assignmentLines()->where('part','=','D')->exists(),
 
 
-            'confirm_a'=>Order::checkConfirmation($this->order_no,'A'),
-            'confirm_b'=>Order::checkConfirmation($this->order_no,'B'),
-            'confirm_c'=>Order::checkConfirmation($this->order_no,'C'),
-            'confirm_d'=>Order::checkConfirmation($this->order_no,'D'),
+            'confirm_a'=>true,//Order::checkConfirmation($this->order_no,'A'),
+            'confirm_b'=>true,//Order::checkConfirmation($this->order_no,'B'),
+            'confirm_c'=>true,//Order::checkConfirmation($this->order_no,'C'),
+            'confirm_d'=>true,//Order::checkConfirmation($this->order_no,'D'),
 
 
 

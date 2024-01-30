@@ -71,24 +71,44 @@ class PackingSessionController extends Controller
                                  ->when((!$request->user()->hasRole('admin'))||(!$request->user()->hasRole('supervisor')),fn($q)=>$q->where('user_id',$request->user()->id))
                                  ->latest();
          $searchService=new SearchQueryService($packingSessionQuery,$searchParameter,['order_no'],[],['order'=>['shp_name','customer_name']]);
-         $sessions= PackingSessionResource::collection($searchService->with(['order','user','checker'])->search()->paginate($rows));
+
+
+          ///////////////////////////////Remove this from the packing sessiion Display, put this in history
+
+
+        //  $sessions= PackingSessionResource::collection($searchService->with(['order','user','checker'])->search()->paginate($rows));
+
+         ///////////////////////////////
+
          $checkers=UserResource::collection(User::role('checker')->orderBy('name')->get());
 
-        //  $searchOrder=?:null;
-          $orders= PackingOrderResource::collection(Order::query()
-                                                ->when($request->has('searchOrder'),fn($q)=>$q->where('order_no','like','%'.$request->searchOrder)
-                                                                                               ->orWhere('customer_name','like','%'.$request->searchOrder.'%')
-                                                                                               )
-                                                ->whereHas('assembly_sessions',fn($q)=>$q->where('system_entry',false))
-                                                ->shipcurrent()
-                                                ->orderByDesc('ending_date')
-                                                ->orderByDesc('ending_time')
-                                                ->paginate(5)
-                                                );
+
+
+         //fetch all packed orders for today;
+
+        //  $orders=DB::table('assembly_sessions')
+        //             ->select('order_parts.order_part','order_parts.description','assembly_sessions.system_entry')
+
+        //             ->leftJoin('packing_sessions',function($join){
+        //                 $join->where('packing_sessions.order_no','=','assembly_sessions.order_no')
+        //                      ->where('packing_sessions.part','=','assembly_sessions.part');
+        //                })
+        //             ->whereNull('packing_sessions.part')
+        //             ->where('order_parts.shp_date','>=',Carbon::today())
+        //             ->join('order_parts','order_parts.order_no','=','assembly_sessions.order_no')
+        //             ->where('assembly_sessions.system_entry','=',0)
+        //             ->groupBy('order_parts.order_part','order_parts.description','assembly_sessions.system_entry')
+        //             ->get();
+
+
+
+            $orders = DB::table('pending_packing')
+                        ->where('shp_date','>=',Carbon::today()->toDateString())
+                        ->get();
 
 
          $checker_id=$request->session()->get('checker_id')?:null;
-        return inertia('PackingSession/List',compact('rows','checkers','sessions','orders','todaysPackedTonnage','packingTime','roles','checker_id'));
+        return inertia('PackingSession/List',compact('rows','checkers','orders','todaysPackedTonnage','packingTime','roles','checker_id'));
 
     }
 
@@ -142,12 +162,6 @@ class PackingSessionController extends Controller
             PackingSessionLine::create($line);
 
         }
-
-
-
-
-        //
-
 
 
         $packingSession=PackingSession::find($request->id);
