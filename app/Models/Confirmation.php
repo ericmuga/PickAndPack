@@ -9,6 +9,8 @@ class Confirmation extends Model
 {
     use HasFactory;
 
+    public $guarded=['id'];
+
   public function order()
   {
     return $this->belongsTo(Order::class,'order_no','order_no');

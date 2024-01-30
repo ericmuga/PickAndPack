@@ -129,7 +129,9 @@ Route::middleware('auth')->group(function () {
         Route::resource('packingSessionLine',PackingSessionLineController::class);
 
 
-        Route::get('/dashboard',[DashboardController::class,'dashboard'] )->name('dashboard');
+        // Route::get('/dashboard',[DashboardController::class,'dashboard'] )->name('dashboard');
+        Route::get('/dashboard',fn()=>inertia('Dashboards/Landing'))->name('dashboard');
+
 
         Route::get('/refresh',[OrderController::class,'refresh'] )->name('refresh');
         Route::get('/scanner',[OrderController::class,'scan'])->name('scanner');

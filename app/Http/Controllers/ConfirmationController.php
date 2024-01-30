@@ -25,50 +25,22 @@ public function index(Request $request)
 
     $records=$request->records?:5;
 
-      $spcodes=DB::table('sales_people')->select('name','code')->get();
-    $columns = ['customer_name', 'shp_name', 'order_no', 'shp_date', 'sp_code', 'ending_date','ended_by'];
+     $orders=DB::table('pending_confirmation')
+               ->select('order_no','shp_date','sp_code','shp_name','A','B','C','D')
+               ->where('shp_date','>=',Carbon::today()->toDateString())
+               ->get();
 
-    $queryBuilder = Order::query()
-                        ->when($request->has('spcodes')&&($request->spcodes<>''),fn($q)=>$q->whereIn('sp_code',$request->spcodes))
-                        ->when($request->has('shp_date')&&($request->shp_date<>''),fn($q)=>$q->where('shp_date',Carbon::parse($request->shp_date)->toDateString()))
-                         ->select($columns);
-
-                         // You can also use `Order::firstWhere('no', 2)` here
-    $searchParameter = $request->has('search')?$request->search:'';
-    $searchColumns = ['customer_name', 'shp_name','order_no'];
-    $strictColumns = [];
-    $relatedModels = [
-        'relatedModel1' => ['related_column1', 'related_column2'],
-        'relatedModel2' => ['related_column3'],
-    ];
-
-    $searchService = new SearchQueryService($queryBuilder, $searchParameter, $searchColumns, [], []);
-    $orders = $searchService
-                ->with(['confirmations']) // Example of eager loading related models
-                ->search()
-                ->orderByDesc('ending_date')
-                ->paginate($records)
-                ->withQueryString();
-
-
-    // Get the list of prepack items
-    $prepackItems = Item::select('description', 'item_no')
-                        ->whereHas('prepacks', function ($q) {
-                                        $q->where('isActive',true);
-                                    })
-                        ->get();
+     $confirmations=DB::table('confirmations')
+                     ->whereIn('order_no',$orders->pluck('order_no'))
+                     ->get();
 
 
 
-    // Return the view with data
-    // dd($request->all());
     return inertia('Orders/List', [
-        'orders' => OrderResource::collection($orders),
-        'columnListing' => $columns,
-        'items' => $prepackItems,
+        'orders' => $orders,
+        'confirmations'=>$confirmations,
         'previousInput'=>$request->all(),
-        'spcodes'=>$spcodes,
-        // 'sectorTonnage'=>DashboardController::getSectorTonnage(true),
+
     ]);
 }
 
@@ -100,70 +72,34 @@ public function export()
 
     public function store(Request $request)
     {
-        if ($request->has('order_no','part_no')){
+             $confirmation=Confirmation::updateOrCreate(['order_no'=>$request->order_no,
+                                            'part_no'=>$request->part_no,
+                                        ],
+                                        ['order_no'=>$request->order_no,
+                                            'part_no'=>$request->part_no,
+                                            'user_id'=>$request->user()->name,
+                                          ]
 
-            if (!Order::checkConfirmation($request->order_no,$request->part_no))
+                                 );
+
+            $confirmedParts=DB::table('confirmations')
+                             ->where('order_no',$request->order_no)
+                             ->count();
+
+            $parts=DB::table('order_parts')
+                     ->where('order_no',$request->order_no)
+                     ->count();
+            $confirmed=false;
+            if ($parts==$confirmedParts)
             {
-                Confirmation::insert(['order_no'=>$request->order_no,
-                'part_no'=>$request->part_no,
-                'user_id'=>$request->user()->name,
-                'created_at'=>Carbon::now(),
-                'updated_at'=>Carbon::now()
-            ]);
-            $this->index($request);
-           }
-           $order=Order::firstWhere('order_no',$request->order_no);
-           if ($order->getParts()==$order->confirmations()->count())
-           {
-            $order->confirmed=true;
-            $order->save();
-           }
+                DB::table('orders')
+                         ->where('order_no',$request->order_no)
+                         ->update(['confirmed'=>1]);
+                $confirmed=true;
 
-      }
-    }
+            }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Confirmation  $confirmation
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Confirmation $confirmation)
-    {
-        //
-    }
+       return response()->json(compact('confirmation','confirmed'));
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Confirmation  $confirmation
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Confirmation $confirmation)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateConfirmationRequest  $request
-     * @param  \App\Models\Confirmation  $confirmation
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateConfirmationRequest $request, Confirmation $confirmation)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Confirmation  $confirmation
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Confirmation $confirmation)
-    {
-        //
-    }
+   }
 }

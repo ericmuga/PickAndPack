@@ -2,182 +2,81 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
-import { useForm } from '@inertiajs/inertia-vue3'
+
 import { Inertia } from '@inertiajs/inertia';
-import debounce from 'lodash/debounce';
+
 import {watch, ref,onMounted} from 'vue';
 import Pagination from '@/Components/Pagination.vue'
 import Modal from '@/Components/Modal.vue'
-import { useStorage } from '@/Composables/useStorage';
-import { useDates } from '@/Composables/useDates';
-import DownloadButton from '@/Components/DownloadButton.vue';
-// import SearchBox from '@/Components/SearchBox.vue';
-// import InputSwitch from 'primevue/inputswitch';
+import debounce from 'lodash/debounce';
+import axios from 'axios';
 
- let searchKey=ref('')
-//   const getRoute=computed(()=>route(`${props.model}'.index'`))
-  watch(searchKey,debounce((value)=>{
-                                            //   alert(value)
-                                    Inertia.get(route('confirmations.index'),{
-                                        'search':searchKey.value,
-                                        'spcodes':selected_spcodes.value,
-                                        'shp_date':shipmentDate.value,
-                                        'records':records.value,
+let ordersArray=ref([]);
+let confirmationsArray=ref([]);
+const props= defineProps({
+    orders:Object,
+    confirmations:Object,
+})
 
+onMounted(() => {
+    ordersArray.value=props.orders;
+    confirmationsArray.value=props.confirmations;
+});
 
-                                    },{preserveState:true,replace:true})
-                                    },300));
+const confirmed = (order_no, part) => {
+  let found = confirmationsArray.value.filter(item => {
+    return item.order_no === order_no && item.part_no === part;
+  });
 
+  return found.length > 0; // Return true if any matches are found, otherwise false
+};
 
+let searchKey=ref('')
 
+watch(searchKey,debounce(()=>{
+    if (searchKey.value=='')
+     ordersArray.value=props.orders;
+    else
+     ordersArray.value=props.orders.filter(item=>item.order_no.endsWith(searchKey.value))
+},300));
 
 let showModal=ref(false);
 
-let showFilters=ref(false);
-
-// const showFilterPane=()=>{showModal=true;}
-let isConfirmed= ref((props.previousInput.hasOwnProperty('isConfirmed'))&&(props.previousInput.isConfirmed=='true')?true:false);
-
-watch(isConfirmed,()=>{
-                          Inertia.get(route('confirmations.index'),{'isConfirmed':isConfirmed.value, 'search':search.value})
-                                //  .onSuccess(()=>{isConfirmed.value=props.previousInput.isConfirmed.value})
-});
 
 
 
 
-const search=ref()
-watch(search, debounce(()=>{Inertia.get(route('confirmations.index'),{search:search.value}, {preserveScroll: true})}, 500));
 
-
-const form2 =useForm({
-    Part:String,
-    Order:String
-});
-
-const selectedParts =ref([])
-
-const props= defineProps({
-    orders:Object,
-    printed:Object,
-    columnListing:Object,
-    previousInput:Object,
-    spcodes:Object,
-    sectorTonnage:Object,
-})
-
-watch(selectedParts,console.log(selectedParts));
-
-const  updateCheckedItems=()=>{
-    selectedParts.value = selectedParts.value.filter(item => items.some(i => i.id === item));
-}
-
-
-
-//write to local storage
-const write=()=>{}
-// const search=()=>
-
-const checkPart=(Order,Part)=>{
-    //update the status of the part to printed, and log who printed and what time
-    // alert(Order+Part)
-    form2.Part=Part
-    form2.Order=Order
-    form2.post('/updatePart',{preserveScroll:true});
-
-}
 const CheckPrinted=(Order,Part)=>{
     props.printed
 }
 
 const ConfirmPrint=(order_no,part_no)=>{
-    Inertia.post(route('confirmations.store'),{order_no,part_no},{preserveScroll:true});
-}
+    axios.post(route('confirmations.store'),{order_no,part_no})
+         .then(response=>{
+                           if (response.data.confirmed){
+                               const index = ordersArray.value.findIndex(item => item.order_no === order_no);
+                               if (index !== -1) {
+                                  ordersArray.value.splice(index, 1);
+                                }
 
-const dynamicObject=ref({});
-// const dateRef =ref({})
+                            }
+                            else
+                            confirmationsArray.value.push(response.data.confirmation)
 
-Object.keys(props.columnListing).forEach(key => {
-  dynamicObject.value[key] = ref('');
+         })
 
-});
-
-function getKeysWithDateType(obj) {
-  const columnListing = obj.columnListing;
-
-  if (typeof columnListing !== "object" || columnListing === null) {
-    return [];
-  }
-
-  return Object.keys(columnListing).filter(
-    (key) => columnListing[key].type === "date"
-  );
 }
 
 
-function removeNullAndBlankKeys(obj) {
-  return Object.fromEntries(
-    Object.entries(obj).filter(([_, value]) => value !== null && value !== '')
-  );
-}
-const dateKeys = getKeysWithDateType(props);
-console.log(dateKeys);
 
 
-const dateDynamicObject = dateKeys.map((key) => ({
-  from: null,
-  to: null,
-  id: key,
-}));
 
 
-function transformObjects(inputObj) {
-  function transformObject(inputItem) {
-    return {
-      from: inputItem.from,
-      to: inputItem.to
-    };
-  }
-
-  const transformedObj = {};
-
-  for (const key in inputObj) {
-    if (inputObj.hasOwnProperty(key)) {
-      const inputObjItem = inputObj[key];
-      const transformedItem = transformObject(inputObjItem);
-      transformedObj[inputObjItem.id] = transformedItem;
-    }
-  }
-
-  return transformedObj;
-}
-
-const postForm=(dynamicObject,dateDynamicObject)=>{
-
-    // showModal=false
-    Inertia.post(route('order.filter',{...removeNullAndBlankKeys(dynamicObject),...removeNullAndBlankKeys(transformObjects(dateDynamicObject))}))
-        //    .onSuccess(showModal=false)
-}
-
-const selected_spcodes=ref([]);
 const records=ref('');
 const shipmentDate=ref('');
 
-const refreshSearch=()=>{
 
-// alert('here');
-  Inertia.get(route('confirmations.index'),
-                      {
-                        'spcodes':selected_spcodes.value,
-                        'shp_date':shipmentDate.value,
-                        'records':records.value,
-                        'search':searchKey.value
-                      },
-                      {
-
-                        preserveScroll:true,preserveState:true,replace:true}
-               );
-}
 </script>
 
 <template>
@@ -185,7 +84,7 @@ const refreshSearch=()=>{
 
     <AuthenticatedLayout @add="showModal=true">
         <template #header>
-            <h2 class="justify-end text-xl font-semibold leading-tight text-gray-800"> Confimation List</h2>
+            <h2 class="text-xl font-semibold leading-tight text-center text-gray-800"> Confirmation List</h2>
         </template>
 
         <div class="py-6">
@@ -196,15 +95,7 @@ const refreshSearch=()=>{
                         <!--stats bar -->
 
                         <div>
-                            <Button  class="" severity="info" @click="showFilters=!showFilters"  >
 
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                  <path v-if="showFilters" stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l7.5-7.5 7.5 7.5m-15 6l7.5-7.5 7.5 7.5" />
-                                  <path v-else stroke-linecap="round" stroke-linejoin="round" d="M19.5 5.25l-7.5 7.5-7.5-7.5m15 6l-7.5 7.5-7.5-7.5" />
-                                </svg>
-
-
-                                 </Button>
                             <Toolbar>
                                 <template #start>
 
@@ -212,59 +103,15 @@ const refreshSearch=()=>{
                                 </template>
                                 <template #center>
 
-                                 <div class="flex flex-col "
-                                    :class="showFilters?'block':'hidden'"
 
-                                 >
-
-                                   <form @submit.prevent="refreshSearch()">
-                                      <div class="flex flex-col items-center justify-between space-x-3 overflow-x-auto text-center">
-
-                                        Sales Codes:
-                                        <div class="max-w-2xl">
-                                        <MultiSelect
-                                             v-model="selected_spcodes"
-                                             optionLabel="name"
-                                             optionValue="code"
-                                             :options="props.spcodes"
-                                             filter
-
-                                          />
-                                        </div>
-
-
-
-                                          Records:
-                                          <Dropdown
-                                             v-model="records"
-                                             :options="[10,20,50,100]"
-                                             placeholder="10"
-
-                                          />
-
-                                      <div>
-                                         Shipment Date:
-
-                                        <input type="date"  class="p-3 hover:border-indigo-500" v-model="shipmentDate" />
-
-                                        <Button type="submit"  label="Go!"/>
-
-
-                                      </div>
-                                    </div>
-                                  </form>
                                  <div class="flex flex-row items-center justify-center m-5 text-center">
 
 
-                                            <input type="text"
-                                               v-model="searchKey" placeholder="Search Order" class="m-2 rounded-lg bg-slate-300 text-md" />
-                                          <!-- <DownloadButton :link="route('export.confirmations')" /> -->
+                                            <input type="text" v-model="searchKey" placeholder="Search Order" class="m-2 rounded-lg bg-slate-300 text-md" />
+                                </div>
 
 
-                                 </div>
 
-
-                             </div>
                             </template>
                                 </Toolbar>
 
@@ -290,33 +137,25 @@ const refreshSearch=()=>{
                                                             Shipment Date
                                                         </th>
 
-                                                        <th scope="col" class="px-4 py-2">
-                                                            Printing Time
-                                                        </th>
-                                                        <th scope="col" class="px-4 py-2">
-                                                            Printed By
-                                                        </th>
-                                                        <th scope="col" class="px-4 py-2">
-                                                            Printing Date
+
+                                                        <th scope="col" class="px-4 py-2 text-center">
+                                                           A
                                                         </th>
                                                         <th scope="col" class="px-4 py-2 text-center">
-                                                            Part A Items
+                                                           B
                                                         </th>
                                                         <th scope="col" class="px-4 py-2 text-center">
-                                                            Part B Items
+                                                           C
                                                         </th>
                                                         <th scope="col" class="px-4 py-2 text-center">
-                                                            Part C Items
-                                                        </th>
-                                                        <th scope="col" class="px-4 py-2 text-center">
-                                                            Part D Items
+                                                           D
                                                         </th>
 
 
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr v-for="order in orders.data" :key="order.order_no"
+                                                    <tr v-for="order in ordersArray" :key="order.order_no"
                                                     class="font-semibold text-black bg-white hover:bg-gray-300">
 
                                                     <td class="px-3 py-2 text-xs">
@@ -324,7 +163,7 @@ const refreshSearch=()=>{
                                                     </td>
                                                     <td class="flex flex-col px-3 py-2 text-xs text-center">
                                                         <span class="text-xs font-bold">{{order.sp_code}}</span>
-                                                        <span class="text-xs font-thin">{{order.sp_name}}</span>
+
                                                     </td>
                                                     <td class="px-3 py-2 text-xs font-bold text-center capitalize bg-yellow-200 rounded-full">
                                                         {{ order.shp_name }}
@@ -332,53 +171,45 @@ const refreshSearch=()=>{
                                                     <td class="px-3 py-2 text-xs font-bold">
                                                         {{ order.shp_date }}
                                                     </td>
-
-                                                    <td class="px-3 py-2 text-xs">
-
-                                                            {{order.ending_time}}
-
-                                                    </td>
-                                                    <td class="px-3 py-2 text-xs">
-                                                        {{ order.ended_by}}
-                                                    </td>
-                                                    <td class="px-3 py-2 text-xs">
-                                                        {{      order.ending_date}}
+                                                    <td class="px-3 py-2 text-xs font-bold text-center">
+                                                       <Button
+                                                        :icon="confirmed(order.order_no,'A')?'pi pi-check':'pi pi-question'"
+                                                        :severity="confirmed(order.order_no,'A')?'success':'warning'"
+                                                        v-show="order.A==1"
+                                                        :disabled="confirmed(order.order_no,'A')"
+                                                        @click="ConfirmPrint(order.order_no,'A')"
+                                                       />
 
                                                     </td>
-                                                    <td class="p-1 px-3 py-2 text-xs text-center " v-if="order.part_a!=0">
-
-                                                        <Button v-show="order.confirm_a" icon="pi pi-check" severity="info" rounded :label="order.part_a" disabled />
-
-                                                        <Button  v-show="!order.confirm_a" icon="pi pi-bell" severity="warning" :badge=order.part_a text raised rounded aria-label="Notification" @click="ConfirmPrint(order.order_no,'A')"/>
+                                                    <td class="px-3 py-2 text-xs font-bold text-center">
+                                                         <Button
+                                                        :icon="confirmed(order.order_no,'B')?'pi pi-check':'pi pi-question'"
+                                                        :severity="confirmed(order.order_no,'B')?'success':'warning'"
+                                                        v-show="order.B==1"
+                                                        :disabled="confirmed(order.order_no,'B')"
+                                                        @click="ConfirmPrint(order.order_no,'B')"
+                                                       />
                                                     </td>
-                                                    <td v-else  class="bg-slat-200">
-
+                                                    <td class="px-3 py-2 text-xs font-bold text-center">
+                                                    <Button
+                                                        :icon="confirmed(order.order_no,'C')?'pi pi-check':'pi pi-question'"
+                                                        :severity="confirmed(order.order_no,'C')?'success':'warning'"
+                                                        v-show="order.C==1"
+                                                        :disabled="confirmed(order.order_no,'C')"
+                                                        @click="ConfirmPrint(order.order_no,'C')"
+                                                       />
                                                     </td>
-                                                    <td class="p-1 px-3 py-2 text-xs text-center " v-if="order.part_b!=0">
-                                                        <Button v-show="order.confirm_b" icon="pi pi-check" severity="info" rounded :label="order.part_b" disabled />
-
-                                                        <Button  v-show="!order.confirm_b" icon="pi pi-bell" severity="warning" :badge=order.part_b text raised rounded aria-label="Notification" @click="
-                                                        ConfirmPrint(order.order_no,'B')"/>
+                                                    <td class="px-3 py-2 text-xs font-bold text-center">
+                                                         <Button
+                                                            :icon="confirmed(order.order_no,'D')?'pi pi-check':'pi pi-question'"
+                                                            :severity="confirmed(order.order_no,'D')?'success':'warning'"
+                                                            v-show="order.D==1"
+                                                            :disabled="confirmed(order.order_no,'D')"
+                                                            @click="ConfirmPrint(order.order_no,'D')"
+                                                        />
                                                     </td>
-                                                    <td v-else  class="bg-slat-200">
 
-                                                    </td>
-                                                    <td class="p-1 px-3 py-2 text-xs text-center " v-if="order.part_c!=0">
-                                                        <Button v-show="order.confirm_c" icon="pi pi-check" severity="info" rounded :label="order.part_c" disabled />
 
-                                                        <Button  v-show="!order.confirm_c" icon="pi pi-bell" severity="warning" :badge=order.part_c text raised rounded aria-label="Notification" @click="ConfirmPrint(order.order_no,'C')"/>
-                                                    </td>
-                                                    <td v-else  class="bg-slat-200">
-
-                                                    </td>
-                                                    <td class="p-1 px-3 py-2 text-xs text-center " v-if="order.part_d!=0">
-                                                        <Button v-show="order.confirm_d" icon="pi pi-check" severity="info" rounded :label="order.part_d" disabled />
-
-                                                        <Button  v-show="!order.confirm_d" icon="pi pi-bell" :badge=order.part_d severity="warning" text raised rounded aria-label="Notification" @click="ConfirmPrint(order.order_no,'D')"/>
-                                                    </td>
-                                                    <td v-else  class="bg-slat-200">
-
-                                                    </td>
                                             </tr>
 
                             </tbody>
@@ -388,7 +219,7 @@ const refreshSearch=()=>{
                     <Toolbar>
                         <template #center>
                             <div >
-                                <Pagination :links="orders.meta.links" />
+                                <!-- <Pagination :links="orders." /> -->
                             </div>
                         </template>
                     </Toolbar>
