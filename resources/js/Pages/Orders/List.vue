@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/inertia-vue3';
+import { Head} from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
 import {watch, ref,onMounted} from 'vue';
 import Modal from '@/Components/Modal.vue'
@@ -9,40 +9,28 @@ import axios from 'axios';
 
 let ordersArray=ref([]);
 let selected_sps=ref([]);
+let searchKey=ref('');
+let sp_codes=ref([]);
 
 const props= defineProps({
     orders:Object,
     confirmations:Object,
 })
-
-
-let sp_codes=ref([]);
-
 const  extractSpArray=()=> {
   const uniqueValuesMap = new Map();
-
   for (const item of ordersArray.value) {
     uniqueValuesMap.set(item.sp_code, item.sp_name);
   }
-
   sp_codes.value = Array.from(uniqueValuesMap.entries());
 }
-
-
-
-
-
-
 onMounted(() => {
     ordersArray.value=props.orders;
     extractSpArray();
-
-
 });
 
 
 
-let searchKey=ref('')
+
 
 watch(selected_sps, debounce(() => {
       if (selected_sps.value.length > 0) {
@@ -61,21 +49,15 @@ watch(searchKey,debounce(()=>{
 
 let showModal=ref(false);
 
-
-
-
 const updateConfirmationCount = (order_no, part) => {
   const index = ordersArray.value.findIndex(entry => entry.order_no === order_no);
   if (index !== -1) {
-    // Increment the confirmation count of the specified part
-    ordersArray.value[index][`${part}_Confirmation_Count`]++; // Assuming your data structure has properties like 'A_Confirmation_Count', 'B_Confirmation_Count', etc.
-    //ordersArray.value.sort((a, b) => b[`${part}_Confirmation_Count`] - a[`${part}_Confirmation_Count`]);
+    ordersArray.value[index][`${part}_Confirmation_Count`]++;
   }
 };
 
-
-const ConfirmPrint=async (order_no,part_no)=>{
-   await axios.post(route('confirmations.store'),{order_no,part_no})
+const ConfirmPrint= (order_no,part_no)=>{
+    axios.post(route('confirmations.store'),{order_no,part_no})
          .then(response=>{
                            if (response.data.confirmed)
                             {
@@ -84,28 +66,51 @@ const ConfirmPrint=async (order_no,part_no)=>{
                                   ordersArray.value.splice(index, 1);
                                 }
                             }
-
-                       });
-updateConfirmationCount(order_no,part_no);
+    });
+    updateConfirmationCount(order_no,part_no);
 }
 
+const form=ref({
+    start_date:null,
+    end_date:null,
+
+});
+
+ const formData = new FormData();
 
 
+//  const postForm=()=>{
+//        formData.append('start_date',form.value.start_date );
+//        formData.append('end_date',form.value.end_date);
+//        axios.get(route('registry.download',formData))
 
+//             .catch((response)=> console.log(response))
+//  }
+const postForm = () => {
+    const queryParams = new URLSearchParams({
+        start_date: form.value.start_date,
+        end_date: form.value.end_date
+    });
 
+    axios.get(route('registry.download') + '?' + queryParams)
+        .then(response => {
 
-const records=ref('');
-const shipmentDate=ref('');
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    showModal.value=false
+}
 
 
 </script>
 
 <template>
-    <Head title="Orders"/>
+    <Head title="Registry"/>
 
     <AuthenticatedLayout @add="showModal=true">
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-center text-gray-800"> Pending confirmation</h2>
+            <h2 class="text-xl font-semibold leading-tight text-center text-gray-800 rounded"> Pending confirmation</h2>
         </template>
 
         <div class="py-6">
@@ -124,15 +129,24 @@ const shipmentDate=ref('');
                                    </div>
                                </template>
                                 <template #end>
+                                 <div class="flex flex-row gap-2 ">
+                                   <Button
+                                      label="Download"
+                                      severity="success"
+                                      class="mx-2"
+                                      @click="showModal=true"
+                                    />
 
-                                <MultiSelect
-                                  v-model="selected_sps"
-                                  filter
-                                  :options="sp_codes"
-                                  option-label="1"
-                                  option-value="0"
-                                  label="Salespersons"
-                                />
+                                    <MultiSelect
+                                    v-model="selected_sps"
+                                    filter
+                                    :options="sp_codes"
+                                    option-label="1"
+                                    option-value="0"
+                                    label="Salespersons"
+                                    />
+                                 </div>
+
                                 </template>
                                 <template #center>
 
@@ -145,6 +159,8 @@ const shipmentDate=ref('');
 
 
 
+
+
                             </template>
                                 </Toolbar>
 
@@ -154,9 +170,7 @@ const shipmentDate=ref('');
                                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
                                                     <tr class="text-white bg-gray-700 ">
-                                                        <!-- <th scope="col" class="px-4 py-2">
-                                                            Barcode
-                                                        </th> -->
+
                                                         <th scope="col" class="px-4 py-2">
                                                             Order No.
                                                         </th>
@@ -204,6 +218,7 @@ const shipmentDate=ref('');
                                                     <td class="px-3 py-2 text-xs font-bold">
                                                         {{ order.shp_date }}
                                                     </td>
+
                                                     <td class="px-3 py-2 text-xs font-bold text-center">
                                                        <Button
                                                         :icon="(order.A_Count<=order.A_Confirmation_Count)?'pi pi-check':'pi pi-question'"
@@ -211,6 +226,7 @@ const shipmentDate=ref('');
                                                         v-show="order.A_Count==1"
                                                         :disabled="(order.A_Count<=order.A_Confirmation_Count)"
                                                         @click="ConfirmPrint(order.order_no,'A')"
+
                                                        />
 
                                                     </td>
@@ -271,45 +287,41 @@ const shipmentDate=ref('');
 </div>
 
    <Modal :show="showModal" @close="showModal=false" >
+    <div  class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> Select Date Range</div>
+    <form class="flex flex-col items-center w-full gap-2 p-5" @submit.prevent="postForm()">
+      <div class="flex flex-row items-center gap-1 ">
+        <label>Start Date</label>
+        <input type="date" class="p-2 rounded-md"
+            v-model="form.start_date"
+        />
+      </div>
+      <div class="flex flex-row items-center gap-1">
+        <label>Start Date</label>
+        <input type="date" class="p-2 rounded-md"
+            v-model="form.end_date"
+        />
+      </div>
+      <div class="flex flex-row items-center gap-1">
+       <Button label="Cancel" severity="danger" @click="showModal=false" icon="pi pi-cancel" type="reset"/>
 
-      <div class="grid p-2 m-4 place-items-center">
-         <heading class="w-full p-4 tracking-wide text-black underline bg-slate-200 align-center">Filter Pane</heading>
-         <form class="" @submit.prevent="postForm(dynamicObject,dateDynamicObject)">
-            <div v-for="item in columnListing" :key="item.name">
+       <a
+        :href="route('registry.download')+'?'+'start_date='+form.start_date+'&end_date='+form.end_date"
+         >
+       <Button
+         severity="success" icon="pi pi-send"
+         class="w-full"
+         @click="showModal=false"
+         label="Download"
+         />
 
-                <div v-if="item.type==='string' && item.default_values.length==0" class="p-3">
-                    <span class="p-float-label">
-                        <InputText :id="item.name"  v-model="dynamicObject[item.name]" class="p-inputtext-sm"/>
-                        <label :for="item.name" class="capitalize">{{ item.name }}</label>
-                    </span>
 
-                </div>
-              <div v-else-if="item.type==='string' &&item.default_values.length>0">
-                <Dropdown :options="item.default_values" v-model="dynamicObject[item.name]" />
-             </div>
-
-             <div v-if="dateDynamicObject.length!=0">
+       </a>
 
 
 
-
-
-             </div>
-            </div>
-            <div v-for="dateData in dateDynamicObject" :key="dateData.id">
-                    <label :for="dateData.id">{{ dateData.id }}</label>
-                    <input type="date" v-model="dateData.from"/>
-                    <input type="date" v-model="dateData.to"/>
-                    <!-- <Calendar v-model="dateData.from" selectionMode="range"  :manualInput="true" /> -->
-                </div>
-        <div class="p-2 text-center">
-                    <Button type="Submit" label="Search" />
-                </div>
-                </form>
       </div>
 
-
-   <!-- <FilterPane :members="columnListing" :targetRoute="route('order.filter')"/> -->
+    </form>
   </Modal>
 </AuthenticatedLayout>
 

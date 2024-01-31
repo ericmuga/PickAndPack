@@ -60,7 +60,7 @@ use App\Models\{Line,LinePrepack, LoadingSession, Order, PackingSession, Permiss
 Route::get('/makeApiCall', [ApiController::class, 'makeCall'])->name('makeCall');
 
 Route::middleware('auth')->group(function () {
-
+Route::get('registry/download',[ConfirmationController::class, 'download'])->name('registry.download');
 
 ///////////////////////////////ACL routes/////////////////////////////////
 
