@@ -15,34 +15,29 @@ const searchKey=ref('');
 
 let filteredOrders=ref({});
 
+let assignmentsArray=ref([]);
+let ordersArray=ref([]);
+
+const assigned = (order_no, part) => {
+  let found = assignmentsArray.value.filter(item => {
+    return item.order_no === order_no && item.part_no === part;
+  });
+
+  return found.length > 0; // Return true if any matches are found, otherwise false
+};
 
 onMounted(()=>{
     selected_spcodes.value=props.selected_spcodes;
     shipmentDate.value=props.date
     records.value=props.records
-    filteredOrders.value=props.orders.data.filter(item => item.confirmations_count !== item.assignments_count);
+     assignmentsArray.value=props.assignments;
+     ordersArray.value=props.orders;
+
 
 })
 
 const assign=()=>{
 
-//   Swal.fire({
-//     title: 'Are you sure?',
-//     text: 'Do you want to create this assignment?',
-//     icon: 'question',
-//     showCancelButton: true,
-//     confirmButtonColor: '#3085d6',
-//     cancelButtonColor: '#d33',
-//     confirmButtonText: 'Yes',
-//     allowOutsideClick: () => !Swal.isLoading() // Prevent interaction when loading
-// }).then((result) => {
-//     if (result.isConfirmed) {
-//         Swal.fire({
-//             title: 'Creating Assignment...',
-//             html: '<div class="flex items-center justify-center"><img src="/img/loading.gif" style="width: 100px; height: 100px;"/></div>',
-//             allowOutsideClick: false,
-//             showConfirmButton: false,
-//         });
 
         Inertia.post(route('assignment.store'), {
             'selectedParts': selectedOrderParts.value,
@@ -137,6 +132,8 @@ const parts=['A','B','C','D'];
 
 const props=defineProps({
          order_parts:Object,
+         assignments:Object,
+         lines:Object,
          assemblers:Object,
          ass:Object,
          spcodes:Object,
@@ -244,27 +241,15 @@ const sumLines=()=>{ totalOrderQty.value=0; totalLines.value=0
 
 let filteredLines=ref([])
 
-const showLines=(order_no,part)=>{
-    //show modal for the part and display the lines
-    // console.log(part);
-    filteredLines.value=filterOrderAndLines(order_no,part)
+const showLines=(orderNo,part)=>{
+   filteredLines.value=props.lines.filter((line) => (line.part === part )&&(line.order_no===orderNo));
    showModal.value=true;
 }
 
 
 
 
-function filterOrderAndLines(orderNo, part) {
-  const order = props.orders.data.find((item) => item.order_no === orderNo);
 
-  if (!order) {
-    return null; // Order with the specified order_no not found
-  }
-  // console.log(order);
-  const filteredLines = order.lines.filter((line) => line.part === part);
-  // console.log(filteredLines)
-  return filteredLines
-}
 
 const selectedOrderParts=ref([]);
 
@@ -437,16 +422,16 @@ const removePart=(newObj)=>
 
 
                                                         <th scope="col" class="px-6 py-3 text-center">
-                                                            Part A Items
+                                                            A
                                                         </th>
                                                         <th scope="col" class="px-6 py-3 text-center">
-                                                            Part B Items
+                                                            B
                                                         </th>
                                                         <th scope="col" class="px-6 py-3 text-center">
-                                                            Part C Items
+                                                            C
                                                         </th>
                                                         <th scope="col" class="px-6 py-3 text-center">
-                                                            Part D Items
+                                                            D
                                                         </th>
 
 
@@ -455,7 +440,7 @@ const removePart=(newObj)=>
                                                 </thead>
                                                 <tbody>
                                                     <tr
-                                                         v-for="order in filteredOrders " :key="order.order_no"
+                                                         v-for="order in ordersArray " :key="order.order_no"
 
                                                          class="font-semibold text-black bg-white hover:bg-gray-300"
 
@@ -466,7 +451,7 @@ const removePart=(newObj)=>
                                                     </td>
                                                     <td class="flex flex-col px-3 py-2 text-xs text-center">
                                                         <span class="text-xs font-bold">{{order.sp_code}}</span>
-                                                        <span class="text-xs font-thin">{{order.sp_name}}</span>
+                                                        <!-- <span class="text-xs font-thin">{{order.sp_name}}</span> -->
                                                     </td>
                                                     <td class="px-3 py-2 text-xs font-bold text-center capitalize bg-yellow-200 rounded-full">
                                                         {{ order.shp_name }}
@@ -476,34 +461,32 @@ const removePart=(newObj)=>
                                                     </td>
 
 
-                                                    <td class="flex-col p-1 px-3 py-2 text-xs text-center " v-if="order.part_a!=0">
+                                                    <td class="flex-col p-1 px-3 py-2 text-xs text-center ">
+
 
 
                                                           <Button
-                                                            v-show="order.confirm_a"
-                                                            icon="pi pi-eye"
-                                                            :severity="order.assigned_a?'warning':'info'"
-                                                           :disabled="order.assigned_a"
-                                                           :badge=order.part_a raised rounded
+                                                            :icon="assigned(order.order_no,'A')?'pi pi-check':'pi pi-question'"
+                                                            :severity="assigned(order.order_no,'A')?'success':'warning'"
+                                                            v-show="order.A==1"
+                                                            :disabled="assigned(order.order_no,'A')"
                                                             @click="showLines(order.order_no,'A')"
-
                                                         />
-
-
-
-                                                       <span class="p-2 m-1 text-teal-500 rounded-full"
-                                                            v-show="checkSelected({'order_no':order.order_no,'part':'A'})">
+                                                         <span class="p-2 m-1 text-teal-500 rounded-full"
+                                                        v-show="checkSelected({'order_no':order.order_no,'part':'A'})">
                                                             Selected
                                                         </span>
-                                                        <span class="p-2 m-1 text-red-500 rounded-full"
-                                                            v-show="order.assigned_a">
+                                                        <!-- <span class="p-2 m-1 text-red-500 rounded-full"
+                                                            v-show="order.assigned_b">
                                                             Assigned
-                                                        </span>
+                                                        </span> -->
+
+
+
+
 
                                                     </td>
-                                                    <td v-else >
 
-                                                    </td>
                                                     <td class="p-1 px-3 py-2 text-xs text-center " v-if="order.part_b!=0">
 
 
@@ -638,7 +621,7 @@ const removePart=(newObj)=>
                     <Toolbar>
                         <template #center>
                             <div >
-                                <Pagination :links="orders.meta.links" />
+                                <!-- <Pagination :links="orders.meta.links" /> -->
                             </div>
                         </template>
                     </Toolbar>

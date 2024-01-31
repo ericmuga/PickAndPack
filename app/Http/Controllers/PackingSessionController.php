@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Services\SearchQueryService;
-use Illuminate\Support\Facades\Auth;
+// use Illuminate\Support\Facades\Auth;
 use App\Exports\PackingSessionExport;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -31,9 +31,9 @@ class PackingSessionController extends Controller
         //display the sessions
         // dd('here');
 
-         $todaysPackedTonnage= PackingSession::whereDate('created_at',Carbon::today())
-                                            ->when((!$request->user()->hasRole('admin'))||(!$request->user()->hasRole('supervisor')),fn($q)=>$q->where('user_id',$request->user()->id))
-                                            ->withSum('lines','weight')->get()->sum('lines_sum_weight')/1000;
+        //  $todaysPackedTonnage= PackingSession::whereDate('created_at',Carbon::today())
+        //                                     ->when((!$request->user()->hasRole('admin'))||(!$request->user()->hasRole('supervisor')),fn($q)=>$q->where('user_id',$request->user()->id))
+        //                                     ->withSum('lines','weight')->get()->sum('lines_sum_weight')/1000;
 
          $packingStartTime=PackingSession::whereDate('created_at',Carbon::today())
                                          ->select('created_at')
@@ -83,22 +83,6 @@ class PackingSessionController extends Controller
          $checkers=UserResource::collection(User::role('checker')->orderBy('name')->get());
 
 
-
-         //fetch all packed orders for today;
-
-        //  $orders=DB::table('assembly_sessions')
-        //             ->select('order_parts.order_part','order_parts.description','assembly_sessions.system_entry')
-
-        //             ->leftJoin('packing_sessions',function($join){
-        //                 $join->where('packing_sessions.order_no','=','assembly_sessions.order_no')
-        //                      ->where('packing_sessions.part','=','assembly_sessions.part');
-        //                })
-        //             ->whereNull('packing_sessions.part')
-        //             ->where('order_parts.shp_date','>=',Carbon::today())
-        //             ->join('order_parts','order_parts.order_no','=','assembly_sessions.order_no')
-        //             ->where('assembly_sessions.system_entry','=',0)
-        //             ->groupBy('order_parts.order_part','order_parts.description','assembly_sessions.system_entry')
-        //             ->get();
 
 
 

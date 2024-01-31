@@ -34,7 +34,7 @@
             <div v-show="subMenuOpen['orders']">
                 <div class="py-2 pl-8 cursor-pointer"><Link :href="route('confirmations.index')" :active="route().current('confirmations.index')" class="block px-2 py-1 font-semibold text-white rounded hover:bg-gray-600 ">Registry</Link></div>
                 <div class="py-2 pl-8 cursor-pointer"><Link :href="route('orders.lines')" :active="route().current('orders.lines')" class="block px-2 py-1 font-semibold text-white rounded hover:bg-gray-600 ">Prepacks</Link></div>
-                <div class="py-2 pl-8 cursor-pointer"><Link :href="route('assignment.index')" :active="route().current('assignment.index')" class="block px-2 py-1 font-semibold text-white rounded hover:bg-gray-600 ">Assignment</Link></div>
+                <div class="py-2 pl-8 cursor-pointer"><Link :href="route('assignment.create')" :active="route().current('assignment.index')" class="block px-2 py-1 font-semibold text-white rounded hover:bg-gray-600 ">Assignment</Link></div>
                 <div class="py-2 pl-8 cursor-pointer"> <Link :href="route('assembly.index')" :active="route().current('assembly.index')" class="block px-2 py-1 font-semibold text-white rounded hover:bg-gray-600 ">Assembly</Link></div>
                 <div class="py-2 pl-8 cursor-pointer"><Link :href="route('packingSession.index')" :active="route().current('packingSession.index')" class="block px-2 py-1 font-semibold text-white rounded hover:bg-gray-600 ">Packing</Link></div>
                 <div class="py-2 pl-8 cursor-pointer"><Link :href="route('loadingSession.index')" :active="route().current('loadingSession.index')"  class="block px-2 py-1 font-semibold text-white rounded hover:bg-gray-600 ">Loading</Link></div>

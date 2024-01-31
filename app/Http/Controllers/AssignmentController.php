@@ -28,16 +28,30 @@ class AssignmentController extends Controller
         else         $records=$request->records?:5;
         $date=$request->has('shp_date')?$request->shp_date:Carbon::tomorrow()->toDateString();
 
-        $orders = AssignmentOrderResource::collection(Order::shipcurrent()
-                                                            ->when($request->has('spcodes')&&($request->spcodes<>''),fn($q)=>$q->whereIn('sp_code',$request->spcodes))
-                                                            ->where('shp_date',$date)
-                                                            ->select('shp_name', 'order_no', 'shp_date', 'sp_code')
-                                                            ->with(['lines','assignmentLines'])
-                                                            ->withCount(['assignmentLines','confirmations'])
-                                                            ->paginate($records)
-                                                            ->appends($request->all())
-                                                            ->withQueryString()
-                                                    );
+        // $orders = AssignmentOrderResource::collection(Order::shipcurrent()
+        //                                                     ->when($request->has('spcodes')&&($request->spcodes<>''),fn($q)=>$q->whereIn('sp_code',$request->spcodes))
+        //                                                     ->where('shp_date',$date)
+        //                                                     ->select('shp_name', 'order_no', 'shp_date', 'sp_code')
+        //                                                     ->with(['lines','assignmentLines'])
+        //                                                     ->withCount(['assignmentLines','confirmations'])
+        //                                                     ->paginate($records)
+        //                                                     ->appends($request->all())
+        //                                                     ->withQueryString()
+        //                                             );
+
+        $orders=DB::table('pending_assignment')
+               ->select('order_no','shp_date','sp_code','shp_name','A','B','C','D')
+               ->where('shp_date','>=',Carbon::today()->toDateString())
+               ->get();
+
+        $assignments=DB::table('assignment_lines')
+                        ->select('order_no','part')
+                        ->whereIn('order_no',$orders->pluck('order_no'))
+                        ->get();
+        $lines=DB::table('lines')
+                 ->where('order_no',$orders->pluck('order_no'))
+                 ->get();
+
         $spcodes=DB::table('sales_people')->select('name','code')->get();
 
         $records=$request->records;
@@ -47,7 +61,7 @@ class AssignmentController extends Controller
         $assemblers=DB::table('users')->select('name','id')->orderBy('name')->get();
 
 
-        return inertia('Assignment/Create',compact('orders' ,'spcodes','assemblers','date','selected_spcodes'));
+        return inertia('Assignment/Create',compact('orders' ,'spcodes','assemblers','date','selected_spcodes','assignments','lines'));
 
     }
 

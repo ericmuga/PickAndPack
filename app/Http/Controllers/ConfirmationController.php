@@ -23,22 +23,20 @@ public function index(Request $request)
     // dd($request->all());
 
 
-    $records=$request->records?:5;
+
 
      $orders=DB::table('pending_confirmation')
-               ->select('order_no','shp_date','sp_code','shp_name','A','B','C','D')
-               ->where('shp_date','>=',Carbon::today()->toDateString())
+               ->select('order_no','shp_date','sp_code','sp_name','shp_name','A_Count','B_Count','C_Count','D_Count','A_Confirmation_Count','B_Confirmation_Count','C_Confirmation_Count','D_Confirmation_Count')
+               ->where('shp_date','>=',now()->toDateString())
+               ->orderByDesc('ending_date')
+               ->orderByDesc('ending_time')
                ->get();
 
-     $confirmations=DB::table('confirmations')
-                     ->whereIn('order_no',$orders->pluck('order_no'))
-                     ->get();
 
 
 
     return inertia('Orders/List', [
         'orders' => $orders,
-        'confirmations'=>$confirmations,
         'previousInput'=>$request->all(),
 
     ]);
@@ -73,33 +71,43 @@ public function export()
     public function store(Request $request)
     {
              $confirmation=Confirmation::updateOrCreate(['order_no'=>$request->order_no,
-                                            'part_no'=>$request->part_no,
-                                        ],
-                                        ['order_no'=>$request->order_no,
-                                            'part_no'=>$request->part_no,
-                                            'user_id'=>$request->user()->name,
-                                          ]
+                                                            'part_no'=>$request->part_no,
+                                                        ],
+                                                        ['order_no'=>$request->order_no,
+                                                         'part_no'=>$request->part_no,
+                                                         'user_id'=>$request->user()->name,
+                                                        ]);
 
-                                 );
+         $confirmed=false;
+             $rec=DB::table('pending_confirmation')
+                    ->where('order_no',$request->order_no)
+                    ->first();
 
-            $confirmedParts=DB::table('confirmations')
-                             ->where('order_no',$request->order_no)
-                             ->count();
+              if ($rec!==null)
+              {
+                    if(($rec->A_Confirmation_Count+
+                        $rec->B_Confirmation_Count+
+                        $rec->C_Confirmation_Count+
+                        $rec->D_Confirmation_Count
+                    )>=
+                    (
+                        $rec->A_Count+
+                        $rec->B_Count+
+                        $rec->C_Count+
+                        $rec->D_Count
+                    ))
+                    {
+                        DB::table('orders')
+                        ->where('order_no',$request->order_no)
+                        ->update(['confirmed'=>1]);
+                        $confirmed=true;
 
-            $parts=DB::table('order_parts')
-                     ->where('order_no',$request->order_no)
-                     ->count();
-            $confirmed=false;
-            if ($parts==$confirmedParts)
-            {
-                DB::table('orders')
-                         ->where('order_no',$request->order_no)
-                         ->update(['confirmed'=>1]);
-                $confirmed=true;
+                    }
+                }
+                else $confirmed=true;
 
-            }
 
-       return response()->json(compact('confirmation','confirmed'));
+       return response()->json(compact('confirmed'));
 
    }
 }

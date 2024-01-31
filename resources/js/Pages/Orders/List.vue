@@ -2,36 +2,55 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
-
-import { Inertia } from '@inertiajs/inertia';
-
 import {watch, ref,onMounted} from 'vue';
-import Pagination from '@/Components/Pagination.vue'
 import Modal from '@/Components/Modal.vue'
 import debounce from 'lodash/debounce';
 import axios from 'axios';
 
 let ordersArray=ref([]);
-let confirmationsArray=ref([]);
+let selected_sps=ref([]);
+
 const props= defineProps({
     orders:Object,
     confirmations:Object,
 })
 
+
+let sp_codes=ref([]);
+
+const  extractSpArray=()=> {
+  const uniqueValuesMap = new Map();
+
+  for (const item of ordersArray.value) {
+    uniqueValuesMap.set(item.sp_code, item.sp_name);
+  }
+
+  sp_codes.value = Array.from(uniqueValuesMap.entries());
+}
+
+
+
+
+
+
 onMounted(() => {
     ordersArray.value=props.orders;
-    confirmationsArray.value=props.confirmations;
+    extractSpArray();
+
+
 });
 
-const confirmed = (order_no, part) => {
-  let found = confirmationsArray.value.filter(item => {
-    return item.order_no === order_no && item.part_no === part;
-  });
 
-  return found.length > 0; // Return true if any matches are found, otherwise false
-};
 
 let searchKey=ref('')
+
+watch(selected_sps, debounce(() => {
+      if (selected_sps.value.length > 0) {
+        ordersArray.value = props.orders.filter(order => selected_sps.value.includes(order.sp_code));
+      } else {
+        ordersArray.value = props.orders;
+      }
+    }, 300));
 
 watch(searchKey,debounce(()=>{
     if (searchKey.value=='')
@@ -45,27 +64,29 @@ let showModal=ref(false);
 
 
 
+const updateConfirmationCount = (order_no, part) => {
+  const index = ordersArray.value.findIndex(entry => entry.order_no === order_no);
+  if (index !== -1) {
+    // Increment the confirmation count of the specified part
+    ordersArray.value[index][`${part}_Confirmation_Count`]++; // Assuming your data structure has properties like 'A_Confirmation_Count', 'B_Confirmation_Count', etc.
+    //ordersArray.value.sort((a, b) => b[`${part}_Confirmation_Count`] - a[`${part}_Confirmation_Count`]);
+  }
+};
 
 
-const CheckPrinted=(Order,Part)=>{
-    props.printed
-}
-
-const ConfirmPrint=(order_no,part_no)=>{
-    axios.post(route('confirmations.store'),{order_no,part_no})
+const ConfirmPrint=async (order_no,part_no)=>{
+   await axios.post(route('confirmations.store'),{order_no,part_no})
          .then(response=>{
-                           if (response.data.confirmed){
+                           if (response.data.confirmed)
+                            {
                                const index = ordersArray.value.findIndex(item => item.order_no === order_no);
                                if (index !== -1) {
                                   ordersArray.value.splice(index, 1);
                                 }
-
                             }
-                            else
-                            confirmationsArray.value.push(response.data.confirmation)
 
-         })
-
+                       });
+updateConfirmationCount(order_no,part_no);
 }
 
 
@@ -84,7 +105,7 @@ const shipmentDate=ref('');
 
     <AuthenticatedLayout @add="showModal=true">
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-center text-gray-800"> Confirmation List</h2>
+            <h2 class="text-xl font-semibold leading-tight text-center text-gray-800"> Pending confirmation</h2>
         </template>
 
         <div class="py-6">
@@ -97,9 +118,21 @@ const shipmentDate=ref('');
                         <div>
 
                             <Toolbar>
-                                <template #start>
+                               <template #start>
+                                   <div class="p-3 font-semibold text-black bg-teal-400 rounded-md">
+                                     Records:{{ orders.length }}
+                                   </div>
+                               </template>
+                                <template #end>
 
-
+                                <MultiSelect
+                                  v-model="selected_sps"
+                                  filter
+                                  :options="sp_codes"
+                                  option-label="1"
+                                  option-value="0"
+                                  label="Salespersons"
+                                />
                                 </template>
                                 <template #center>
 
@@ -173,40 +206,40 @@ const shipmentDate=ref('');
                                                     </td>
                                                     <td class="px-3 py-2 text-xs font-bold text-center">
                                                        <Button
-                                                        :icon="confirmed(order.order_no,'A')?'pi pi-check':'pi pi-question'"
-                                                        :severity="confirmed(order.order_no,'A')?'success':'warning'"
-                                                        v-show="order.A==1"
-                                                        :disabled="confirmed(order.order_no,'A')"
+                                                        :icon="(order.A_Count<=order.A_Confirmation_Count)?'pi pi-check':'pi pi-question'"
+                                                        :severity="(order.A_Count<=order.A_Confirmation_Count)?'success':'warning'"
+                                                        v-show="order.A_Count==1"
+                                                        :disabled="(order.A_Count<=order.A_Confirmation_Count)"
                                                         @click="ConfirmPrint(order.order_no,'A')"
                                                        />
 
                                                     </td>
                                                     <td class="px-3 py-2 text-xs font-bold text-center">
                                                          <Button
-                                                        :icon="confirmed(order.order_no,'B')?'pi pi-check':'pi pi-question'"
-                                                        :severity="confirmed(order.order_no,'B')?'success':'warning'"
-                                                        v-show="order.B==1"
-                                                        :disabled="confirmed(order.order_no,'B')"
+                                                        :icon="(order.B_Count<=order.B_Confirmation_Count)?'pi pi-check':'pi pi-question'"
+                                                        :severity="(order.B_Count<=order.B_Confirmation_Count)?'success':'warning'"
+                                                        v-show="order.B_Count==1"
+                                                        :disabled="(order.B_Count<=order.B_Confirmation_Count)"
                                                         @click="ConfirmPrint(order.order_no,'B')"
                                                        />
                                                     </td>
                                                     <td class="px-3 py-2 text-xs font-bold text-center">
-                                                    <Button
-                                                        :icon="confirmed(order.order_no,'C')?'pi pi-check':'pi pi-question'"
-                                                        :severity="confirmed(order.order_no,'C')?'success':'warning'"
-                                                        v-show="order.C==1"
-                                                        :disabled="confirmed(order.order_no,'C')"
+                                                     <Button
+                                                        :icon="(order.C_Count<=order.C_Confirmation_Count)?'pi pi-check':'pi pi-question'"
+                                                        :severity="(order.C_Count<=order.C_Confirmation_Count)?'success':'warning'"
+                                                        v-show="order.C_Count==1"
+                                                        :disabled="(order.C_Count<=order.C_Confirmation_Count)"
                                                         @click="ConfirmPrint(order.order_no,'C')"
                                                        />
                                                     </td>
                                                     <td class="px-3 py-2 text-xs font-bold text-center">
-                                                         <Button
-                                                            :icon="confirmed(order.order_no,'D')?'pi pi-check':'pi pi-question'"
-                                                            :severity="confirmed(order.order_no,'D')?'success':'warning'"
-                                                            v-show="order.D==1"
-                                                            :disabled="confirmed(order.order_no,'D')"
-                                                            @click="ConfirmPrint(order.order_no,'D')"
-                                                        />
+                                                          <Button
+                                                        :icon="(order.D_Count<=order.D_Confirmation_Count)?'pi pi-check':'pi pi-question'"
+                                                        :severity="(order.D_Count<=order.D_Confirmation_Count)?'success':'warning'"
+                                                        v-show="order.D_Count==1"
+                                                        :disabled="(order.D_Count<=order.D_Confirmation_Count)"
+                                                        @click="ConfirmPrint(order.order_no,'D')"
+                                                       />
                                                     </td>
 
 
