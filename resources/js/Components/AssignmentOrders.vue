@@ -1,0 +1,237 @@
+<script setup>
+
+import Toolbar from 'primevue/toolbar';
+import {watch, ref,onMounted} from 'vue';
+
+import debounce from 'lodash/debounce';
+
+
+let ordersArray=ref([]);
+let selected_sps=ref([]);
+let searchKey=ref('');
+let sp_codes=ref([]);
+
+
+const props=defineProps({
+    orders:Object
+})
+
+const  extractSpArray=()=> {
+  const uniqueValuesMap = new Map();
+  for (const item of ordersArray.value) {
+    uniqueValuesMap.set(item.sp_code, item.sp_name);
+  }
+  sp_codes.value = Array.from(uniqueValuesMap.entries());
+}
+
+
+onMounted(() => {
+    ordersArray.value = props.orders;
+    extractSpArray();
+
+});
+
+
+
+watch(selected_sps, debounce(() => {
+      if (selected_sps.value.length > 0) {
+        ordersArray.value = props.orders.filter(order => selected_sps.value.includes(order.sp_code));
+      } else {
+        ordersArray.value = props.orders;
+      }
+      extractSpArray();
+    }, 300));
+
+watch(searchKey,debounce(()=>{
+    // console.log('got')
+    if (searchKey.value=='')
+     ordersArray.value=props.orders;
+    else
+     ordersArray.value=props.orders.filter(item=>item.order_no.endsWith(searchKey.value))
+    extractSpArray();
+},300));
+
+
+
+
+
+
+function handleButtonClick(orderNo, part) {
+
+  $emit('add-assignment', { orderNo, part });
+}
+</script>
+
+<template>
+
+           <div>
+
+            <Toolbar>
+                <template #start>
+                    <div class="p-3 font-semibold text-black bg-teal-400 rounded-md">
+                        Records:{{ orders.length }}
+                    </div>
+                </template>
+                <template #end>
+                    <div class="flex flex-row gap-2 ">
+
+
+                <MultiSelect
+                    v-model="selected_sps"
+                    filter
+                    :options="sp_codes"
+                    option-label="1"
+                    option-value="0"
+                    label="Salespersons"
+                    />
+                    </div>
+
+                </template>
+                <template #center>
+
+
+                    <div class="flex flex-row items-center justify-center m-5 text-center">
+                      <input type="text" v-model="searchKey" placeholder="Search Order" class="m-2 rounded-lg bg-slate-300 text-md" />
+                   </div>
+
+
+
+
+
+            </template>
+                </Toolbar>
+
+                      <div class="scrollable-container">
+
+                             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+
+                                    <tr class="text-white bg-gray-700 ">
+
+                                        <th scope="col" class="px-4 py-2">
+                                            Order No.
+                                        </th>
+                                        <th scope="col" class="px-4 py-2 text-center">
+                                            Sales Person
+                                        </th>
+                                        <th scope="col" class="px-4 py-2">
+                                            Ship-to Name
+                                        </th>
+                                        <th scope="col" class="px-4 py-2">
+                                            Shipment Date
+                                        </th>
+
+
+                                        <th scope="col" class="px-4 py-2 text-center">
+                                            A
+                                        </th>
+                                        <th scope="col" class="px-4 py-2 text-center">
+                                            B
+                                        </th>
+                                        <th scope="col" class="px-4 py-2 text-center">
+                                            C
+                                        </th>
+                                        <th scope="col" class="px-4 py-2 text-center">
+                                            D
+                                        </th>
+
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="order in ordersArray" :key="order.order_no"
+                                    class="font-semibold text-black bg-white hover:bg-gray-300">
+
+                                    <td class="px-3 py-2 text-xs">
+                                        {{ order.order_no }}
+                                    </td>
+                                    <td class="flex flex-col px-3 py-2 text-xs text-center">
+                                        <span class="text-xs font-bold">{{order.sp_code}}</span>
+
+                                    </td>
+                                    <td class="px-3 py-2 text-xs font-bold text-center capitalize bg-yellow-200 rounded-full">
+                                        {{ order.shp_name }}
+                                    </td>
+                                    <td class="px-3 py-2 text-xs font-bold">
+                                        {{ order.shp_date }}
+                                    </td>
+
+                                    <td class="px-3 py-2 text-xs font-bold text-center">
+                                        <Button
+                                        :icon="(order.A_Count<=order.A_Confirmation_Count)?'pi pi-check':'pi pi-question'"
+                                        :severity="(order.A_Count<=order.A_Confirmation_Count)?'success':'warning'"
+                                        v-show="order.A_Count==1"
+                                        :disabled="(order.A_Count<=order.A_Confirmation_Count)"
+                                        @click="ConfirmPrint(order.order_no,'A')"
+
+                                        />
+
+                                    </td>
+                                    <td class="px-3 py-2 text-xs font-bold text-center">
+                                            <Button
+                                        :icon="(order.B_Count<=order.B_Confirmation_Count)?'pi pi-check':'pi pi-question'"
+                                        :severity="(order.B_Count<=order.B_Confirmation_Count)?'success':'warning'"
+                                        v-show="order.B_Count==1"
+                                        :disabled="(order.B_Count<=order.B_Confirmation_Count)"
+                                        @click="ConfirmPrint(order.order_no,'B')"
+                                        />
+                                    </td>
+                                    <td class="px-3 py-2 text-xs font-bold text-center">
+                                        <Button
+                                        :icon="(order.C_Count<=order.C_Confirmation_Count)?'pi pi-check':'pi pi-question'"
+                                        :severity="(order.C_Count<=order.C_Confirmation_Count)?'success':'warning'"
+                                        v-show="order.C_Count==1"
+                                        :disabled="(order.C_Count<=order.C_Confirmation_Count)"
+                                        @click="ConfirmPrint(order.order_no,'C')"
+                                        />
+                                    </td>
+                                    <td class="px-3 py-2 text-xs font-bold text-center">
+                                            <Button
+                                        :icon="(order.D_Count<=order.D_Confirmation_Count)?'pi pi-check':'pi pi-question'"
+                                        :severity="(order.D_Count<=order.D_Confirmation_Count)?'success':'warning'"
+                                        v-show="order.D_Count==1"
+                                        :disabled="(order.D_Count<=order.D_Confirmation_Count)"
+                                        @click="ConfirmPrint(order.order_no,'D')"
+                                        />
+                                    </td>
+
+
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <Toolbar>
+                        <template #center>
+                            <div >
+                                <!-- <Pagination :links="orders." /> -->
+                            </div>
+                        </template>
+                    </Toolbar>
+
+
+                </div>
+
+
+</template>
+
+
+
+<style>
+.scrollable-container {
+  max-height: 400px; /* Adjust the height as needed */
+  overflow-y: auto;
+}
+
+.card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin: 10px;
+  padding: 10px;
+}
+
+.card-content {
+  margin-bottom: 10px;
+}
+</style>

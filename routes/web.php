@@ -97,8 +97,9 @@ Route::get('registry/download',[ConfirmationController::class, 'download'])->nam
 
 
        Route::post('/generate-pdf',[PackingController::class,'printLabel'])->name('packing.printLabel');
-
+        Route::get('assignment/assignmentStore',[AssignmentController::class,'getPending']);
         Route::resource('assignment',AssignmentController::class);
+
 
         Route::post('download/linePrepacks',[LinePrepackController::class,'export'])->name('linePrepacks.download');
         Route::resource('linePrepacks',LinePrepackController::class);
