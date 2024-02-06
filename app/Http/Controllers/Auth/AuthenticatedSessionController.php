@@ -17,13 +17,21 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): Response
-    {
-        return Inertia::render('Auth/Login', [
-            'canResetPassword' => Route::has('password.request'),
-            'status' => session('status'),
-        ]);
-    }
+    // public function create(): Response
+    // {
+    //     return Inertia::render('Auth/Login', [
+    //         'canResetPassword' => Route::has('password.request'),
+    //         'status' => session('status'),
+    //     ]);
+    // }
+
+    public function create()
+        {
+            return view('login', [
+                'canResetPassword' => Route::has('password.request'),
+                'status' => session('status'),
+            ]);
+        }
 
     /**
      * Handle an incoming authentication request.
@@ -40,14 +48,34 @@ class AuthenticatedSessionController extends Controller
     /**
      * Destroy an authenticated session.
      */
-    public function destroy(Request $request): RedirectResponse
-    {
-        Auth::guard('web')->logout();
+    // public function destroy(Request $request): RedirectResponse
+    // {
+    //     Auth::guard('web')->logout();
 
-        $request->session()->invalidate();
+    //     $request->session()->invalidate();
 
-        $request->session()->regenerateToken();
+    //     $request->session()->regenerateToken();
 
-        return redirect('/');
-    }
+    //     return redirect('login');
+
+    //     //  return view('login', [
+    //     //         'canResetPassword' => Route::has('password.request'),
+    //     //         'status' => session('status'),
+    //     //     ]);
+    // }
+
+    public function destroy(Request $request)
+{
+    Auth::guard('web')->logout();
+
+    $request->session()->invalidate();
+
+    $request->session()->regenerateToken();
+
+    // Return a view response instead of a redirect response
+    return view('login', [
+        'canResetPassword' => Route::has('password.request'),
+        'status' => session('status'),
+    ]);
+}
 }

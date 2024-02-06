@@ -60,7 +60,7 @@ class DashboardController extends Controller
 
      public static function dashboard(Request $request)
      {
-
+        return inertia('Dashboard/Landing');
 
          $tonnage=round(Line::whereHas('order',fn($q)=>$q->where('shp_date',Carbon::tomorrow()->toDateString()))->sum('qty_base')/1000,2);
 
