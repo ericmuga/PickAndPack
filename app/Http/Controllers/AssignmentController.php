@@ -39,15 +39,38 @@ class AssignmentController extends Controller
 
     public function create(Request $request)
     {
-        $orders = Cache::remember('pending_assignment', 15 * 60, function () {
-                return DB::table('pending_assignment')
-                    ->select('order_no', 'shp_date', 'sp_code', 'sp_name', 'shp_name', 'A_Weight', 'B_Weight', 'C_Weight', 'D_Weight')
+        $orders =
+        Cache::remember('pending_assignment', 15 * 60, function () {return
+                 DB::table('pending_assignment')
+                    ->select('order_no', 'shp_date', 'sp_code', 'sp_name', 'shp_name', 'A_Weight', 'B_Weight', 'C_Weight', 'D_Weight','A_Assignment_Count','B_Assignment_Count','C_Assignment_Count','D_Assignment_Count')
                     ->where('shp_date', '>=', now()->toDateString())
                     ->get();
             });
 
+        $assignments=collect([]);
+
+        foreach ($orders as $order)
+        {
+            if ($order->A_Assignment_Count>0)
+            {
+                $assignments->push(['order_no'=>$order->order_no,'A','weight'=>$order->A_Weight]);
+            }
+            if ($order->B_Assignment_Count>0)
+            {
+                $assignments->push(['order_no'=>$order->order_no,'B','weight'=>$order->B_Weight]);
+            }
+            if ($order->C_Assignment_Count>0)
+            {
+                $assignments->push(['order_no'=>$order->order_no,'C','weight'=>$order->C_Weight]);
+            }
+            if ($order->D_Assignment_Count>0)
+            {
+                $assignments->push(['order_no'=>$order->order_no,'D','weight'=>$order->D_Weight]);
+            }
+        }
+
         $assemblers=DB::table('users')->select('name','id')->orderBy('name')->get();
-        return inertia('Assignment/Create',compact('orders' ,'assemblers'));
+        return inertia('Assignment/Create',compact('orders' ,'assemblers','assignments'));
 
     }
 

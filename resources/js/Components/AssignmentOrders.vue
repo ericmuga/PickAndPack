@@ -1,19 +1,28 @@
 <script setup>
 
 import Toolbar from 'primevue/toolbar';
-import {watch, ref,onMounted} from 'vue';
+import {watch, ref,onMounted,defineEmits} from 'vue';
 
 import debounce from 'lodash/debounce';
 
+const emit=defineEmits();
+
+function handleButtonClick(orderNo, part,weight) {
+    const assignment={ order_no:orderNo, part ,weight };
+
+  emit('add-assignment',assignment );
+}
 
 let ordersArray=ref([]);
+let assignmentsArray=ref([]);
 let selected_sps=ref([]);
 let searchKey=ref('');
 let sp_codes=ref([]);
 
 
 const props=defineProps({
-    orders:Object
+    orders:Object,
+    assignments:Object
 })
 
 const  extractSpArray=()=> {
@@ -27,6 +36,7 @@ const  extractSpArray=()=> {
 
 onMounted(() => {
     ordersArray.value = props.orders;
+    assignmentsArray.value = props.assignments;
     extractSpArray();
 
 });
@@ -51,15 +61,29 @@ watch(searchKey,debounce(()=>{
     extractSpArray();
 },300));
 
+function pushUniqueOrder(orderNo, part,weight) {
+    // Check if the object already exists in the array
+    const exists = assignmentsArray.value.some(item => item.order_no === orderNo && item.part === part);
+    if (!exists) {
+        assignmentsArray.value.push({ order_no: orderNo, part: part,weight:weight });
+    }
 
+ handleButtonClick(orderNo,part,weight)
 
-
-
-
-function handleButtonClick(orderNo, part) {
-
-  $emit('add-assignment', { orderNo, part });
 }
+
+const checkAssigned=(orderNo,part)=>{
+    const exists = assignmentsArray.value.filter(item => item.order_no == orderNo && item.part == part);
+
+    return exists.length>0
+}
+
+
+
+// function handleButtonClick(orderNo, part) {
+
+//   emit('add-assignment', { orderNo, part });
+// }
 </script>
 
 <template>
@@ -159,11 +183,12 @@ function handleButtonClick(orderNo, part) {
 
                                     <td class="px-3 py-2 text-xs font-bold text-center">
                                         <Button
-                                        :icon="(order.A_Weight<=order.A_Confirmation_Count)?'pi pi-check':'pi pi-question'"
-                                        :severity="(order.A_Weight<=order.A_Confirmation_Count)?'success':'warning'"
+                                        :icon="checkAssigned(order.order_no,'A')?'pi pi-check':'pi pi-question'"
+                                        :severity="checkAssigned(order.order_no,'A')?'success':'warning'"
                                         v-show="order.A_Weight>0"
-                                        :disabled="(order.A_Weight<=order.A_Confirmation_Count)"
-                                        @click="ConfirmPrint(order.order_no,'A')"
+                                        :label="order.A_Weight"
+                                        :disabled="checkAssigned(order.order_no,'A')"
+                                        @click="pushUniqueOrder(order.order_no,'A',order.A_Weight)"
 
                                         />
 
@@ -174,7 +199,7 @@ function handleButtonClick(orderNo, part) {
                                         :severity="(order.B_Weight<=order.B_Confirmation_Count)?'success':'warning'"
                                         v-show="order.B_Weight>0"
                                         :disabled="(order.B_Weight<=order.B_Confirmation_Count)"
-                                        @click="ConfirmPrint(order.order_no,'B')"
+                                        @click="pushUniqueOrder(order.order_no,'B')"
                                         />
                                     </td>
                                     <td class="px-3 py-2 text-xs font-bold text-center">
@@ -183,7 +208,7 @@ function handleButtonClick(orderNo, part) {
                                         :severity="(order.C_Weight<=order.C_Confirmation_Count)?'success':'warning'"
                                         v-show="order.C_Weight>0"
                                         :disabled="(order.C_Weight<=order.C_Confirmation_Count)"
-                                        @click="ConfirmPrint(order.order_no,'C')"
+                                        @click="pushUniqueOrder(order.order_no,'C')"
                                         />
                                     </td>
                                     <td class="px-3 py-2 text-xs font-bold text-center">
@@ -192,7 +217,7 @@ function handleButtonClick(orderNo, part) {
                                         :severity="(order.D_Weight<=order.D_Confirmation_Count)?'success':'warning'"
                                         v-show="order.D_Weight>0"
                                         :disabled="(order.D_Weight<=order.D_Confirmation_Count)"
-                                        @click="ConfirmPrint(order.order_no,'D')"
+                                        @click="pushUniqueOrder(order.order_no,'D')"
                                         />
                                     </td>
 

@@ -2,19 +2,23 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head} from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
-import {watch, ref,onMounted} from 'vue';
+import {watch, ref,onMounted,computed} from 'vue';
 import Modal from '@/Components/Modal.vue'
 import debounce from 'lodash/debounce';
 import axios from 'axios';
 import AssignmentOrders from '@/Components/AssignmentOrders.vue';
+import AssignmentPart from '@/Components/AssignmentPart.vue';
 
 
 const props= defineProps({
     orders:Object,
     assemblers:Object,
+    assignments:Object,
 })
 
-
+// onMounted(()=>{
+//      assignmentsArray.value = props.assignments;
+// })
 
 
 
@@ -58,17 +62,32 @@ const checkAssigned = (order_no, part) => {
     return index !== -1;
 };
 
-const addAssignmentHandler=()=>{
+const addAssignmentHandler=(assignment)=>{
 
-}
+        assignmentArray.value.push({ order_no: assignment.order_no, part:assignment.part,weight:assignment.weight });
+    }
+
+
+const totalWeight = computed(() => {
+  return assignmentArray.value.reduce((sum, order) => {
+    return sum + parseFloat(order.weight);
+  }, 0);
+});
 
 
 const form=ref({
-    start_date:null,
-    end_date:null,
+  parts:[],
+  assignee:''
+
 
 });
+const makeAssignment=()=>{
+  form.parts=assignmentArray.value;
+  form.post(route('assignments.store'))
+  form.reset()
+  assignmentArray.value=[];
 
+}
 
 
 
@@ -92,11 +111,49 @@ const form=ref({
                         <div>
                             <div class="relative grid grid-cols-4 overflow-x-auto shadow-md sm:rounded-lg">
                                <div class="col-span-3">
-                                  <AssignmentOrders @add-assignment="addAssignmentHandler()" :orders="orders"/>
+                                  <AssignmentOrders @add-assignment="addAssignmentHandler" :orders="orders" :assignments="assignments"/>
                               </div>
 
                         <div class="col-span-1">
-                          {{ assignmentArray }}
+                            <div class="p-3 m-3 text-center rounded-md bg-slate-500"> Make Assignments</div>
+                           <table v-show="assignmentArray.length>0">
+                            <tr >
+                                <th>Order</th>
+                                <th>Part</th>
+                                <th>Weight</th>
+                            </tr>
+                            <tr v-for="ass in assignmentArray">
+                                <td class="text-center">{{ass.order_no }}</td>
+                                <td class="text-center">{{ass.part }}</td>
+                                <td class="text-center">{{ass.weight }}</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td class="font-bold">Total</td>
+                                <td class="tex-center">{{totalWeight }}</td>
+                            </tr>
+                           </table>
+                           <div class="flex flex-col gap-4 m-5 text-center">
+                            <form @submit.prevent="makeAssignment()" v-show="assignmentArray.length>0" >
+                            <Dropdown
+                                :options="assemblers"
+                                option-label="name"
+                                option-value="code"
+                                v-model="form.assignee"
+                            />
+                            <Button
+                                label="Assign"
+                                severity="success"
+                                icon="pi pi-send"
+                                type="submit"
+                                :disabled="form.processing||form.assignee==''"
+                            />
+                            <input type="text" v-model="form.parts" hidden>
+
+                            </form>
+
+                           </div>
+
                         </div>
                     </div>
 
