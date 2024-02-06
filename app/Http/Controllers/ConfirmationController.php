@@ -19,7 +19,7 @@ class ConfirmationController extends Controller
     public function index(Request $request)
     {    $orders=DB::table('pending_confirmation')
                 ->select('order_no','shp_date','sp_code','sp_name','shp_name','A_Count','B_Count','C_Count','D_Count','A_Confirmation_Count','B_Confirmation_Count','C_Confirmation_Count','D_Confirmation_Count')
-                ->where('shp_date','>=',now()->toDateString())
+                // ->where('shp_date','>=',now()->toDateString())
                 ->orderByDesc('ending_date')
                 ->orderByDesc('ending_time')
                 ->get();

@@ -268,7 +268,7 @@ const refreshSearch=()=>{
                             </template>
                                 </Toolbar>
 
-                                        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+                                        <div class="relative overflow-x-auto overflow-y-auto shadow-md sm:rounded-lg" style="max-height: 400px;">
 
                                             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -388,7 +388,7 @@ const refreshSearch=()=>{
                     <Toolbar>
                         <template #center>
                             <div >
-                                <Pagination :links="orders.meta.links" />
+                                <!-- <Pagination :links="orders.meta.links" /> -->
                             </div>
                         </template>
                     </Toolbar>
