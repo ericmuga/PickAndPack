@@ -75,11 +75,11 @@ const form=ref({
 </script>
 
 <template>
-    <Head title="Registry"/>
+    <Head title="Assignment"/>
 
     <AuthenticatedLayout @add="showModal=true">
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-center text-gray-800 rounded"> Pending confirmation</h2>
+            <h2 class="text-xl font-semibold leading-tight text-center text-gray-800 rounded"> Pending Assignment</h2>
         </template>
 
         <div class="py-6">

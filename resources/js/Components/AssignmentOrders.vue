@@ -82,6 +82,7 @@ function handleButtonClick(orderNo, part) {
                     :options="sp_codes"
                     option-label="1"
                     option-value="0"
+                    style="max-width: 200px;"
                     label="Salespersons"
                     />
                     </div>
@@ -158,10 +159,10 @@ function handleButtonClick(orderNo, part) {
 
                                     <td class="px-3 py-2 text-xs font-bold text-center">
                                         <Button
-                                        :icon="(order.A_Count<=order.A_Confirmation_Count)?'pi pi-check':'pi pi-question'"
-                                        :severity="(order.A_Count<=order.A_Confirmation_Count)?'success':'warning'"
-                                        v-show="order.A_Count==1"
-                                        :disabled="(order.A_Count<=order.A_Confirmation_Count)"
+                                        :icon="(order.A_Weight<=order.A_Confirmation_Count)?'pi pi-check':'pi pi-question'"
+                                        :severity="(order.A_Weight<=order.A_Confirmation_Count)?'success':'warning'"
+                                        v-show="order.A_Weight>0"
+                                        :disabled="(order.A_Weight<=order.A_Confirmation_Count)"
                                         @click="ConfirmPrint(order.order_no,'A')"
 
                                         />
@@ -169,28 +170,28 @@ function handleButtonClick(orderNo, part) {
                                     </td>
                                     <td class="px-3 py-2 text-xs font-bold text-center">
                                             <Button
-                                        :icon="(order.B_Count<=order.B_Confirmation_Count)?'pi pi-check':'pi pi-question'"
-                                        :severity="(order.B_Count<=order.B_Confirmation_Count)?'success':'warning'"
-                                        v-show="order.B_Count==1"
-                                        :disabled="(order.B_Count<=order.B_Confirmation_Count)"
+                                        :icon="(order.B_Weight<=order.B_Confirmation_Count)?'pi pi-check':'pi pi-question'"
+                                        :severity="(order.B_Weight<=order.B_Confirmation_Count)?'success':'warning'"
+                                        v-show="order.B_Weight>0"
+                                        :disabled="(order.B_Weight<=order.B_Confirmation_Count)"
                                         @click="ConfirmPrint(order.order_no,'B')"
                                         />
                                     </td>
                                     <td class="px-3 py-2 text-xs font-bold text-center">
                                         <Button
-                                        :icon="(order.C_Count<=order.C_Confirmation_Count)?'pi pi-check':'pi pi-question'"
-                                        :severity="(order.C_Count<=order.C_Confirmation_Count)?'success':'warning'"
-                                        v-show="order.C_Count==1"
-                                        :disabled="(order.C_Count<=order.C_Confirmation_Count)"
+                                        :icon="(order.C_Weight<=order.C_Confirmation_Count)?'pi pi-check':'pi pi-question'"
+                                        :severity="(order.C_Weight<=order.C_Confirmation_Count)?'success':'warning'"
+                                        v-show="order.C_Weight>0"
+                                        :disabled="(order.C_Weight<=order.C_Confirmation_Count)"
                                         @click="ConfirmPrint(order.order_no,'C')"
                                         />
                                     </td>
                                     <td class="px-3 py-2 text-xs font-bold text-center">
                                             <Button
-                                        :icon="(order.D_Count<=order.D_Confirmation_Count)?'pi pi-check':'pi pi-question'"
-                                        :severity="(order.D_Count<=order.D_Confirmation_Count)?'success':'warning'"
-                                        v-show="order.D_Count==1"
-                                        :disabled="(order.D_Count<=order.D_Confirmation_Count)"
+                                        :icon="(order.D_Weight<=order.D_Confirmation_Count)?'pi pi-check':'pi pi-question'"
+                                        :severity="(order.D_Weight<=order.D_Confirmation_Count)?'success':'warning'"
+                                        v-show="order.D_Weight>0"
+                                        :disabled="(order.D_Weight<=order.D_Confirmation_Count)"
                                         @click="ConfirmPrint(order.order_no,'D')"
                                         />
                                     </td>

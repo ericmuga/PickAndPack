@@ -17,33 +17,12 @@ let filteredOrders=ref({});
 
 
 onMounted(()=>{
-    selected_spcodes.value=props.selected_spcodes;
-    shipmentDate.value=props.date
-    records.value=props.records
-    filteredOrders.value=props.orders.data.filter(item => item.confirmations_count !== item.assignments_count);
+
+    filteredOrders.value=props.orders.filter(item => item.confirmations_count !== item.assignments_count);
 
 })
 
 const assign=()=>{
-
-//   Swal.fire({
-//     title: 'Are you sure?',
-//     text: 'Do you want to create this assignment?',
-//     icon: 'question',
-//     showCancelButton: true,
-//     confirmButtonColor: '#3085d6',
-//     cancelButtonColor: '#d33',
-//     confirmButtonText: 'Yes',
-//     allowOutsideClick: () => !Swal.isLoading() // Prevent interaction when loading
-// }).then((result) => {
-//     if (result.isConfirmed) {
-//         Swal.fire({
-//             title: 'Creating Assignment...',
-//             html: '<div class="flex items-center justify-center"><img src="/img/loading.gif" style="width: 100px; height: 100px;"/></div>',
-//             allowOutsideClick: false,
-//             showConfirmButton: false,
-//         });
-
         Inertia.post(route('assignment.store'), {
             'selectedParts': selectedOrderParts.value,
             'assignee': assignee.value,
@@ -340,15 +319,7 @@ const removePart=(newObj)=>
 
                         <div>
 
-                             <Button  class="" severity="info" @click="showFilters=!showFilters"  >
 
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                  <path v-if="showFilters" stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l7.5-7.5 7.5 7.5m-15 6l7.5-7.5 7.5 7.5" />
-                                  <path v-else stroke-linecap="round" stroke-linejoin="round" d="M19.5 5.25l-7.5 7.5-7.5-7.5m15 6l-7.5 7.5-7.5-7.5" />
-                                </svg>
-
-
-                                 </Button>
                             <Toolbar>
                                 <template #start>
 
@@ -476,7 +447,7 @@ const removePart=(newObj)=>
                                                     </td>
 
 
-                                                    <td class="flex-col p-1 px-3 py-2 text-xs text-center " v-if="order.part_a!=0">
+                                                    <td class="flex-col p-1 px-3 py-2 text-xs text-center ">
 
 
                                                           <Button
