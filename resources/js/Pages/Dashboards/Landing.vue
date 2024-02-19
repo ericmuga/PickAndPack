@@ -1,11 +1,11 @@
 
 <template>
     <GuestLayout>
-        <Head title="Log in" />
+        <!-- <Head title="Log in" /> -->
 
-        <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
+        <!-- <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
             {{ status }}
-        </div>
+        </div> -->
   <div class="flex flex-col w-auto h-auto gap-3 fade-in place-items-center">
     <Link :href="route('confirmations.index')" class="w-full p-2 font-semibold tracking-wide text-center rounded-md btn-registry">Registry</Link>
     <div class="w-full">
@@ -13,22 +13,10 @@
         <Accordion class="w-full" v-show="showAssignment">
 
          <AccordionTab header="Station A" class="w-full" >
-               <ul>
-                    <li class="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer hover:text-white hover:font-bold"><Link :href="route('assignment.create')">Retail</Link></li>
-                    <li class="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer hover:text-white hover:font-bold"><Link :href="route('assignment.create')" >Horeca</Link></li>
-                    <li class="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer hover:text-white hover:font-bold"><Link :href="route('assignment.create')">UPC</Link></li>
-                    <li class="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer hover:text-white hover:font-bold"><Link :href="route('assignment.create')">FF</Link></li>
-                    <li class="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer hover:text-white hover:font-bold"><Link :href="route('assignment.create')">ALL</Link></li>
-                </ul>
+               <AssignmentLinks station="a"/>
             </AccordionTab>
-            <AccordionTab header="Station B">
-                <ul>
-                    <li class="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer hover:text-white hover:font-bold"><Link :href="route('assignment.create')">Retail</Link></li>
-                    <li class="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer hover:text-white hover:font-bold"><Link :href="route('assignment.create')" >Horeca</Link></li>
-                    <li class="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer hover:text-white hover:font-bold"><Link :href="route('assignment.create')">UPC</Link></li>
-                    <li class="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer hover:text-white hover:font-bold"><Link :href="route('assignment.create')">FF</Link></li>
-                    <li class="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer hover:text-white hover:font-bold"><Link :href="route('assignment.create')">ALL</Link></li>
-                </ul>
+            <AccordionTab header="Station B" >
+                <AssignmentLinks station="b"/>
             </AccordionTab>
         </Accordion>
 
@@ -47,6 +35,7 @@ import { Link,Head } from '@inertiajs/inertia-vue3';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
+import AssignmentLinks from './AssignmentLinks.vue';
 import {ref } from 'vue'
 let showAssignment=ref(false);
 

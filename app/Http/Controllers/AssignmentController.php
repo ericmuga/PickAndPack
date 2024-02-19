@@ -11,7 +11,8 @@ use Illuminate\Support\Str;
 use App\Services\ExcelService;
 use Illuminate\Support\Facades\Cache;
 use PhpParser\Node\Stmt\Switch_;
-
+use App\Enums\CodeType;
+use Illuminate\Support\Collection;
 class AssignmentController extends Controller
 {
     /**
@@ -62,29 +63,58 @@ class AssignmentController extends Controller
             });
 
         //filter the request based on the parameters:
-         $codeMap = [
-                        'HORECA' => ['052', '053', '054', '055', '056', '057','061', '001', '002', 'B010', 'B016', 'B025', 'B026'],
-                        'RETAIL' => ['012', '013', '023', '024', '031', '032', '034', '062', '129', '611'],
-                        'MSA'=> ['041','042','043','044','B285'],
-                        'UPC'=>['085','067','180','134','035','608','575','590','037','143'],
-                        'F-FOOD'=>['145','151','140','138','141','128','164','147','104','124','154'],
-                        // Add other groups as needed
-                    ];
- //retail codes
-        switch ($request->flag) {
+      // Define a default condition
 
-            case 'retail':$orders=$orders->whereIn('sp_code',$codeMap['RETAIL']);
-            case 'horeca':$orders=$orders->whereIn('sp_code',$codeMap['HORECA']);
-            case 'retail':$orders=$orders->whereIn('sp_code',$codeMap['RETAIL']);
-            case 'upc':$orders=$orders->whereIn('sp_code',$codeMap['UPC']);
-            case 'ff':$orders=$orders->whereIn('sp_code',$codeMap['F-FOOD']);
+    //   dd($orders->take(5));
 
-                break;
+    // dd(CodeType::MAP['HORECA']);
+$condition = function ($item) {
+    return $item->B_Weight > 0;
+};
 
-            default:
-                # code...
-                break;
+if (!$request->has('flag')) {
+    // dd($orders);
+    if ($request->station == 'a') {
+        $condition = function ($item) {
+
+            return floatval($item->A_Weight) > 0 || floatval($item->C_Weight) > 0 || floatval($item->D_Weight) > 0;
+        };
+    }
+} else {
+    switch ($request->flag) {
+        case 'horeca':
+            $sp_code = CodeType::MAP['HORECA'];
+            break;
+        case 'retail':
+            $sp_code = CodeType::MAP['RETAIL'];
+            break;
+        case 'msa':
+            $sp_code = CodeType::MAP['MSA'];
+            break;
+        case 'upc':
+            $sp_code = CodeType::MAP['UPC'];
+            break;
+        case 'ff':
+            $sp_code = CodeType::MAP['F_FOOD'];
+            break;
+        default:
+            // Handle the default case if needed
+            break;
+    }
+
+    if (isset($sp_code)) {
+        if ($request->station == 'a') {
+            $condition = function ($item) {
+                return $item->A_Weight > 0 || $item->C_Weight > 0 || $item->D_Weight > 0;
+            };
         }
+        $orders = $orders->whereIn('sp_code', $sp_code);
+    }
+}
+// dd($orders);
+$orders = $orders->filter($condition)->values();
+
+
 
         $assignments=collect([]);
 

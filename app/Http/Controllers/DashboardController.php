@@ -7,121 +7,65 @@ use App\Models\{AssemblyLine, Line, Transfer,Order, PackingSessionLine, Stock};
 use Illuminate\Http\Request;
 use App\Services\SearchQueryService;
 use Carbon\Carbon;
-
-// use Inertia\Inertia;
-// use PhpParser\Node\Expr\Cast\Array_;
+use App\Enums\CodeType;
 
 class DashboardController extends Controller
 {
 
-
-    public static function getSectorTonnage($confirmed=false)
-     {
+    public  function getSectorTonnage($confirmed = false)
+    {
         $codeMap = [
-                        'HORECA' => ['052', '053', '054', '055', '056', '057','061', '001', '002', 'B010', 'B016', 'B025', 'B026'],
-                        'RETAIL' => ['012', '013', '023', '024', '031', '032', '034', '062', '129', '611'],
-                        'MSA'=> ['041','042','043','044','B285'],
-                        'UPC'=>['085','067','180','134','035','608','575','590','037','143'],
-                        'F-FOOD'=>['145','151','140','138','141','128','164','147','104','124','154'],
-                        // Add other groups as needed
-                    ];
+            CodeType::HORECA()->value => CodeType::HORECA()->codes,
+            CodeType::RETAIL()->value => CodeType::RETAIL()->codes,
+            CodeType::MSA()->value => CodeType::MSA()->codes,
+            CodeType::UPC()->value => CodeType::UPC()->codes,
+            CodeType::F_FOOD()->value => CodeType::F_FOOD()->codes,
+            // Add other groups as needed
+        ];
 
-         $ordersWithSum = Order::select('sp_code', 'order_no')
-                                ->current()
-                                ->when($confirmed,fn($q)=>$q->confirmed())
-                                ->groupBy('sp_code', 'order_no')
-                                ->withSum('lines', 'qty_base')
-                                ->get();
+        $ordersWithSum = $this->getOrdersWithSum($confirmed);
+        $sumBySpCode = $this->calculateSumBySpCode($ordersWithSum);
+        $sectorTonnage = $this->calculateSectorTonnage($codeMap, $sumBySpCode);
 
-        // Group the results by sp_code
-        $groupedBySpCode = $ordersWithSum->groupBy('sp_code');
-
-        // Calculate the sum of lines_sum_qty_base for each sp_code
-        $sumBySpCode = $groupedBySpCode->map(function ($orders) {
-            return $orders->sum('lines_sum_qty_base');
-        });
-
-
-        $sectorTonnage = [];
-
-            foreach ($codeMap as $groupName => $groupCodes) {
-                $sectorTonnage[$groupName] = round(collect($sumBySpCode)->only($groupCodes)->sum()/1000,2);
-            }
-
-           arsort($sectorTonnage);
-
-           return($sectorTonnage);
-
-     }
-
-
-
-
-
-     public static function dashboard(Request $request)
-     {
-        return inertia('Dashboard/Landing');
-
-         $tonnage=round(Line::whereHas('order',fn($q)=>$q->where('shp_date',Carbon::tomorrow()->toDateString()))->sum('qty_base')/1000,2);
-
-         $assembled=round(AssemblyLine::whereHas('order',fn($q)=>$q->current())->sum('ass_qty')/1000,2);
-         $packed=round(PackingSessionLine::whereHas('order',fn($q)=>$q->current())->sum('weight')/1000,2);
-        //  $loaded=round(PackingSessionLine::whereHas('order',fn($q)=>$q->current())->sum('weight')/1000,2);
-         $loaded=0;
-
-
-
-
-        $queryBuilder = (new Transfer())->stockSummary(); // You can also use `Order::firstWhere('no', 2)` here
-        $searchParameter = $request->has('search')?$request->search:'';
-        $searchColumns = ['Transfers.item_no'];
-        $strictColumns = [];
-        $relatedModels = [
-                                'item' => ['description'],
-
-                         ];
-
-        $searchService = new SearchQueryService($queryBuilder, $searchParameter, $searchColumns, [], $relatedModels);
-
-        $stocks = $searchService->search()
-                                ->orderByDesc('Today_and_Tomorrow')
-                                ->paginate(5)
-                                ->withQueryString();
-
-
-
-
-
-            $orders=Order::current()->select('confirmed')->get();
-
-            $top5=Line::whereHas('order', function ($q) {
-                                            $q->current();
-                                        })
-                                        ->selectRaw('item_description,SUM(qty_base)/1000 as Tonnage')
-                                        ->groupBy('item_description')
-                                        ->orderByDesc('Tonnage')
-                                        ->take(5)
-                                        ->get();
-
-
-                $data=[
-                        'tonnage'=>$tonnage,
-                        'sectorTonnage'=>\App\Http\Controllers\DashboardController::getSectorTonnage(),
-                        'assembled'=>$assembled,
-                        'packed'=>$packed,
-                        'loaded'=>$loaded,
-                        'todays'=>$orders->count(),
-                        'pending'=>$orders->where('confirmed',false)->count(),
-                        'stocks'=>$stocks,
-                        'top5Labels'=>$top5->pluck('item_description'),
-                        'top5Weights'=>$top5->pluck('Tonnage'),
-                        'headers'=>$stocks->count()>0?array_keys($stocks->first()->toArray()):[],
-                        // $headings = $collection->count() > 0 ? array_keys($collection->first()->toArray()) : [];
-                      ];
-         return  inertia('Dashboard',$data);
-
+        return $this->sortAndFormatSectorTonnage($sectorTonnage);
     }
 
+
+private function getOrdersWithSum($confirmed)
+{
+    return Order::select('sp_code', 'order_no')
+        ->current()
+        ->when($confirmed, fn ($q) => $q->confirmed())
+        ->groupBy('sp_code', 'order_no')
+        ->withSum('lines', 'qty_base')
+        ->get();
+}
+
+private function calculateSumBySpCode($ordersWithSum)
+{
+    return $ordersWithSum->groupBy('sp_code')
+        ->map(function ($orders) {
+            return $orders->sum('lines_sum_qty_base');
+        });
+}
+
+private function calculateSectorTonnage($codeMap, $sumBySpCode)
+{
+    $sectorTonnage = [];
+
+    foreach ($codeMap as $groupName => $groupCodes) {
+        $sectorTonnage[$groupName] = round(collect($sumBySpCode)->only($groupCodes)->sum() / 1000, 2);
+    }
+
+    return $sectorTonnage;
+}
+
+private function sortAndFormatSectorTonnage($sectorTonnage)
+{
+    arsort($sectorTonnage);
+
+    return $sectorTonnage;
+}
 
 
 }
