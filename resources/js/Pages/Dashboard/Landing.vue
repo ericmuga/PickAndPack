@@ -4,6 +4,7 @@ import { Head } from '@inertiajs/inertia-vue3';
 import { Inertia } from '@inertiajs/inertia'
 
 
+
 import { ref, onMounted, computed } from 'vue';
 import gsap from 'gsap';
 // import { usePage } from '@inertiajs/vue3';
@@ -62,10 +63,31 @@ window.addEventListener('resize', () => {
         <!-- Add content for the Customers card -->
       </div>
 
-      <div ref="customerCard" class="mb-4 card" @click="Inertia.get(route('assignment.index'))">
+      <div ref="customerCard" class="mb-4 card">
         <h3 class="mb-2 text-xl font-semibold">Assignment</h3>
         <!-- Add content for the Customers card -->
-      </div>
+        <Accordion >
+            <AccordionTab header="Assignment-B">
+                <ul>
+                    <li @click="Inertia.get(route('assignment.index'))">B-Retail</li>
+                    <li @click="Inertia.get(route('assignment.index'))" >B-Horeca</li>
+                    <li @click="Inertia.get(route('assignment.index'))">B-UPC</li>
+                    <li @click="Inertia.get(route('assignment.index'))">B-FF</li>
+                    <li @click="Inertia.get(route('assignment.index'))">B-ALL</li>
+                </ul>
+            </AccordionTab>
+            <AccordionTab header="Assignment-OTHER">
+                <ul>
+                    <li @click="Inertia.get(route('assignment.index',{'flag':'retail'}))">OTHER-Retail</li>
+                    <li @click="Inertia.get(route('assignment.index'))" >OTHER-Horeca</li>
+                    <li @click="Inertia.get(route('assignment.index'))">OTHER-UPC</li>
+                    <li @click="Inertia.get(route('assignment.index'))">OTHER-FF</li>
+                    <li @click="Inertia.get(route('assignment.index'))">OTHER-ALL</li>
+                </ul>
+            </AccordionTab>
+            </Accordion>
+
+    </div>
 
       <!-- Sales Card -->
       <div ref="salesCard" class="mb-4 card" @click="Inertia.get(route('assembly.index'))">

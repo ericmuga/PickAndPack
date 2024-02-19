@@ -8,7 +8,32 @@
         </div>
   <div class="flex flex-col w-auto h-auto gap-3 fade-in place-items-center">
     <Link :href="route('confirmations.index')" class="w-full p-2 font-semibold tracking-wide text-center rounded-md btn-registry">Registry</Link>
-    <Link :href="route('assignment.create')"  class="w-full p-2 font-semibold tracking-wide text-center rounded-md btn-assignment">Assignment</Link>
+    <div class="w-full">
+    <p  class="w-full p-2 font-semibold tracking-wide text-center rounded-md btn-registry btn-assignment hover:cursor-pointer" @click="toggleAssignment()">Assignment</p>
+        <Accordion class="w-full" v-show="showAssignment">
+
+         <AccordionTab header="Station A" class="w-full" >
+               <ul>
+                    <li class="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer hover:text-white hover:font-bold"><Link :href="route('assignment.create')">Retail</Link></li>
+                    <li class="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer hover:text-white hover:font-bold"><Link :href="route('assignment.create')" >Horeca</Link></li>
+                    <li class="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer hover:text-white hover:font-bold"><Link :href="route('assignment.create')">UPC</Link></li>
+                    <li class="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer hover:text-white hover:font-bold"><Link :href="route('assignment.create')">FF</Link></li>
+                    <li class="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer hover:text-white hover:font-bold"><Link :href="route('assignment.create')">ALL</Link></li>
+                </ul>
+            </AccordionTab>
+            <AccordionTab header="Station B">
+                <ul>
+                    <li class="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer hover:text-white hover:font-bold"><Link :href="route('assignment.create')">Retail</Link></li>
+                    <li class="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer hover:text-white hover:font-bold"><Link :href="route('assignment.create')" >Horeca</Link></li>
+                    <li class="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer hover:text-white hover:font-bold"><Link :href="route('assignment.create')">UPC</Link></li>
+                    <li class="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer hover:text-white hover:font-bold"><Link :href="route('assignment.create')">FF</Link></li>
+                    <li class="text-center rounded-md hover:bg-slate-400 hover:cursor-pointer hover:text-white hover:font-bold"><Link :href="route('assignment.create')">ALL</Link></li>
+                </ul>
+            </AccordionTab>
+        </Accordion>
+
+    </div>
+    <!-- <Link :href="route('assignment.create')"  class="w-full p-2 font-semibold tracking-wide text-center rounded-md btn-assignment">Assignment</Link> -->
     <Link :href="route('assembly.index')"  class="w-full p-2 font-semibold tracking-wide text-center rounded-md btn-assembly">Assembly</Link>
     <Link :href="route('packingSession.index')"  class="w-full p-2 font-semibold tracking-wide text-center rounded-md btn-packing">Packing</Link>
     <Link :href="route('loadingSession.index')"  class="w-full p-2 font-semibold tracking-wide text-center rounded-md btn-admin">Loading</Link>
@@ -20,14 +45,12 @@
 <script setup>
 import { Link,Head } from '@inertiajs/inertia-vue3';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
+import Accordion from 'primevue/accordion';
+import AccordionTab from 'primevue/accordiontab';
+import {ref } from 'vue'
+let showAssignment=ref(false);
 
-// const route = useRoute();
-
-// You may not need this goTo method anymore with Link
-// but you can keep it for other functionality if needed
-// const goTo = (page) => {
-//    console.log(`Navigating to ${page} page`);
-//  }
+const toggleAssignment=()=>showAssignment.value=!showAssignment.value
 </script>
 
 <style scoped>

@@ -114,9 +114,9 @@ const makeAssignment=()=>{
                                   <AssignmentOrders @add-assignment="addAssignmentHandler" :orders="orders" :assignments="assignments"/>
                               </div>
 
-                        <div class="col-span-1">
+                        <div class="col-span-1 px-4 shadow-lg">
                             <div class="p-3 m-3 text-center rounded-md bg-slate-500"> Make Assignments</div>
-                           <table v-show="assignmentArray.length>0">
+                           <table v-show="assignmentArray.length >0">
                             <tr >
                                 <th>Order</th>
                                 <th>Part</th>
@@ -130,7 +130,7 @@ const makeAssignment=()=>{
                             <tr>
                                 <td></td>
                                 <td class="font-bold">Total</td>
-                                <td class="tex-center">{{totalWeight }}</td>
+                                <td class="text-right">{{totalWeight }}</td>
                             </tr>
                            </table>
                            <div class="flex flex-col gap-4 m-5 text-center">

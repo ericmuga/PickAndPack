@@ -4,6 +4,8 @@ import { Head } from '@inertiajs/inertia-vue3';
 import { Inertia } from '@inertiajs/inertia'
 
 
+
+
 import { ref, onMounted, computed } from 'vue';
 import gsap from 'gsap';
 // import { usePage } from '@inertiajs/vue3';
@@ -89,6 +91,8 @@ window.addEventListener('resize', () => {
         <h3 class="mb-2 text-xl font-semibold">Admin</h3>
         <!-- Add content for the Sales card -->
       </div>
+
+
     </div>
 
 

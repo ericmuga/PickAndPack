@@ -79,11 +79,6 @@ const checkAssigned=(orderNo,part)=>{
 }
 
 
-
-// function handleButtonClick(orderNo, part) {
-
-//   emit('add-assignment', { orderNo, part });
-// }
 </script>
 
 <template>
@@ -194,30 +189,36 @@ const checkAssigned=(orderNo,part)=>{
 
                                     </td>
                                     <td class="px-3 py-2 text-xs font-bold text-center">
-                                            <Button
-                                        :icon="(order.B_Weight<=order.B_Confirmation_Count)?'pi pi-check':'pi pi-question'"
-                                        :severity="(order.B_Weight<=order.B_Confirmation_Count)?'success':'warning'"
-                                        v-show="order.B_Weight>0"
-                                        :disabled="(order.B_Weight<=order.B_Confirmation_Count)"
-                                        @click="pushUniqueOrder(order.order_no,'B')"
-                                        />
-                                    </td>
-                                    <td class="px-3 py-2 text-xs font-bold text-center">
                                         <Button
-                                        :icon="(order.C_Weight<=order.C_Confirmation_Count)?'pi pi-check':'pi pi-question'"
-                                        :severity="(order.C_Weight<=order.C_Confirmation_Count)?'success':'warning'"
-                                        v-show="order.C_Weight>0"
-                                        :disabled="(order.C_Weight<=order.C_Confirmation_Count)"
-                                        @click="pushUniqueOrder(order.order_no,'C')"
+                                        :icon="checkAssigned(order.order_no,'B')?'pi pi-check':'pi pi-question'"
+                                        :severity="checkAssigned(order.order_no,'B')?'success':'warning'"
+                                        v-show="order.B_Weight>0"
+                                        :label="order.B_Weight"
+                                        :disabled="checkAssigned(order.order_no,'B')"
+                                        @click="pushUniqueOrder(order.order_no,'B',order.B_Weight)"
+
                                         />
                                     </td>
                                     <td class="px-3 py-2 text-xs font-bold text-center">
-                                            <Button
-                                        :icon="(order.D_Weight<=order.D_Confirmation_Count)?'pi pi-check':'pi pi-question'"
-                                        :severity="(order.D_Weight<=order.D_Confirmation_Count)?'success':'warning'"
+                                       <Button
+                                        :icon="checkAssigned(order.order_no,'C')?'pi pi-check':'pi pi-question'"
+                                        :severity="checkAssigned(order.order_no,'C')?'success':'warning'"
+                                        v-show="order.C_Weight>0"
+                                        :label="order.C_Weight"
+                                        :disabled="checkAssigned(order.order_no,'C')"
+                                        @click="pushUniqueOrder(order.order_no,'C',order.C_Weight)"
+
+                                        />
+                                    </td>
+                                    <td class="px-3 py-2 text-xs font-bold text-center">
+                                           <Button
+                                        :icon="checkAssigned(order.order_no,'D')?'pi pi-check':'pi pi-question'"
+                                        :severity="checkAssigned(order.order_no,'D')?'success':'warning'"
                                         v-show="order.D_Weight>0"
-                                        :disabled="(order.D_Weight<=order.D_Confirmation_Count)"
-                                        @click="pushUniqueOrder(order.order_no,'D')"
+                                        :label="order.D_Weight"
+                                        :disabled="checkAssigned(order.order_no,'D')"
+                                        @click="pushUniqueOrder(order.order_no,'D',order.D_Weight)"
+
                                         />
                                     </td>
 

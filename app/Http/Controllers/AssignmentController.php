@@ -10,6 +10,8 @@ use App\Services\SearchQueryService;
 use Illuminate\Support\Str;
 use App\Services\ExcelService;
 use Illuminate\Support\Facades\Cache;
+use PhpParser\Node\Stmt\Switch_;
+
 class AssignmentController extends Controller
 {
     /**
@@ -42,10 +44,47 @@ class AssignmentController extends Controller
         $orders =
         Cache::remember('pending_assignment', 15 * 60, function () {return
                  DB::table('pending_assignment')
-                    ->select('order_no', 'shp_date', 'sp_code', 'sp_name', 'shp_name', 'A_Weight', 'B_Weight', 'C_Weight', 'D_Weight','A_Assignment_Count','B_Assignment_Count','C_Assignment_Count','D_Assignment_Count')
+                    ->select('order_no',
+                              'shp_date',
+                              'sp_code',
+                              'sp_name',
+                              'shp_name',
+                              'A_Weight',
+                              'B_Weight',
+                              'C_Weight',
+                              'D_Weight',
+                              'A_Assignment_Count',
+                              'B_Assignment_Count',
+                              'C_Assignment_Count',
+                              'D_Assignment_Count')
                     ->where('shp_date', '>=', now()->toDateString())
                     ->get();
             });
+
+        //filter the request based on the parameters:
+         $codeMap = [
+                        'HORECA' => ['052', '053', '054', '055', '056', '057','061', '001', '002', 'B010', 'B016', 'B025', 'B026'],
+                        'RETAIL' => ['012', '013', '023', '024', '031', '032', '034', '062', '129', '611'],
+                        'MSA'=> ['041','042','043','044','B285'],
+                        'UPC'=>['085','067','180','134','035','608','575','590','037','143'],
+                        'F-FOOD'=>['145','151','140','138','141','128','164','147','104','124','154'],
+                        // Add other groups as needed
+                    ];
+ //retail codes
+        switch ($request->flag) {
+
+            case 'retail':$orders=$orders->whereIn('sp_code',$codeMap['RETAIL']);
+            case 'horeca':$orders=$orders->whereIn('sp_code',$codeMap['HORECA']);
+            case 'retail':$orders=$orders->whereIn('sp_code',$codeMap['RETAIL']);
+            case 'upc':$orders=$orders->whereIn('sp_code',$codeMap['UPC']);
+            case 'ff':$orders=$orders->whereIn('sp_code',$codeMap['F-FOOD']);
+
+                break;
+
+            default:
+                # code...
+                break;
+        }
 
         $assignments=collect([]);
 
