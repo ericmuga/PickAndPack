@@ -30,22 +30,11 @@ const updateAssignmentCount = (order_no, part) => {
 
 const assignmentArray=ref([])
 
-// const assignee=ref('')
-
-// const assign=()=>{
-//     axios.post('assignment.store',{'assignmentArray':assignmentArray.value,'assignee':assignee.value})
-//          .then(()=>{
-//             assignee.value=''
-//             assignmentArray.value=[];
-//          })
-//          .catch((response)=>{
-//            console.log(response)
-//          })
-// }
 
 const AddPart= (order_no,part)=>{
     // console.log('here')
      assignmentArray.value.push({order_no,part});
+
      updateAssignmentCount(order_no,part)
 }
 
@@ -61,6 +50,8 @@ const checkAssigned = (order_no, part) => {
 const addAssignmentHandler=(assignment)=>{
 
         assignmentArray.value.push({ order_no: assignment.order_no, part:assignment.part,weight:assignment.weight });
+        form.parts=assignmentArray.value;
+
     }
 
 
@@ -78,10 +69,10 @@ const form=useForm({
 
 });
 const makeAssignment=()=>{
-  form.parts=assignmentArray.value;
-  form.post(route('assignments.store'))
+
+  form.post(route('assignment.store'))
   form.reset()
-  assignmentArray.value=[];
+
 
 }
 
@@ -130,13 +121,14 @@ const makeAssignment=()=>{
                             </tr>
                            </table>
                            <div class="gap-4 m-5 text-center ">
-                            <form class="flex flex-col gap-2" @submit.prevent="assign()" v-show="assignmentArray.length>0" >
-                            <label >Assignee</label>
+                            <form class="flex flex-col gap-2" @submit.prevent="makeAssignment()" v-show="assignmentArray.length>0" >
+                            <!-- <label >Assignee</label> -->
                             <Dropdown
                                 :options="assemblers"
                                 option-label="name"
-                                option-value="code"
+                                option-value="id"
                                 filter
+                                placeholder="Assignee"
                                v-model="form.assignee"
                             />
                             <Button
@@ -144,9 +136,9 @@ const makeAssignment=()=>{
                                 severity="success"
                                 icon="pi pi-send"
                                 type="submit"
-                                :disabled="form.processing||form.assignee==''||form.assignee=='Assignee'"
+                                :disabled="form.processing||form.assignee==''"
                             />
-                            <input type="text" v-model="form.parts" hidden>
+                            <!-- <input type="text" v-model="form.parts" hidden> -->
 
                             </form>
 

@@ -189,7 +189,7 @@ class AssignmentController extends Controller
     public function store(Request $request)
     {
 
-        // dd($request->all());
+        dd($request->all());
 
 
         if($request->records=='ALL')$records=200;
