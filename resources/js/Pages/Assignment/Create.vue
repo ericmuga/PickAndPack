@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head} from '@inertiajs/inertia-vue3';
+import { Head, useForm} from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
 import {watch, ref,onMounted,computed} from 'vue';
 import Modal from '@/Components/Modal.vue'
@@ -17,11 +17,6 @@ const props= defineProps({
     station:String,
 })
 
-// onMounted(()=>{
-//      assignmentsArray.value = props.assignments;
-// })
-
-
 
 
 let showModal=ref(false);
@@ -35,18 +30,18 @@ const updateAssignmentCount = (order_no, part) => {
 
 const assignmentArray=ref([])
 
-const assignee=ref('')
+// const assignee=ref('')
 
-const assign=()=>{
-    axios.post('assignment.store',{'assignmentArray':assignmentArray.value,'assignee':assignee.value})
-         .then(()=>{
-            assignee.value=''
-            assignmentArray.value=[];
-         })
-         .catch((response)=>{
-           console.log(response)
-         })
-}
+// const assign=()=>{
+//     axios.post('assignment.store',{'assignmentArray':assignmentArray.value,'assignee':assignee.value})
+//          .then(()=>{
+//             assignee.value=''
+//             assignmentArray.value=[];
+//          })
+//          .catch((response)=>{
+//            console.log(response)
+//          })
+// }
 
 const AddPart= (order_no,part)=>{
     // console.log('here')
@@ -76,19 +71,19 @@ const totalWeight = computed(() => {
 });
 
 
-// const form=ref({
-//   parts:[],
-//   assignee:''
+const form=useForm({
+  parts:[],
+  assignee:''
 
 
-// });
-// const makeAssignment=()=>{
-//   form.parts=assignmentArray.value;
-//   form.post(route('assignments.store'))
-//   form.reset()
-//   assignmentArray.value=[];
+});
+const makeAssignment=()=>{
+  form.parts=assignmentArray.value;
+  form.post(route('assignments.store'))
+  form.reset()
+  assignmentArray.value=[];
 
-// }
+}
 
 
 
@@ -142,7 +137,7 @@ const totalWeight = computed(() => {
                                 option-label="name"
                                 option-value="code"
                                 filter
-                               v-model="assignee"
+                               v-model="form.assignee"
                             />
                             <Button
                                 label="Assign"
