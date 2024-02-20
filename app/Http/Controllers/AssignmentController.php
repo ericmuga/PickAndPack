@@ -42,81 +42,85 @@ class AssignmentController extends Controller
 
     public function create(Request $request)
     {
-        $orders =
-        Cache::remember('pending_assignment', 15 * 60, function () {return
-                 DB::table('pending_assignment')
-                    ->select('order_no',
-                              'shp_date',
-                              'sp_code',
-                              'sp_name',
-                              'shp_name',
-                              'A_Weight',
-                              'B_Weight',
-                              'C_Weight',
-                              'D_Weight',
-                              'A_Assignment_Count',
-                              'B_Assignment_Count',
-                              'C_Assignment_Count',
-                              'D_Assignment_Count')
-                    ->where('shp_date', '>=', now()->toDateString())
-                    ->get();
-            });
+      $orders =Cache::remember('pending_assignment', 15 * 60, function () {return
+                                DB::table('pending_assignment')
+                                    ->select('order_no',
+                                            'shp_date',
+                                            'sp_code',
+                                            'sp_name',
+                                            'shp_name',
+                                            'A_Weight',
+                                            'B_Weight',
+                                            'C_Weight',
+                                            'D_Weight',
+                                            'A_Assignment_Count',
+                                            'B_Assignment_Count',
+                                            'C_Assignment_Count',
+                                            'D_Assignment_Count')
+                                    ->where('shp_date', '>=', now()->toDateString())
+                                    ->get();
+                            });
 
-        //filter the request based on the parameters:
-      // Define a default condition
 
-    //   dd($orders->take(5));
+      $orders = $orders->filter($this->getFilterCondition($request))->values();
+      $assignments=$this->generateAssignmentsArray($orders);
+      $station=$request->station;
+      $assemblers=DB::table('users')->select('name','id')->orderBy('name')->get();
+      return inertia('Assignment/Create',compact('orders' ,'assemblers','assignments','station'));
 
-    // dd(CodeType::MAP['HORECA']);
-$condition = function ($item) {
-    return $item->B_Weight > 0;
-};
-
-if (!$request->has('flag')) {
-    // dd($orders);
-    if ($request->station == 'a') {
-        $condition = function ($item) {
-
-            return floatval($item->A_Weight) > 0 || floatval($item->C_Weight) > 0 || floatval($item->D_Weight) > 0;
-        };
-    }
-} else {
-    switch ($request->flag) {
-        case 'horeca':
-            $sp_code = CodeType::MAP['HORECA'];
-            break;
-        case 'retail':
-            $sp_code = CodeType::MAP['RETAIL'];
-            break;
-        case 'msa':
-            $sp_code = CodeType::MAP['MSA'];
-            break;
-        case 'upc':
-            $sp_code = CodeType::MAP['UPC'];
-            break;
-        case 'ff':
-            $sp_code = CodeType::MAP['F_FOOD'];
-            break;
-        default:
-            // Handle the default case if needed
-            break;
     }
 
-    if (isset($sp_code)) {
-        if ($request->station == 'a') {
+
+    private function getFilterCondition($request, $sp_code = null)
+        {
             $condition = function ($item) {
-                return $item->A_Weight > 0 || $item->C_Weight > 0 || $item->D_Weight > 0;
+                return $item->B_Weight > 0;
             };
+
+            if (!$request->has('flag')) {
+                if ($request->station == 'a') {
+                    $condition = function ($item) {
+                        return $item->A_Weight > 0 || $item->C_Weight > 0 || $item->D_Weight > 0;
+                    };
+                }
+            } else {
+                switch ($request->flag) {
+                    case 'horeca':
+                        $sp_code = CodeType::MAP['HORECA'];
+                        break;
+                    case 'retail':
+                        $sp_code = CodeType::MAP['RETAIL'];
+                        break;
+                    case 'msa':
+                        $sp_code = CodeType::MAP['MSA'];
+                        break;
+                    case 'upc':
+                        $sp_code = CodeType::MAP['UPC'];
+                        break;
+                    case 'ff':
+                        $sp_code = CodeType::MAP['F_FOOD'];
+                        break;
+                    default:
+                        // Handle the default case if needed
+                        break;
+                }
+
+                if (isset($sp_code)) {
+                    if ($request->station == 'a') {
+                        $condition = function ($item) {
+                            return $item->A_Weight > 0 || $item->C_Weight > 0 || $item->D_Weight > 0;
+                        };
+                    }
+                }
+            }
+
+            return $condition;
         }
-        $orders = $orders->whereIn('sp_code', $sp_code);
-    }
-}
-// dd($orders);
-$orders = $orders->filter($condition)->values();
 
 
-
-        $assignments=collect([]);
+    private function generateAssignmentsArray($orders)
+    {
+         $assignments=collect([]);
 
         foreach ($orders as $order)
         {
@@ -137,13 +141,8 @@ $orders = $orders->filter($condition)->values();
                 $assignments->push(['order_no'=>$order->order_no,'D','weight'=>$order->D_Weight]);
             }
         }
-
-        $assemblers=DB::table('users')->select('name','id')->orderBy('name')->get();
-        return inertia('Assignment/Create',compact('orders' ,'assemblers','assignments'));
-
+        return $assignments;
     }
-
-
 
     public function index(Request $request)
     {

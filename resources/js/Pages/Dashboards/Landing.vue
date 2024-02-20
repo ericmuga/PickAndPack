@@ -35,7 +35,7 @@ import { Link,Head } from '@inertiajs/inertia-vue3';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
-import AssignmentLinks from './AssignmentLinks.vue';
+import AssignmentLinks from '@/Components/AssignmentLinks.vue';
 import {ref } from 'vue'
 let showAssignment=ref(false);
 

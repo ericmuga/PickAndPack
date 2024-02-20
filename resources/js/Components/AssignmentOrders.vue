@@ -22,7 +22,8 @@ let sp_codes=ref([]);
 
 const props=defineProps({
     orders:Object,
-    assignments:Object
+    assignments:Object,
+    station:String,
 })
 
 const  extractSpArray=()=> {
@@ -142,16 +143,16 @@ const checkAssigned=(orderNo,part)=>{
                                         </th>
 
 
-                                        <th scope="col" class="px-4 py-2 text-center">
+                                        <th v-show="station=='a'" scope="col" class="px-4 py-2 text-center">
                                             A
                                         </th>
-                                        <th scope="col" class="px-4 py-2 text-center">
+                                        <th v-show="station=='b'" scope="col" class="px-4 py-2 text-center">
                                             B
                                         </th>
-                                        <th scope="col" class="px-4 py-2 text-center">
+                                        <th v-show="station=='a'" scope="col" class="px-4 py-2 text-center">
                                             C
                                         </th>
-                                        <th scope="col" class="px-4 py-2 text-center">
+                                        <th v-show="station=='a'" scope="col" class="px-4 py-2 text-center">
                                             D
                                         </th>
 
@@ -176,7 +177,7 @@ const checkAssigned=(orderNo,part)=>{
                                         {{ order.shp_date }}
                                     </td>
 
-                                    <td class="px-3 py-2 text-xs font-bold text-center">
+                                    <td class="px-3 py-2 text-xs font-bold text-center" v-show="station=='a'">
                                         <Button
                                         :icon="checkAssigned(order.order_no,'A')?'pi pi-check':'pi pi-question'"
                                         :severity="checkAssigned(order.order_no,'A')?'success':'warning'"
@@ -188,7 +189,7 @@ const checkAssigned=(orderNo,part)=>{
                                         />
 
                                     </td>
-                                    <td class="px-3 py-2 text-xs font-bold text-center">
+                                    <td class="px-3 py-2 text-xs font-bold text-center" v-show="station=='b'">
                                         <Button
                                         :icon="checkAssigned(order.order_no,'B')?'pi pi-check':'pi pi-question'"
                                         :severity="checkAssigned(order.order_no,'B')?'success':'warning'"
@@ -199,7 +200,7 @@ const checkAssigned=(orderNo,part)=>{
 
                                         />
                                     </td>
-                                    <td class="px-3 py-2 text-xs font-bold text-center">
+                                    <td class="px-3 py-2 text-xs font-bold text-center" v-show="station=='a'">
                                        <Button
                                         :icon="checkAssigned(order.order_no,'C')?'pi pi-check':'pi pi-question'"
                                         :severity="checkAssigned(order.order_no,'C')?'success':'warning'"
@@ -210,7 +211,7 @@ const checkAssigned=(orderNo,part)=>{
 
                                         />
                                     </td>
-                                    <td class="px-3 py-2 text-xs font-bold text-center">
+                                    <td class="px-3 py-2 text-xs font-bold text-center" v-show="station=='a'">
                                            <Button
                                         :icon="checkAssigned(order.order_no,'D')?'pi pi-check':'pi pi-question'"
                                         :severity="checkAssigned(order.order_no,'D')?'success':'warning'"

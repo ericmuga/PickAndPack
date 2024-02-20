@@ -14,6 +14,7 @@ const props= defineProps({
     orders:Object,
     assemblers:Object,
     assignments:Object,
+    station:String,
 })
 
 // onMounted(()=>{
@@ -75,19 +76,19 @@ const totalWeight = computed(() => {
 });
 
 
-const form=ref({
-  parts:[],
-  assignee:''
+// const form=ref({
+//   parts:[],
+//   assignee:''
 
 
-});
-const makeAssignment=()=>{
-  form.parts=assignmentArray.value;
-  form.post(route('assignments.store'))
-  form.reset()
-  assignmentArray.value=[];
+// });
+// const makeAssignment=()=>{
+//   form.parts=assignmentArray.value;
+//   form.post(route('assignments.store'))
+//   form.reset()
+//   assignmentArray.value=[];
 
-}
+// }
 
 
 
@@ -98,7 +99,7 @@ const makeAssignment=()=>{
 
     <AuthenticatedLayout @add="showModal=true">
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-center text-gray-800 rounded"> Pending Assignment</h2>
+            <h2 class="text-xl font-semibold leading-tight text-center text-gray-800 rounded">Assignment Station {{ station.toUpperCase() }}</h2>
         </template>
 
         <div class="py-6">
@@ -111,11 +112,11 @@ const makeAssignment=()=>{
                         <div>
                             <div class="relative grid grid-cols-4 overflow-x-auto shadow-md sm:rounded-lg">
                                <div class="col-span-3">
-                                  <AssignmentOrders @add-assignment="addAssignmentHandler" :orders="orders" :assignments="assignments"/>
+                                  <AssignmentOrders @add-assignment="addAssignmentHandler" :orders="orders" :assignments="assignments" :station="station"/>
                               </div>
 
                         <div class="col-span-1 px-4 shadow-lg">
-                            <div class="p-3 m-3 text-center rounded-md bg-slate-500"> Make Assignments</div>
+                            <div class="p-3 m-3 text-center text-white rounded-md bg-slate-500"> Make Assignments</div>
                            <table v-show="assignmentArray.length >0">
                             <tr >
                                 <th>Order</th>
@@ -130,23 +131,25 @@ const makeAssignment=()=>{
                             <tr>
                                 <td></td>
                                 <td class="font-bold">Total</td>
-                                <td class="text-right">{{totalWeight }}</td>
+                                <td class="text-center">{{totalWeight.toFixed(1) }}</td>
                             </tr>
                            </table>
-                           <div class="flex flex-col gap-4 m-5 text-center">
-                            <form @submit.prevent="makeAssignment()" v-show="assignmentArray.length>0" >
+                           <div class="gap-4 m-5 text-center ">
+                            <form class="flex flex-col gap-2" @submit.prevent="assign()" v-show="assignmentArray.length>0" >
+                            <label >Assignee</label>
                             <Dropdown
                                 :options="assemblers"
                                 option-label="name"
                                 option-value="code"
-                                v-model="form.assignee"
+                                filter
+                               v-model="assignee"
                             />
                             <Button
                                 label="Assign"
                                 severity="success"
                                 icon="pi pi-send"
                                 type="submit"
-                                :disabled="form.processing||form.assignee==''"
+                                :disabled="form.processing||form.assignee==''||form.assignee=='Assignee'"
                             />
                             <input type="text" v-model="form.parts" hidden>
 

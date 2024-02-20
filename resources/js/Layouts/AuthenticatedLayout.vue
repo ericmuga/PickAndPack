@@ -34,7 +34,19 @@
             <div v-show="subMenuOpen['orders']">
                 <div class="py-2 pl-8 cursor-pointer"><Link :href="route('confirmations.index')" :active="route().current('confirmations.index')" class="block px-2 py-1 font-semibold text-white rounded hover:bg-gray-600 ">Registry</Link></div>
                 <div class="py-2 pl-8 cursor-pointer"><Link :href="route('orders.lines')" :active="route().current('orders.lines')" class="block px-2 py-1 font-semibold text-white rounded hover:bg-gray-600 ">Prepacks</Link></div>
-                <div class="py-2 pl-8 cursor-pointer"><Link :href="route('assignment.create')" :active="route().current('assignment.index')" class="block px-2 py-1 font-semibold text-white rounded hover:bg-gray-600 ">Assignment</Link></div>
+                <div class="block w-full px-2 py-2 pl-8 font-semibold text-white rounded cursor-pointer hover:bg-gray-600">
+                <p  class="p-2 font-semibold tracking-wide rounded-md hover:cursor-pointer" @click="toggleAssignment()">Assignment</p>
+                    <Accordion  v-show="showAssignment">
+
+                    <AccordionTab header="Station A" class="w-full" >
+                        <AssignmentLinks station="a"/>
+                        </AccordionTab>
+                        <AccordionTab header="Station B" >
+                            <AssignmentLinks station="b"/>
+                        </AccordionTab>
+                    </Accordion>
+
+                </div>
                 <div class="py-2 pl-8 cursor-pointer"> <Link :href="route('assembly.index')" :active="route().current('assembly.index')" class="block px-2 py-1 font-semibold text-white rounded hover:bg-gray-600 ">Assembly</Link></div>
                 <div class="py-2 pl-8 cursor-pointer"><Link :href="route('packingSession.index')" :active="route().current('packingSession.index')" class="block px-2 py-1 font-semibold text-white rounded hover:bg-gray-600 ">Packing</Link></div>
                 <div class="py-2 pl-8 cursor-pointer"><Link :href="route('loadingSession.index')" :active="route().current('loadingSession.index')"  class="block px-2 py-1 font-semibold text-white rounded hover:bg-gray-600 ">Loading</Link></div>
@@ -128,8 +140,13 @@
 import { Inertia } from '@inertiajs/inertia';
 import { Link } from '@inertiajs/inertia-vue3';
 import { ref,onMounted,onBeforeUnmount } from 'vue';
+import Accordion from 'primevue/accordion';
+import AccordionTab from 'primevue/accordiontab';
+import AssignmentLinks from '@/Components/AssignmentLinks.vue';
 
+let showAssignment=ref(false);
 
+const toggleAssignment=()=>showAssignment.value=!showAssignment.value
 const sidebarOpen = ref(false);
 
 const handleScreenSizeChange = () => {
@@ -161,6 +178,7 @@ onBeforeUnmount(() => {
 const subMenuOpen = ref({
   dashboard: false,
   orders: false,
+  assignments:false,
   admin:false,
   user:false,
   reports:false,
