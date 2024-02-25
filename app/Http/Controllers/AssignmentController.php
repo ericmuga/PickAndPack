@@ -27,12 +27,12 @@ class AssignmentController extends Controller
     }
 
    public function getPending(){
-     $orders = Cache::remember('pending_assignment', 15 * 60, function () {
+    //  $orders = Cache::remember('pending_assignment', 15 * 60, function () {
                 return DB::table('pending_assignment')
                     ->select('order_no', 'shp_date', 'sp_code', 'sp_name', 'shp_name', 'A_Weight', 'B_Weight', 'C_Weight', 'D_Weight')
                     ->where('shp_date', '>=', now()->toDateString())
                     ->get();
-            });
+            // });
 
     return response()->json(compact('orders'));
 
@@ -63,7 +63,10 @@ class AssignmentController extends Controller
 
 
       $orders = $orders->filter($this->getFilterCondition($request))->values();
-      $assignments=$this->generateAssignmentsArray($orders);
+      $assignments=Cache::remember('assignments', 15 * 60, function () use($orders) {return
+                 $this->generateAssignmentsArray($orders);
+            });
+    //    dd(Cache::get('assignments'));
       $station=$request->station;
       $flag=$request->flag?:'';
       $assemblers=Cache::remember('assemblers', 15 * 60, function () {return DB::table('users')->select('name','id')->orderBy('name')->get();});
@@ -178,37 +181,43 @@ class AssignmentController extends Controller
                         ->appends($request->all());
 
         $assignments= AssignmentResource::collection($assignments);
-
-        //list of assemblers
         $dateParam=$request->has('date')?$request->date:Carbon::today()->toDateString();
         $assemblersParam=$request->has('assemblers')?$request->assemblers:[];
-       $assemblers=DB::table('users')->select('name','id')->orderBy('name')->get();
+        $assemblers=DB::table('users')->select('name','id')->orderBy('name')->get();
 
         return inertia('Assignment/List',compact('assignments','assemblers','assemblersParam','dateParam'));
     }
 
     public function store(Request $request)
     {
-
-        // dd($request->all());
-        $ass=Assignment::create([
+         $ass=Assignment::create([
                 'assignee_id'=>$request->assignee,
                 'assignor_id'=>$request->user()->id,
                 'batch_no'=>Str::uuid()
 
        ]);
+         $assignments=collect(Cache::get('assignments'));
 
         foreach($request->parts as $p)
         {
 
-            AssignmentLine::create([
-                  'assignment_id'=>$ass->id,
-                  'batch_no'=>$ass->batch_no,
-                  'part'=>$p['part'],
-                  'order_no'=>$p['order_no'],
-            ]);
+            AssignmentLine::updateOrCreate([
+                                               'part'=>$p['part'],
+                                                'order_no'=>$p['order_no'],
+                                            ],
+                                            [
+                                                'assignment_id'=>$ass->id,
+                                                'batch_no'=>$ass->batch_no,
+                                                'part'=>$p['part'],
+                                                'order_no'=>$p['order_no'],
+                                            ],
+                                        );
+            $assignments->push(['order_no'=>$p['order_no'],$p['part'],'weight'=>1]);
         }
-       //check if order has been fully assigned for that station,
+
+        Cache::set('assignments',$assignments);
+
+
        $assigned=false;
        if ($request->station='b') $assigned=true;
        else{
@@ -222,7 +231,7 @@ class AssignmentController extends Controller
          if ($order_parts<=$assigned)
              $assigned=true;
        }
-              return response()->json([compact('assigned')],200);
+              return response()->json([compact('assigned','assignments')],200);
 
     }
 

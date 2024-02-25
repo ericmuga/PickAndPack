@@ -31,20 +31,44 @@ const  extractSpArray=()=> {
     sp_codes.value = Array.from(uniqueValuesMap.entries());
 }
 
-
-onMounted(() => {
-    ordersArray.value = props.orders;
-    assignmentsArray.value = props.assignments;
-    extractSpArray();
-
-});
-
 const props=defineProps({
     orders:Object,
     assignments:Object,
     station:String,
     assigned:[],
 })
+
+onMounted(() => {
+    assignmentsArray.value = props.assignments;
+    ordersArray.value=[];
+    for (let j = 0; j < props.orders.length; j++) {
+    if (props.station == 'a') {
+        if (!
+            ((props.orders[j].A_Weight > 0 && checkAssigned(props.orders[j].order_no, 'A')) || props.orders[j].A_Weight == 0) &&
+            ((props.orders[j].C_Weight > 0 && checkAssigned(props.orders[j].order_no, 'C')) || props.orders[j].C_Weight == 0) &&
+            ((props.orders[j].D_Weight > 0 && checkAssigned(props.orders[j].order_no, 'D')) || props.orders[j].D_Weight == 0)
+        ) {
+            ordersArray.value.push(props.orders[j]);
+        }
+    }
+
+    if (props.station == 'b') {
+        if (props.orders[j].order_no=='S+ORD0000413292')
+        console.log(checkAssigned(props.orders[j].order_no, 'B'));
+
+        if (!
+            (props.orders[j].B_Weight > 0 && checkAssigned(props.orders[j].order_no, 'B')) || props.orders[j].B_Weight == 0
+        ) {
+            ordersArray.value.push(props.orders[j]);
+        }
+    }
+}
+
+
+    extractSpArray();
+
+});
+
 const assigned = ref(props.assigned);
 const assignedRef = ref(props.assigned);
 
@@ -100,10 +124,15 @@ function pushUniqueOrder(orderNo, part,weight) {
 
 }
 
-const checkAssigned=(orderNo,part)=>{
-    const exists = assignmentsArray.value.filter(item => item.order_no == orderNo && item.part == part);
+// const checkAssigned=(orderNo,part)=>{
+//     const exists = assignmentsArray.value.filter(item => item.order_no == orderNo && item.part == part);
 
-    return exists.length>0
+//     return exists.length>0
+// }
+
+const checkAssigned = (orderNo, part) => {
+    const exists = assignmentsArray.value.filter(item => item.order_no === orderNo && item["0"] === part);
+    return exists.length > 0;
 }
 
 const removeFullyAssigned=(orderNo)=>{

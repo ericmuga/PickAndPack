@@ -32,10 +32,12 @@ const updateAssignmentCount = (order_no, part) => {
 
 const assignmentArray=ref([])
 
+const assignedArray=ref(props.assignments);
 
 const AddPart= (order_no,part)=>{
     // console.log('here')
      assignmentArray.value.push({order_no,part});
+    //  assignedArray.value.push({order_no,part});
 
      updateAssignmentCount(order_no,part)
 }
@@ -77,7 +79,9 @@ axios.post(route('assignment.store'), {'parts':form.parts,'assignee':form.assign
                                 if (response.data[0].assigned) {
                                     assigned.value=assignmentArray.value
                                 }
+                                assignedArray.value=response.data[0].assignments
                                 assignmentArray.value=[]
+
                      Swal.fire('Success!','Assignment Successful','success');
                  })
              .catch( error=>console.log(error));
@@ -108,12 +112,25 @@ axios.post(route('assignment.store'), {'parts':form.parts,'assignee':form.assign
                         <!--stats bar -->
 
                         <div>
+                         <div class="w-full text-center">
+                             <div class="">
+                                   <Button
+                                      label="Download"
+                                      severity="success"
+                                      class="mx-2"
+                                      @click="showModal=true"
+                                    />
+
+                                </div>
+
+                         </div>
+
                             <div class="relative grid overflow-x-auto shadow-md md:grid-cols-4 sm:grid-cols-1 sm:rounded-lg">
                                <div class="col-span-3">
                                   <AssignmentOrders
                                         @add-assignment="addAssignmentHandler"
                                         :orders="orders"
-                                        :assignments="assignments"
+                                        :assignments="assignedArray"
                                         :station="station"
                                         :assigned="assigned"
                                    />
