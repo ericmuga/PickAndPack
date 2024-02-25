@@ -8,13 +8,15 @@ import debounce from 'lodash/debounce';
 import axios from 'axios';
 import AssignmentOrders from '@/Components/AssignmentOrders.vue';
 import AssignmentPart from '@/Components/AssignmentPart.vue';
+// import swal from
 
-
+import Swal from 'sweetalert2';
 const props= defineProps({
     orders:Object,
     assemblers:Object,
     assignments:Object,
     station:String,
+    flag:String,
 })
 
 
@@ -40,8 +42,9 @@ const AddPart= (order_no,part)=>{
 
 
 
+
 const checkAssigned = (order_no, part) => {
-    let index = ordersArray.value.findIndex(item =>
+let index = ordersArray.value.findIndex(item =>
         item.order_no === order_no && item[`${part}_Assignment_Count`] > 0
     );
     return index !== -1;
@@ -51,6 +54,7 @@ const addAssignmentHandler=(assignment)=>{
 
         assignmentArray.value.push({ order_no: assignment.order_no, part:assignment.part,weight:assignment.weight });
         form.parts=assignmentArray.value;
+        assigned.value=form.parts
 
     }
 
@@ -61,18 +65,24 @@ const totalWeight = computed(() => {
   }, 0);
 });
 
-
 const form=useForm({
   parts:[],
-  assignee:''
-
-
+  assignee:'',
 });
-const makeAssignment=()=>{
 
-  form.post(route('assignment.store'))
+const assigned=ref([]);
+const  makeAssignment=  ()=>{
+axios.post(route('assignment.store'), {'parts':form.parts,'assignee':form.assignee,'station':props.station})
+            .then(response => { //assigned.value=response.data[0].assigned
+                                if (response.data[0].assigned) {
+                                    assigned.value=assignmentArray.value
+                                }
+                                assignmentArray.value=[]
+                     Swal.fire('Success!','Assignment Successful','success');
+                 })
+             .catch( error=>console.log(error));
+
   form.reset()
-
 
 }
 
@@ -85,7 +95,9 @@ const makeAssignment=()=>{
 
     <AuthenticatedLayout @add="showModal=true">
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-center text-gray-800 rounded">Assignment Station {{ station.toUpperCase() }}</h2>
+            <h2 class="text-xl font-semibold leading-tight text-center text-gray-800 rounded">
+                Assignment Station {{ station.toUpperCase() }}</h2>
+                <p class="text-center">{{flag.toUpperCase() }}</p>
         </template>
 
         <div class="py-6">
@@ -96,14 +108,20 @@ const makeAssignment=()=>{
                         <!--stats bar -->
 
                         <div>
-                            <div class="relative grid grid-cols-4 overflow-x-auto shadow-md sm:rounded-lg">
+                            <div class="relative grid overflow-x-auto shadow-md md:grid-cols-4 sm:grid-cols-1 sm:rounded-lg">
                                <div class="col-span-3">
-                                  <AssignmentOrders @add-assignment="addAssignmentHandler" :orders="orders" :assignments="assignments" :station="station"/>
+                                  <AssignmentOrders
+                                        @add-assignment="addAssignmentHandler"
+                                        :orders="orders"
+                                        :assignments="assignments"
+                                        :station="station"
+                                        :assigned="assigned"
+                                   />
                               </div>
 
-                        <div class="col-span-1 px-4 shadow-lg">
+                        <div class="items-center col-span-1 px-4 shadow-lg">
                             <div class="p-3 m-3 text-center text-white rounded-md bg-slate-500"> Make Assignments</div>
-                           <table v-show="assignmentArray.length >0">
+                           <table v-show="assignmentArray.length >0" class="text-center item-center">
                             <tr >
                                 <th>Order</th>
                                 <th>Part</th>

@@ -26,7 +26,6 @@ import ConfirmationService from 'primevue/confirmationservice';
 import Calendar from 'primevue/calendar';
 import Dropdown from 'primevue/dropdown';
 import Password from 'primevue/password';
-import Swal from 'sweetalert2';
 import Badge from 'primevue/badge';
 
 import SearchBox from '@/Components/SearchBox.vue'
@@ -54,7 +53,6 @@ createInertiaApp({
             .component('Calendar',Calendar)
             .component('Calendar',Calendar)
             .component('Password',Password)
-            .component('Swal',Swal)
             .component('Badge',Badge)
             // .component('Link',Link)
             .mount(el);

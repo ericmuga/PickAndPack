@@ -65,8 +65,9 @@ class AssignmentController extends Controller
       $orders = $orders->filter($this->getFilterCondition($request))->values();
       $assignments=$this->generateAssignmentsArray($orders);
       $station=$request->station;
-      $assemblers=DB::table('users')->select('name','id')->orderBy('name')->get();
-      return inertia('Assignment/Create',compact('orders' ,'assemblers','assignments','station'));
+      $flag=$request->flag?:'';
+      $assemblers=Cache::remember('assemblers', 15 * 60, function () {return DB::table('users')->select('name','id')->orderBy('name')->get();});
+      return inertia('Assignment/Create',compact('orders' ,'assemblers','assignments','station','flag'));
 
     }
 
@@ -189,83 +190,43 @@ class AssignmentController extends Controller
     public function store(Request $request)
     {
 
-        dd($request->all());
-
-
-        if($request->records=='ALL')$records=200;
-        else         $records=$request->records?:15;
-       $ass=Assignment::create([
+        // dd($request->all());
+        $ass=Assignment::create([
                 'assignee_id'=>$request->assignee,
                 'assignor_id'=>$request->user()->id,
                 'batch_no'=>Str::uuid()
 
        ]);
 
-     foreach($request->selectedParts as $p)
+        foreach($request->parts as $p)
         {
 
-            AssignmentLine::updateOrCreate([
-                 'assignment_id'=>$ass->id,
-                 'batch_no'=>$ass->batch_no,
-                'part'=>$p['part'],
-                'order_no'=>$p['order_no'],
+            AssignmentLine::create([
+                  'assignment_id'=>$ass->id,
+                  'batch_no'=>$ass->batch_no,
+                  'part'=>$p['part'],
+                  'order_no'=>$p['order_no'],
             ]);
         }
-
-//  $records=$request->records?:100;
-       $date=$request->has('shp_date')?$request->shp_date:Carbon::tomorrow()->toDateString();
-        $orders = AssignmentOrderResource::collection(Order::shipcurrent()
-                                                            ->when($request->has('selected_spcodes')&&($request->selected_spcodes<>''),fn($q)=>$q->whereIn('sp_code',$request->selected_spcodes))
-                                                            ->where('shp_date',$date)
-                                                            ->select('shp_name', 'order_no', 'shp_date', 'sp_code')
-                                                            ->with(['lines','assignmentLines'])
-                                                            ->withCount(['assignmentLines','confirmations'])
-                                                            ->paginate($records)
-                                                            ->appends($request->all())
-                                                            ->withQueryString()
-                                                    );
-
-        $assignments= AssignmentResource::collection(Assignment::with('assignee','assignor')
-                                                               ->when($request->has('date')&&($request->date<>''),
-                                                                           fn($q)=>$q->where('created_at','>=',Carbon::parse($request->date)->toDateString())
-                                                                                     ->where('created_at','<=',Carbon::parse($request->date)->addDay(1)->toDateString()))
-                                                               ->when(!$request->has('date')||($request->date==''),
-                                                                           fn($q)=>$q->where('created_at','>=',Carbon::today()->toDateString())
-                                                                                     ->where('created_at','<=',Carbon::tomorrow(1)->toDateString()))
-                                                               ->withCount('lines')
-                                                               ->latest()
-                                                               ->paginate($records)
-                                                                );
-
-        //list of assemblers
-        $dateParam=$request->has('date')?$request->date:Carbon::today()->toDateString();
-        $assemblersParam=$request->has('assemblers')?$request->assemblers:[];
-        $assemblers=DB::table('users')->select('name','id')->orderBy('name')->get();
-
-
-        $selected_spcodes=$request->selected_spcodes?:'';
-         $spcodes=DB::table('sales_people')->select('name','code')->get();
-
-
-
-        return inertia('Assignment/Create',compact('orders' ,'spcodes','selected_spcodes','assemblers','date','records'));
+       //check if order has been fully assigned for that station,
+       $assigned=false;
+       if ($request->station='b') $assigned=true;
+       else{
+          $order_parts=DB::table('order_parts')
+                   ->where('order_no',$request->part[0]->order_no)
+                   ->where('part','<>','B')
+                   ->count();
+          $assigned= AssignmentLine::where('order_no',$request->part[0]->order_no)
+                                   ->where('part','<>','B')
+                                   ->count();
+         if ($order_parts<=$assigned)
+             $assigned=true;
+       }
+              return response()->json([compact('assigned')],200);
 
     }
 
-    public function assign(Request $request)
-    {
 
-        /**
-         * assin a single par
-         */
-    }
-
-    /**
-    * Display the specified resource.
-    *
-    * @param  int  $id
-    * @return \Illuminate\Http\Response
-    */
     public function show($id)
     {
 
@@ -278,12 +239,6 @@ class AssignmentController extends Controller
 
     }
 
-    /**
-    * Show the form for editing the specified resource.
-    *
-    * @param  int  $id
-    * @return \Illuminate\Http\Response
-    */
     public function edit($id)
     {
         //
