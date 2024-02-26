@@ -44,17 +44,18 @@ onMounted(() => {
     for (let j = 0; j < props.orders.length; j++) {
     if (props.station == 'a') {
         if (!
-            ((props.orders[j].A_Weight > 0 && checkAssigned(props.orders[j].order_no, 'A')) || props.orders[j].A_Weight == 0) &&
+            (((props.orders[j].A_Weight > 0 && checkAssigned(props.orders[j].order_no, 'A')) || props.orders[j].A_Weight == 0) &&
             ((props.orders[j].C_Weight > 0 && checkAssigned(props.orders[j].order_no, 'C')) || props.orders[j].C_Weight == 0) &&
             ((props.orders[j].D_Weight > 0 && checkAssigned(props.orders[j].order_no, 'D')) || props.orders[j].D_Weight == 0)
-        ) {
+            )
+            )
+        {
             ordersArray.value.push(props.orders[j]);
         }
     }
 
     if (props.station == 'b') {
-        if (props.orders[j].order_no=='S+ORD0000413292')
-        console.log(checkAssigned(props.orders[j].order_no, 'B'));
+
 
         if (!
             (props.orders[j].B_Weight > 0 && checkAssigned(props.orders[j].order_no, 'B')) || props.orders[j].B_Weight == 0
@@ -119,9 +120,9 @@ function pushUniqueOrder(orderNo, part,weight) {
     if (!exists) {
         assignmentsArray.value.push({ order_no: orderNo, part: part,weight:weight });
     }
-    removeFullyAssigned(orderNo)
-    handleButtonClick(orderNo,part,weight)
 
+    handleButtonClick(orderNo,part,weight)
+ removeFullyAssigned(orderNo)
 }
 
 // const checkAssigned=(orderNo,part)=>{
@@ -131,20 +132,19 @@ function pushUniqueOrder(orderNo, part,weight) {
 // }
 
 const checkAssigned = (orderNo, part) => {
-    const exists = assignmentsArray.value.filter(item => item.order_no === orderNo && item["0"] === part);
+    // const exists = assignmentsArray.value.filter(item => item.order_no === orderNo && item["0"] === part);
+    const exists = assignmentsArray.value.filter(item => item.order_no === orderNo && item.part === part);
     return exists.length > 0;
 }
 
 const removeFullyAssigned=(orderNo)=>{
 
     const order=ordersArray.value.filter(item=>item.order_no===orderNo)[0]
-    let indexToRemove=-1;
+
     if (props.station=='a')
     {
-
-
-        //check if order has part a and a is assigned
-        if (
+        console.log(checkAssigned(orderNo,'A'))
+      if (
             ((order.A_Weight>0)&&(checkAssigned(orderNo,'A'))||order.A_Weight==0)
             // &&(((order.B_Weight>0)&&(checkAssigned(orderNo,'B'))||order.B_Weight==0))
             &&(((order.C_Weight>0)&&(checkAssigned(orderNo,'C'))||order.C_Weight==0))

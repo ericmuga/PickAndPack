@@ -113,7 +113,7 @@ axios.post(route('assignment.store'), {'parts':form.parts,'assignee':form.assign
 
                         <div>
                          <div class="w-full text-center">
-                             <div class="">
+                             <!-- <div class="">
                                    <Button
                                       label="Download"
                                       severity="success"
@@ -121,7 +121,7 @@ axios.post(route('assignment.store'), {'parts':form.parts,'assignee':form.assign
                                       @click="showModal=true"
                                     />
 
-                                </div>
+                                </div> -->
 
                          </div>
 

@@ -62,11 +62,11 @@ class AssignmentController extends Controller
                             });
 
 
-      $orders = $orders->filter($this->getFilterCondition($request))->values();
+      $orders = $this->filterOrders($request,$orders) ->values();
+
       $assignments=Cache::remember('assignments', 15 * 60, function () use($orders) {return
-                 $this->generateAssignmentsArray($orders);
-            });
-    //    dd(Cache::get('assignments'));
+                            $this->generateAssignmentsArray($orders);
+                        });
       $station=$request->station;
       $flag=$request->flag?:'';
       $assemblers=Cache::remember('assemblers', 15 * 60, function () {return DB::table('users')->select('name','id')->orderBy('name')->get();});
@@ -74,21 +74,26 @@ class AssignmentController extends Controller
 
     }
 
-
-    private function getFilterCondition($request, $sp_code = null)
+    private function filterOrders($request,$orders)
+    {
+        //filter by station
+        if ($request->station=='a')
         {
-            $condition = function ($item) {
-                return $item->B_Weight > 0;
-            };
+            //return only orders that have station a
+            $orders=$orders->filter(function ($item) {
+                    return $item->A_Weight>0 || $item->C_Weight>0 || $item->D_Weight>0;
+                });
+        }
+        else
+        {
+            $orders=$orders->filter(function ($item) {
+                    return $item->B_Weight>0 ;
+                });
+        }
 
-            if (!$request->has('flag')) {
-                if ($request->station == 'a') {
-                    $condition = function ($item) {
-                        return $item->A_Weight > 0 || $item->C_Weight > 0 || $item->D_Weight > 0;
-                    };
-                }
-            } else {
-                switch ($request->flag) {
+        // filter by flag
+        $sp_code=null;
+        switch ($request->flag) {
                     case 'horeca':
                         $sp_code = CodeType::MAP['HORECA'];
                         break;
@@ -107,19 +112,10 @@ class AssignmentController extends Controller
                     default:
                         // Handle the default case if needed
                         break;
-                }
+                };
+        return $orders->whereIn('sp_code',$sp_code);
 
-                if (isset($sp_code)) {
-                    if ($request->station == 'a') {
-                        $condition = function ($item) {
-                            return $item->A_Weight > 0 || $item->C_Weight > 0 || $item->D_Weight > 0;
-                        };
-                    }
-                }
-            }
-
-            return $condition;
-        }
+    }
 
 
     private function generateAssignmentsArray($orders)
@@ -130,19 +126,19 @@ class AssignmentController extends Controller
         {
             if ($order->A_Assignment_Count>0)
             {
-                $assignments->push(['order_no'=>$order->order_no,'A','weight'=>$order->A_Weight]);
+                $assignments->push(['order_no'=>$order->order_no,'part'=>'A','weight'=>$order->A_Weight]);
             }
             if ($order->B_Assignment_Count>0)
             {
-                $assignments->push(['order_no'=>$order->order_no,'B','weight'=>$order->B_Weight]);
+                $assignments->push(['order_no'=>$order->order_no,'part'=>'B','weight'=>$order->B_Weight]);
             }
             if ($order->C_Assignment_Count>0)
             {
-                $assignments->push(['order_no'=>$order->order_no,'C','weight'=>$order->C_Weight]);
+                $assignments->push(['order_no'=>$order->order_no,'part'=>'C','weight'=>$order->C_Weight]);
             }
             if ($order->D_Assignment_Count>0)
             {
-                $assignments->push(['order_no'=>$order->order_no,'D','weight'=>$order->D_Weight]);
+                $assignments->push(['order_no'=>$order->order_no,'part'=>'D','weight'=>$order->D_Weight]);
             }
         }
         return $assignments;
@@ -212,7 +208,7 @@ class AssignmentController extends Controller
                                                 'order_no'=>$p['order_no'],
                                             ],
                                         );
-            $assignments->push(['order_no'=>$p['order_no'],$p['part'],'weight'=>1]);
+            $assignments->push(['order_no'=>$p['order_no'],'part'=>$p['part'],'weight'=>"1"]);
         }
 
         Cache::set('assignments',$assignments);
