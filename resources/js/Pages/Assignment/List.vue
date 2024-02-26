@@ -87,7 +87,7 @@ import ProgressBar from 'primevue/progressbar';
                         <div>
                             <Toolbar>
                                 <template #start>
-                                    <Link :href="route('assignment.create')">
+                                    <!-- <Link :href="route('assignment.create')">
                                         <Button
                                             label="Add"
                                             icon="pi pi-plus"
@@ -96,7 +96,7 @@ import ProgressBar from 'primevue/progressbar';
                                             rounded
                                         >
                                         </Button>
-                                    </Link>
+                                    </Link> -->
 
                                 </template>
                                 <template #center>

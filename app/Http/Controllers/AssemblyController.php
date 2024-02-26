@@ -19,21 +19,25 @@ class AssemblyController extends Controller
     public function index(Request $request)
     {
 
-                $orders= AssemblyOrderResource::collection(Order::query()
-                                                        ->when($request->has('search'),fn($q)=>
-                                                                $q->where('order_no','like','%'.$request->search)
-
-                                                                )
-                                                        ->whereHas('confirmations')
-                                                            ->whereHas('assignmentLines', fn($q)=>$q->whereHas('assignment', fn($q)=>$q->where(
-                                                                'assignee_id',$request->user()->id)))
-                                                        ->shipcurrent()
-                                                        ->orderByDesc('ending_date')
-                                                        ->orderByDesc('ending_time')
-                                                        ->paginate(100)
-                                                        ->withQuerystring()
-
-                                                    );
+        $orders= DB::table('pending_assembly')
+                                    ->select('order_no',
+                                            'shp_date',
+                                            'sp_code',
+                                            'sp_name',
+                                            'shp_name',
+                                            'assignee_id',
+                                            'A_Assignment_Count',
+                                            'B_Assignment_Count',
+                                            'C_Assignment_Count',
+                                            'D_Assignment_Count',
+                                            'A_Assembly_Count',
+                                            'B_Assembly_Count',
+                                            'C_Assembly_Count',
+                                            'D_Assembly_Count'
+                                            )
+                                    ->where('shp_date', '>=', now()->toDateString())
+                                    ->where('assignee_id', '=', $request->user()->id)
+                                    ->get();
 
 
              return inertia('Orders/Assemble',['orders'=>$orders]);
@@ -46,19 +50,15 @@ class AssemblyController extends Controller
     {
 
         $orderLines = Line::query()
-                            ->where('order_no', $request->order_no)
+                          ->select('item_no','item_description','order_qty','orders.order_no','barcode','qty_base','orders.shp_name','orders.sp_code as sp_search_name')
+                          ->join('orders','orders.order_no','lines.order_no')
+                            ->where('lines.order_no', $request->order_no)
                             ->where('part', $request->part_no)
-                            ->withSum('prepacks', 'total_quantity')
-                            ->with('order','assemblies')
                             ->orderBy('item_description')
-                            ->paginate(300)
-                            ->appends($request->all())
-                            ->withQueryString();
+                            ->get();
 
-        return inertia('Assembly/PartPackLines', [
-                            'orderLines' =>LineResource::collection($orderLines),
-                            'previousInput' => $request->all(),
-                        ]);
+
+        return inertia('Assembly/PartPackLines', compact('orderLines'));
     }
 
 

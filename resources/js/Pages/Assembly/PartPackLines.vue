@@ -29,20 +29,20 @@ onMounted(() => {
     //populate assembled
     //for each line, get the last assembly push that into the assembled array
 
-    if (props.orderLines.data.length>0)
+    if (props.orderLines.length>0)
 
   {
-   for (var i = props.orderLines.data.length - 1; i >= 0; i--)
+   for (var i = props.orderLines.length - 1; i >= 0; i--)
    {
 
 
 
 
-    for (var j = props.orderLines.data[i].assemblies.length - 1; j >= 0; j--)
+    for (var j = props.orderLines[i].assemblies.length - 1; j >= 0; j--)
     {
      const result = searchByMultipleKeyValues([
-                                                  ['line_no', props.orderLines.data[i].assemblies[j].line_no],
-                                                  ['order_no', props.orderLines.data[i].assemblies[j].order_no]
+                                                  ['line_no', props.orderLines[i].assemblies[j].line_no],
+                                                  ['order_no', props.orderLines[i].assemblies[j].order_no]
 
                                                 ]);
 
@@ -60,8 +60,8 @@ onMounted(() => {
                                    'barcode':result.barcode,
                                     'order_no':result.order_no,
                                     'line_no':result.line_no,
-                                     'from_batch':props.orderLines.data[i].assemblies[j].from_batch,
-                                     'to_batch':props.orderLines.data[i].assemblies[j].to_batch,
+                                     'from_batch':props.orderLines[i].assemblies[j].from_batch,
+                                     'to_batch':props.orderLines[i].assemblies[j].to_batch,
 
                             });
 
@@ -102,7 +102,7 @@ let showModal=ref(false);
 let closeModal=ref(true);
 const isActive = ref(false);
 
-const extractedData = ref(Object.entries(props.orderLines.data).map(([key, value]) => {
+const extractedData = ref(Object.entries(props.orderLines).map(([key, value]) => {
 
     return {
 
@@ -433,9 +433,16 @@ onUnmounted(() => {
                                                       <!--  <button @click="startTimer" :disabled="isRunning">Start</button>
                                                         <button @click="stopTimer" :disabled="!isRunning">Stop</button>
                                                         <button @click="resetTimer" :disabled="!isRunning && currentTime === 0">Reset</button> -->
-                                                       <span class="p-2 font-bold tracking-wide text-yellow-500 bg-gray-600 rounded">{{orderLines.data[0].order.shp_name}} </span>
+<!-- </div>
+       <div v-for="assignment in assignments.data" :key="assignment.id">
+          <AssignmentCard :assignment="assignment" @click="showContents(assignment.id)" class="shadow-md hover:shadow-lg hover:cursor-pointer hover:shadow-orange-400" />
+       </div>
 
-                                                       <span class="p-2 font-bold tracking-wide text-yellow-500 bg-gray-600 rounded">{{orderLines.data[0].order.sp_search_name}} </span>
+</div> -->
+
+                                                                          <span class="p-2 font-bold tracking-wide text-yellow-500 bg-gray-600 rounded">{{orderLines[0].shp_name}} </span>
+
+                                                       <span class="p-2 font-bold tracking-wide text-yellow-500 bg-gray-600 rounded">{{orderLines[0].sp_search_name}} </span>
 
                                                   </div>
                                     </div>
@@ -462,9 +469,9 @@ onUnmounted(() => {
                                             <div class="w-full m-2 text-center">
 
 
-                                               {{assembledArray.length }} / {{ orderLines.data.length }}
+                                               {{assembledArray.length }} / {{ orderLines.length }}
 
-                                               <ProgressBar :value="Math.round((assembledArray.length)/(orderLines.data.length)*100)" />
+                                               <ProgressBar :value="Math.round((assembledArray.length)/(orderLines.length)*100)" />
 
                                             </div>
 
@@ -480,7 +487,7 @@ onUnmounted(() => {
                                                             <tr
                                                               @click="newItem=line.item_no"
 
-                                                              v-for="line in orderLines.data" :key="line.item_description"
+                                                              v-for="line in orderLines" :key="line.item_description"
 
                                                                 class="bg-white border-b dark:bg-gray-900 dark:border-gray-700 hover:bg-slate-400 hover:text-white ">
                                                                 <div v-if="!ItemInAssembledArray(line.item_no)" class="flex justify-between">

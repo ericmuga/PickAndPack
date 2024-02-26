@@ -14,9 +14,48 @@ import Swal from 'sweetalert2'
 import SearchBox from '@/Components/SearchBox.vue'
 
 const search=ref()
-watch(search, debounce(()=>{Inertia.post('/order/all',{search:search.value}, {preserveScroll: true})}, 500));
 
-const prop=defineProps({
+const ordersArray=ref(props.orders);
+
+watch(search, debounce(()=>{
+
+  if (search.value!='')
+  {
+        ordersArray.value=ordersArray.value.filter(item=>item.order_no.endsWith(search.value))
+    } else {
+        ordersArray.value = props.orders;
+    }
+}, 500));
+
+
+onMounted(()=>{
+    //ordersArray with only unfulfilled orders
+    for (let j = 0; j < props.orders.length; j++) {
+            if (  (
+                    parseInt(props.orders[j].A_Assignment_Count)+
+                    parseInt(props.orders[j].B_Assignment_Count)+
+                    parseInt(props.orders[j].C_Assignment_Count)+
+                    parseInt(props.orders[j].D_Assignment_Count)
+
+                )
+                    <
+                (
+                    parseInt(props.orders[j].A_Assembly_Count)+
+                    parseInt(props.orders[j].B_Assembly_Count)+
+                    parseInt(props.orders[j].C_Assembly_Count)+
+                    parseInt(props.orders[j].D_Assembly_Count)
+
+                )
+                )
+
+                    {
+
+                        ordersArray.value.push(props.orders[j])
+                    }
+
+         };
+        });
+const props=defineProps({
     orders:Object})
     const inputField=ref(null);
 
@@ -29,7 +68,13 @@ debounce( ()=>{Inertia.get(route('assembly.index'),{'search':newItem.value})})
 ,500);
 
 
-const confirmPack=(order_no,part)=>{ Inertia.get(route('assemble.order',{'order_no':order_no,'part_no':part}))}
+const confirmPack=(order_no,part)=>{
+
+
+    Inertia.get(route('assemble.order',{'order_no':order_no,'part_no':part}))
+
+
+    }
 </script>
 
 
@@ -57,7 +102,7 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('assemble.order',{'order_
                                 <template #center>
                                     <div>
                                         <!-- <Pagination :links="orderLines.meta.links" /> -->
-                                        <input type="text" v-model="newItem"  ref="inputField" placeholder="Search Order" class="m-2 text-center rounded-lg bg-slate-300 text-md">
+                                        <input type="text" v-model="search"  ref="inputField" placeholder="Search Order" class="m-2 text-center rounded-lg bg-slate-300 text-md">
 
                                         <!-- <SearchBox :model="route('order.pack')" /> -->
                                     <div>
@@ -99,23 +144,23 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('assemble.order',{'order_
             </th>
 
             <th scope="col" class="px-2 py-2 text-center">
-                Part A Items
+                A
             </th>
             <th scope="col" class="px-2 py-2 text-center">
-                Part B Items
+                B
             </th>
             <th scope="col" class="px-2 py-2 text-center">
-                Part C Items
+                C
             </th>
             <th scope="col" class="px-2 py-2 text-center">
-                Part D Items
+                D
             </th>
 
 
         </tr>
     </thead>
     <tbody>
-        <tr v-for="order in orders.data" :key="order.order_no"
+        <tr v-for="order in ordersArray" :key="order.order_no"
         class="font-semibold text-black bg-white hover:bg-gray-300">
 
         <td class="px-2 py-2 text-xs break-all">
@@ -133,13 +178,13 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('assemble.order',{'order_
         </td>
 
 
-        <td class="p-1 px-2 py-2 text-xs text-center " v-if="order.part_a!=0">
+        <td class="p-1 px-2 py-2 text-xs text-center " v-if="order.A_Assignment_Count!=0">
 
             <Button
-               v-show="order.assigned_a"
-               :icon="order.assembled_a?'pi pi-check':'pi pi-cart-plus'"
-               :severity="order.assembled_a?'success':'warning'"
-               :disabled="order.assembled_a"
+               v-show="order.A_Assignment_Count>0"
+               :icon="order.A_Assignment_Count>=A_Assembly_Count?'pi pi-check':'pi pi-cart-plus'"
+               :severity="order.A_Assembly_Count>0?'success':'warning'"
+               :disabled="order.A_Assembly_Count>0"
                rounded
                :label="pack"
                @click="confirmPack(order.order_no,'A')"
@@ -149,12 +194,13 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('assemble.order',{'order_
         <td v-else  class="bg-slat-200">
 
         </td>
-        <td class="p-1 px-2 py-2 text-xs text-center " v-if="order.part_b!=0">
+       <td class="p-1 px-2 py-2 text-xs text-center " v-if="order.B_Assignment_Count!=0">
+
             <Button
-               v-show="order.assigned_b"
-               :icon="order.assembled_b?'pi pi-check':'pi pi-cart-plus'"
-               :severity="order.assembled_b?'success':'warning'"
-               :disabled="order.assembled_b"
+               v-show="order.B_Assignment_Count>0"
+               :icon="order.B_Assignment_Count>=B_Assembly_Count?'pi pi-check':'pi pi-cart-plus'"
+               :severity="order.B_Assembly_Count>0?'success':'warning'"
+               :disabled="order.B_Assembly_Count>0"
                rounded
                :label="pack"
                @click="confirmPack(order.order_no,'B')"
@@ -164,12 +210,13 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('assemble.order',{'order_
         <td v-else  class="bg-slat-200">
 
         </td>
-        <td class="p-1 px-2 py-2 text-xs text-center " v-if="order.part_c!=0">
+       <td class="p-1 px-2 py-2 text-xs text-center " v-if="order.C_Assignment_Count!=0">
+
             <Button
-               v-show="order.assigned_c"
-               :icon="order.assembled_c?'pi pi-check':'pi pi-cart-plus'"
-               :severity="order.assembled_c?'success':'warning'"
-               :disabled="order.assembled_c"
+               v-show="order.C_Assignment_Count>0"
+               :icon="order.C_Assignment_Count>=C_Assembly_Count?'pi pi-check':'pi pi-cart-plus'"
+               :severity="order.C_Assembly_Count>0?'success':'warning'"
+               :disabled="order.C_Assembly_Count>0"
                rounded
                :label="pack"
                @click="confirmPack(order.order_no,'C')"
@@ -179,12 +226,13 @@ const confirmPack=(order_no,part)=>{ Inertia.get(route('assemble.order',{'order_
         <td v-else  class="bg-slat-200">
 
         </td>
-        <td class="p-1 px-2 py-2 text-xs text-center " v-if="order.part_d!=0">
-           <Button
-               v-show="order.assigned_d"
-               :icon="order.assembled_d?'pi pi-check':'pi pi-cart-plus'"
-               :severity="order.assembled_d?'success':'warning'"
-               :disabled="order.assembled_d"
+        <td class="p-1 px-2 py-2 text-xs text-center " v-if="order.D_Assignment_Count!=0">
+
+            <Button
+               v-show="order.D_Assignment_Count>0"
+               :icon="order.D_Assignment_Count>=D_Assembly_Count?'pi pi-check':'pi pi-cart-plus'"
+               :severity="order.D_Assembly_Count>0?'success':'warning'"
+               :disabled="order.D_Assembly_Count>0"
                rounded
                :label="pack"
                @click="confirmPack(order.order_no,'D')"
