@@ -23,16 +23,16 @@ const props=defineProps({
      ordersArray.value=ref(props.orders);
 });
 const ordersArray=ref(props.orders);
-watch(search, debounce(()=>{
+// watch(search, debounce(()=>{
 
-  if (ordersArray.value.length>0)
-    if (search.value!='')
-  {
-        ordersArray.value=ordersArray.value.filter(item=>item.order_no.endsWith(search.value))
-    } else {
-        ordersArray.value = props.orders;
-    }
-}, 500));
+//   if (ordersArray.value.length>0)
+//     if (search.value!='')
+//   {
+//         ordersArray.value=ordersArray.value.filter(item=>item.order_no.endsWith(search.value))
+//     } else {
+//         ordersArray.value = props.orders;
+//     }
+// }, 500));
 
 
 onMounted(()=>{
@@ -169,7 +169,7 @@ const confirmPack=(order_no,part)=>{
         class="font-semibold text-black bg-white hover:bg-gray-300">
 
         <td class="px-2 py-2 text-xs break-all">
-            {{ order.order_no }}
+            <!-- {{ order.order_no }} -->
         </td>
         <td class="flex flex-col px-2 py-2 text-xs text-center ">
             <span class="text-xs font-bold">{{order.sp_code}}</span>
