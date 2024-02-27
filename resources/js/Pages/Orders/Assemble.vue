@@ -5,8 +5,8 @@ import { Head } from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
 import debounce from 'lodash/debounce';
 import {watch, ref,onMounted} from 'vue';
-import Swal from 'sweetalert2'
-import SearchBox from '@/Components/SearchBox.vue'
+// import Swal from 'sweetalert2'
+// import SearchBox from '@/Components/SearchBox.vue'
 import { Inertia } from '@inertiajs/inertia';
 // import Intertia from
 
@@ -23,16 +23,16 @@ const props=defineProps({
      ordersArray.value=ref(props.orders);
 });
 const ordersArray=ref(props.orders);
-// watch(search, debounce(()=>{
+watch(search, debounce(()=>{
 
-//   if (ordersArray.value.length>0)
-//     if (search.value!='')
-//   {
-//         ordersArray.value=ordersArray.value.filter(item=>item.order_no.endsWith(search.value))
-//     } else {
-//         ordersArray.value = props.orders;
-//     }
-// }, 500));
+  if (ordersArray.value.length>0)
+    if (search.value!='')
+  {
+        ordersArray.value=ordersArray.value.filter(item=>item.order_no.endsWith(search.value))
+    } else {
+        ordersArray.value = props.orders;
+    }
+}, 500));
 
 
 onMounted(()=>{
