@@ -29,52 +29,52 @@ onMounted(() => {
     //populate assembled
     //for each line, get the last assembly push that into the assembled array
 
-    if (props.orderLines.length>0)
+//     if (props.orderLines.length>0)
 
-  {
-   for (var i = props.orderLines.length - 1; i >= 0; i--)
-   {
-
-
-
-
-    for (var j = props.orderLines[i].assemblies.length - 1; j >= 0; j--)
-    {
-     const result = searchByMultipleKeyValues([
-                                                  ['line_no', props.orderLines[i].assemblies[j].line_no],
-                                                  ['order_no', props.orderLines[i].assemblies[j].order_no]
-
-                                                ]);
+//   {
+//    for (var i = props.orderLines.length - 1; i >= 0; i--)
+//    {
 
 
 
-      if (result.value!=0)
-      {
-        assembledArray.value.push({
-                                   'item_no':result.item_no,
-                                   'assembled_qty':result.assembled_qty,
-                                    'assembled_pcs':result.assembled_pcs,
-                                    'order_qty':result.order_qty,
-                                   'prepacks_total_quantity':result.prepacks_total_quantity,
-                                   'item_description':result.item_description,
-                                   'barcode':result.barcode,
-                                    'order_no':result.order_no,
-                                    'line_no':result.line_no,
-                                     'from_batch':props.orderLines[i].assemblies[j].from_batch,
-                                     'to_batch':props.orderLines[i].assemblies[j].to_batch,
 
-                            });
+//     for (var j = props.orderLines[i].assemblies.length - 1; j >= 0; j--)
+//     {
+//      const result = searchByMultipleKeyValues([
+//                                                   ['line_no', props.orderLines[i].assemblies[j].line_no],
+//                                                   ['order_no', props.orderLines[i].assemblies[j].order_no]
+
+//                                                 ]);
 
 
 
-      };
+//       if (result.value!=0)
+//       {
+//         assembledArray.value.push({
+//                                    'item_no':result.item_no,
+//                                    'assembled_qty':result.assembled_qty,
+//                                     'assembled_pcs':result.assembled_pcs,
+//                                     'order_qty':result.order_qty,
+//                                    'prepacks_total_quantity':result.prepacks_total_quantity,
+//                                    'item_description':result.item_description,
+//                                    'barcode':result.barcode,
+//                                     'order_no':result.order_no,
+//                                     'line_no':result.line_no,
+//                                      'from_batch':props.orderLines[i].assemblies[j].from_batch,
+//                                      'to_batch':props.orderLines[i].assemblies[j].to_batch,
+
+//                             });
 
 
-    };
 
-};
+//       };
 
-};
+
+//     };
+
+// };
+
+// };
 
 
 //     setInterval(() => {
@@ -108,12 +108,12 @@ const extractedData = ref(Object.entries(props.orderLines).map(([key, value]) =>
 
         'order_qty': value.order_qty ,// Use the value with ref/ Extract 'age' key as value with ref
         'qty_base': value.qty_base ,// Use the value with ref/ Extract 'age' key as value with ref
-        'prepacks_total_quantity': value.prepacks_total_quantity ,// Use the value with ref/ Extract 'age' key as value with ref
+        // 'prepacks_total_quantity': value.prepacks_total_quantity ,// Use the value with ref/ Extract 'age' key as value with ref
         'barcode':value.barcode,
         'item_no':value.item_no,
         'item_description':value.item_description,
         'order_no':value.order_no,
-        'line_no':value.line_no
+        // 'line_no':value.line_no
 
     };
 }));
@@ -137,16 +137,16 @@ watch( newItem,
                        searchResult.value= searchByBarcodeOrItemNo((newItem.value.toUpperCase()).trim())
                        if (searchResult.value!=0)
                         {
-
-                            if (parseFloat(searchResult.value.order_qty)>parseFloat(searchResult.value.prepacks_total_quantity))
-                            {
+                            //  alert('hey')
+                            //if (parseFloat(searchResult.value.order_qty)>parseFloat(searchResult.value.prepacks_total_quantity))
+                            //{
                                 showModal.value=true
                                 updateScannedItem(searchResult.value)
 
 
 
-                            }
-                            else scanError.value=`Maximum limit ${searchResult.value.order_qty} reached.`;
+//                            }
+  //                          else scanError.value=`Maximum limit ${searchResult.value.order_qty} reached.`;
 
                         }
                         else scanError.value=`Item Not found!`;
@@ -201,21 +201,21 @@ const submitForm=()=>{
    //push item into assembled array
 
 
-     if ((form2.order_qty-form2.prepacks_total_quantity)!=form.assembled_qty)
-     {
-           Swal.fire({
-                                        title: 'The assembled qty is lower/higher than expected',
-                                        text: "Are you sure you want to assemble non default qty?",
-                                        icon: 'warning',
-                                        showCancelButton: true,
-                                        confirmButtonColor: '#3085d6',
-                                        cancelButtonColor: '#d33',
-                                        confirmButtonText: 'Ok'
-                                        }).then((result) => {
-                                            if (!result.isConfirmed) {return }
-                        });
+    //  if ((form2.order_qty-form2.prepacks_total_quantity)!=form.assembled_qty)
+    //  {
+    //        Swal.fire({
+    //                                     title: 'The assembled qty is lower/higher than expected',
+    //                                     text: "Are you sure you want to assemble non default qty?",
+    //                                     icon: 'warning',
+    //                                     showCancelButton: true,
+    //                                     confirmButtonColor: '#3085d6',
+    //                                     cancelButtonColor: '#d33',
+    //                                     confirmButtonText: 'Ok'
+    //                                     }).then((result) => {
+    //                                         if (!result.isConfirmed) {return }
+    //                     });
 
-     }
+    //  }
 
 
     const existingItemIndex = assembledArray.value.findIndex(item => item.item_no === form.item_no);
@@ -239,12 +239,14 @@ const submitForm=()=>{
                                    'assembled_qty':form.assembled_qty,
                                    'assembled_pcs':form.assembled_pcs,
                                    'order_qty':form.order_qty,
-                                   'prepacks_total_quantity':form.prepacks_total_quantity,
+                                   'prepacks_total_quantity':0,
+                                //    'prepacks_total_quantity':form.prepacks_total_quantity,
                                    'item_description':form.item_description,
                                    'barcode':form.barcode,
                                     'item_no':form.item_no,
                                     'order_no':form.order_no,
-                                    'line_no':form.line_no,
+                                    // 'line_no':form.line_no,
+                                    'line_no':0,
                                     'from_batch':form.from_batch,
                                     'to_batch':form.to_batch
 
