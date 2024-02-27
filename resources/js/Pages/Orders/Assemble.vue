@@ -10,9 +10,9 @@ import SearchBox from '@/Components/SearchBox.vue'
 import { Inertia } from '@inertiajs/inertia';
 // import Intertia from
 
-const search=ref()
+const search=ref('')
 
-const ordersArray=ref(props.orders);
+
 
 const props=defineProps({
     orders:Object})
@@ -22,16 +22,16 @@ const props=defineProps({
      inputField.value.focus();
      ordersArray.value=ref(props.orders);
 });
+const ordersArray=ref(props.orders);
+watch(search, debounce(()=>{
 
-// watch(search, debounce(()=>{
-
-//   if (search.value!='')
-//   {
-//         ordersArray.value=ordersArray.value.filter(item=>item.order_no.endsWith(search.value))
-//     } else {
-//         ordersArray.value = props.orders;
-//     }
-// }, 500));
+  if (search.value!='')
+  {
+        ordersArray.value=ordersArray.value.filter(item=>item.order_no.endsWith(search.value))
+    } else {
+        ordersArray.value = props.orders;
+    }
+}, 500));
 
 
 onMounted(()=>{
@@ -102,7 +102,11 @@ const confirmPack=(order_no,part)=>{
                                 <template #center>
                                     <div>
                                         <!-- <Pagination :links="orderLines.meta.links" /> -->
-                                        <!-- <input type="text" v-model="search"  ref="inputField" placeholder="Search Order" class="m-2 text-center rounded-lg bg-slate-300 text-md"> -->
+                                        <input  type="text" v-model="search"
+                                                ref="inputField"
+                                                placeholder="Search Order"
+                                                class="m-2 text-center rounded-lg bg-slate-300 text-md"
+                                        >
 
                                         <!-- <SearchBox :model="route('order.pack')" /> -->
                                     <div>
