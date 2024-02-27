@@ -11,12 +11,12 @@ import { Inertia } from '@inertiajs/inertia';
 // import Intertia from
 
 const search=ref('')
-
+const inputField=ref(null);
 
 
 const props=defineProps({
     orders:Object})
-    const inputField=ref(null);
+
 
     onMounted(() => {
      inputField.value.focus();
@@ -25,7 +25,8 @@ const props=defineProps({
 const ordersArray=ref(props.orders);
 watch(search, debounce(()=>{
 
-  if (search.value!='')
+  if (ordersArray.value.length>0)
+    if (search.value!='')
   {
         ordersArray.value=ordersArray.value.filter(item=>item.order_no.endsWith(search.value))
     } else {
