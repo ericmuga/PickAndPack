@@ -49,14 +49,24 @@ class AssemblyController extends Controller
     public function assembleOrder(Request $request)
     {
 
+       //cre
         $orderLines = Line::query()
-                          ->select('item_no','item_description','order_qty','orders.order_no','barcode','qty_base','orders.shp_name','orders.sp_code as sp_search_name')
-                          ->join('orders','orders.order_no','lines.order_no')
+                            ->select('item_no',
+                                    'item_description',
+                                    'line_no',
+                                    'order_qty',
+                                    'orders.order_no',
+                                    'barcode',
+                                    'qty_base',
+                                    'shp_name',
+                                    DB::raw("CONCAT(orders.sp_code, orders.sp_name) AS sp_search_name"))
+                            ->join('orders', 'orders.order_no', '=', 'lines.order_no')
+                            ->with('assemblies')
                             ->where('lines.order_no', $request->order_no)
                             ->where('part', $request->part_no)
                             ->orderBy('item_description')
                             ->get();
-
+                            // dd($orderLines);
 
         return inertia('Assembly/PartPackLines', compact('orderLines'));
     }

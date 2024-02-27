@@ -442,7 +442,7 @@ onUnmounted(() => {
 
 </div> -->
 
-                                                                          <span class="p-2 font-bold tracking-wide text-yellow-500 bg-gray-600 rounded">{{orderLines[0].shp_name}} </span>
+                                                                          <!-- <span class="p-2 font-bold tracking-wide text-yellow-500 bg-gray-600 rounded">{{orderLines[0].shp_name}} </span> -->
 
                                                        <span class="p-2 font-bold tracking-wide text-yellow-500 bg-gray-600 rounded">{{orderLines[0].sp_search_name}} </span>
 
