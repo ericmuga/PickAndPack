@@ -92,7 +92,7 @@ class PackingSessionController extends Controller
 
 
          $checker_id=$request->session()->get('checker_id')?:null;
-        return inertia('PackingSession/List',compact('rows','checkers','orders','todaysPackedTonnage','packingTime','roles','checker_id'));
+        return inertia('PackingSession/List',compact('rows','checkers','orders','packingTime','roles','checker_id'));
 
     }
 

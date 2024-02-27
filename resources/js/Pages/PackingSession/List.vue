@@ -154,19 +154,19 @@ const showUpdateModal=(session)=>{
 
     <AuthenticatedLayout @add="showModal=true">
         <template #header>
-            <div class="flex items-center justify-center gap-4 text-xl font-semibold leading-tight text-center text-indigo-400 place-items-center">
+            <!-- <div class="flex items-center justify-center gap-4 text-xl font-semibold leading-tight text-center text-indigo-400 place-items-center">
                <h2>
                  {{!adminOrSupervisor?'My':''}} Packing Sessions
                </h2>
 
-            </div>
-            <div class="flex flex-row justify-center w-full mt-3 text-center ">
+            </div> -->
+ <div class="flex flex-row justify-center w-full mt-3 text-center ">
     <!-- Sales Today Card -->
     <div class="flex flex-col justify-center p-4 mx-2 bg-red-300 rounded-md shadow-md my-">
       <div class="">
-        <h2 class="mb-2 text-xl font-semibold">{{!adminOrSupervisor?'My':''}} Packing Today</h2>
+        <!-- <h2 class="mb-2 text-xl font-semibold">{{!adminOrSupervisor?'My':''}} Packing Today</h2> -->
         <!-- Your sales today data goes here -->
-        <div class="text-3xl font-bold">{{ todaysPackedTonnage.toFixed(2) }}T</div>
+        <!-- <div class="text-3xl font-bold">{{ todaysPackedTonnage.toFixed(2) }}T</div> -->
         <div>
 
         </div>
@@ -177,9 +177,9 @@ const showUpdateModal=(session)=>{
     </div>
     <div class="flex flex-col justify-between max-h-screen p-4 mx-2 bg-teal-300 rounded-md shadow-md">
       <div>
-        <h2 class="mb-2 text-xl font-semibold">{{!adminOrSupervisor?'My':''}} Packing Time</h2>
+        <!-- <h2 class="mb-2 text-xl font-semibold">{{!adminOrSupervisor?'My':''}} Packing Time</h2> -->
         <!-- Your sales today data goes here -->
-        <div class="text-3xl font-bold">{{ packingTime }} Mins</div>
+        <!-- <div class="text-3xl font-bold">{{ packingTime }} Mins</div> -->
         <div>
 
         </div>

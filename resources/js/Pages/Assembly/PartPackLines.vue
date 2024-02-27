@@ -29,52 +29,52 @@ onMounted(() => {
     //populate assembled
     //for each line, get the last assembly push that into the assembled array
 
-//     if (props.orderLines.length>0)
+    if (props.orderLines.length>0)
 
-//   {
-//    for (var i = props.orderLines.length - 1; i >= 0; i--)
-//    {
-
-
-
-
-//     for (var j = props.orderLines[i].assemblies.length - 1; j >= 0; j--)
-//     {
-//      const result = searchByMultipleKeyValues([
-//                                                   ['line_no', props.orderLines[i].assemblies[j].line_no],
-//                                                   ['order_no', props.orderLines[i].assemblies[j].order_no]
-
-//                                                 ]);
+  {
+   for (var i = props.orderLines.length - 1; i >= 0; i--)
+   {
 
 
 
-//       if (result.value!=0)
-//       {
-//         assembledArray.value.push({
-//                                    'item_no':result.item_no,
-//                                    'assembled_qty':result.assembled_qty,
-//                                     'assembled_pcs':result.assembled_pcs,
-//                                     'order_qty':result.order_qty,
-//                                    'prepacks_total_quantity':result.prepacks_total_quantity,
-//                                    'item_description':result.item_description,
-//                                    'barcode':result.barcode,
-//                                     'order_no':result.order_no,
-//                                     'line_no':result.line_no,
-//                                      'from_batch':props.orderLines[i].assemblies[j].from_batch,
-//                                      'to_batch':props.orderLines[i].assemblies[j].to_batch,
 
-//                             });
+    for (var j = props.orderLines[i].assemblies.length - 1; j >= 0; j--)
+    {
+     const result = searchByMultipleKeyValues([
+                                                  ['line_no', props.orderLines[i].assemblies[j].line_no],
+                                                  ['order_no', props.orderLines[i].assemblies[j].order_no]
+
+                                                ]);
 
 
 
-//       };
+      if (result.value!=0)
+      {
+        assembledArray.value.push({
+                                   'item_no':result.item_no,
+                                   'assembled_qty':result.assembled_qty,
+                                    'assembled_pcs':result.assembled_pcs,
+                                    'order_qty':result.order_qty,
+                                //    'prepacks_total_quantity':result.prepacks_total_quantity,
+                                   'item_description':result.item_description,
+                                   'barcode':result.barcode,
+                                    'order_no':result.order_no,
+                                    'line_no':result.line_no,
+                                     'from_batch':props.orderLines[i].assemblies[j].from_batch,
+                                     'to_batch':props.orderLines[i].assemblies[j].to_batch,
+
+                            });
 
 
-//     };
 
-// };
+      };
 
-// };
+
+    };
+
+};
+
+};
 
 
 //     setInterval(() => {
@@ -113,7 +113,7 @@ const extractedData = ref(Object.entries(props.orderLines).map(([key, value]) =>
         'item_no':value.item_no,
         'item_description':value.item_description,
         'order_no':value.order_no,
-        // 'line_no':value.line_no
+        'line_no':value.line_no
 
     };
 }));
@@ -246,8 +246,8 @@ const submitForm=()=>{
                                    'barcode':form.barcode,
                                     'item_no':form.item_no,
                                     'order_no':form.order_no,
-                                    // 'line_no':form.line_no,
-                                    'line_no':0,
+                                    'line_no':form.line_no,
+                                    // 'line_no':,
                                     'from_batch':form.from_batch,
                                     'to_batch':form.to_batch
 
@@ -327,7 +327,7 @@ const closeAssembly = () => {
                 route('assembly.store'),
                 {
                     'data': assembledArray.value,
-                    'part':orderLines[0].part,
+                    'part':props.orderLines[0].part,
                     'autosave': false,
                     'assembly_time': formatTime.value,
                 },
