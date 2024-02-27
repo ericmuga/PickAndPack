@@ -164,9 +164,9 @@ const confirmPack=(order_no,part)=>{
 
         </tr>
     </thead>
-    <tbody v-if="ordersArray.length>0">
+    <tbody v-if="ordersArray.value.length>0">
 
-        <tr v-for="order in ordersArray" :key="order.order_no"
+        <tr v-for="order in ordersArray.value" :key="order.order_no"
         class="font-semibold text-black bg-white hover:bg-gray-300">
 
         <td class="px-2 py-2 text-xs break-all">
