@@ -18,11 +18,31 @@ const props=defineProps({
     orders:Object})
 
 
-    onMounted(() => {
-     inputField.value.focus();
-     ordersArray.value=ref(props.orders);
+
+const ordersArray=ref([]);
+
+
+
+
+onMounted(()=>{
+    inputField.value.focus();
+
+    const filteredOrders = props.orders.filter(order => {
+    const assignmentCount = parseInt(order.A_Assignment_Count) +
+                           parseInt(order.B_Assignment_Count) +
+                           parseInt(order.C_Assignment_Count) +
+                           parseInt(order.D_Assignment_Count);
+
+    const assemblyCount = parseInt(order.A_Assembly_Count) +
+                         parseInt(order.B_Assembly_Count) +
+                         parseInt(order.C_Assembly_Count) +
+                         parseInt(order.D_Assembly_Count);
+
+    return assignmentCount < assemblyCount;
 });
-const ordersArray=ref(props.orders);
+
+ordersArray.value.push(...filteredOrders);
+        });
 watch(search, debounce(()=>{
 
   if (ordersArray.value.length>0)
@@ -34,39 +54,6 @@ watch(search, debounce(()=>{
     }
 }, 500));
 
-
-onMounted(()=>{
-    //ordersArray with only unfulfilled orders
-    for (let j = 0; j < props.orders.length; j++) {
-            if (  (
-                    parseInt(props.orders[j].A_Assignment_Count)+
-                    parseInt(props.orders[j].B_Assignment_Count)+
-                    parseInt(props.orders[j].C_Assignment_Count)+
-                    parseInt(props.orders[j].D_Assignment_Count)
-
-                )
-                    <
-                (
-                    parseInt(props.orders[j].A_Assembly_Count)+
-                    parseInt(props.orders[j].B_Assembly_Count)+
-                    parseInt(props.orders[j].C_Assembly_Count)+
-                    parseInt(props.orders[j].D_Assembly_Count)
-
-                )
-                )
-
-                    {
-
-                        ordersArray.value.push(props.orders[j])
-                    }
-
-         };
-        });
-
-// let newItem=ref('');
-// watch( newItem,
-// debounce( ()=>{Inertia.get(route('assembly.index'),{'search':newItem.value})})
-// ,500);
 
 
 const confirmPack=(order_no,part)=>{
@@ -164,9 +151,9 @@ const confirmPack=(order_no,part)=>{
 
         </tr>
     </thead>
-    <tbody v-if="ordersArray.value.length>0">
+    <tbody v-if="ordersArray.length>0">
 
-        <tr v-for="order in ordersArray.value" :key="order.order_no"
+        <tr v-for="order in orders" :key="order.order_no"
         class="font-semibold text-black bg-white hover:bg-gray-300">
 
         <td class="px-2 py-2 text-xs break-all">
@@ -222,7 +209,7 @@ const confirmPack=(order_no,part)=>{
                v-show="order.C_Assignment_Count>0"
                :icon="order.C_Assignment_Count>=C_Assembly_Count?'pi pi-check':'pi pi-cart-plus'"
                :severity="order.C_Assembly_Count>0?'success':'warning'"
-               :disabled="order.C_Assembly_Count>0"
+
                rounded
                :label="pack"
                @click="confirmPack(order.order_no,'C')"
