@@ -3,19 +3,25 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
-// import Button from 'primevue/button';
-
-import { Inertia } from '@inertiajs/inertia';
 import debounce from 'lodash/debounce';
 import {watch, ref,onMounted} from 'vue';
-
 import Swal from 'sweetalert2'
-
 import SearchBox from '@/Components/SearchBox.vue'
+import { Inertia } from '@inertiajs/inertia';
+// import Intertia from
 
 const search=ref()
 
 const ordersArray=ref(props.orders);
+
+const props=defineProps({
+    orders:Object})
+    const inputField=ref(null);
+
+    onMounted(() => {
+     inputField.value.focus();
+     ordersArray.value=ref(props.orders);
+});
 
 watch(search, debounce(()=>{
 
@@ -55,13 +61,7 @@ onMounted(()=>{
 
          };
         });
-const props=defineProps({
-    orders:Object})
-    const inputField=ref(null);
 
-    onMounted(() => {
-    inputField.value.focus();
-});
 let newItem=ref('');
 watch( newItem,
 debounce( ()=>{Inertia.get(route('assembly.index'),{'search':newItem.value})})
