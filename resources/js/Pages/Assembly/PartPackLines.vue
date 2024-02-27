@@ -18,7 +18,7 @@ const scanItem=ref(null);
 
 const props= defineProps({
     orderLines:Object,
-    // pick_no:String,
+
 
 })
 
@@ -183,7 +183,7 @@ const form2=useForm({
    assembled_pcs:0,
    qty_base:0,
    item_description:'',
-  from_batch:'',
+   from_batch:'',
    to_batch:'',
    order_no:'',
    line_no:''
@@ -240,6 +240,7 @@ const submitForm=()=>{
                                    'assembled_pcs':form.assembled_pcs,
                                    'order_qty':form.order_qty,
                                    'prepacks_total_quantity':0,
+
                                 //    'prepacks_total_quantity':form.prepacks_total_quantity,
                                    'item_description':form.item_description,
                                    'barcode':form.barcode,
@@ -326,6 +327,7 @@ const closeAssembly = () => {
                 route('assembly.store'),
                 {
                     'data': assembledArray.value,
+                    'part':orderLines[0].part,
                     'autosave': false,
                     'assembly_time': formatTime.value,
                 },
@@ -442,7 +444,7 @@ onUnmounted(() => {
 
 </div> -->
 
-                                                                          <!-- <span class="p-2 font-bold tracking-wide text-yellow-500 bg-gray-600 rounded">{{orderLines[0].shp_name}} </span> -->
+                                                                          <span class="p-2 font-bold tracking-wide text-yellow-500 bg-gray-600 rounded">{{orderLines[0].shp_name}} </span>
 
                                                        <span class="p-2 font-bold tracking-wide text-yellow-500 bg-gray-600 rounded">{{orderLines[0].sp_search_name}} </span>
 

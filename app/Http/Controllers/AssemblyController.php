@@ -59,6 +59,7 @@ class AssemblyController extends Controller
                                     'barcode',
                                     'qty_base',
                                     'shp_name',
+                                    'part',
                                     DB::raw("CONCAT(orders.sp_code, orders.sp_name) AS sp_search_name"))
                             ->join('orders', 'orders.order_no', '=', 'lines.order_no')
                             ->with('assemblies')
@@ -79,18 +80,16 @@ public function store(Request $request)
    $user=Auth::user()->id;
 
 
-    $part=Line::where('order_no',$request->data[0]['order_no'])
-              ->where('line_no',$request->data[0]['line_no'])
-              ->first()->part;
+
 
     $ass_id=AssignmentLine::where('order_no',$request->data[0]['order_no'])
-                          ->where('part',$part)
+                          ->where('part',$request->part)
                           ->first()->assignment_id;
 
 
      $session=AssemblySession::updateOrCreate([
                                                     'order_no'=>$request->data[0]['order_no'],
-                                                    'part'=>$part,
+                                                    'part'=>$request->part,
                                                     'system_entry'=>$request->autosave,
                                                     ],
                                                     [
