@@ -19,7 +19,7 @@ class UserResource extends JsonResource
                 'user_name'=>$this->name,
                 'email'=>$this->email,
                 'id'=>$this->id,
-                'prepacks'=>$this->whenCounted('linePrepacks'),
+                // 'prepacks'=>$this->whenCounted('linePrepacks'),
                 'roles'=> RoleResource::collection($this->whenLoaded('roles')),
         ];
     }

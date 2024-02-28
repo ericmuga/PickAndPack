@@ -10,8 +10,9 @@ use Illuminate\Support\Facades\DB;
 use App\Services\SearchQueryService;
 // use Illuminate\Support\Facades\Auth;
 use App\Exports\PackingSessionExport;
+// use Doctrine\Common\Cache\Cache;
 use Maatwebsite\Excel\Facades\Excel;
-
+use Illuminate\Support\Facades\Cache;
 class PackingSessionController extends Controller
 {
     /**
@@ -28,72 +29,17 @@ class PackingSessionController extends Controller
 
     public function index(Request $request)
     {
-        //display the sessions
-        // dd('here');
-
-        //  $todaysPackedTonnage= PackingSession::whereDate('created_at',Carbon::today())
-        //                                     ->when((!$request->user()->hasRole('admin'))||(!$request->user()->hasRole('supervisor')),fn($q)=>$q->where('user_id',$request->user()->id))
-        //                                     ->withSum('lines','weight')->get()->sum('lines_sum_weight')/1000;
-
-         $packingStartTime=PackingSession::whereDate('created_at',Carbon::today())
-                                         ->select('created_at')
-                                         ->when((!$request->user()->hasRole('admin'))||(!$request->user()->hasRole('supervisor')),fn($q)=>$q->where('user_id',$request->user()->id))
-                                         ->orderBy('created_at')->first();
-
-        $packingEndTime=PackingSession::whereDate('created_at',Carbon::today())
-                                         ->select('updated_at')
-                                         ->when((!$request->user()->hasRole('admin'))||(!$request->user()->hasRole('supervisor')),fn($q)=>$q->where('user_id',$request->user()->id))
-                                         ->orderByDesc('updated_at')->first();
-//    dd($packingEndTime);
-        if ($packingEndTime) {
-
-
-                          $packingTime = Carbon::parse($packingEndTime->updated_at)
-                                    ->diffInMinutes(Carbon::parse($packingStartTime->created_at));
-
-                            } else {
-                                $packingTime = null; // Handle the case when no result is found
-                            }
-
-
-
-
-
-        $roles=$request->user()->roles()->get()->pluck('name');
-
-         $rows=$request->has('rows')?$request->row:5;
-         $searchParameter=$request->search?:'';
-        //  dd($searchParameter);
-
+         $roles=Cache::remember('roles',30*60,fn()=>$request->user()->roles()->get()->pluck('name'));
          $date=$request->has('date')?$request->date:Carbon::today()->toDateString();
          $nextDay=$request->has('date')?Carbon::parse($request->date)->addDay(1):Carbon::tomorrow()->toDateString();
-         $packingSessionQuery=  PackingSession::query()
-                                 ->when((!$request->user()->hasRole('admin'))||(!$request->user()->hasRole('supervisor')),fn($q)=>$q->where('user_id',$request->user()->id))
-                                 ->latest();
-         $searchService=new SearchQueryService($packingSessionQuery,$searchParameter,['order_no'],[],['order'=>['shp_name','customer_name']]);
-
-
-          ///////////////////////////////Remove this from the packing sessiion Display, put this in history
-
-
-        //  $sessions= PackingSessionResource::collection($searchService->with(['order','user','checker'])->search()->paginate($rows));
-
-         ///////////////////////////////
-
-         $checkers=UserResource::collection(User::role('checker')->orderBy('name')->get());
-
-
-
-
-
-            $orders = DB::table('pending_packing')
-                        ->where('shp_date','>=',Carbon::today()->toDateString())
-
-                        ->get();
+         $checkers=Cache::remember('checkers',30*60, fn()=>UserResource::collection(User::role('checker')->orderBy('name')->get()));
+         $orders = DB::table('pending_packing')
+                     ->where('shp_date','>=',Carbon::today()->toDateString())
+                     ->get();
 
 
          $checker_id=$request->session()->get('checker_id')?:null;
-        return inertia('PackingSession/List',compact('rows','checkers','orders','packingTime','roles','checker_id'));
+        return inertia('PackingSession/List',compact('checkers','orders','roles','checker_id'));
 
     }
 
