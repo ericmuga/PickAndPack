@@ -80,7 +80,11 @@ watch( newItem,
     // ordersArray.value.push(...filteredOrders)
     // alert('i')
     if (newItem.value!='')
-     ordersArray.value=ordersArray.value.filter(item => item.order_no.endsWith(newItem.value));
+     ordersArray.value = ordersArray.value.filter(item =>
+                                                    item.order_no.includes(newItem.value) ||
+                                                    item.shp_name.toUpperCase().includes(newItem.value.toUpperCase())
+                                                );
+
     else ordersArray.value=props.orders
  })
 
@@ -225,7 +229,9 @@ const showUpdateModal=(session)=>{
                                             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                                 <tr class="text-xs text-white bg-gray-700 ">
                                                     <th scope="col" class="py-2 text-center md:px-1">Order</th>
-                                                    <th scope="col" class="py-2 text-center md:px-1">Details</th>
+                                                    <th scope="col" class="py-2 text-center md:px-1">Ship-to</th>
+                                                    <th scope="col" class="py-2 text-center md:px-1">Saleperson</th>
+                                                    <th scope="col" class="py-2 text-center md:px-1">Shipment date</th>
                                                     <th scope="col" class="py-2 text-center md:px-4">A</th>
                                                     <th scope="col" class="py-2 text-center md:px-4">B</th>
                                                     <th scope="col" class="py-2 text-center md:px-4">C</th>
@@ -236,6 +242,8 @@ const showUpdateModal=(session)=>{
                                                 <tr v-for="order in ordersArray" :key="order.order_no" class="font-semibold text-black bg-white hover:bg-gray-300">
                                                     <td class="px-2 py-2 text-xs break-all">{{ order.order_no }}</td>
                                                     <td class="px-2 py-2 text-xs break-all">{{ order.shp_name }}</td>
+                                                    <td class="px-2 py-2 text-xs break-all">{{ order.sp_name }}</td>
+                                                    <td class="px-2 py-2 text-xs break-all">{{ order.shp_date }}</td>
                                                     <td class="p-1 px-2 py-2 text-xs text-center">
                                                         <Button v-show="order.A_Assembly_Count>0"
                                                                 icon="pi pi-gift"
