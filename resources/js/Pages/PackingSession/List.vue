@@ -31,11 +31,30 @@ const props=defineProps({
     packingTime:String,
     roles:Array,
 });
-let orderArray=ref([]);
+let ordersArray=ref([]);
 onMounted(() => {
 
     if (props.checker_id!=null) form.checker_id=props.checker_id
-    orderArray.value=props.orders;
+
+//    const filteredOrders = props.orders.filter(order => {
+//     const packingCount = parseInt(order.A_Packing_Count) +
+//                            parseInt(order.B_Packing_Count) +
+//                            parseInt(order.C_Packing_Count) +
+//                            parseInt(order.D_Packing_Count);
+
+//     const assemblyCount = parseInt(order.A_Assembly_Count) +
+//                          parseInt(order.B_Assembly_Count) +
+//                          parseInt(order.C_Assembly_Count) +
+//                          parseInt(order.D_Assembly_Count);
+
+//     return packingCount > assemblyCount;
+// });
+
+// ordersArray.value.push(...filteredOrders);
+ordersArray.value=props.orders
+
+
+
 });
 
 
@@ -44,10 +63,25 @@ let newItem=ref('');
 
 watch( newItem,
  debounce( ()=>{
+    // const filteredOrders = props.orders.filter(order => {
+    //         const packingCount = parseInt(order.A_Packing_Count) +
+    //                             parseInt(order.B_Packing_Count) +
+    //                             parseInt(order.C_Packing_Count) +
+    //                             parseInt(order.D_Packing_Count);
 
-    if (newItem.value=='') orderArray.value=props.orders
-    else
-    orderArray.value=props.orders.filter(item => item.order_part.includes(newItem.value));
+    //         const assemblyCount = parseInt(order.A_Assembly_Count) +
+    //                             parseInt(order.B_Assembly_Count) +
+    //                             parseInt(order.C_Assembly_Count) +
+    //                             parseInt(order.D_Assembly_Count);
+
+    //         return packingCount > assemblyCount;
+    //     });
+
+    // ordersArray.value.push(...filteredOrders)
+    // alert('i')
+    if (newItem.value!='')
+     ordersArray.value=ordersArray.value.filter(item => item.order_no.endsWith(newItem.value));
+    else ordersArray.value=props.orders
  })
 
 ,500);
@@ -71,14 +105,16 @@ const form= useForm({
    checker_id:'',
    order_no:'',
    part:'',
+   packing_session_id:'',
 
 })
 
 
-const selectOrderPart=(order,part)=>{
+const selectOrderPart=(order,part,session_id)=>{
 
     form.order_no=order;
     form.part=part;
+    form.packing_session_id=session_id;
     if (!props.checker_id){
         showModal.value=true;
     }
@@ -90,7 +126,7 @@ const selectOrderPart=(order,part)=>{
 
                         onSuccess:()=>{
                                         form.reset();
-                                        Swal.fire(`Session Created Successfully!`,'','success');
+                                        // Swal.fire(`Session Created Successfully!`,'','success');
                                       }
                     }
                    )
@@ -162,32 +198,7 @@ const showUpdateModal=(session)=>{
             </div> -->
  <div class="flex flex-row justify-center w-full mt-3 text-center ">
     <!-- Sales Today Card -->
-    <div class="flex flex-col justify-center p-4 mx-2 bg-red-300 rounded-md shadow-md my-">
-      <div class="">
-        <!-- <h2 class="mb-2 text-xl font-semibold">{{!adminOrSupervisor?'My':''}} Packing Today</h2> -->
-        <!-- Your sales today data goes here -->
-        <!-- <div class="text-3xl font-bold">{{ todaysPackedTonnage.toFixed(2) }}T</div> -->
-        <div>
-
-        </div>
-
-
-      </div>
-      <!-- <div class="mt-4 text-sm text-gray-500">+5% from yesterday</div> -->
-    </div>
-    <div class="flex flex-col justify-between max-h-screen p-4 mx-2 bg-teal-300 rounded-md shadow-md">
-      <div>
-        <!-- <h2 class="mb-2 text-xl font-semibold">{{!adminOrSupervisor?'My':''}} Packing Time</h2> -->
-        <!-- Your sales today data goes here -->
-        <!-- <div class="text-3xl font-bold">{{ packingTime }} Mins</div> -->
-        <div>
-
-        </div>
-
-
-      </div>
-      <!-- <div class="mt-4 text-sm text-gray-500">+5% from yesterday</div> -->
-    </div>
+    <div class="w-full font-semibold tracking-wide text-center">Packing</div>
     </div>
         </template>
 
@@ -205,103 +216,64 @@ const showUpdateModal=(session)=>{
 
                                      <input type="text" v-model="newItem"  ref="inputField" placeholder="Search Order" class="justify-center max-w-sm m-2 text-center rounded-lg bg-slate-300 ">
 
-                                     <div v-if="orderArray.length==0" class="w-full p-3 mt-2 text-center">
+                                     <div v-if="ordersArray.length==0" class="w-full p-3 mt-2 text-center">
                                                  No Orders were found.
-                                                </div>
-                                        <div class="relative overflow-x-auto shadow-md sm:rounded-lg" v-else>
-                                    <table class="w-full text-xs text-left text-gray-500 dark:text-gray-400">
-                                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-
-                                            <tr class="text-xs text-white bg-gray-700 ">
-                                                <!-- <th scope="col" class="px-2 py-2">
-                                                    Barcode
-                                                </th> -->
-
-                                                <th scope="col" class="py-2 text-center md:px-1">
-                                                   Order
-                                                </th>
-                                                <th scope="col" class="py-2 text-center md:px-1">
-                                                   Details
-                                                </th>
-                                                <th scope="col" class="py-2 text-center md:px-1">
-                                                    A
-                                                </th>
-                                                 <th scope="col" class="py-2 text-center md:px-1">
-                                                    B
-                                                </th>
-                                                 <th scope="col" class="py-2 text-center md:px-1">
-                                                    C
-                                                </th>
-                                                 <th scope="col" class="py-2 text-center md:px-1">
-                                                    D
-                                                </th>
-
-
-
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr v-for="order in orderArray" :key="order.order_no"
-                                            class="font-semibold text-black bg-white hover:bg-gray-300">
-
-                                           <td class="px-2 py-2 text-xs break-all">
-                                                {{ order.order_no }}
-                                            </td>
-
-                                            <td class="px-2 py-2 text-xs break-all">
-                                                {{ order.shp_name }}
-                                            </td>
-
-
-
-                                            <td class="p-1 px-2 py-2 text-xs text-center">
-
-                                                <Button
-                                                 v-show="order.A==1"
-                                                icon="pi pi-gift"
-                                                        severity="danger"
-                                                        rounded
-
-                                                         @click="selectOrderPart(order.order_no,'A')"
-                                                        />
-                                                </td>
-                                                <td>
-                                               <Button
-                                                 v-show="order.B==1"
-                                                icon="pi pi-gift"
-                                                        severity="danger"
-                                                        rounded
-
-                                                         @click="selectOrderPart(order.order_no,'B')"
-                                                        />
-                                                </td>
-                                                <td>
-                                                <Button
-                                                 v-show="order.C==1"
-                                                icon="pi pi-gift"
-                                                        severity="danger"
-                                                        rounded
-
-                                                         @click="selectOrderPart(order.order_no,'C')"
-                                                        />
-                                                </td>
-                                                <td>
-                                                <Button
-                                                 v-show="order.D==1"
-                                                icon="pi pi-gift"
-                                                        severity="danger"
-                                                        rounded
-
-                                                         @click="selectOrderPart(order.order_no,'D')"
-                                                        />
-                                                </td>
-
-
-                                    </tr>
-
-                                    </tbody>
-                                    </table>
+                                     </div>
+                                     <div class="relative overflow-x-auto overflow-y-auto shadow-md sm:rounded-lg"
+                                     style="height: 400px;" v-else>
+                                        <table class="w-full text-xs text-left text-gray-500 dark:text-gray-400">
+                                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                                <tr class="text-xs text-white bg-gray-700 ">
+                                                    <th scope="col" class="py-2 text-center md:px-1">Order</th>
+                                                    <th scope="col" class="py-2 text-center md:px-1">Details</th>
+                                                    <th scope="col" class="py-2 text-center md:px-4">A</th>
+                                                    <th scope="col" class="py-2 text-center md:px-4">B</th>
+                                                    <th scope="col" class="py-2 text-center md:px-4">C</th>
+                                                    <th scope="col" class="py-2 text-center md:px-4">D</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="order in ordersArray" :key="order.order_no" class="font-semibold text-black bg-white hover:bg-gray-300">
+                                                    <td class="px-2 py-2 text-xs break-all">{{ order.order_no }}</td>
+                                                    <td class="px-2 py-2 text-xs break-all">{{ order.shp_name }}</td>
+                                                    <td class="p-1 px-2 py-2 text-xs text-center">
+                                                        <Button v-show="order.A_Assembly_Count>0"
+                                                                icon="pi pi-gift"
+                                                                :severity="order.A_Packing_Count>0?'success':'danger'"
+                                                                rounded
+                                                               @click="selectOrderPart(order.order_no,'A',order.packing_session_id)"
+                                                         />
+                                                    </td>
+                                                    <td>
+                                                        <Button v-show="order.B_Assembly_Count>0"
+                                                                icon="pi pi-gift"
+                                                                :severity="order.B_Packing_Count>0?'success':'danger'"
+                                                                rounded
+                                                               @click="selectOrderPart(order.order_no,'B',order.packing_session_id)"
+                                                         />
+                                                    </td>
+                                                    <td>
+                                                         <Button v-show="order.B_Assembly_Count>0"
+                                                                icon="pi pi-gift"
+                                                                :severity="order.B_Packing_Count>0?'success':'danger'"
+                                                                rounded
+                                                               @click="selectOrderPart(order.order_no,'B',order.packing_session_id)"
+                                                         />
+                                                    </td>
+                                                    <td>
+                                                         <Button v-show="order.D_Assembly_Count>0"
+                                                                icon="pi pi-gift"
+                                                                :severity="order.D_Packing_Count>0?'success':'danger'"
+                                                                rounded
+                                                               @click="selectOrderPart(order.order_no,'D',order.packing_session_id)"
+                                                         />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
+
+
                                     </div>
                                  </template>
 

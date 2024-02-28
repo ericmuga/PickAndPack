@@ -30,6 +30,7 @@ class AssemblyController extends Controller
                                             'B_Assignment_Count',
                                             'C_Assignment_Count',
                                             'D_Assignment_Count',
+
                                             'A_Assembly_Count',
                                             'B_Assembly_Count',
                                             'C_Assembly_Count',
@@ -39,7 +40,7 @@ class AssemblyController extends Controller
                                     ->where('assignee_id', '=', $request->user()->id)
                                     ->get();
 
-
+    //    dd($orders);
              return inertia('Orders/Assemble',['orders'=>$orders]);
 
       }

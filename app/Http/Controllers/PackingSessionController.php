@@ -88,6 +88,7 @@ class PackingSessionController extends Controller
 
             $orders = DB::table('pending_packing')
                         ->where('shp_date','>=',Carbon::today()->toDateString())
+
                         ->get();
 
 
@@ -99,41 +100,23 @@ class PackingSessionController extends Controller
 
     public function store(Request $request)
     {
-
-        if(Line::where('order_no',$request->order_no)
-               ->where('part',$request->part)
-               ->whereHas('order',fn($q)=>$q->whereHas('assembly_lines'))
-               ->exists()
-          )
-          {
-                if(!PackingSession::where('order_no',$request->order_no)
-                    ->where('part',$request->part)
-                    ->exists()
-                    )
-                    {
-                        $session=PackingSession::create(array_merge($request->all(),['user_id'=>$request->user()->id,
-                                                                            'packing_time'=>Carbon::createFromTime(0, 0, 0)
-                                                                        ]
-                                                        )
-                                            );
-
-                        //save checker in session
-                        if(!$request->session()->has('checker_id'))
-                          {
-                            if ($request->has('checker_id'))
-                            $request->session()->put('checker_id', $request->checker_id);
-                          }
-
-
-                        return redirect(route('packingSession.show',$session->id));
-                    }
-                    else{
-                        //order doesn't have that part
-                    }
+          if(!$request->session()->has('checker_id'))
+            {
+                if ($request->has('checker_id'))
+                $request->session()->put('checker_id', $request->checker_id);
             }
-            else{
-                //order has no assembly lines error
+            if($request->packing_session_id==0)
+            {
+                $session=PackingSession::create(array_merge($request->except('packing_session_id'),
+                                                                ['user_id'=>$request->user()->id,
+                                                                'packing_time'=>Carbon::createFromTime(0, 0, 0)
+                                                                ]
+                                                            )
+                                                );
+                return redirect(route('packingSession.show',$session->id));
             }
+             else
+                return redirect(route('packingSession.show',$request->packing_session_id));
 
     }
 
@@ -216,15 +199,13 @@ class PackingSessionController extends Controller
         }
 
         $session= PackingSessionResource::make($s->load('lines','order','user','lines.packing_vessel'));
-        // dd($session);
-        // dd($session->order_no);
+
         $lines=$session->lines;
 
 
         $OrderLines=PackingOrderLineResource::collection(Line::where('order_no',$session->order_no)
-                                                            ->where('part',$session->part)
-
-                                                            ->get()
+                                                             ->where('part',$session->part)
+                                                             ->get()
                                                         );
 
          $packingVessels=PackingVesselResource::collection(PackingVessel::latest()->get());

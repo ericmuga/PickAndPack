@@ -141,6 +141,7 @@ watch( newItem,
                             //if (parseFloat(searchResult.value.order_qty)>parseFloat(searchResult.value.prepacks_total_quantity))
                             //{
                                 showModal.value=true
+                                console.log(searchResult.value)
                                 updateScannedItem(searchResult.value)
 
 
@@ -220,21 +221,10 @@ const submitForm=()=>{
 
     const existingItemIndex = assembledArray.value.findIndex(item => item.item_no === form.item_no);
 
-
-
-
-    if (existingItemIndex !== -1)
-    {
-      // If the key already exists, update the value
-      //   alert('here')
-      assembledArray.value[existingItemIndex].item_no = form.item_no;
-      assembledArray.value[existingItemIndex].assembled_qty = form.assembled_qty;
-      assembledArray.value[existingItemIndex].from_batch = form.from_batch;
-      assembledArray.value[existingItemIndex].to_batch = form.to_batch;
-      // assembledArray.value[existingItemIndex].qty_base = form.qty_base;
-    } else
-    {
-      // If the key doesn't exist, push a new key-value pair
+        if (existingItemIndex !== -1)
+        {
+        assembledArray.value.splice(existingItemIndex)
+        }
       assembledArray.value.push({ 'item_no':form.item_no,
                                    'assembled_qty':form.assembled_qty,
                                    'assembled_pcs':form.assembled_pcs,
@@ -252,7 +242,7 @@ const submitForm=()=>{
                                     'to_batch':form.to_batch
 
                                 });
-    }
+
 
     showModal.value=false
     newItem.value = '';

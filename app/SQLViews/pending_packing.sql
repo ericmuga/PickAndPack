@@ -1,11 +1,11 @@
 USE [pickandpack]
 GO
 
-/****** Object:  View [dbo].[pending_assembly]    Script Date: 27/02/2024 16:36:05 ******/
-DROP VIEW [dbo].[pending_assembly]
+/****** Object:  View [dbo].[pending_packing]    Script Date: 28/02/2024 05:46:53 ******/
+DROP VIEW [dbo].[pending_packing]
 GO
 
-/****** Object:  View [dbo].[pending_assembly]    Script Date: 27/02/2024 16:36:05 ******/
+/****** Object:  View [dbo].[pending_packing]    Script Date: 28/02/2024 05:46:53 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -13,7 +13,8 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 
-CREATE   VIEW [dbo].[pending_assembly] as(
+
+CREATE   VIEW [dbo].[pending_packing] as(
 
 
 SELECT
@@ -23,16 +24,16 @@ SELECT
     a.shp_date,
     a.sp_code,
     a.sp_code+'|'+a.sp_name [sp_name],
-    COALESCE(d.A_Assignment_Count, 0) AS A_Assignment_Count,
-    COALESCE(d.B_Assignment_Count, 0) AS B_Assignment_Count,
-    COALESCE(d.C_Assignment_Count, 0) AS C_Assignment_Count,
-    COALESCE(d.D_Assignment_Count, 0) AS D_Assignment_Count,
+    COALESCE(d.A_Packing_Count, 0) AS A_Packing_Count,
+    COALESCE(d.B_Packing_Count, 0) AS B_Packing_Count,
+    COALESCE(d.C_Packing_Count, 0) AS C_Packing_Count,
+    COALESCE(d.D_Packing_Count, 0) AS D_Packing_Count,
 
 	COALESCE(e.A_Assembly_Count, 0) AS A_Assembly_Count,
     COALESCE(e.B_Assembly_Count, 0) AS B_Assembly_Count,
     COALESCE(e.C_Assembly_Count, 0) AS C_Assembly_Count,
     COALESCE(e.D_Assembly_Count, 0) AS D_Assembly_Count,
-	d.[assignee_id]
+	isnull(d.[id],0) [packing_session_id]
 FROM
     [dbo].[orders] AS a
 INNER JOIN
@@ -55,25 +56,25 @@ LEFT JOIN
      GROUP BY
           assembly_sessions.order_no
 		 )
-		 AS e ON a.order_no = e.order_no
+
+		 AS e ON a.order_no = e.order_no --and (e.A_Assembly_Count+e.B_Assembly_Count+e.C_Assembly_Count+e.D_Assembly_Count)>0
 
 LEFT JOIN
     (SELECT
         distinct  order_no,
-		 [assignments].[assignee_id],
-         SUM(CASE WHEN part = 'A' THEN 1 ELSE 0 END) AS A_Assignment_Count,
-         SUM(CASE WHEN part = 'B' THEN 1 ELSE 0 END) AS B_Assignment_Count,
-         SUM(CASE WHEN part = 'C' THEN 1 ELSE 0 END) AS C_Assignment_Count,
-         SUM(CASE WHEN part = 'D' THEN 1 ELSE 0 END) AS D_Assignment_Count
+		 id,
+         SUM(CASE WHEN part = 'A' THEN 1 ELSE 0 END) AS A_Packing_Count,
+         SUM(CASE WHEN part = 'B' THEN 1 ELSE 0 END) AS B_Packing_Count,
+         SUM(CASE WHEN part = 'C' THEN 1 ELSE 0 END) AS C_Packing_Count,
+         SUM(CASE WHEN part = 'D' THEN 1 ELSE 0 END) AS D_Packing_Count
      FROM
-         [assignment_lines]
-		 inner join [assignments] on assignment_lines.assignment_id=assignments.id
+         [packing_sessions]
+
      GROUP BY
          order_no,
-		 [assignments].[assignee_id]
+		 id
     ) AS d ON a.order_no = d.order_no
-WHERE
-    a.confirmed = 1
+	where (e.A_Assembly_Count+e.B_Assembly_Count+e.C_Assembly_Count+e.D_Assembly_Count)>0
 
 GROUP BY
     a.order_no,
@@ -85,15 +86,15 @@ GROUP BY
     a.ending_date,
     a.sp_code,
     a.sp_name,
-	d.A_Assignment_Count,
-	d.B_Assignment_Count,
-	d.C_Assignment_Count,
-	d.D_Assignment_Count,
+	d.A_Packing_Count,
+	d.B_Packing_Count,
+	d.C_Packing_Count,
+	d.D_Packing_Count,
 	A_Assembly_Count,
 	B_Assembly_Count,
 	C_Assembly_Count,
 	D_Assembly_Count,
-	d.[assignee_id]
+	d.[id]
 )
 
 GO
