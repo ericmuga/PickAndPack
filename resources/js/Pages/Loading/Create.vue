@@ -67,7 +67,7 @@ function getSumOfCounts(array) {
     <AuthenticatedLayout>
 
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">Loading</h2>
+            <h2 class="text-xl font-semibold leading-tight text-center text-gray-800">Loading</h2>
         </template>
 
         <div class="py-6">
@@ -96,14 +96,14 @@ function getSumOfCounts(array) {
                         </Toolbar>
 
 
-                        <div class="flex text-center">
+                        <div class="text-center ">
 
                          <div class="m-4 text-center shadow-md">
                             <input type="text" v-model="newItem"  ref="inputField" placeholder="Scan Vessel" class="m-2 rounded-lg bg-slate-300 text-md">
                              <p v-if="scanError" class="p-3 m-3 font-bold text-black bg-red-400 rounded">{{ scanError }}</p>
 
 
-                                                  <div class="relative overflow-x-auto text-center shadow-md sm:rounded-lg">
+                                                  <div class="relative overflow-x-auto overflow-y-auto text-center shadow-md sm:rounded-lg" style="height: 400px;">
 
 
                                             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -113,31 +113,31 @@ function getSumOfCounts(array) {
                                                         <!-- <th scope="col" class="px-4 py-2">
                                                             Barcode
                                                         </th> -->
-                                                        <th scope="col" class="px-4 py-2">
+                                                        <th scope="col" class="px-4 ">
                                                             Order No.
                                                         </th>
 
-                                                        <th scope="col" class="px-4 py-2">
+                                                        <th scope="col" class="px-4 ">
                                                             Ship-to Name
                                                         </th>
 
-                                                        <th scope="col" class="px-4 py-2 text-center">
+                                                        <th scope="col" class="px-4 text-center">
                                                             A Vessels
                                                         </th>
-                                                        <th scope="col" class="px-4 py-2 text-center">
+                                                        <th scope="col" class="px-4 text-center">
                                                             B Vessels
                                                         </th>
-                                                        <th scope="col" class="px-4 py-2 text-center">
+                                                        <th scope="col" class="px-4 text-center">
                                                             C Vessels
                                                         </th>
-                                                        <th scope="col" class="px-4 py-2 text-center">
+                                                        <th scope="col" class="px-4 text-center">
                                                             D Vessels
                                                         </th>
-                                                        <th scope="col" class="px-4 py-2 text-center">
+                                                        <th scope="col" class="px-4 text-center">
                                                            Expected Vessels
                                                         </th>
 
-                                                        <th scope="col" class="px-4 py-2 text-center">
+                                                        <th scope="col" class="px-4 text-center">
                                                             Loaded
                                                         </th>
 
