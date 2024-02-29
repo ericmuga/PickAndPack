@@ -18,6 +18,15 @@ import { useSearchArray } from '@/Composables/useSearchArray';
 import debounce from 'lodash/debounce'
 import { SearchCircleIcon } from '@vue-hero-icons/solid';
 let printedArray=ref([]);
+const props=defineProps({
+    OrderLines:Object,
+    session:Object,
+    // lastVessel:String,
+    packingVessels:Object,
+    lines:Object,
+    printedArray:Object,
+    roles:Object,
+});
 const calculatedSum=ref([]);
 
 function resolveDescriptionById(id) {
@@ -748,15 +757,7 @@ const qrCodeImage=(text)=> {
 
 let lastVessel=ref(1);
 // lastVessel.value=to
-const props=defineProps({
-    OrderLines:Object,
-    session:Object,
-    // lastVessel:String,
-    packingVessels:Object,
-    lines:Object,
-    printedArray:Object,
-    roles:Object,
-});
+
 
 // const { lines} = toRefs(props);
 let lines=ref([]);
