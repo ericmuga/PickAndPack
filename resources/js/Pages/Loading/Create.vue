@@ -18,6 +18,7 @@ const newItem = ref('');
 const items = reactive([]);
 const count = ref(0);
 let scanError = ref('');
+
 const calculateVesselCount = (dataArray) => {
   return dataArray.reduce((sum, item) => sum + parseInt(item.vessel_count), 0);
 };
@@ -31,8 +32,29 @@ const props= defineProps({
 
 })
 
+function getCountForCode(array, codeToFind) {
+  let count = 0;
+  array.forEach(entry => {
+    if (entry.code === codeToFind) {
+      count++;
+    }
+  });
+  return count;
+}
 
+function getSumOfCounts(array) {
+  const codeCounts = {};
+  array.forEach(entry => {
+    codeCounts[entry.code] = (codeCounts[entry.code] || 0) + 1;
+  });
 
+  let sum = 0;
+  for (const code in codeCounts) {
+    sum += codeCounts[code];
+  }
+
+  return sum;
+}
 
 
 
@@ -78,7 +100,7 @@ const props= defineProps({
 
                          <div class="m-4 text-center shadow-md">
                             <input type="text" v-model="newItem"  ref="inputField" placeholder="Scan Vessel" class="m-2 rounded-lg bg-slate-300 text-md">
-                                                                <p v-if="scanError" class="p-3 m-3 font-bold text-black bg-red-400 rounded">{{ scanError }}</p>
+                             <p v-if="scanError" class="p-3 m-3 font-bold text-black bg-red-400 rounded">{{ scanError }}</p>
 
 
                                                   <div class="relative overflow-x-auto text-center shadow-md sm:rounded-lg">
@@ -100,16 +122,16 @@ const props= defineProps({
                                                         </th>
 
                                                         <th scope="col" class="px-4 py-2 text-center">
-                                                            Part A Items
+                                                            A Vessels
                                                         </th>
                                                         <th scope="col" class="px-4 py-2 text-center">
-                                                            Part B Items
+                                                            B Vessels
                                                         </th>
                                                         <th scope="col" class="px-4 py-2 text-center">
-                                                            Part C Items
+                                                            C Vessels
                                                         </th>
                                                         <th scope="col" class="px-4 py-2 text-center">
-                                                            Part D Items
+                                                            D Vessels
                                                         </th>
                                                         <th scope="col" class="px-4 py-2 text-center">
                                                            Expected Vessels
@@ -136,12 +158,9 @@ const props= defineProps({
 
                                                     <td class="p-1 px-3 py-2 text-xs text-center " v-if="order.part_a!=0">
 
-                                                        <Button v-show="order.confirm_a" icon="pi pi-check" severity="info" rounded :label="order.part_a" disabled />
-
-                                                        <Button  v-show="!order.confirm_a" icon="pi pi-bell" severity="warning" :badge=order.part_a text raised rounded aria-label="Notification" @click="ConfirmPrint(order.order_no,'A')"/>
                                                         <ul v-if="order.vessel_a.lenght>0">
                                                             <li v-for="ves in order.vessel_a" :key="ves.code">
-                                                            {{ ves.code+'-'+ves.vessel_count}}
+                                                            {{ ves.code+'-'+getCountForCode(order.vessel_a,ves.code)}}
                                                         </li>
 
                                                         </ul>
@@ -151,13 +170,13 @@ const props= defineProps({
 
                                                     </td>
                                                     <td class="p-1 px-3 py-2 text-xs text-center " v-if="order.part_b!=0">
-                                                        <Button v-show="order.confirm_b" icon="pi pi-check" severity="info" rounded :label="order.part_b" disabled />
+                                                        <!-- <Button v-show="order.confirm_b" icon="pi pi-check" severity="info" rounded :label="order.part_b" disabled /> -->
 
-                                                        <Button  v-show="!order.confirm_b" icon="pi pi-bell" severity="warning" :badge=order.part_b text raised rounded aria-label="Notification" @click="
-                                                        ConfirmPrint(order.order_no,'B')"/>
+                                                        <!-- <Button  v-show="!order.confirm_b" icon="pi pi-bell" severity="warning" :badge=order.part_b text raised rounded aria-label="Notification" @click="
+                                                        ConfirmPrint(order.order_no,'B')"/> -->
                                                         <ul v-if="order.vessel_b.length>0">
                                                             <li v-for="ves in order.vessel_b" :key="ves.code">
-                                                            {{ ves.code+'-'+ves.vessel_count}}
+                                                            {{ ves.code+'-'+getCountForCode(order.vessel_b,ves.code)}}
                                                         </li>
                                                         </ul>
 
@@ -166,13 +185,13 @@ const props= defineProps({
 
                                                     </td>
                                                     <td class="p-1 px-3 py-2 text-xs text-center " v-if="order.part_c!=0">
-                                                        <Button v-show="order.confirm_c" icon="pi pi-check" severity="info" rounded :label="order.part_c" disabled />
+                                                        <!-- <Button v-show="order.confirm_c" icon="pi pi-check" severity="info" rounded :label="order.part_c" disabled /> -->
 
-                                                        <Button  v-show="!order.confirm_c" icon="pi pi-bell" severity="warning" :badge=order.part_c text raised rounded aria-label="Notification" @click="ConfirmPrint(order.order_no,'C')"/>
+                                                        <!-- <Button  v-show="!order.confirm_c" icon="pi pi-bell" severity="warning" :badge=order.part_c text raised rounded aria-label="Notification" @click="ConfirmPrint(order.order_no,'C')"/> -->
 
                                                         <ul v-if="order.vessel_c.length>0">
                                                             <li v-for="ves in order.vessel_c" :key="ves.code">
-                                                            {{ ves.code+'-'+ves.vessel_count}}
+                                                            {{ ves.code+'-'+getCountForCode(order.vessel_c,ves.code)}}
                                                         </li>
 
                                                     </ul>
@@ -181,19 +200,23 @@ const props= defineProps({
 
                                                     </td>
                                                     <td class="p-1 px-3 py-2 text-xs text-center " v-if="order.part_d!=0">
-                                                        <Button v-show="order.confirm_d" icon="pi pi-check" severity="info" rounded :label="order.part_d" disabled />
+                                                        <!-- <Button v-show="order.confirm_d" icon="pi pi-check" severity="info" rounded :label="order.part_d" disabled /> -->
 
-                                                        <Button  v-show="!order.confirm_d" icon="pi pi-bell" :badge=order.part_d severity="warning" text raised rounded aria-label="Notification" @click="ConfirmPrint(order.order_no,'D')"/>
+                                                        <!-- <Button  v-show="!order.confirm_d" icon="pi pi-bell" :badge=order.part_d severity="warning" text raised rounded aria-label="Notification" @click="ConfirmPrint(order.order_no,'D')"/> -->
                                                        <ul v-if="order.vessel_d.length>0">
                                                             <li v-for="ves in order.vessel_d" :key="ves.code">
-                                                            {{ ves.code+'-'+ves.vessel_count}}
+                                                            {{ ves.code+'-'+getCountForCode(order.vessel_c,ves.code)}}
                                                         </li></ul>
                                                     </td>
                                                     <td v-else  class="bg-slat-200">
 
                                                     </td>
                                                    <td class="m-2 text-center bg-yellow-200 rounded-full">
-                                                    {{calculateVesselCount(order.vessel_a)+calculateVesselCount(order.vessel_b)+calculateVesselCount(order.vessel_d)+calculateVesselCount(order.vessel_c)  }}
+                                                    {{getSumOfCounts(order.vessel_d)+
+                                                      getSumOfCounts(order.vessel_b)+
+                                                      getSumOfCounts(order.vessel_c)+
+                                                      getSumOfCounts(order.vessel_d)
+                                                     }}
                                                    </td>
                                                    <td class="p-2 text-center bg-teal-300 rounded-md">
                                                      0

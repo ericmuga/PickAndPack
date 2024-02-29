@@ -146,7 +146,7 @@ const createOrUpdatesession=()=>{
 
                         onSuccess:()=>{
                                         form.reset();
-                                        Swal.fire(`Session ${mode.state}ed Successfully!`,'','success');
+                                        // Swal.fire(`Session ${mode.state}ed Successfully!`,'','success');
                                       }
                     }
                    )
@@ -154,7 +154,7 @@ const createOrUpdatesession=()=>{
      form.patch(route('packingSession.update',form.session_no),
                 {
                     onSuccess:()=>{ form.reset();
-                                    Swal.fire(`Session ${mode.state}ed Successfully!`,'','success');
+                                    //Swal.fire(`Session ${mode.state}ed Successfully!`,'','success');
                                 }
                 });
       showModal.value=false;
@@ -247,33 +247,33 @@ const showUpdateModal=(session)=>{
                                                     <td class="p-1 px-2 py-2 text-xs text-center">
                                                         <Button v-show="order.A_Assembly_Count>0"
                                                                 icon="pi pi-gift"
-                                                                :severity="order.A_Packing_Count>0?'success':'danger'"
+                                                                :severity="(order.A_Assembly_Count>0)&&(order.A_Packing_Count>0)?'success':'danger'"
                                                                 rounded
-                                                               @click="selectOrderPart(order.order_no,'A',order.packing_session_id)"
+                                                               @click="selectOrderPart(order.order_no,'A',order.A_Packing_Count)"
                                                          />
                                                     </td>
                                                     <td>
                                                         <Button v-show="order.B_Assembly_Count>0"
                                                                 icon="pi pi-gift"
-                                                                :severity="order.B_Packing_Count>0?'success':'danger'"
+                                                                :severity="(order.B_Assembly_Count>0)&&(order.B_Packing_Count>0)?'success':'danger'"
                                                                 rounded
-                                                               @click="selectOrderPart(order.order_no,'B',order.packing_session_id)"
+                                                               @click="selectOrderPart(order.order_no,'B',order.B_Packing_Count)"
                                                          />
                                                     </td>
                                                     <td>
-                                                         <Button v-show="order.B_Assembly_Count>0"
+                                                         <Button v-show="order.C_Assembly_Count>0"
                                                                 icon="pi pi-gift"
-                                                                :severity="order.B_Packing_Count>0?'success':'danger'"
+                                                                :severity="(order.C_Assembly_Count>0)&&(order.C_Packing_Count>0)?'success':'danger'"
                                                                 rounded
-                                                               @click="selectOrderPart(order.order_no,'B',order.packing_session_id)"
+                                                               @click="selectOrderPart(order.order_no,'C',order.C_Packing_Count)"
                                                          />
                                                     </td>
                                                     <td>
                                                          <Button v-show="order.D_Assembly_Count>0"
                                                                 icon="pi pi-gift"
-                                                                :severity="order.D_Packing_Count>0?'success':'danger'"
+                                                                :severity="(order.D_Assembly_Count>0)&&(order.D_Packing_Count>0)?'success':'danger'"
                                                                 rounded
-                                                               @click="selectOrderPart(order.order_no,'D',order.packing_session_id)"
+                                                               @click="selectOrderPart(order.order_no,'D',order.D_Packing_Count)"
                                                          />
                                                     </td>
                                                 </tr>

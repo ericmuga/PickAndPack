@@ -229,11 +229,29 @@ const exportData = (jsonData, columns) => {
  exportToExcel(jsonData, columns, fileName);
 
 };
+const sessionsArray =ref([]);
+onMounted(()=>{
+    sessionsArray.value=props.sessions;
+})
 
 const search=ref()
-watch(search, debounce(()=>{Inertia.post('/order/all',{search:search.value}, {preserveScroll: true})}, 500));
+watch(search, debounce(()=>{
+    // Inertia.post('/order/all',{search:search.value}, {preserveScroll: true})
+    if (search.value!='')
+    {
+      sessionsArray.value=sessionsArray.value.filter(session=>
+        {
+            return session.vehicle_plate.startsWith(search.value.toUpperCase())
+            ||session.sp_name.includes(search.value)
 
-const prop=defineProps({
+        })
+    }
+
+   else
+    sessionsArray.value=props.sessions;
+    }, 500));
+
+const props=defineProps({
     sessions:Object,
     drivers:Object,
     vehicles:Object,
@@ -250,13 +268,6 @@ const filteredView=(id)=>{
 
 Inertia.get(route('loadSession')+'?id='+id)
 }
-
-//   let showModal=ref(false);
-let newItem=ref('');
-
-watch( newItem,
-debounce( ()=>{Inertia.get(route('packing.index'),{'search':newItem.value})})
-,500);
 
 
 
@@ -316,9 +327,9 @@ const showUpdateModal=(session)=>{
 
     mode.state='Update'
     form.vehicle=session.vehicle_id
-    form.assistant_loader_id=session.assistant_loader_id
+    // form.assistant_loader_id=session.assistant_loader_id
     form.driver_id=session.driver_id
-    form.assistant_driver_id=session.assistant_driver_id
+    // form.assistant_driver_id=session.assistant_driver_id
     form.sp_code=session.sp_code
     form.shp_date=session.shp_date
 
@@ -343,12 +354,12 @@ const showUpdateModal=(session)=>{
 
     <AuthenticatedLayout @add="showModal=true">
           <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">Loading</h2>
+            <h2 class="text-xl font-semibold leading-tight text-center text-gray-800">Loading Sessions</h2>
         </template>
 
-        <div class="py-6">
+        <div class="items-center py-6 text-center" >
             <!-- <Modal :show="true" > Hi there </Modal> -->
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8" style="width:800px;">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
 
@@ -369,7 +380,7 @@ const showUpdateModal=(session)=>{
                                 <template #center>
                                     <div>
                                         <!-- <Pagination :links="orderLines.meta.links" /> -->
-                                        <input type="text" v-model="newItem"  ref="inputField" class="m-2 rounded-lg bg-slate-300 text-md">
+                                        <input type="text" v-model="search"  ref="inputField" class="m-2 rounded-lg bg-slate-300 text-md">
 
                                         <!-- <SearchBox :model="route('order.pack')" /> -->
                                     <div>
@@ -393,74 +404,74 @@ const showUpdateModal=(session)=>{
                                             </template>
                                         </Toolbar>
 
-                                        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+                                        <div class="relative items-center overflow-x-auto overflow-y-auto text-center shadow-md sm:rounded-lg" style="height: 400px;">
 
 <!---table comes here-->
-      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                                            <table class="text-sm text-gray-500 dark:text-gray-400" >
                                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
                                                     <tr class="bg-slate-300">
                                                         <!-- <th scope="col" class="px-2 py-1">
                                                             Barcode
                                                         </th> -->
-                                                        <th scope="col" class="px-2 py-1">
+                                                        <th >
                                                            Session Id
                                                         </th>
-                                                        <th scope="col" class="px-2 py-1 text-center">
+                                                        <th class="text-center" >
                                                             Route
                                                         </th>
                                                         <!--
                                                         <th scope="col" class="px-2 py-1">
                                                             Assistant Loader
                                                         </th>-->
-                                                        <th scope="col" class="px-2 py-1">
+                                                        <th >
                                                             Vehicle
                                                         </th>
 
-                                                         <th scope="col" class="px-2 py-1">
+                                                         <!-- <th scope="col" class="px-2 py-1">
                                                             Driver
-                                                        </th>
-                                                        <th scope="col" class="px-2 py-1">
+                                                        </th> -->
+                                                        <th >
                                                             Load
                                                         </th>
 
-                                                        <th scope="col" class="px-2 py-1">
+                                                        <!-- <th col="2">
                                                            Actions
-                                                        </th>
+                                                        </th> -->
 
 
 
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr v-for="session in sessions.data" :key="session.id"
+                                                    <tr v-for="session in sessionsArray" :key="session.loading_session_id"
                                                     class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
 
-                                                    <td class="px-3 py-2 text-xs">
-                                                        {{ session.id }}
+                                                    <td class="">
+                                                        {{ session.loading_session_id }}
                                                     </td>
 
-                                                     <td class="px-3 py-2 text-xs font-bold text-center ">
-                                                        {{ session.route }}
+                                                     <td class="">
+                                                        {{ session.sp_name }}
                                                     </td>
 
-                                                     <td class="px-3 py-2 text-xs">
+                                                     <td class="">
 
-                                                            {{ session.vehicle }}
+                                                            {{ session.vehicle_plate }}
 
                                                     </td>
 
-                                                     <td class="px-3 py-2 text-xs">
+                                                     <!-- <td class="px-3 py-2 text-xs">
 
                                                             {{session.driver}}
 
-                                                    </td>
+                                                    </td> -->
 
-                                                    <td class="px-3 py-2 text-xs">
+                                                    <td class="">
 
 
 
-                                                            <Button
+                                                            <!-- <Button
                                                                 v-if="session.lines.length>0"
                                                                 type="button"
                                                                 label="Load"
@@ -469,7 +480,7 @@ const showUpdateModal=(session)=>{
                                                                 badgeClass="p-badge-danger"
                                                                 outlined
                                                                 @click="showContents(session)"
-                                                                />
+                                                                /> -->
 
 
 
@@ -478,7 +489,7 @@ const showUpdateModal=(session)=>{
 
                                                     <td class="px-3 py-2 text-xs text-center">
                                                         <Button
-                                                         @click="filteredView(session.id)"
+                                                         @click="filteredView(session.loading_session_id)"
                                                          :disabled="(session.status==='complete')"
                                                          :severity="(session.status==='complete')?'success':'warning'"
 
@@ -502,7 +513,7 @@ const showUpdateModal=(session)=>{
                                                                       text
 
 
-                                                                      @click="showUpdateModal(session.id)"
+                                                                      @click="showUpdateModal(session.loading_sesion_id)"
                                                                       />
                                                        </div>
                                                     </td>
@@ -523,7 +534,7 @@ const showUpdateModal=(session)=>{
                 </div>
                         <div class="items-center w-full text-center">
 
-                            <Pagination :links="sessions.meta.links" />
+                            <!-- <Pagination :links="sessions.meta.links" /> -->
                         </div>
 
 
@@ -539,7 +550,7 @@ const showUpdateModal=(session)=>{
 
      <div class="flex flex-col p-4 rounded-sm">
 
-        <div  class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> {{mode.state}} Item</div>
+        <div  class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> {{mode.state}} Loading Session</div>
         <!-- <div v-else class="w-full p-2 mb-2 tracking-wide text-center text-white rounded-sm bg-slate-500"> Update Item</div> -->
 
           <form  @submit.prevent="createOrUpdateItem()">

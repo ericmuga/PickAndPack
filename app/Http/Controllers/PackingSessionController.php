@@ -30,14 +30,10 @@ class PackingSessionController extends Controller
     public function index(Request $request)
     {
          $roles=Cache::remember('roles',30*60,fn()=>$request->user()->roles()->get()->pluck('name'));
-         $date=$request->has('date')?$request->date:Carbon::today()->toDateString();
-         $nextDay=$request->has('date')?Carbon::parse($request->date)->addDay(1):Carbon::tomorrow()->toDateString();
          $checkers=Cache::remember('checkers',30*60, fn()=>UserResource::collection(User::role('checker')->orderBy('name')->get()));
          $orders = DB::table('pending_packing')
                      ->where('shp_date','>=',Carbon::today()->toDateString())
                      ->get();
-
-
          $checker_id=$request->session()->get('checker_id')?:null;
         return inertia('PackingSession/List',compact('checkers','orders','roles','checker_id'));
 
@@ -51,32 +47,35 @@ class PackingSessionController extends Controller
                 if ($request->has('checker_id'))
                 $request->session()->put('checker_id', $request->checker_id);
             }
+
+
+
             if($request->packing_session_id==0)
-            {
-                $session=PackingSession::create(array_merge($request->except('packing_session_id'),
-                                                                ['user_id'=>$request->user()->id,
-                                                                'packing_time'=>Carbon::createFromTime(0, 0, 0)
-                                                                ]
-                                                            )
-                                                );
-                return redirect(route('packingSession.show',$session->id));
-            }
-             else
-                return redirect(route('packingSession.show',$request->packing_session_id));
+                {
+                    $session=PackingSession::create(array_merge($request->except('packing_session_id'),
+                                                                    ['user_id'=>$request->user()->id,
+                                                                    'packing_time'=>Carbon::createFromTime(0, 0, 0)
+                                                                    ]
+                                                                )
+                                                    );
+                    return redirect(route('packingSession.show',$session->id));
+                }
+                else
+                {
+
+                    return redirect(route('packingSession.show',$request->packing_session_id));
+                }
+
 
     }
 
     public function closePacking(Request $request)
     {
-        // dd($request->all());
-        //save lines
         foreach ($request->lines as $line) {
 
             PackingSessionLine::create($line);
 
         }
-
-
         $packingSession=PackingSession::find($request->id);
         $packingSession->system_entry=0;
         $packingSession->save();

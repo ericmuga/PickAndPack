@@ -7,7 +7,9 @@ use App\Http\Resources\LoadingSessionResource;
 // use App\Http\Resources\LoadingOrderResource;
 use App\Http\Resources\VesselResource;
 use App\Models\{LoadingLine, LoadingSession, Order, PackingSessionLine, User, Vehicle, Vessel,Line};
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 // use Illuminate\Support\Js;
 
@@ -22,17 +24,14 @@ class LoadingSessionController extends Controller
     {
 
       //List loadingSessions
-       $drivers=User::role('driver')->select('id','name')->get();
-    //    $drivers=User::select('id','name')->get();
-       $vehicles=Vehicle::select('id','plate')->get();
-       $loaders=User::role('loader')->select('id','name')->where('id','<>',$request->user()->id)->get();
-
-
-       $rows=$request->rows?:5;
-        $spcodes=DB::table('sales_people')->select('name','code')->get();
-
-        $sessions= LoadingSessionResource::collection(LoadingSession::with('lines','SalesPerson')->latest()->paginate($rows));
-// dd($sessions);
+       $drivers=Cache::remember('drivers',60*60,fn()=>User::role('driver')->select('id','name')->get());
+       $vehicles=Cache::remember('vehicles',60*60,fn()=>Vehicle::select('id','plate')->get());
+       $loaders=Cache::remember('loaders',60*60,fn()=>User::role('loader')->select('id','name')->where('id','<>',$request->user()->id)->get());
+       $spcodes=Cache::remember('Salespersons',60*60,fn()=>DB::table('sales_people')->select('name','code')->get());
+       $sessions=DB::table('loading_session_list')
+                    //  ->where('shp_date','>=',Carbon::today()->toDateString())
+                     ->orderByDesc('loading_session_id')
+                     ->get();
        return inertia('Loading/List',compact('sessions','drivers','vehicles','loaders','spcodes'));
 
 

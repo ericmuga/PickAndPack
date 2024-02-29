@@ -37,14 +37,16 @@ class ApiController extends Controller
         $key = '412cce7c-a737-4d01-b929-534fcc80e79d';
 
 
-       $customers=[824,913,404,240,258,914,420,823];
+       $customers=[240,913,404,240,258,914,420,823];
 
        for($i=0; $i<count($customers); $i++ )
        {
 
 
-        $response = Http::get('https://fchoice-endpoint-prod.docwyn.com/?api_key='.$key.'&company='.$company.'&recieved_date='.$receivedDate.'&cust_no='.$customers[$i]);
+        // $response = Http::get('https://fchoice-endpoint-prod.docwyn.com/?api_key='.$key.'&company='.$company.'&recieved_date='.$receivedDate.'&cust_no='.$customers[$i]);
+        $response = Http::get('https://beta-endpoint-fc.docwyn.com/?api_key='.$key.'&company='.$company.'&recieved_date='.$receivedDate.'&cust_no='.$customers[$i]);
         $responseData = $response->json(); // Assuming the response is in JSON format
+        dd($responseData);
         $extdocItem='';
 
         //make collection
