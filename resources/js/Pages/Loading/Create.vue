@@ -158,7 +158,7 @@ function getSumOfCounts(array) {
 
                                                     <td class="p-1 px-3 py-2 text-xs text-center " v-if="order.part_a!=0">
 
-                                                        <ul v-if="order.vessel_a.lenght>0">
+                                                        <ul v-if="order.vessel_a.length>0">
                                                             <li v-for="ves in order.vessel_a" :key="ves.code">
                                                             {{ ves.code+'-'+getCountForCode(order.vessel_a,ves.code)}}
                                                         </li>
@@ -205,14 +205,14 @@ function getSumOfCounts(array) {
                                                         <!-- <Button  v-show="!order.confirm_d" icon="pi pi-bell" :badge=order.part_d severity="warning" text raised rounded aria-label="Notification" @click="ConfirmPrint(order.order_no,'D')"/> -->
                                                        <ul v-if="order.vessel_d.length>0">
                                                             <li v-for="ves in order.vessel_d" :key="ves.code">
-                                                            {{ ves.code+'-'+getCountForCode(order.vessel_c,ves.code)}}
+                                                            {{ ves.code+'-'+getCountForCode(order.vessel_d,ves.code)}}
                                                         </li></ul>
                                                     </td>
                                                     <td v-else  class="bg-slat-200">
 
                                                     </td>
                                                    <td class="m-2 text-center bg-yellow-200 rounded-full">
-                                                    {{getSumOfCounts(order.vessel_d)+
+                                                    {{getSumOfCounts(order.vessel_a)+
                                                       getSumOfCounts(order.vessel_b)+
                                                       getSumOfCounts(order.vessel_c)+
                                                       getSumOfCounts(order.vessel_d)
