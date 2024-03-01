@@ -226,23 +226,23 @@ function () {
 
 const closePacking=()=>{
 
-    Swal.fire({
-    title: 'Are you sure?',
-    text: "Packed orders may not be undone!",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'End Session!',
-    allowOutsideClick: () => !Swal.isLoading() // Prevent interaction when loading
-}).then((result) => {
-    if (result.isConfirmed) {
-        Swal.fire({
-            title: 'Posting..',
-            html: '<div class="flex items-center justify-center"><img src="/img/loading.gif" style="width: 100px; height: 100px;"/></div>',
-            allowOutsideClick: false,
-            showConfirmButton: false,
-        });
+//     Swal.fire({
+//     title: 'Are you sure?',
+//     text: "Packed orders may not be undone!",
+//     icon: 'warning',
+//     showCancelButton: true,
+//     confirmButtonColor: '#3085d6',
+//     cancelButtonColor: '#d33',
+//     confirmButtonText: 'End Session!',
+//     allowOutsideClick: () => !Swal.isLoading() // Prevent interaction when loading
+// }).then((result) => {
+//     if (result.isConfirmed) {
+//         Swal.fire({
+//             title: 'Posting..',
+//             html: '<div class="flex items-center justify-center"><img src="/img/loading.gif" style="width: 100px; height: 100px;"/></div>',
+//             allowOutsideClick: false,
+//             showConfirmButton: false,
+//         });
 
         Inertia.post(
             route('packingSession.close'),
@@ -252,8 +252,8 @@ const closePacking=()=>{
                 onError: (error) => Swal.fire('Error', error.message, 'error')
             }
         );
-    }
-});
+    // }
+// });
 
 }
 
