@@ -334,7 +334,7 @@ const showCreateModal=()=>{
 const showUpdateModal=(id)=>{
 
     let session=sessionsArray.value.filter(s=>s.loading_session_id==id)[0]
-    console.log(session)
+    // console.log(session)
     mode.state='Update'
     form.vehicle_id= parseInt(session.vehicle_id)
     form.driver_id=session.driver_id
