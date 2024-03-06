@@ -287,14 +287,22 @@ const form= useForm({
 
 
 const createOrUpdateItem=()=>{
+
+    let data={'vehicle_id':form.vehicle_id,
+              'loader_id':form.loader_id,
+              'driver_id':form.driver_id,
+              'assistant_driver_id':form.assistant_driver_id,
+              'sp_code':form.sp_code,
+              'shp_date':form.shp_date
+             }
+
     if (mode.state=='Create')
-          form.post(route('loadingSession.store'),
-                    { preserveScroll: true,
-                      onSuccess: () =>{ form.reset()
-                                      Swal.fire(`Session ${mode.state}d Successfully!`,'','success');
-                                    }
-                    }
-                   )
+         axios.post(route('loadingSession.store'),data)
+              .then(response=>{
+                sessionsArray.value=response.data.sessions;
+              })
+              .catch(error=>{Swal.fire('Error!',error.message,'error')})
+
         else
      form.patch(route('loadingSession.update',form.name),
                 { preserveScroll: true,
@@ -323,16 +331,16 @@ const showCreateModal=()=>{
 
 }
 
-const showUpdateModal=(session)=>{
+const showUpdateModal=(id)=>{
 
+    let session=sessionsArray.value.filter(s=>s.loading_session_id==id)[0]
+    console.log(session)
     mode.state='Update'
-    form.vehicle=session.vehicle_id
-    // form.assistant_loader_id=session.assistant_loader_id
+    form.vehicle_id= parseInt(session.vehicle_id)
     form.driver_id=session.driver_id
-    // form.assistant_driver_id=session.assistant_driver_id
+    form.assistant_driver_id=session.assistant_driver_id
     form.sp_code=session.sp_code
     form.shp_date=session.shp_date
-
     showModal.value=true
 }
 
@@ -513,7 +521,7 @@ const showUpdateModal=(session)=>{
                                                                       text
 
 
-                                                                      @click="showUpdateModal(session.loading_sesion_id)"
+                                                                      @click="showUpdateModal(session.loading_session_id)"
                                                                       />
                                                        </div>
                                                     </td>

@@ -29,7 +29,7 @@ class LoadingSessionController extends Controller
        $loaders=Cache::remember('loaders',60*60,fn()=>User::role('loader')->select('id','name')->where('id','<>',$request->user()->id)->get());
        $spcodes=Cache::remember('Salespersons',60*60,fn()=>DB::table('sales_people')->select('name','code')->get());
        $sessions=DB::table('loading_session_list')
-                    //  ->where('shp_date','>=',Carbon::today()->toDateString())
+                     ->where('shp_date','>=',Carbon::today()->toDateString())
                      ->orderByDesc('loading_session_id')
                      ->get();
        return inertia('Loading/List',compact('sessions','drivers','vehicles','loaders','spcodes'));
@@ -37,6 +37,8 @@ class LoadingSessionController extends Controller
 
 
     }
+
+
 
     public function loadingSheet(Request $request)
     {
@@ -53,27 +55,6 @@ class LoadingSessionController extends Controller
     }
 
 
-//    public function loadVessel(Request $request)
-//    {
-//       //check if there's a loading session for the current user
-
-//      $lds=LoadingSession::where('user_id',$request->user()->id)->latest()->first();
-
-//      if ($lds->count()>0)
-//      {
-
-//         //associate the load to the session
-//         $srd= $request->order_no
-//         Vessel::
-//      }
-// }
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
-
     public function loadSession(Request $request)
     {
 
@@ -81,21 +62,22 @@ class LoadingSessionController extends Controller
 
         //display only vessels that belong to that route
         $orders=OrderPackingResource::collection(Order::where('shp_date', $session->shp_date)
-                            ->where('sp_code', $session->sp_code)
-                            ->whereHas('packing_sessions')
-                            ->get());
+                                    ->where('sp_code', $session->sp_code)
+                                    ->whereHas('packing_sessions')
+                                    ->get());
 
 
 
 
+        // $pending_loading=DB::table('pending_loading')
+        //                    ->where();
+
+        // $packingLines=PackingSessionLine::whereHas('session',fn($q)=>$q->whereHas('order',fn($q)=>$q->where('sp_code',$session->sp_code)))
+        //                                 ->with('session','packing_vessel');
 
 
-        $packingLines=PackingSessionLine::whereHas('session',fn($q)=>$q->whereHas('order',fn($q)=>$q->where('sp_code',$session->sp_code)))
-                                        ->with('session','packing_vessel');
 
-
-
-        return inertia('Loading/Create',['packingLines'=>$packingLines,
+        return inertia('Loading/Create',[//'packingLines'=>$packingLines,
                                          'session'=>LoadingSessionResource::make($session),
                                         'orders'=>$orders]);
 
@@ -169,7 +151,13 @@ class LoadingSessionController extends Controller
                       ->exists())
         LoadingSession::create($details);
 
-        return redirect(route('loadingSession.index'));
+        $sessions=DB::table('loading_session_list')
+                     ->where('shp_date','>=',Carbon::today()->toDateString())
+                     ->orderByDesc('loading_session_id')
+                     ->get();
+        return response()->json(compact('sessions'));
+
+        // return redirect(route('loadingSession.index'));
     }
 
     /**
