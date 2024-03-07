@@ -317,7 +317,10 @@ const closeAssembly = () => {
     //             allowOutsideClick: false,
     //             showConfirmButton: false,
     //         });
-
+if (assembledArray.value.length==0) {
+    Swal.fire('Error','The assembly is empty','error')
+}
+else
             Inertia.post(
                 route('assembly.store'),
                 {
