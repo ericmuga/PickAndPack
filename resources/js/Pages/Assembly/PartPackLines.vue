@@ -254,10 +254,10 @@ const submitForm=()=>{
     form2.reset();
 }
 
-
+const  cItem=ref({});
 
 const updateScannedItem =(item)=>{
-
+  cItem.value=item;
 // console.log(item)
 //update form
     form.item_no=item.item_no
@@ -609,10 +609,10 @@ onUnmounted(() => {
         Customer Spec: {{ form.customer_spec }}
         <div class="flex flex-row justify_between ">
              <span class="px-3 text-center capitalize">Ordered PCS</span>
-             <span class="p-3 px-3 text-center text-black capitalize bg-lime-400">{{ form.assembled_pcs }}</span>
+             <span class="p-3 px-3 text-center text-black capitalize bg-lime-400">{{ cItem.order_qty }}</span>
 
             <span class="px-3 text-center capitalize">Ordered Weight</span>
-            <span class="p-3 px-3 text-center text-white capitalize bg-teal-400">{{ parseFloat(form.order_qty).toFixed(2) }}</span>
+            <span class="p-3 px-3 text-center text-white capitalize bg-teal-400">{{ parseFloat(cItem.qty_base).toFixed(2) }}</span>
         </div>
         <div class="flex flex-row justify_between">
 
