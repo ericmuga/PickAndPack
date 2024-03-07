@@ -56,7 +56,7 @@ class UserController extends Controller
         $users = $searchService
                 ->with(['permissions','roles']) // Example of eager loading related models
                 ->search();
-        $rows=$request->has('rows')?$request->rows:10;
+        $rows=$request->has('rows')?$request->rows:100;
 
 
     //   dd($users);

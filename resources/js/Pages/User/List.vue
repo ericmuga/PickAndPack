@@ -10,7 +10,7 @@ import Toolbar from 'primevue/toolbar';
 import { useForm } from '@inertiajs/inertia-vue3'
 import { Inertia } from '@inertiajs/inertia';
 import debounce from 'lodash/debounce';
-import {watch, ref} from 'vue';
+import {watch, ref,onMounted} from 'vue';
 import Pagination from '@/Components/Pagination.vue'
 import Swal from 'sweetalert2'
 import Modal from '@/Components/Modal.vue'
@@ -58,6 +58,24 @@ const props=  defineProps({
        permissions:Object,
   })
 
+  const  usersArray=ref();
+
+
+  onMounted(()=>
+  {
+    usersArray.value=props.users.data;
+  }
+  )
+  let search=ref('');
+  watch(search, () => {
+    if (search.value !== '') {
+        const searchTerm = search.value.toLowerCase();
+        usersArray.value = usersArray.value.filter(user =>
+            user.user_name.toLowerCase().includes(searchTerm)
+        );
+    }
+    else usersArray.value=props.users.data
+});
   let showModal=ref(false);
 
 
@@ -87,7 +105,10 @@ const showUpdateModal=(user)=>{
 
     <AuthenticatedLayout @add="showModal=true">
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">User {{ users.data.length }}</h2>
+            <div class="w-full text-center">
+                <h2 class="text-xl font-semibold leading-tight text-center text-gray-800 ">Users </h2>
+            </div>
+
         </template>
 
         <div class="py-6">
@@ -115,13 +136,7 @@ const showUpdateModal=(user)=>{
                                     ></Button>
                                 </template>
                                 <template #center>
-                                    <div>
-                                        <Pagination :links="users.meta.links" />
-                                    </div>
-                                    <!-- <Modal :show="showModal.value">
-                                        <FilterPane :propsData="columnListing" />
-                                    </Modal> -->
-                                      <!-- <FilterPane :propsData="columnListing" /> -->
+                                    <input type="text" v-model="search"  ref="inputField" placeholder="Search" class="m-2 rounded-lg bg-slate-300 text-md">
 
                                 </template>
 
@@ -135,11 +150,11 @@ const showUpdateModal=(user)=>{
 
 
 
-                                             <SearchBox  :model="route('users.index')" />
+
                                     </template>
                                         </Toolbar>
 
-                                        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+                                        <div class="relative overflow-x-auto overflow-y-auto shadow-md sm:rounded-lg" style="height: 400px;">
 
                                             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -174,7 +189,7 @@ const showUpdateModal=(user)=>{
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr v-for="user in users.data" :key="user.user_no"
+                                                    <tr v-for="user in usersArray" :key="user.email"
                                                     class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
 
                                                     <td class="px-3 py-2 text-xs">
@@ -220,9 +235,9 @@ const showUpdateModal=(user)=>{
 
                     <Toolbar>
                         <template #center>
-                            <div >
+                            <!-- <div >
                                 <Pagination :links="users.meta.links" />
-                            </div>
+                            </div> -->
                         </template>
                     </Toolbar>
 
