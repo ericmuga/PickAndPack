@@ -170,7 +170,8 @@ const form=useForm({
    from_batch:'',
    to_batch:'',
    order_no:'',
-   line_no:''
+   line_no:'',
+   customer_spec:''
 
 
 });
@@ -187,7 +188,8 @@ const form2=useForm({
    from_batch:'',
    to_batch:'',
    order_no:'',
-   line_no:''
+   line_no:'',
+   customer_spec:'',
 
 
 });
@@ -230,6 +232,7 @@ const submitForm=()=>{
                                    'assembled_pcs':form.assembled_pcs,
                                    'order_qty':form.order_qty,
                                    'prepacks_total_quantity':0,
+                                   'customer_spec':form.customer_spec,
 
                                 //    'prepacks_total_quantity':form.prepacks_total_quantity,
                                    'item_description':form.item_description,
@@ -268,6 +271,7 @@ const updateScannedItem =(item)=>{
     form.item_description=item.item_description
     form.order_no=item.order_no
     form.line_no=item.line_no
+    form.customer_spec=item.customer_spec
     form.batch_no=''
 
 
@@ -284,6 +288,7 @@ const updateScannedItem =(item)=>{
     form2.item_description=item.item_description
     form2.order_no=item.order_no
     form2.line_no=item.line_no
+    form2.customer_spec=item.customer_spec
 
 
 
@@ -495,7 +500,10 @@ onUnmounted(() => {
                                                                     {{ line.barcode }}
                                                                 </td>
                                                                 <td class="px-3 py-2 text-xs">
-                                                                    {{ line.order_qty }}
+                                                                    {{ parseFloat(line.order_qty).toFixed(2) }}
+                                                                </td>
+                                                                <td class="px-3 py-2 text-xs">
+                                                                    {{ line.customer_spec }}
                                                                 </td>
 
                                                                 <!-- <td class="px-3 py-2 text-xs">
@@ -537,7 +545,10 @@ onUnmounted(() => {
                                                                     {{ line.barcode }}
                                                                 </td>
                                                                 <td class="px-3 py-2 text-xs">
-                                                                    {{ line.assembled_qty }}
+                                                                    {{ parseFloat(line.assembled_qty).toFixed(2) }}
+                                                                </td>
+                                                                <td class="px-3 py-2 text-xs">
+                                                                    {{line.customer_spec }}
                                                                 </td>
 
                                                                 </div>
@@ -595,17 +606,18 @@ onUnmounted(() => {
 
         class="flex flex-col justify-center gap-2 p-5">
         <span class="p-3 text-center capitalize">{{ form.item_description }}</span>
+        Customer Spec: {{ form.customer_spec }}
         <div class="flex flex-row justify_between ">
              <span class="px-3 text-center capitalize">Ordered PCS</span>
-            <span class="p-3 px-3 text-center text-black capitalize bg-lime-400">{{ form.assembled_pcs }}</span>
+             <span class="p-3 px-3 text-center text-black capitalize bg-lime-400">{{ form.assembled_pcs }}</span>
 
             <span class="px-3 text-center capitalize">Ordered Weight</span>
-            <span class="p-3 px-3 text-center text-white capitalize bg-teal-400">{{ form.order_qty,2 }}</span>
+            <span class="p-3 px-3 text-center text-white capitalize bg-teal-400">{{ parseFloat(form.order_qty).toFixed(2) }}</span>
         </div>
         <div class="flex flex-row justify_between">
 
             <span class="px-3 text-center capitalize">Prepacked Qty</span>
-            <span class="p-3 px-3 text-center text-black capitalize bg-orange-500">{{ form.prepacks_total_quantity }}</span>
+            <span class="p-3 px-3 text-center text-black capitalize bg-orange-500">{{ form.prepacks_total_quantity?parseFloat(form.prepacks_total_quantity).toFixed(2):0 }}</span>
         </div>
           <div
             class="flex items-center space-x-8"

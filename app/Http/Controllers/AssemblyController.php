@@ -54,6 +54,7 @@ class AssemblyController extends Controller
         $orderLines = Line::query()
                             ->select('item_no',
                                     'item_description',
+                                    'customer_spec',
                                     'line_no',
                                     'order_qty',
                                     'orders.order_no',

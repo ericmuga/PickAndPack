@@ -367,17 +367,17 @@ const showUpdateModal=(id)=>{
 
         <div class="items-center py-6 text-center" >
             <!-- <Modal :show="true" > Hi there </Modal> -->
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8" style="width:800px;">
+            <div class="items-center mx-auto text-center max-w-7xl sm:px-6 lg:px-8" >
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
 
                         <!--stats bar -->
 
-                        <div>
+                        <!-- <div> -->
                             <Toolbar>
                                 <template #start>
                                       <Button
-                                         label="Add"
+                                         label="Add Session"
                                          icon="pi pi-plus"
                                          severity="success"
                                          @click="showCreateModal()"
@@ -389,165 +389,143 @@ const showUpdateModal=(id)=>{
                                     <div>
                                         <!-- <Pagination :links="orderLines.meta.links" /> -->
                                         <input type="text" v-model="search"  ref="inputField" class="m-2 rounded-lg bg-slate-300 text-md">
-
-                                        <!-- <SearchBox :model="route('order.pack')" /> -->
-                                    <div>
-                                        <!-- <Pagination :links="orders.meta.links" /> -->
                                     </div>
-                                    </div>
-
-
                                 </template>
 
-                                    <template #end>
+                              </Toolbar>
 
-
-
-
-                                            <!-- <InputText v-model="search" aria-placeholder="search"/> -->
-
-                                             <div>
-
-                                            </div>
-                                            </template>
-                                        </Toolbar>
-
-                                        <div class="relative items-center overflow-x-auto overflow-y-auto text-center shadow-md sm:rounded-lg" style="height: 400px;">
+                                    <div class="grid items-center grid-cols-1 overflow-x-auto overflow-y-auto text-center shadow-md" style="height: 400px;">
 
 <!---table comes here-->
-                                            <table class="text-sm text-gray-500 dark:text-gray-400" >
-                                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                        <table class="-mt-40 text-sm text-gray-500 dark:text-gray-400" >
+                                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
-                                                    <tr class="bg-slate-300">
-                                                        <!-- <th scope="col" class="px-2 py-1">
-                                                            Barcode
-                                                        </th> -->
-                                                        <th >
-                                                           Session Id
-                                                        </th>
+                                                <tr class="bg-slate-300">
+                                                    <!-- <th scope="col" class="px-2 py-1">
+                                                        Barcode
+                                                    </th> -->
+                                                    <th >
+                                                        Session Id
+                                                    </th>
+                                                    <th class="text-center" >
+                                                        Route
+                                                    </th>
                                                         <th class="text-center" >
-                                                            Route
-                                                        </th>
-                                                        <!--
-                                                        <th scope="col" class="px-2 py-1">
-                                                            Assistant Loader
-                                                        </th>-->
-                                                        <th >
-                                                            Vehicle
-                                                        </th>
+                                                        Shipment Date
+                                                    </th>
+                                                    <!--
+                                                    <th scope="col" class="px-2 py-1">
+                                                        Assistant Loader
+                                                    </th>-->
+                                                    <th >
+                                                        Vehicle
+                                                    </th>
 
-                                                         <!-- <th scope="col" class="px-2 py-1">
-                                                            Driver
-                                                        </th> -->
-                                                        <th >
-                                                            Load
-                                                        </th>
+                                                        <!-- <th scope="col" class="px-2 py-1">
+                                                        Driver
+                                                    </th> -->
+                                                    <th >
+                                                        Load
+                                                    </th>
 
-                                                        <!-- <th col="2">
-                                                           Actions
-                                                        </th> -->
+                                                    <!-- <th col="2">
+                                                        Actions
+                                                    </th> -->
 
 
 
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr v-for="session in sessionsArray" :key="session.loading_session_id"
-                                                    class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="session in sessionsArray" :key="session.loading_session_id"
+                                                class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
+
+                                                <td class="">
+                                                    {{ session.loading_session_id }}
+                                                </td>
 
                                                     <td class="">
-                                                        {{ session.loading_session_id }}
-                                                    </td>
-
-                                                     <td class="">
-                                                        {{ session.sp_name }}
-                                                    </td>
-
-                                                     <td class="">
-
-                                                            {{ session.vehicle_plate }}
-
-                                                    </td>
-
-                                                     <!-- <td class="px-3 py-2 text-xs">
-
-                                                            {{session.driver}}
-
-                                                    </td> -->
+                                                    {{ session.sp_name }}
+                                                </td>
+                                                <td class="">
+                                                    {{ session.shp_date}}
+                                                </td>
 
                                                     <td class="">
 
+                                                        {{ session.vehicle_plate }}
+
+                                                </td>
+
+                                                    <!-- <td class="px-3 py-2 text-xs">
+
+                                                        {{session.driver}}
+
+                                                </td> -->
+
+                                                <td class="">
 
 
-                                                            <!-- <Button
-                                                                v-if="session.lines.length>0"
-                                                                type="button"
-                                                                label="Load"
-                                                                icon="pi pi-gift"
-                                                                :badge="session.lines.length"
-                                                                badgeClass="p-badge-danger"
-                                                                outlined
-                                                                @click="showContents(session)"
-                                                                /> -->
+
+                                                        <!-- <Button
+                                                            v-if="session.lines.length>0"
+                                                            type="button"
+                                                            label="Load"
+                                                            icon="pi pi-gift"
+                                                            :badge="session.lines.length"
+                                                            badgeClass="p-badge-danger"
+                                                            outlined
+                                                            @click="showContents(session)"
+                                                            /> -->
 
 
 
-                                                    </td>
+                                                </td>
 
 
-                                                    <td class="px-3 py-2 text-xs text-center">
+                                                <td class="px-3 py-2 text-xs text-center">
+                                                    <Button
+                                                        @click="filteredView(session.loading_session_id)"
+                                                        :disabled="(session.status==='complete')"
+                                                        :severity="(session.status==='complete')?'success':'warning'"
+
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                                                        </svg>
+                                                            <!-- <div class="card">
+                                                            <ProgressBar :value="50"></ProgressBar>
+                                                        </div> -->
+                                                    </Button>
+
+
+                                                </td>
+                                                <td>
+                                                    <div class="flex flex-row">
+                                                        <!-- <Drop  :drop-route="route('sessions.destroy',{'session':session.id})"/> -->
                                                         <Button
-                                                         @click="filteredView(session.loading_session_id)"
-                                                         :disabled="(session.status==='complete')"
-                                                         :severity="(session.status==='complete')?'success':'warning'"
-
-                                                        >
-                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
-                                                            </svg>
-                                                             <!-- <div class="card">
-                                                                <ProgressBar :value="50"></ProgressBar>
-                                                            </div> -->
-                                                        </Button>
+                                                                    icon="pi pi-pencil"
+                                                                    severity="info"
+                                                                    text
 
 
-                                                    </td>
-                                                    <td>
-                                                       <div class="flex flex-row">
-                                                          <!-- <Drop  :drop-route="route('sessions.destroy',{'session':session.id})"/> -->
-                                                            <Button
-                                                                      icon="pi pi-pencil"
-                                                                      severity="info"
-                                                                      text
+                                                                    @click="showUpdateModal(session.loading_session_id)"
+                                                                    />
+                                                    </div>
+                                                </td>
 
+                                        </tr>
 
-                                                                      @click="showUpdateModal(session.loading_session_id)"
-                                                                      />
-                                                       </div>
-                                                    </td>
-
-                                            </tr>
-
-                            </tbody>
-                        </table>
-
-
-                                        </div>
+                        </tbody>
+                                        </table>
+                                  </div>
 
 
 
 
 
 
-                </div>
-                        <div class="items-center w-full text-center">
-
-                            <!-- <Pagination :links="sessions.meta.links" /> -->
-                        </div>
-
-
-
-                <!--end of stats bar-->
+                <!-- </div> -->
 
             </div>
         </div>
