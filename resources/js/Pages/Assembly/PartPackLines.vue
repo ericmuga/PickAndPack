@@ -308,6 +308,7 @@ let allAssembled=true;
                   for (var i = props.orderLines.length - 1; i >= 0; i--)
                          {
                            filteredAssembly=assembledArray.value.filter(line=>line.line_no===props.orderLines[i].line_no)
+                           console.log(filteredAssembly)
                            if (filteredAssembly.length==0)
                            {
                             allAssembled=false;
