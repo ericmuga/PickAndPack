@@ -232,24 +232,10 @@ const exportData = (jsonData, columns) => {
 const sessionsArray =ref([]);
 onMounted(()=>{
     sessionsArray.value=props.sessions;
+    inputField.value.focus();
 })
 
-const search=ref()
-watch(search, debounce(()=>{
-    // Inertia.post('/order/all',{search:search.value}, {preserveScroll: true})
-    if (search.value!='')
-    {
-      sessionsArray.value=sessionsArray.value.filter(session=>
-        {
-            return session.vehicle_plate.startsWith(search.value.toUpperCase())
-            ||session.sp_name.includes(search.value)
 
-        })
-    }
-
-   else
-    sessionsArray.value=props.sessions;
-    }, 500));
 
 const props=defineProps({
     sessions:Object,
@@ -260,9 +246,7 @@ const props=defineProps({
 })
     const inputField=ref(null);
 
-    onMounted(() => {
-    inputField.value.focus();
-});
+
 
 const filteredView=(id)=>{
 
@@ -344,8 +328,49 @@ const showUpdateModal=(id)=>{
     showModal.value=true
 }
 
+const shp_date=ref();
+
+const search=ref()
+watch(search, debounce(()=>{
+
+    if (sessionsArray.value.length>0)
+    {    if (search.value!='')
+            {
+            sessionsArray.value=sessionsArray.value.filter(session=>
+                {
+                    return session.vehicle_plate.startsWith(search.value.toUpperCase())
+                    ||session.sp_name.includes(search.value)
+
+                })
+            }
+
+        else
+            sessionsArray.value=props.sessions;
+
+        if(shp_date.value) sessionsArray.value=sessionsArray.value.filter(session=>session.shp_date==shp_date.value)
+
+    }
+    }, 500));
 
 
+
+watch(shp_date,()=>{
+    if (!shp_date.value)
+       sessionsArray.value=props.sessions;
+    else
+      sessionsArray.value=sessionsArray.value.filter(session=>session.shp_date==shp_date.value)
+
+   if (search.value!==undefined)
+    {
+      sessionsArray.value=sessionsArray.value.filter(session=>
+        {
+            return session.vehicle_plate.startsWith(search.value.toUpperCase())
+            ||session.sp_name.includes(search.value)
+
+        })
+    }
+
+});
 
 
 
@@ -390,6 +415,13 @@ const showUpdateModal=(id)=>{
                                         <!-- <Pagination :links="orderLines.meta.links" /> -->
                                         <input type="text" v-model="search"  ref="inputField" class="m-2 rounded-lg bg-slate-300 text-md">
                                     </div>
+                                    <div class="flex flex-row">
+                                    <input type="date"
+                                        v-model="shp_date"
+                                        />
+                                        <Button v-show="shp_date!=null" @click="shp_date=null" icon="pi pi-times" severity="danger" outlined aria-label="Cancel" />
+
+                                     </div>
                                 </template>
 
                               </Toolbar>
