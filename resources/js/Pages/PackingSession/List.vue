@@ -226,11 +226,14 @@ watch(shp_date,()=>{
                                    <div class="flex flex-col items-center gap-2">
 
                                      <input type="text" v-model="newItem"  ref="inputField" placeholder="Search Order" class="justify-center max-w-sm m-2 text-center rounded-lg bg-slate-300 ">
-                                     <input type="date"
+                                     <div class="flex flex-row">
+                                        <input type="date"
                                         v-model="shp_date"
                                         />
                                         <Button v-show="shp_date!=null" @click="shp_date=null" icon="pi pi-times" severity="danger" outlined aria-label="Cancel" />
-                                     <div v-if="ordersArray.length==0" class="w-full p-3 mt-2 text-center">
+
+                                     </div>
+                                      <div v-if="ordersArray.length==0" class="w-full p-3 mt-2 text-center">
                                                  No Orders were found.
                                      </div>
                                      <div class="relative overflow-x-auto overflow-y-auto shadow-md sm:rounded-lg"
