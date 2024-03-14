@@ -61,34 +61,7 @@ ordersArray.value=props.orders
 let newItem=ref('');
 
 
-watch( newItem,
- debounce( ()=>{
-    // const filteredOrders = props.orders.filter(order => {
-    //         const packingCount = parseInt(order.A_Packing_Count) +
-    //                             parseInt(order.B_Packing_Count) +
-    //                             parseInt(order.C_Packing_Count) +
-    //                             parseInt(order.D_Packing_Count);
 
-    //         const assemblyCount = parseInt(order.A_Assembly_Count) +
-    //                             parseInt(order.B_Assembly_Count) +
-    //                             parseInt(order.C_Assembly_Count) +
-    //                             parseInt(order.D_Assembly_Count);
-
-    //         return packingCount > assemblyCount;
-    //     });
-
-    // ordersArray.value.push(...filteredOrders)
-    // alert('i')
-    if (newItem.value!='')
-     ordersArray.value = ordersArray.value.filter(item =>
-                                                    item.order_no.includes(newItem.value) ||
-                                                    item.shp_name.toUpperCase().includes(newItem.value.toUpperCase())
-                                                );
-
-    else ordersArray.value=props.orders
- })
-
-,500);
 const adminArray = ['supervisor', 'admin'];
 
 const adminOrSupervisor = computed(() => props.roles.some(value => adminArray.includes(value)));
@@ -186,6 +159,40 @@ const showUpdateModal=(session)=>{
     form.part=session.part
 
 }
+
+const shp_date=ref();
+
+watch( newItem,
+ debounce( ()=>{
+
+    if (newItem.value!='')
+     ordersArray.value = ordersArray.value.filter(item =>
+                                                    item.order_no.includes(newItem.value) ||
+                                                    item.shp_name.toUpperCase().includes(newItem.value.toUpperCase())
+                                                );
+
+    else ordersArray.value=props.orders
+
+     if (shp_date.value) ordersArray.value=ordersArray.value.filter(order=>order.shp_date==shp_date.value)
+ })
+
+,500);
+
+watch(shp_date,()=>{
+    if (!shp_date.value)
+       ordersArray.value=props.orders;
+    else
+      ordersArray.value=ordersArray.value.filter(order=>order.shp_date==shp_date.value)
+
+        if (newItem.value!='')
+           ordersArray.value=ordersArray.value.filter(item=>item.order_no.endsWith(newItem.value))
+
+   if (newItem.value!='')
+     ordersArray.value = ordersArray.value.filter(item =>
+                                                    item.order_no.includes(newItem.value) ||
+                                                    item.shp_name.toUpperCase().includes(newItem.value.toUpperCase())
+                                                );
+});
 </script>
 
 
@@ -219,7 +226,10 @@ const showUpdateModal=(session)=>{
                                    <div class="flex flex-col items-center gap-2">
 
                                      <input type="text" v-model="newItem"  ref="inputField" placeholder="Search Order" class="justify-center max-w-sm m-2 text-center rounded-lg bg-slate-300 ">
-
+                                     <input type="date"
+                                        v-model="shp_date"
+                                        />
+                                        <Button v-show="shp_date!=null" @click="shp_date=null" icon="pi pi-times" severity="danger" outlined aria-label="Cancel" />
                                      <div v-if="ordersArray.length==0" class="w-full p-3 mt-2 text-center">
                                                  No Orders were found.
                                      </div>
