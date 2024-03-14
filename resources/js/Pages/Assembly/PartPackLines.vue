@@ -297,57 +297,76 @@ onMounted(() => {
 
 
 
-
+let allAssembled=true;
+                  let filteredAssembly=[];
                 const closeAssembly = () => {
-                    // Swal.fire({
-                        //     title: 'Are you sure?',
-                        //     text: "Assembled orders may not be undone!",
-                        //     icon: 'warning',
-                        //     showCancelButton: true,
-                        //     confirmButtonColor: '#3085d6',
-                        //     cancelButtonColor: '#d33',
-                        //     confirmButtonText: 'Close Assembly!',
-                        //     allowOutsideClick: () => !Swal.isLoading(), // Prevent interaction when loading
-                        // }).then((result) => {
-                            //     stopTimer();
-                            //     if (result.isConfirmed) {
-                                //         Swal.fire({
-                                    //             title: 'Posting..',
-                                    //             html: '<div class="flex items-center justify-center"><img src="/img/loading.gif" style="width: 100px; height: 100px;"/></div>',
-                                    //             allowOutsideClick: false,
-                                    //             showConfirmButton: false,
-                                    //         });
-                                    if (assembledArray.value.length==0) {
+                     if (assembledArray.value.length==0) {
                                         Swal.fire('Error','The assembly is empty','error')
                                     }
-                                    else{
+                    //check if all lines have been assembled, alert if partial assembly
 
-                                        // if (assembledArray.value.some(function(item)
-                                        // {
-                                        //     return isNaN(item.assembled_qty)||isNaN(item.assembled_pcs)||isNaN(item.from_batch)||isNaN(item.to_batch);
-                                        // } )){
-                                        //     Swal.fire('Error','One of the numeric values contains a non-number','error')
-                                        // }
-                                        // else
+                  for (var i = props.orderLines.length - 1; i >= 0; i--)
+                         {
+                           filteredAssembly=assembledArray.value.filter(line=>line.line_no===props.orderLines[i].line_no)
+                           if (filteredAssembly.length==0)
+                           {
+                            allAssembled=false;
+                            break;
+                           }
+                         }//
+
+                         if (allAssembled)
+                           {
 
 
-                                        Inertia.post(
-                                        route('assembly.store'),
-                                        {
-                                            'data': assembledArray.value,
-                                            'part':props.orderLines[0].part,
-                                            'autosave': false,
-                                            'assembly_time': formatTime.value,
-                                        },
-                                        {
-                                            // onSuccess: () => Swal.fire('Success!', 'Assembly Closed Successfully!', 'success'),
-                                            onError: (error) => Swal.fire('Error', error.message, 'error')
-                                        }
-                                        );
-                                        //         }
-                                        //     });
-                                    };
+                                Inertia.post(
+                                route('assembly.store'),
+                                {
+                                    'data': assembledArray.value,
+                                    'part':props.orderLines[0].part,
+                                    'autosave': false,
+                                    'assembly_time': formatTime.value,
+                                },
+                                {
+                                    onError: (error) => Swal.fire('Error', error.message, 'error')
                                 }
+                                );
+
+
+                            }
+
+                            else
+                            {
+                              Swal.fire({
+                                        title: 'Partial Assembly?',
+                                        text: "One or more lines have not been assembled. Confirm Partial Assembly?",
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#3085d6',
+                                        cancelButtonColor: '#d33',
+                                        confirmButtonText: 'Confirm!'
+                                        }).
+                                        then((result) => {
+                                            if (result.isConfirmed) {
+
+                                               Inertia.post(
+                                                    route('assembly.store'),
+                                                    {
+                                                        'data': assembledArray.value,
+                                                        'part':props.orderLines[0].part,
+                                                        'autosave': false,
+                                                        'assembly_time': formatTime.value,
+                                                    },
+                                                    {
+                                                        onError: (error) => Swal.fire('Error', error.message, 'error')
+                                                    }
+                                                    );
+
+                                            }})
+
+                            }
+                        };
+
 
 
 
