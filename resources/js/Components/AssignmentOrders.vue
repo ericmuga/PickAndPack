@@ -251,16 +251,16 @@ watch(searchKey,debounce(()=>{
                         </th>
 
 
-                        <th v-show="station=='a'" scope="col" class="px-4 py-2 text-center">
+                        <th v-show="station=='a'" scope="col" class="px-2 py-1 text-center">
                             A
                         </th>
-                        <th v-show="station=='b'" scope="col" class="px-4 py-2 text-center">
+                        <th v-show="station=='b'" scope="col" class="px-2 py-1 text-center">
                             B
                         </th>
-                        <th v-show="station=='a'" scope="col" class="px-4 py-2 text-center">
+                        <th v-show="station=='a'" scope="col" class="px-2 py-1 text-center">
                             C
                         </th>
-                        <th v-show="station=='a'" scope="col" class="px-4 py-2 text-center">
+                        <th v-show="station=='a'" scope="col" class="px-2 py-1 text-center">
                             D
                         </th>
 
@@ -271,60 +271,60 @@ watch(searchKey,debounce(()=>{
                     <tr v-for="order in ordersArray" :key="order.order_no"
                     class="font-semibold text-black bg-white hover:bg-gray-300">
 
-                    <td class="px-3 py-2 text-xs">
+                    <td class="px-1 py-1 text-xs">
                         {{ order.order_no }}
                     </td>
-                    <td class="flex flex-col px-3 py-2 text-xs text-center">
+                    <td class="flex flex-col px-1 py-1 text-xs text-center">
                         <span class="text-xs font-bold">{{order.sp_code}}</span>
 
                     </td>
-                    <td class="px-3 py-2 text-xs font-bold text-center capitalize bg-yellow-200 rounded-full">
+                    <td class="px-1 py-1 text-xs font-bold text-center capitalize bg-yellow-200 rounded-full">
                         {{ order.shp_name }}
                     </td>
-                    <td class="px-3 py-2 text-xs font-bold">
+                    <td class="px-3 py-2 text-xs ">
                         {{ order.shp_date }}
                     </td>
 
-                    <td class="px-3 py-2 text-xs font-bold text-center" v-show="station=='a'">
+                    <td class="px-1 py-1 text-xs text-center" v-show="station=='a'">
                         <Button
-                        :icon="checkAssigned(order.order_no,'A')?'pi pi-check':'pi pi-question'"
+
                         :severity="checkAssigned(order.order_no,'A')?'success':'warning'"
                         v-show="order.A_Weight>0"
-                        :label="order.A_Weight"
+                        :label="'W:'+order.A_Weight+'L:'+order.A_Items"
                         :disabled="checkAssigned(order.order_no,'A')"
                         @click="pushUniqueOrder(order.order_no,'A',order.A_Weight)"
 
                         />
 
                     </td>
-                    <td class="px-3 py-2 text-xs font-bold text-center" v-show="station=='b'">
+                    <td class="px-1 py-1 text-xs text-center" v-show="station=='b'">
                         <Button
-                        :icon="checkAssigned(order.order_no,'B')?'pi pi-check':'pi pi-question'"
+
                         :severity="checkAssigned(order.order_no,'B')?'success':'warning'"
                         v-show="order.B_Weight>0"
-                        :label="order.B_Weight"
+                        :label="'W:'+order.B_Weight+'L:'+order.B_Items"
                         :disabled="checkAssigned(order.order_no,'B')"
                         @click="pushUniqueOrder(order.order_no,'B',order.B_Weight)"
 
                         />
                     </td>
-                    <td class="px-3 py-2 text-xs font-bold text-center" v-show="station=='a'">
+                    <td class="px-1 py-1 text-xs text-center" v-show="station=='a'">
                         <Button
-                        :icon="checkAssigned(order.order_no,'C')?'pi pi-check':'pi pi-question'"
+
                         :severity="checkAssigned(order.order_no,'C')?'success':'warning'"
                         v-show="order.C_Weight>0"
-                        :label="order.C_Weight"
+                       :label="'W:'+order.C_Weight+'L:'+order.C_Items"
                         :disabled="checkAssigned(order.order_no,'C')"
                         @click="pushUniqueOrder(order.order_no,'C',order.C_Weight)"
 
                         />
                     </td>
-                    <td class="px-3 py-2 text-xs font-bold text-center" v-show="station=='a'">
+                    <td class="px-1 py-1 text-xs text-center" v-show="station=='a'">
                         <Button
-                        :icon="checkAssigned(order.order_no,'D')?'pi pi-check':'pi pi-question'"
+
                         :severity="checkAssigned(order.order_no,'D')?'success':'warning'"
                         v-show="order.D_Weight>0"
-                        :label="order.D_Weight"
+                        :label="'W:'+order.D_Weight+'L:'+order.D_Items"
                         :disabled="checkAssigned(order.order_no,'D')"
                         @click="pushUniqueOrder(order.order_no,'D',order.D_Weight)"
 
