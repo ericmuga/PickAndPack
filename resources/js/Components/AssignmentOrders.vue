@@ -86,33 +86,7 @@ watch(assignedRef, (newValue, oldValue) => {
 
 
 
-watch(selected_sps, debounce(() => {
-    if (selected_sps.value.length > 0) {
-        ordersArray.value = props.orders.filter(order => selected_sps.value.includes(order.sp_code));
 
-        if (searchKey.value!='')
-        ordersArray.value=ordersArray.value.filter(item=>item.order_no.endsWith(searchKey.value))
-    } else {
-        ordersArray.value = props.orders;
-    }
-    extractSpArray();
-}, 300));
-
-watch(searchKey,debounce(()=>{
-    // console.log('got')
-    if (searchKey.value=='')
-    ordersArray.value=props.orders;
-    else
-    {
-        //ordersArray.value = props.orders.filter(order => searchKey.value.includes(order.sp_code));
-       ordersArray.value=ordersArray.value.filter(item=>item.order_no.endsWith(searchKey.value))
-        if (selected_sps.value.length > 0) {
-        ordersArray.value = props.orders.filter(order => selected_sps.value.includes(order.sp_code));
-
-        }
-    }
-    extractSpArray();
-},300));
 
 function pushUniqueOrder(orderNo, part,weight) {
     // Check if the object already exists in the array
@@ -160,6 +134,51 @@ const removeFullyAssigned=(orderNo)=>{
 
 }
 
+const shp_date=ref();
+
+watch(shp_date,()=>{
+    if (!shp_date.value)
+       ordersArray.value=props.orders;
+    else
+      ordersArray.value=ordersArray.value.filter(order=>order.shp_date==shp_date.value)
+
+        if (searchKey.value!='')
+           ordersArray.value=ordersArray.value.filter(item=>item.order_no.endsWith(searchKey.value))
+         if (selected_sps.value.length > 0)
+            ordersArray.value = ordersArray.value.filter(order => selected_sps.value.includes(order.sp_code));
+extractSpArray();
+});
+
+watch(selected_sps, () => {
+    if (selected_sps.value.length > 0)
+        ordersArray.value = props.orders.filter(order => selected_sps.value.includes(order.sp_code));
+    else
+       ordersArray.value = props.orders;
+
+     if (shp_date.value)
+        ordersArray.value=ordersArray.value.filter(order=>order.shp_date==shp_date.value)
+
+    if (searchKey.value!='')
+        ordersArray.value=ordersArray.value.filter(item=>item.order_no.endsWith(searchKey.value))
+
+    extractSpArray();
+});
+
+watch(searchKey,debounce(()=>{
+    // console.log('got')
+    if (searchKey.value=='')
+    ordersArray.value=props.orders;
+    else
+      ordersArray.value=ordersArray.value.filter(item=>item.order_no.endsWith(searchKey.value))
+
+    if (selected_sps.value.length > 0)
+        ordersArray.value = ordersArray.value.filter(order => selected_sps.value.includes(order.sp_code));
+    if (shp_date.value!=null)
+          ordersArray.value=ordersArray.value.filter(order=>order.shp_date==shp_date.value)
+   extractSpArray();
+},300));
+
+
 
 
 
@@ -198,6 +217,10 @@ const removeFullyAssigned=(orderNo)=>{
                 <div class="flex flex-row items-center justify-center m-5 text-center">
 
                     <input type="text" v-model="searchKey" placeholder="Search Order" class="m-2 rounded-lg bg-slate-300 text-md" />
+                    <input type="date"
+                      v-model="shp_date"
+                    />
+                    <Button v-show="shp_date!=null" @click="shp_date=null" icon="pi pi-times" severity="danger" outlined aria-label="Cancel" />
                 </div>
 
 

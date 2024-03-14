@@ -5,10 +5,9 @@ import { Head } from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
 import debounce from 'lodash/debounce';
 import {watch, ref,onMounted} from 'vue';
-// import Swal from 'sweetalert2'
-// import SearchBox from '@/Components/SearchBox.vue'
+
 import { Inertia } from '@inertiajs/inertia';
-// import Intertia from
+import Calendar from 'primevue/calendar';
 
 const search=ref('')
 const inputField=ref(null);
@@ -83,7 +82,7 @@ watch(search, debounce(()=>{
     }
 }, 500));
 
-
+const ship_date=ref([]);
 
 const confirmPack=(order_no,part)=>{
 
@@ -124,6 +123,7 @@ const confirmPack=(order_no,part)=>{
                                                 placeholder="Search Order"
                                                 class="m-2 text-center rounded-lg bg-slate-300 text-md"
                                         >
+
 
                                         <!-- <SearchBox :model="route('order.pack')" /> -->
                                     <div>

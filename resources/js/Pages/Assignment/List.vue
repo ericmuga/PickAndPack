@@ -265,14 +265,7 @@ import ProgressBar from 'primevue/progressbar';
 
                                                 </tbody>
  </table>
-<!-- </div>
-       <div v-for="assignment in assignments.data" :key="assignment.id">
-          <AssignmentCard :assignment="assignment" @click="showContents(assignment.id)" class="shadow-md hover:shadow-lg hover:cursor-pointer hover:shadow-orange-400" />
-       </div>
-
-</div> -->
-
-                                      </div>
+                   </div>
                                       </div>
                                       </div>
          <Toolbar>

@@ -51,7 +51,6 @@ createInertiaApp({
             .component('Pagination',Pagination)
             .component('SearchBox',SearchBox)
             .component('Calendar',Calendar)
-            .component('Calendar',Calendar)
             .component('Password',Password)
             .component('Badge',Badge)
             // .component('Link',Link)

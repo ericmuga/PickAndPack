@@ -14,7 +14,10 @@ use Illuminate\Support\Facades\DB;
 class ConfirmationController extends Controller
 {
     // use ExcelExportTrait;
-
+public function download(Request $request)
+    {
+        return Excel::download(new ConfirmationExport($request), 'confirmations.xlsx');
+    }
 
     public function index(Request $request)
     {    $orders=DB::table('pending_confirmation')
@@ -31,10 +34,7 @@ class ConfirmationController extends Controller
 
         ]);
     }
-    public function download(Request $request)
-    {
-        return Excel::download(new ConfirmationExport($request), 'confirmations.xlsx');
-    }
+
 
 
     public function store(Request $request)
