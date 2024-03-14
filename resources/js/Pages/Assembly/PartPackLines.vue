@@ -304,7 +304,8 @@ let allAssembled=true;
                                         Swal.fire('Error','The assembly is empty','error')
                                     }
                     //check if all lines have been assembled, alert if partial assembly
-
+              else
+              {
                   for (var i = props.orderLines.length - 1; i >= 0; i--)
                          {
                            filteredAssembly=assembledArray.value.filter(line=>line.line_no===props.orderLines[i].line_no)
@@ -366,6 +367,7 @@ let allAssembled=true;
                                             }})
 
                             }
+                        }
                         };
 
 

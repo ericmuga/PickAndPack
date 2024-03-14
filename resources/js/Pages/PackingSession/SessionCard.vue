@@ -223,38 +223,65 @@ function () {
 
 );
 
-
+let filteredPacking=[];
+let allPacked=true
 const closePacking=()=>{
-
-//     Swal.fire({
-//     title: 'Are you sure?',
-//     text: "Packed orders may not be undone!",
-//     icon: 'warning',
-//     showCancelButton: true,
-//     confirmButtonColor: '#3085d6',
-//     cancelButtonColor: '#d33',
-//     confirmButtonText: 'End Session!',
-//     allowOutsideClick: () => !Swal.isLoading() // Prevent interaction when loading
-// }).then((result) => {
-//     if (result.isConfirmed) {
-//         Swal.fire({
-//             title: 'Posting..',
-//             html: '<div class="flex items-center justify-center"><img src="/img/loading.gif" style="width: 100px; height: 100px;"/></div>',
-//             allowOutsideClick: false,
-//             showConfirmButton: false,
-//         });
-
-        Inertia.post(
-            route('packingSession.close'),
-            { 'id': props.session.data.id ,lines:lines.value},
+ filteredPacking=[];
+ allPacked=true
+//prevent empty packing
+     if (lines.value.length===0)
+      Swal.fire('Error!','Empty Packing','error');
+    else
+//warn if not all lines have been packed
+       { for(var i=0; i<props.OrderLines.data.length;i++)
+        {
+            filteredPacking=lines.value.filter(line=>line.line_no===props.OrderLines.data[i].line_no);
+            if (filteredPacking.length==0)
             {
-                onSuccess: () => Swal.fire('Success!', 'Session Ended Successfully!', 'success'),
-                onError: (error) => Swal.fire('Error', error.message, 'error')
+                allPacked=false;
+                break;
             }
-        );
-    // }
-// });
 
+        }
+
+        if (!allPacked)
+        {
+            //give warning
+            Swal.fire({
+                title: 'Partial Packing?',
+                text: "One or more lines has not been packed. Confirm Partial Packing?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Confirm!'
+                }).
+                then((result) => {
+                    if (result.isConfirmed) {
+
+                        Inertia.post(
+                                route('packingSession.close'),
+                                { 'id': props.session.data.id ,'lines':lines.value},
+                                {
+                                    onSuccess: () => Swal.fire('Success!', 'Session Ended Successfully!', 'success'),
+                                    onError: (error) => Swal.fire('Error', error.message, 'error')
+                                }
+                            );
+
+                    }})
+        }
+        else
+
+            Inertia.post(
+                route('packingSession.close'),
+                { 'id': props.session.data.id ,'lines':lines.value},
+                {
+                    onSuccess: () => Swal.fire('Success!', 'Session Ended Successfully!', 'success'),
+                    onError: (error) => Swal.fire('Error', error.message, 'error')
+                }
+            );
+
+    }
 }
 
 

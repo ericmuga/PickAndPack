@@ -645,37 +645,67 @@ const updateScannedItem =(item)=>{
 }
 
 
-
+let allAssembled=true;
+                  let filteredAssembly=[];
 
 
 const closeAssembly=()=>{
 
      //if the assembled quantity is not equal to the ordered quantity
 
-     Swal.fire({
-                    title: 'Are you sure?',
-                    text: "Packed orders may not be undone!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Pack Order!'
-                    }).then((result) => {
-                        if (result.isConfirmed)
-                        {
+       if (assembledArray.value.length==0) {
+                                        Swal.fire('Error','The packing is empty','error')
+                                    }
 
-                          stopTimer();
-                          // console.log(formatTime);
-                            Inertia.post(route('packing.store'),{'data':assembledArray.value,
-                                                                 'packing_time':formatTime.value,
-                                                                 'checker_id':checker_id.value,
-                                                                 'autosave':false,
-                                                                }
-                                         );
+     for (var i = props.orderLines.length - 1; i >= 0; i--)
+                         {
+                           filteredAssembly=assembledArray.value.filter(line=>line.line_no===props.orderLines[i].line_no)
+                           console.log(filteredAssembly)
+                           if (filteredAssembly.length==0)
+                           {
+                            allAssembled=false;
+                            break;
+                           }
+                         }//
+
+                         if (!allAssembled)
+                           {
+
+                                Swal.fire({
+                                                title: 'Partial Packing?',
+                                                text: "Confirm Partial packing?",
+                                                icon: 'warning',
+                                                showCancelButton: true,
+                                                confirmButtonColor: '#3085d6',
+                                                cancelButtonColor: '#d33',
+                                                confirmButtonText: 'Pack Order!'
+                                                }).then((result) => {
+                                                    if (result.isConfirmed)
+                                                    {
+
+                                                    stopTimer();
+                                                    // console.log(formatTime);
+                                                        Inertia.post(route('packing.store'),{'data':assembledArray.value,
+                                                                                            'packing_time':formatTime.value,
+                                                                                            'checker_id':checker_id.value,
+                                                                                            'autosave':false,
+                                                                                            }
+                                                                    );
 
 
-                        }
-    })
+                                                    }
+                                })
+                            }
+                            else{
+                                stopTimer();
+                                                    // console.log(formatTime);
+                                                        Inertia.post(route('packing.store'),{'data':assembledArray.value,
+                                                                                            'packing_time':formatTime.value,
+                                                                                            'checker_id':checker_id.value,
+                                                                                            'autosave':false,
+                                                                                            }
+                                                                    );
+                            }
 }
 
 const isRunning = ref(false);
