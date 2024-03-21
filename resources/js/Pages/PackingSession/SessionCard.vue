@@ -1074,9 +1074,20 @@ lookupAndAddProperties();
 
 
 
+const removeFromArray=(line)=>{
+    //check if carton printed.
 
 
 
+
+    lines.value=lines.value.filter(l=>l.id!==line.id)
+    items.value=lines.value
+}
+
+const getVesselCode =(id)=>{
+    // console.log(id)
+    return props.packingVessels.data.filter(v=>v.id==id)[0].code
+}
 
 
 
@@ -1212,7 +1223,7 @@ lookupAndAddProperties();
                                                             {{ parseFloat(line.weight).toFixed(2)}}
                                                         </td>
                                                         <td class="px-3 text-xs font-bold">
-                                                            {{ line.packing_vessel_code }}
+                                                            {{ getVesselCode(line.packing_vessel_id) }}
                                                         </td>
                                                         <td class="px-3 text-xs font-bold">
                                                             {{ line.from_vessel}}
@@ -1230,14 +1241,14 @@ lookupAndAddProperties();
 
                                                         <Button icon="pi pi-times" class="justify-end p-button-danger"
                                                         text rounded
-                                                        @click="drop(route('packingSessionLine.destroy',{'id':line.id}))"
+                                                        @click="removeFromArray(line)"
                                                         />
-                                                        <Button
+                                                        <!-- <Button
                                                         icon="pi pi-pencil"
                                                         severity="info"
                                                         text
                                                         @click="showUpdateModal(line)"
-                                                        />
+                                                        /> -->
 
                                                     </td>
                                                     <td v-else></td>
