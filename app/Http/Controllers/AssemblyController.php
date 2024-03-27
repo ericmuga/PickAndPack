@@ -34,7 +34,8 @@ class AssemblyController extends Controller
                                             'A_Assembly_Count',
                                             'B_Assembly_Count',
                                             'C_Assembly_Count',
-                                            'D_Assembly_Count'
+                                            'D_Assembly_Count',
+                                            'Complete'
                                             )
                                     ->where('shp_date', '>=', now()->toDateString())
                                     ->where('assignee_id', '=', $request->user()->id)

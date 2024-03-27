@@ -26,60 +26,22 @@ const ordersArray=ref([]);
 onMounted(()=>{
     inputField.value.focus();
 
-    const filteredOrders = props.orders.filter(order => {
-    const assignmentCount = parseInt(order.A_Assignment_Count) +
-                           parseInt(order.B_Assignment_Count) +
-                           parseInt(order.C_Assignment_Count) +
-                           parseInt(order.D_Assignment_Count);
-
-    const assemblyCount = parseInt(order.A_Assembly_Count) +
-                         parseInt(order.B_Assembly_Count) +
-                         parseInt(order.C_Assembly_Count) +
-                         parseInt(order.D_Assembly_Count);
-
-    return assignmentCount > assemblyCount;
-});
+    const filteredOrders = props.orders.filter(order => order.Complete==0);
 
 ordersArray.value.push(...filteredOrders);
         });
 
 
+
+
+
 watch(search, debounce(()=>{
-
-//   if (ordersArray.value.length>0)
-    if (search.value!='')
-  {
-        ordersArray.value=ordersArray.value.filter(item=>{
-             const assignmentCount = parseInt(item.A_Assignment_Count) +
-                           parseInt(item.B_Assignment_Count) +
-                           parseInt(item.C_Assignment_Count) +
-                           parseInt(item.D_Assignment_Count);
-
-    const assemblyCount = parseInt(item.A_Assembly_Count) +
-                         parseInt(item.B_Assembly_Count) +
-                         parseInt(item.C_Assembly_Count) +
-                         parseInt(item.D_Assembly_Count)
+    // alert('here')
+if (search.value!='')
+      ordersArray.value=props.orders.filter(item=>item.order_no.endsWith(search.value)&&(item.Complete==0));
+else  ordersArray.value = props.orders.filter(order =>order.Complete==0);
 
 
-        return    item.order_no.endsWith(search.value)&&(assignmentCount > assemblyCount);
-
-        })
-    }
-    else {
-        ordersArray.value = props.orders.filter(order => {
-    const assignmentCount = parseInt(order.A_Assignment_Count) +
-                           parseInt(order.B_Assignment_Count) +
-                           parseInt(order.C_Assignment_Count) +
-                           parseInt(order.D_Assignment_Count);
-
-    const assemblyCount = parseInt(order.A_Assembly_Count) +
-                         parseInt(order.B_Assembly_Count) +
-                         parseInt(order.C_Assembly_Count) +
-                         parseInt(order.D_Assembly_Count);
-
-    return assignmentCount > assemblyCount;
-});
-    }
 }, 500));
 
 const ship_date=ref([]);

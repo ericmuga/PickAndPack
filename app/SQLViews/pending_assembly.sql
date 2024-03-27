@@ -1,11 +1,7 @@
 USE [pickandpack]
 GO
 
-/****** Object:  View [dbo].[pending_assembly]    Script Date: 27/02/2024 16:36:05 ******/
-DROP VIEW [dbo].[pending_assembly]
-GO
-
-/****** Object:  View [dbo].[pending_assembly]    Script Date: 27/02/2024 16:36:05 ******/
+/****** Object:  View [dbo].[pending_assembly]    Script Date: 27/03/2024 08:46:41 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -13,7 +9,8 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 
-CREATE   VIEW [dbo].[pending_assembly] as(
+
+CREATE OR ALTER   VIEW [dbo].[pending_assembly] as(
 
 
 SELECT
@@ -32,6 +29,16 @@ SELECT
     COALESCE(e.B_Assembly_Count, 0) AS B_Assembly_Count,
     COALESCE(e.C_Assembly_Count, 0) AS C_Assembly_Count,
     COALESCE(e.D_Assembly_Count, 0) AS D_Assembly_Count,
+	CASE when (select count ([line_no]) from [lines] where [order_no]=a.[order_no] and order_qty>0)=
+	           (SELECT
+					 count (*)
+					 FROM
+				 [assembly_lines]
+				  inner join [assembly_sessions] on assembly_session_id=assembly_sessions.id
+				  inner join [lines] on [assembly_lines].line_no=lines.line_no and [lines].order_no=assembly_sessions.order_no
+
+			    ) then 1 else 0 end as
+	[Complete],
 	d.[assignee_id]
 FROM
     [dbo].[orders] AS a
