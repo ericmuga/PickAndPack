@@ -36,11 +36,10 @@ ordersArray.value.push(...filteredOrders);
 
 
 watch(search, debounce(()=>{
-    // alert('here')
-if (search.value!='')
-      ordersArray.value=props.orders.filter(item=>item.order_no.endsWith(search.value)&&(item.Complete==0));
-else  ordersArray.value = props.orders.filter(order =>order.Complete==0);
 
+if (search.value!='')
+    ordersArray.value=props.orders.filter(item=>item.order_no.endsWith(search.value)&&(item.Complete==0));
+else  ordersArray.value = props.orders.filter(order =>order.Complete==0);
 
 }, 500));
 
@@ -52,6 +51,13 @@ const confirmPack=(order_no,part)=>{
     Inertia.get(route('assemble.order',{'order_no':order_no,'part_no':part}))
 
 
+    }
+
+    const colorPicker=(Lines,AssLines)=>{
+
+      if ((AssLines<1)) return 'warning';
+      if (Lines>AssLines) return 'info';
+      if ((Lines==AssLines)) return 'success'
     }
 </script>
 
@@ -167,7 +173,7 @@ const confirmPack=(order_no,part)=>{
                                                         <Button
                                                         v-show="order.A_Assignment_Count>0"
                                                         :icon="order.A_Assignment_Count>=A_Assembly_Count?'pi pi-check':'pi pi-cart-plus'"
-                                                        :severity="order.A_Assembly_Count>0?'success':'warning'"
+                                                        :severity=colorPicker(order.A_Lines,order.A_AssLine)
 
                                                         rounded
                                                         :label="pack"
@@ -183,7 +189,7 @@ const confirmPack=(order_no,part)=>{
                                                         <Button
                                                         v-show="order.B_Assignment_Count>0"
                                                         :icon="order.B_Assignment_Count>=B_Assembly_Count?'pi pi-check':'pi pi-cart-plus'"
-                                                        :severity="order.B_Assembly_Count>0?'success':'warning'"
+                                                        :severity=colorPicker(order.B_Lines,order.B_AssLine)
 
                                                         rounded
                                                         :label="pack"
@@ -199,7 +205,7 @@ const confirmPack=(order_no,part)=>{
                                                         <Button
                                                         v-show="order.C_Assignment_Count>0"
                                                         :icon="order.C_Assignment_Count>=C_Assembly_Count?'pi pi-check':'pi pi-cart-plus'"
-                                                        :severity="order.C_Assembly_Count>0?'success':'warning'"
+                                                        :severity=colorPicker(order.C_Lines,order.C_AssLine)
 
                                                         rounded
                                                         :label="pack"
@@ -215,7 +221,7 @@ const confirmPack=(order_no,part)=>{
                                                         <Button
                                                         v-show="order.D_Assignment_Count>0"
                                                         :icon="order.D_Assignment_Count>=D_Assembly_Count?'pi pi-check':'pi pi-cart-plus'"
-                                                        :severity="order.D_Assembly_Count>0?'success':'warning'"
+                                                        :severity=colorPicker(order.D_Lines,order.D_AssLine)
 
                                                         rounded
                                                         :label="pack"

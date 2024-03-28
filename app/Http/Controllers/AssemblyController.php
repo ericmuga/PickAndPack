@@ -35,6 +35,15 @@ class AssemblyController extends Controller
                                             'B_Assembly_Count',
                                             'C_Assembly_Count',
                                             'D_Assembly_Count',
+
+                                            'A_AssLine',
+                                            'B_AssLine',
+                                            'C_AssLine',
+                                            'D_AssLine',
+                                             'A_Lines',
+                                            'B_Lines',
+                                            'C_Lines',
+                                            'D_Lines',
                                             'Complete'
                                             )
                                     ->where('shp_date', '>=', now()->toDateString())
