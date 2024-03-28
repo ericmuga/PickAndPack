@@ -17,6 +17,7 @@ import Button from 'primevue/button';
 import { useSearchArray } from '@/Composables/useSearchArray';
 import debounce from 'lodash/debounce'
 import { SearchCircleIcon } from '@vue-hero-icons/solid';
+
 let printedArray=ref([]);
 const props=defineProps({
     OrderLines:Object,
@@ -285,27 +286,6 @@ const closePacking=()=>{
 }
 
 
-const drop=(dropRoute)=>Swal.fire({
-    title: 'Are you sure?',
-    text: "You won't be able to revert this!",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Yes, delete it!'
-})
-.then( (result) => {if (result.isConfirmed) {
-
-    Inertia.delete(dropRoute,
-    {onSuccess:()=>{
-        form.reset();
-        Swal.fire('Action Successful!','Item deleted successfully','success');
-        selectedItem.value=''
-        calculateSum();
-        printedArray.value=props.printedArray
-    }
-})
-}});
 
 
 
@@ -315,7 +295,7 @@ const drop=(dropRoute)=>Swal.fire({
 onMounted(() => {
     // console.log(attrs.auth.user)
 
-    lines.value=props.lines
+    linesArray.value=props.lines
     inputField.value.focus();
     calculateSum();
     printedArray.value=props.printedArray
@@ -332,7 +312,7 @@ onMounted(() => {
 const calculateSum = () => {
     const sumsMap = new Map();
 
-    lines.value.forEach((item, index) => {
+    linesArray.value.forEach((item, index) => {
 
 
         const key = `${item.packing_vessel_id}-${item.from_vessel}-${item.to_vessel}`;
@@ -350,7 +330,7 @@ const calculateSum = () => {
         sum.qty += parseFloat(item.qty);
 
         // Sum tare_weight only when the key changes
-        if (index === 0 || key !== `${lines.value[index - 1].packing_vessel_id}-${lines.value[index - 1].from_vessel}-${lines.value[index - 1].to_vessel}`) {
+        if (index === 0 || key !== `${linesArray.value[index - 1].packing_vessel_id}-${linesArray.value[index - 1].from_vessel}-${linesArray.value[index - 1].to_vessel}`) {
             sum.tare_weight += parseFloat(item.packing_vessel.tare_weight);
         }
     });
@@ -783,16 +763,52 @@ const qrCodeImage=(text)=> {
 
 
 let lastVessel=ref(1);
+
+const deleteVessel=(from_vessel,to_vessel,vessel_id)=>{
+
+   /**
+    * remove all items in that vessel on the current array
+    * if vessel is committed delete the vessel lines
+    */
+
+    Swal.fire({
+                title: 'Void Vessel?',
+                text: "Are you sure you want to void the vessel?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Void!'
+                }).
+                then((result) => {
+                    if (result.isConfirmed) {
+
+                        linesArray.value=linesArray.value.filter(item=>!(item.to_vessel==to_vessel&&item.from_vessel==from_vessel&&item.packing_vessel_id==vessel_id))
+                        items.value=linesArray.value;
+                        //do ajax
+
+                      axios.post(route('vessels.void',{ range_start:from_vessel,
+                                                        range_end:to_vessel,
+                                                        vessel_type:getVesselCode(vessel_id),
+                                                        order_no:props.session.data.order_no
+                                                       }))
+
+                    }})
+
+
+
+    ////delete from database
+}
 // lastVessel.value=to
 
 
 // const { lines} = toRefs(props);
-let lines=ref([]);
+let linesArray=ref([]);
 
 
 
 
-watch(() => lines.value, calculateSum());
+watch(() => linesArray.value, calculateSum());
 
 
 
@@ -801,7 +817,7 @@ const newArray = computed(() => {
     const cumulativeQty = {};
 
     // Iterate through additionalData to calculate cumulative quantities
-    lines.value.forEach((item) => {
+    linesArray.value.forEach((item) => {
         const itemNo = item.item_no;
         const qty = parseFloat(item.qty);
         cumulativeQty[itemNo] = (cumulativeQty[itemNo] || 0) + qty;
@@ -873,7 +889,7 @@ const getItemDescription=(itemNo)=> {
 }
 
 const getItemPackedQty=(itemNo)=> {
-    const filteredData = lines.value.filter(item => item.item_no ===itemNo);
+    const filteredData = linesArray.value.filter(item => item.item_no ===itemNo);
     if (filteredData.length>0) return filteredData[0].qty; else return 0;
 
 }
@@ -930,20 +946,10 @@ const groupedItems = computed(() => {
 
 
 
-// const array1 = ref([
-//     {"id":5,"code":"Small Carton","tare_weight":"0.5","description":"Small Carton"},
-//     {"id":4,"code":"Carton","tare_weight":"1.0","description":"Normal Carton"},
-//     {"id":3,"code":"Crate","tare_weight":"1.8","description":"Normal Crate"}
-// ]);
-
-// const array2 = ref([
-//     {"item_no":"J31031806","packing_vessel_id":5,"from_vessel":1,"to_vessel":1,"qty":15,"weight":15,"packing_session_id":797,"order_no":"S+ORD0000392013"}
-// ]);
-
 const groupedArray = ref([]);
 
 function groupAndSumWeight() {
-    groupedArray.value = lines.value.reduce((acc, obj) => {
+    groupedArray.value = linesArray.value.reduce((acc, obj) => {
         const key = `${obj.packing_vessel_id}_${obj.to_vessel}_${obj.from_vessel}`;
         acc[key] = acc[key] || { packing_vessel_id: obj.packing_vessel_id, to_vessel: obj.to_vessel, from_vessel: obj.from_vessel, total_weight: 0 };
         acc[key].total_weight += obj.weight;
@@ -993,7 +999,7 @@ const createOrUpdateSession = () => {
             order_no:props.session.data.order_no,
         });
 
-        lines.value=items.value;
+        linesArray.value=items.value;
 
         // reduce the quantity of that line in the main array, if its zero, hide
 
@@ -1067,6 +1073,7 @@ lookupAndAddProperties();
 
                 return result;
             }, {});
+
         });
 
 
@@ -1080,14 +1087,22 @@ const removeFromArray=(line)=>{
 
 
 
-    lines.value=lines.value.filter(l=>l.id!==line.id)
-    items.value=lines.value
+    linesArray.value=linesArray.value.filter(l=>l.id!==line.id)
+    items.value=linesArray.value
 }
 
 const getVesselCode =(id)=>{
     // console.log(id)
     return props.packingVessels.data.filter(v=>v.id==id)[0].code
 }
+
+const getVesselId =(code)=>{
+    // console.log(id)
+    return props.packingVessels.data.filter(v=>v.code==code)[0].id
+}
+
+
+
 
 
 
@@ -1165,7 +1180,7 @@ const getVesselCode =(id)=>{
                                         <template #end>
                                         </template>
                                     </Toolbar>
-                                    <div v-if="lines.length==0" class="w-full p-3 mt-2 text-center">
+                                    <div v-if="linesArray.length==0" class="w-full p-3 mt-2 text-center">
                                         No Lines were found.
                                     </div>
                                     <div class="relative overflow-x-auto shadow-md sm:rounded-lg" v-else>
@@ -1198,9 +1213,9 @@ const getVesselCode =(id)=>{
                                                             <th scope="col" class="px-2 py-1">
                                                                 To
                                                             </th>
-                                                            <th scope="col" class="px-2 py-1">
+                                                            <!-- <th scope="col" class="px-2 py-1">
                                                                 Actions
-                                                            </th>
+                                                            </th> -->
 
 
 
@@ -1209,7 +1224,7 @@ const getVesselCode =(id)=>{
 
 
                                                     <tbody>
-                                                        <tr v-for="line in lines" :key="line.id"
+                                                        <tr v-for="line in linesArray" :key="line.id"
                                                         class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
 
                                                         <td class="text-xs">
@@ -1239,10 +1254,10 @@ const getVesselCode =(id)=>{
 
                                                         <!-- <Drop  :drop-route="route('packingSessionLine.destroy',{'id':line.id})" /> -->
 
-                                                        <Button icon="pi pi-times" class="justify-end p-button-danger"
+                                                        <!-- <Button icon="pi pi-times" class="justify-end p-button-danger"
                                                         text rounded
                                                         @click="removeFromArray(line)"
-                                                        />
+                                                        /> -->
                                                         <!-- <Button
                                                         icon="pi pi-pencil"
                                                         severity="info"
@@ -1263,13 +1278,14 @@ const getVesselCode =(id)=>{
                                         <!-- {{ groupedArray }} -->
                                         <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                                             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                                <tr class="">
+                                                <tr class="text-center">
                                                     <th>Vessel Range</th>
                                                     <th>Vessel Count</th>
                                                     <th>Vessel</th>
                                                     <!-- <th>Tare Weight</th> -->
                                                     <th>Weight</th>
-                                                    <th>Label</th>
+                                                    <th>Print</th>
+                                                    <th>Void</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -1283,18 +1299,14 @@ const getVesselCode =(id)=>{
                                                         :disabled="checkMatchingRanges(sum)"
                                                         @click="generatePDF(sum.from_vessel,sum.to_vessel,sum.code,sum.gross_weight)"
                                                         /> </td>
+
+                                                     <td> <Button icon="pi pi-trash" severity="danger"
+
+                                                        @click="deleteVessel(sum.from_vessel,sum.to_vessel,getVesselId(sum.code))"
+                                                        /> </td>
                                                     </tr>
                                                 </tbody>
-                                                <!-- Table footer with totals -->
-                                                <!-- <tr class="font-bold text-center bg-white border-b dark:bg-gray-900 dark:border-gray-700">
-                                                    <td >Total</td>
-                                                    <td>{{ calculateTotals[2] }}</td>
-                                                    <td></td>
 
-                                                    <td></td>
-                                                    <td>{{ calculateTotals[0] }}</td>
-
-                                                </tr> -->
 
                                             </table>
 
