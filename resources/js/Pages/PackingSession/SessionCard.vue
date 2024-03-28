@@ -295,23 +295,10 @@ const closePacking=()=>{
 onMounted(() => {
     // console.log(attrs.auth.user)
 
-    linesArray.value=props.lines
+    lines.value=props.lines
     inputField.value.focus();
     calculateSum();
     printedArray.value=props.printedArray
-
-    //copying printed array into prited vessels
-
-    for(let i=0; 1<props.printedArray.length; i++)
-    {
-
-        printedVessels.value.push({'from_vessel':props.printedArray[i].range_start,
-                              'to_vessel':props.printedArray[i].range_end,
-                              'vessel':getVesselCode(props.printedArray[i].packing_vessel_id)
-
-                             })
-    }
-
 
     axios.get(`getLastVessel/${props.session.data.id}`)
     .then((response)=>{
@@ -325,7 +312,7 @@ onMounted(() => {
 const calculateSum = () => {
     const sumsMap = new Map();
 
-    linesArray.value.forEach((item, index) => {
+    lines.value.forEach((item, index) => {
 
 
         const key = `${item.packing_vessel_id}-${item.from_vessel}-${item.to_vessel}`;
@@ -343,7 +330,7 @@ const calculateSum = () => {
         sum.qty += parseFloat(item.qty);
 
         // Sum tare_weight only when the key changes
-        if (index === 0 || key !== `${linesArray.value[index - 1].packing_vessel_id}-${linesArray.value[index - 1].from_vessel}-${linesArray.value[index - 1].to_vessel}`) {
+        if (index === 0 || key !== `${lines.value[index - 1].packing_vessel_id}-${lines.value[index - 1].from_vessel}-${lines.value[index - 1].to_vessel}`) {
             sum.tare_weight += parseFloat(item.packing_vessel.tare_weight);
         }
     });
@@ -747,7 +734,7 @@ const generatePDF = (from=1,to=1,vessel='',weight) =>
     });
 
 
-    printedVessels.value.push({'from_vessel':from,'to_vessel':to,'vessel':vessel});
+
 
     axios.get(`getLastVessel/${props.session.data.id}`)
     .then((response)=>{
@@ -757,15 +744,6 @@ const generatePDF = (from=1,to=1,vessel='',weight) =>
     openModal();
 
 };
-
-const printedVessels=ref([]);
-
-const checkPrintedVessels=(from_vessel,to_vessel,vessel)=>{
-    let found=[];
-    found=printedVessels.value.filter(item=>!(item.to_vessel==to_vessel&&item.from_vessel==from_vessel&&item.vessel==vessel))
-    return(found.length>0)
-
-}
 
 function convertToValidFilename(inputString) {
     // Replace spaces and special characters with underscores
@@ -785,58 +763,16 @@ const qrCodeImage=(text)=> {
 
 
 let lastVessel=ref(1);
-
-const deleteVessel=(from_vessel,to_vessel,vessel_id)=>{
-
-   /**
-    * remove all items in that vessel on the current array
-    * if vessel is committed delete the vessel lines
-    */
-
-    Swal.fire({
-                title: 'Void Vessel?',
-                text: "Are you sure you want to void the vessel?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Void!'
-                }).
-                then((result) => {
-                    if (result.isConfirmed) {
-
-                        linesArray.value=linesArray.value.filter(item=>!(item.to_vessel==to_vessel&&item.from_vessel==from_vessel&&item.packing_vessel_id==vessel_id))
-                        items.value=linesArray.value;
-                        // printedVessels.value.push({'from_vessel':from,'to_vessel':to,'vessel':vessel});
-                        printedVessels.value=printedVessels.value.filter(item=>!(item.to_vessel==to_vessel&&item.from_vessel==from_vessel&&item.vessel==getVesselCode(vessel_id)))
-                        //do ajax
-
-                      axios.post(route('vessels.void',{ range_start:from_vessel,
-                                                        range_end:to_vessel,
-                                                        vessel_type:getVesselCode(vessel_id),
-                                                        vessel_id:vessel_id,
-                                                        order_no:props.session.data.order_no,
-                                                        part:props.session.data.part,
-                                                        packing_session_id:props.session.data.id
-
-                                                       }))
-
-                    }})
-
-
-
-    ////delete from database
-}
 // lastVessel.value=to
 
 
 // const { lines} = toRefs(props);
-let linesArray=ref([]);
+let lines=ref([]);
 
 
 
 
-watch(() => linesArray.value, calculateSum());
+watch(() => lines.value, calculateSum());
 
 
 
@@ -845,7 +781,7 @@ const newArray = computed(() => {
     const cumulativeQty = {};
 
     // Iterate through additionalData to calculate cumulative quantities
-    linesArray.value.forEach((item) => {
+    lines.value.forEach((item) => {
         const itemNo = item.item_no;
         const qty = parseFloat(item.qty);
         cumulativeQty[itemNo] = (cumulativeQty[itemNo] || 0) + qty;
@@ -917,7 +853,7 @@ const getItemDescription=(itemNo)=> {
 }
 
 const getItemPackedQty=(itemNo)=> {
-    const filteredData = linesArray.value.filter(item => item.item_no ===itemNo);
+    const filteredData = lines.value.filter(item => item.item_no ===itemNo);
     if (filteredData.length>0) return filteredData[0].qty; else return 0;
 
 }
@@ -977,7 +913,7 @@ const groupedItems = computed(() => {
 const groupedArray = ref([]);
 
 function groupAndSumWeight() {
-    groupedArray.value = linesArray.value.reduce((acc, obj) => {
+    groupedArray.value = lines.value.reduce((acc, obj) => {
         const key = `${obj.packing_vessel_id}_${obj.to_vessel}_${obj.from_vessel}`;
         acc[key] = acc[key] || { packing_vessel_id: obj.packing_vessel_id, to_vessel: obj.to_vessel, from_vessel: obj.from_vessel, total_weight: 0 };
         acc[key].total_weight += obj.weight;
@@ -1027,7 +963,7 @@ const createOrUpdateSession = () => {
             order_no:props.session.data.order_no,
         });
 
-        linesArray.value=items.value;
+        lines.value=items.value;
 
         // reduce the quantity of that line in the main array, if its zero, hide
 
@@ -1101,7 +1037,6 @@ lookupAndAddProperties();
 
                 return result;
             }, {});
-
         });
 
 
@@ -1115,22 +1050,14 @@ const removeFromArray=(line)=>{
 
 
 
-    linesArray.value=linesArray.value.filter(l=>l.id!==line.id)
-    items.value=linesArray.value
+    lines.value=lines.value.filter(l=>l.id!==line.id)
+    items.value=lines.value
 }
 
 const getVesselCode =(id)=>{
     // console.log(id)
     return props.packingVessels.data.filter(v=>v.id==id)[0].code
 }
-
-const getVesselId =(code)=>{
-    // console.log(id)
-    return props.packingVessels.data.filter(v=>v.code==code)[0].id
-}
-
-
-
 
 
 
@@ -1208,7 +1135,7 @@ const getVesselId =(code)=>{
                                         <template #end>
                                         </template>
                                     </Toolbar>
-                                    <div v-if="linesArray.length==0" class="w-full p-3 mt-2 text-center">
+                                    <div v-if="lines.length==0" class="w-full p-3 mt-2 text-center">
                                         No Lines were found.
                                     </div>
                                     <div class="relative overflow-x-auto shadow-md sm:rounded-lg" v-else>
@@ -1241,9 +1168,9 @@ const getVesselId =(code)=>{
                                                             <th scope="col" class="px-2 py-1">
                                                                 To
                                                             </th>
-                                                            <!-- <th scope="col" class="px-2 py-1">
+                                                            <th scope="col" class="px-2 py-1">
                                                                 Actions
-                                                            </th> -->
+                                                            </th>
 
 
 
@@ -1252,7 +1179,7 @@ const getVesselId =(code)=>{
 
 
                                                     <tbody>
-                                                        <tr v-for="line in linesArray" :key="line.id"
+                                                        <tr v-for="line in lines" :key="line.id"
                                                         class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
 
                                                         <td class="text-xs">
@@ -1282,10 +1209,10 @@ const getVesselId =(code)=>{
 
                                                         <!-- <Drop  :drop-route="route('packingSessionLine.destroy',{'id':line.id})" /> -->
 
-                                                        <!-- <Button icon="pi pi-times" class="justify-end p-button-danger"
+                                                        <Button icon="pi pi-times" class="justify-end p-button-danger"
                                                         text rounded
                                                         @click="removeFromArray(line)"
-                                                        /> -->
+                                                        />
                                                         <!-- <Button
                                                         icon="pi pi-pencil"
                                                         severity="info"
@@ -1306,14 +1233,13 @@ const getVesselId =(code)=>{
                                         <!-- {{ groupedArray }} -->
                                         <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                                             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                                <tr class="text-center">
+                                                <tr class="">
                                                     <th>Vessel Range</th>
                                                     <th>Vessel Count</th>
                                                     <th>Vessel</th>
                                                     <!-- <th>Tare Weight</th> -->
                                                     <th>Weight</th>
-                                                    <th>Print</th>
-                                                    <th>Void</th>
+                                                    <th>Label</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -1324,17 +1250,21 @@ const getVesselId =(code)=>{
                                                     <!-- <td>{{ sum.tare_weight*(sum.to_vessel-sum.from_vessel+1) }}</td> -->
                                                     <td>{{ sum.gross_weight }}</td>
                                                     <td> <Button icon="pi pi-print" severity="success"
-                                                        :disabled="checkPrintedVessels(sum.from_vessel,sum.to_vessel,sum.code)"
+                                                        :disabled="checkMatchingRanges(sum)"
                                                         @click="generatePDF(sum.from_vessel,sum.to_vessel,sum.code,sum.gross_weight)"
-                                                        /> </td>
-
-                                                     <td> <Button icon="pi pi-trash" severity="danger"
-
-                                                        @click="deleteVessel(sum.from_vessel,sum.to_vessel,getVesselId(sum.code))"
                                                         /> </td>
                                                     </tr>
                                                 </tbody>
+                                                <!-- Table footer with totals -->
+                                                <!-- <tr class="font-bold text-center bg-white border-b dark:bg-gray-900 dark:border-gray-700">
+                                                    <td >Total</td>
+                                                    <td>{{ calculateTotals[2] }}</td>
+                                                    <td></td>
 
+                                                    <td></td>
+                                                    <td>{{ calculateTotals[0] }}</td>
+
+                                                </tr> -->
 
                                             </table>
 
