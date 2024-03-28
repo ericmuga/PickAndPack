@@ -300,6 +300,19 @@ onMounted(() => {
     calculateSum();
     printedArray.value=props.printedArray
 
+    //copying printed array into prited vessels
+
+    for(let i=0; 1<props.printedArray.length; i++)
+    {
+
+        printedVessels.value.push({'from_vessel':props.printedArray[i].range_start,
+                              'to_vessel':props.printedArray[i].range_end,
+                              'vessel':getVesselCode(props.printedArray[i].packing_vessel_id)
+
+                             })
+    }
+
+
     axios.get(`getLastVessel/${props.session.data.id}`)
     .then((response)=>{
         lastVessel.value=response.data
@@ -734,7 +747,7 @@ const generatePDF = (from=1,to=1,vessel='',weight) =>
     });
 
 
-
+    printedVessels.value.push({'from_vessel':from,'to_vessel':to,'vessel':vessel});
 
     axios.get(`getLastVessel/${props.session.data.id}`)
     .then((response)=>{
@@ -744,6 +757,15 @@ const generatePDF = (from=1,to=1,vessel='',weight) =>
     openModal();
 
 };
+
+const printedVessels=ref([]);
+
+const checkPrintedVessels=(from_vessel,to_vessel,vessel)=>{
+    let found=[];
+    found=printedVessels.value.filter(item=>!(item.to_vessel==to_vessel&&item.from_vessel==from_vessel&&item.vessel==vessel))
+    return(found.length>0)
+
+}
 
 function convertToValidFilename(inputString) {
     // Replace spaces and special characters with underscores
@@ -785,12 +807,18 @@ const deleteVessel=(from_vessel,to_vessel,vessel_id)=>{
 
                         linesArray.value=linesArray.value.filter(item=>!(item.to_vessel==to_vessel&&item.from_vessel==from_vessel&&item.packing_vessel_id==vessel_id))
                         items.value=linesArray.value;
+                        // printedVessels.value.push({'from_vessel':from,'to_vessel':to,'vessel':vessel});
+                        printedVessels.value=printedVessels.value.filter(item=>!(item.to_vessel==to_vessel&&item.from_vessel==from_vessel&&item.vessel==getVesselCode(vessel_id)))
                         //do ajax
 
                       axios.post(route('vessels.void',{ range_start:from_vessel,
                                                         range_end:to_vessel,
                                                         vessel_type:getVesselCode(vessel_id),
-                                                        order_no:props.session.data.order_no
+                                                        vessel_id:vessel_id,
+                                                        order_no:props.session.data.order_no,
+                                                        part:props.session.data.part,
+                                                        packing_session_id:props.session.data.id
+
                                                        }))
 
                     }})
@@ -1296,7 +1324,7 @@ const getVesselId =(code)=>{
                                                     <!-- <td>{{ sum.tare_weight*(sum.to_vessel-sum.from_vessel+1) }}</td> -->
                                                     <td>{{ sum.gross_weight }}</td>
                                                     <td> <Button icon="pi pi-print" severity="success"
-                                                        :disabled="checkMatchingRanges(sum)"
+                                                        :disabled="checkPrintedVessels(sum.from_vessel,sum.to_vessel,sum.code)"
                                                         @click="generatePDF(sum.from_vessel,sum.to_vessel,sum.code,sum.gross_weight)"
                                                         /> </td>
 

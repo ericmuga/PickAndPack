@@ -156,7 +156,8 @@ class PackingSessionController extends Controller
          $packingVessels=PackingVesselResource::collection(PackingVessel::latest()->get());
          $roles=auth()->user()->roles->pluck('name');
 
-         $printedArray=Vessel::where('part',$session->part)->where('order_no',$session->order_no)->whereHas('logs')->get();
+        //  $printedArray=Vessel::where('part',$session->part)->where('order_no',$session->order_no)->whereHas('logs')->get();
+         $printedArray=Vessel::where('part',$session->part)->where('order_no',$session->order_no)->get();
         return inertia('PackingSession/SessionCard',compact('session','OrderLines','lastVessel','packingVessels','lines','printedArray','roles'));
 
 

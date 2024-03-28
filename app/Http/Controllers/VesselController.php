@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\VesselOrderResource;
 use App\Models\AssemblyLine;
 use App\Models\Order;
+use App\Models\PackingSessionLine;
 use App\Models\User;
 use App\Models\Vessel;
 use App\Models\VesselLog;
@@ -105,6 +106,54 @@ class VesselController extends Controller
 
         return response()->json(['message' => 'File uploaded successfully', 'path' => $path]);
     }
+
+    public function voidVessel(Request $request)
+{
+    $query = Vessel::query();
+
+    // Extract parameters from the request
+    $range_start = $request->input('range_start');
+    $range_end = $request->input('range_end');
+    $vessel_type = $request->input('vessel_type');
+    $vessel_id = $request->input('vessel_id');
+    $order_no = $request->input('order_no');
+    $part = $request->input('part');
+
+    // Add conditions to the query
+    if ($range_start !== null) {
+        $query->where('range_start', $range_start);
+    }
+
+    if ($range_end !== null) {
+        $query->where('range_end', $range_end);
+    }
+
+    if ($vessel_type !== null) {
+        $query->where('vessel_type', $vessel_type);
+    }
+
+    if ($order_no !== null) {
+        $query->where('order_no', $order_no);
+    }
+    if ($part !== null) {
+        $query->where('part', $part);
+    }
+
+    // Execute delete operation
+    $query->delete();
+
+
+    //delete from packing session lines
+    PackingSessionLine::where('packing_session_id',$request->packing_session_id)
+                      ->where('order_no',$order_no)
+                      ->where('from_vessel',$range_start)
+                      ->where('to_vessel',$range_end)
+                      ->where('packing_vessel_id',$vessel_id)
+                      ->delete();
+
+    return response()->json(['message' => 'Vessels deleted successfully']);
+}
+
 
     /**
      * Display the specified resource.
