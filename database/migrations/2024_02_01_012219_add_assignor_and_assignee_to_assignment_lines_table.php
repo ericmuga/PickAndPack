@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::table('assignment_lines', function (Blueprint $table) {
 
-            $table->unsignedBigInteger('assignee_id')->references('user_id')->on('users');
-            $table->unsignedBigInteger('assignor_id')->references('user_id')->on('users');
+            $table->unsignedBigInteger('assignee_id')->references('user_id')->on('users')->nullable();
+            $table->unsignedBigInteger('assignor_id')->references('user_id')->on('users')->nullable();
         });
     }
 
