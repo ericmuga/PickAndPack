@@ -101,7 +101,10 @@ const postForm = () => {
         });
     showModal.value=false
 }
+const doRefresh=()=>{
+    axios.get(route('orderRefresh'))
 
+}
 
 </script>
 
@@ -130,6 +133,12 @@ const postForm = () => {
                                </template>
                                 <template #end>
                                  <div class="flex flex-row gap-2 ">
+                                     <Button
+                                        severity="warning" icon="rounded outlined pi pi-refresh"
+                                        class="w-full"
+                                        @click="doRefresh()"
+
+                                        />
                                    <Button
                                       label="Download"
                                       severity="success"
@@ -316,6 +325,7 @@ const postForm = () => {
 
 
        </a>
+
 
 
 

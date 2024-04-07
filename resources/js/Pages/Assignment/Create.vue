@@ -7,7 +7,7 @@ import Modal from '@/Components/Modal.vue'
 import debounce from 'lodash/debounce';
 import axios from 'axios';
 import AssignmentOrders from '@/Components/AssignmentOrders.vue';
-import AssignmentPart from '@/Components/AssignmentPart.vue';
+// import AssignmentPart from '@/Components/AssignmentPart.vue';
 // import swal from
 
 import Swal from 'sweetalert2';

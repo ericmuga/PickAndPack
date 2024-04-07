@@ -115,9 +115,12 @@ class AssignmentController extends Controller
                         break;
                     default:
                         // Handle the default case if needed
+
                         break;
                 };
-        return $orders->whereIn('sp_code',$sp_code);
+          if ($sp_code==null) return $orders;
+          else
+           return $orders->whereIn('sp_code',$sp_code);
 
     }
 

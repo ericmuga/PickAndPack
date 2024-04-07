@@ -136,6 +136,7 @@ Route::get('registry/download',[ConfirmationController::class, 'download'])->nam
 
 
         Route::get('/refresh',[OrderController::class,'refresh'] )->name('refresh');
+        Route::get('/OrderRefresh',[ConfirmationController::class,'refresh'] )->name('orderRefresh');
         Route::get('/scanner',[OrderController::class,'scan'])->name('scanner');
         Route::get('orders/download/', [OrderController::class, 'export'])->name('orders.export');
 

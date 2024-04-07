@@ -37,38 +37,49 @@ const props=defineProps({
     station:String,
     assigned:[],
 })
-
-onMounted(() => {
-    assignmentsArray.value = props.assignments;
-    ordersArray.value=[];
-    for (let j = 0; j < props.orders.length; j++) {
-    if (props.station == 'a') {
-        if (!
-            (((props.orders[j].A_Weight > 0 && checkAssigned(props.orders[j].order_no, 'A')) || props.orders[j].A_Weight == 0) &&
-            ((props.orders[j].C_Weight > 0 && checkAssigned(props.orders[j].order_no, 'C')) || props.orders[j].C_Weight == 0) &&
-            ((props.orders[j].D_Weight > 0 && checkAssigned(props.orders[j].order_no, 'D')) || props.orders[j].D_Weight == 0)
-            )
-            )
-        {
-            ordersArray.value.push(props.orders[j]);
-        }
+const stationOrders=()=>{
+    if (props.station === 'a') {
+        ordersArray.value = props.orders.filter(order => {
+            return (
+            (order.A_Weight > 0 && !checkAssigned(order.order_no, 'A'))||
+            (order.C_Weight > 0 && !checkAssigned(order.order_no, 'C'))||
+            (order.D_Weight > 0 && !checkAssigned(order.order_no, 'D'))
+            );
+        });
+    } else if (props.station === 'b') {
+        ordersArray.value = props.orders.filter(order => {
+            return (order.B_Weight > 0 && !checkAssigned(order.order_no, 'B'));
+        });
     }
 
-    if (props.station == 'b') {
+    if (shp_date.value!==''&&shp_date.value!==null)
+        ordersArray.value=ordersArray.value.filter(order=>order.shp_date==shp_date.value)
 
+    if (searchKey.value!=''&&searchKey.value!==null)
+        ordersArray.value=ordersArray.value.filter(item=>item.order_no.endsWith(searchKey.value))
 
-        if (!
-            (props.orders[j].B_Weight > 0 && checkAssigned(props.orders[j].order_no, 'B')) || props.orders[j].B_Weight == 0
-        ) {
-            ordersArray.value.push(props.orders[j]);
-        }
-    }
+    if (selected_sps.value.length > 0)
+        ordersArray.value = ordersArray.value.filter(order => selected_sps.value.includes(order.sp_code));
+        extractSpArray();
 }
 
+const preAssignDate=()=> {
+      const currentDate = new Date();
+      const year = currentDate.getFullYear();
+      let month = currentDate.getMonth() + 1;
+      month = month < 10 ? '0' + month : month;
+      let day = currentDate.getDate();
+      day = day < 10 ? '0' + day : day;
+      shp_date.value = `${year}-${month}-${day}`;
+    }
 
-    extractSpArray();
+onMounted(() => {
+   preAssignDate();
+    assignmentsArray.value = props.assignments;
+    stationOrders();
 
 });
+
 
 const assigned = ref(props.assigned);
 const assignedRef = ref(props.assigned);
@@ -81,13 +92,6 @@ watch(assignedRef, (newValue, oldValue) => {
 });
 
 
-
-
-
-
-
-
-
 function pushUniqueOrder(orderNo, part,weight) {
     // Check if the object already exists in the array
     const exists = assignmentsArray.value.some(item => item.order_no === orderNo && item.part === part);
@@ -96,87 +100,33 @@ function pushUniqueOrder(orderNo, part,weight) {
     }
 
     handleButtonClick(orderNo,part,weight)
- removeFullyAssigned(orderNo)
+    removeFullyAssigned(orderNo)
 }
 
-// const checkAssigned=(orderNo,part)=>{
-//     const exists = assignmentsArray.value.filter(item => item.order_no == orderNo && item.part == part);
 
-//     return exists.length>0
-// }
-
-const checkAssigned = (orderNo, part) => {
-    // const exists = assignmentsArray.value.filter(item => item.order_no === orderNo && item["0"] === part);
-    const exists = assignmentsArray.value.filter(item => item.order_no === orderNo && item.part === part);
-    return exists.length > 0;
-}
-
-const removeFullyAssigned=(orderNo)=>{
-
-    const order=ordersArray.value.filter(item=>item.order_no===orderNo)[0]
-
-    if (props.station=='a')
-    {
-        console.log(checkAssigned(orderNo,'A'))
-      if (
-            ((order.A_Weight>0)&&(checkAssigned(orderNo,'A'))||order.A_Weight==0)
-            // &&(((order.B_Weight>0)&&(checkAssigned(orderNo,'B'))||order.B_Weight==0))
-            &&(((order.C_Weight>0)&&(checkAssigned(orderNo,'C'))||order.C_Weight==0))
-            &&(((order.D_Weight>0)&&(checkAssigned(orderNo,'D'))||order.D_Weight==0))
-           )
-           ordersArray.value=ordersArray.value.filter(item=>item.order_no!==orderNo)
+    const checkAssigned = (orderNo, part) => {
+        // const exists = assignmentsArray.value.filter(item => item.order_no === orderNo && item["0"] === part);
+        const exists = assignmentsArray.value.filter(item => item.order_no === orderNo && item.part === part);
+        return exists.length > 0;
     }
 
-    if (props.station=='b')
-    {
-           ordersArray.value=ordersArray.value.filter(item=>item.order_no!==orderNo)
+    const removeFullyAssigned=(orderNo)=>{
+
+        const order=ordersArray.value.filter(item=>item.order_no===orderNo)[0]
+        stationOrders();
+        ordersArray.value=ordersArray.value.filter(item=>item.order_no!==orderNo)
+
+
     }
 
-}
+    const shp_date=ref();
 
-const shp_date=ref();
+     const checkFilters=()=>{
 
-watch(shp_date,()=>{
-    if (!shp_date.value)
-       ordersArray.value=props.orders;
-    else
-      ordersArray.value=ordersArray.value.filter(order=>order.shp_date==shp_date.value)
-
-        if (searchKey.value!='')
-           ordersArray.value=ordersArray.value.filter(item=>item.order_no.endsWith(searchKey.value))
-         if (selected_sps.value.length > 0)
-            ordersArray.value = ordersArray.value.filter(order => selected_sps.value.includes(order.sp_code));
-extractSpArray();
-});
-
-watch(selected_sps, () => {
-    if (selected_sps.value.length > 0)
-        ordersArray.value = props.orders.filter(order => selected_sps.value.includes(order.sp_code));
-    else
-       ordersArray.value = props.orders;
-
-     if (shp_date.value)
-        ordersArray.value=ordersArray.value.filter(order=>order.shp_date==shp_date.value)
-
-    if (searchKey.value!='')
-        ordersArray.value=ordersArray.value.filter(item=>item.order_no.endsWith(searchKey.value))
-
-    extractSpArray();
-});
-
-watch(searchKey,debounce(()=>{
-    // console.log('got')
-    if (searchKey.value=='')
-    ordersArray.value=props.orders;
-    else
-      ordersArray.value=ordersArray.value.filter(item=>item.order_no.endsWith(searchKey.value))
-
-    if (selected_sps.value.length > 0)
-        ordersArray.value = ordersArray.value.filter(order => selected_sps.value.includes(order.sp_code));
-    if (shp_date.value!=null)
-          ordersArray.value=ordersArray.value.filter(order=>order.shp_date==shp_date.value)
-   extractSpArray();
-},300));
+     }
+    watch(shp_date,()=>stationOrders())
+    watch(selected_sps, () =>stationOrders())
+    watch(searchKey,debounce(()=>{ stationOrders()},300));
 
 
 
@@ -218,7 +168,7 @@ watch(searchKey,debounce(()=>{
 
                     <input type="text" v-model="searchKey" placeholder="Search Order" class="m-2 rounded-lg bg-slate-300 text-md" />
                     <input type="date"
-                      v-model="shp_date"
+                    v-model="shp_date"
                     />
                     <Button v-show="shp_date!=null" @click="shp_date=null" icon="pi pi-times" severity="danger" outlined aria-label="Cancel" />
                 </div>
@@ -313,7 +263,7 @@ watch(searchKey,debounce(()=>{
 
                         :severity="checkAssigned(order.order_no,'C')?'success':'warning'"
                         v-show="order.C_Weight>0"
-                       :label="'W:'+order.C_Weight+'L:'+order.C_Items"
+                        :label="'W:'+order.C_Weight+'L:'+order.C_Items"
                         :disabled="checkAssigned(order.order_no,'C')"
                         @click="pushUniqueOrder(order.order_no,'C',order.C_Weight)"
 
