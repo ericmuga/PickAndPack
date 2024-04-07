@@ -523,11 +523,11 @@ function checkMatchingRanges(secondObject) {
 }
 
 
-const generatePDF = (from=1,to=1,vessel='',weight) =>
+const generatePDF = (from=1,to=1,vessel='',passedWeight) =>
 {
 
     // console.log()
-
+   let weight=(parseFloat(passedWeight)/(to-from+1)).toFixed(2);
 
     const doc = new jsPDF({
         orientation: "portrait",
@@ -619,19 +619,6 @@ const generatePDF = (from=1,to=1,vessel='',weight) =>
     })
 
     ///////////////////// buffer lines in and array ////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     const qrCodeText=props.session.data.order_no+'_'+props.session.data.part+'_'+pageNum;
 
