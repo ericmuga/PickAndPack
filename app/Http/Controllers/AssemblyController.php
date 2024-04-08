@@ -141,7 +141,16 @@ public function store(Request $request)
 
   }
 
+  public function remove(Request $request) {
 
+    //   dd($request->all());
+        DB::table('assembly_lines')
+          ->where('line_no',$request->line_no)
+          ->where('order_no',$request->order_no)
+          ->delete();
+       return response(null,200);
+
+  }
 
 
 

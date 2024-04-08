@@ -110,6 +110,7 @@ Route::get('registry/download',[ConfirmationController::class, 'download'])->nam
         /////////////////////Assembly Routes //////////////////////
          ///list orders ready for assembly
         Route::resource('assembly',AssemblyController::class);
+        Route::post('removeAssembly',[AssemblyController::class,'remove'])->name('assembly.remove');
         Route::get('assemble/order', [AssemblyController::class, 'assembleOrder'])->name('assemble.order');
 
          /////////////packing Routes///////////////////
