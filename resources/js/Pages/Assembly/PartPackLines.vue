@@ -18,36 +18,23 @@ const scanItem=ref(null);
 
 const props= defineProps({
     orderLines:Object,
-
-
 })
 
 
-onMounted(() => {
-    inputField.value.focus();
-
-    //populate assembled
-    //for each line, get the last assembly push that into the assembled array
-
-    if (props.orderLines.length>0)
+const loadAssembly=()=>{
+ if (props.orderLines.length>0)
 
     {
         for (var i = props.orderLines.length - 1; i >= 0; i--)
         {
-
-
-
-
+          //populate already assembled
             for (var j = props.orderLines[i].assemblies.length - 1; j >= 0; j--)
             {
                 const result = searchByMultipleKeyValues([
-                ['line_no', props.orderLines[i].assemblies[j].line_no],
-                ['order_no', props.orderLines[i].assemblies[j].order_no]
+                                                            ['line_no', props.orderLines[i].assemblies[j].line_no],
+                                                            ['order_no', props.orderLines[i].assemblies[j].order_no]
 
-                ]);
-
-
-
+                                                        ]);
                 if (result.value!=0)
                 {
                     assembledArray.value.push({
@@ -55,7 +42,6 @@ onMounted(() => {
                         'assembled_qty':result.assembled_qty,
                         'assembled_pcs':result.assembled_pcs,
                         'order_qty':result.order_qty,
-                        //    'prepacks_total_quantity':result.prepacks_total_quantity,
                         'item_description':result.item_description,
                         'barcode':result.barcode,
                         'order_no':result.order_no,
@@ -64,30 +50,18 @@ onMounted(() => {
                         'to_batch':props.orderLines[i].assemblies[j].to_batch,
 
                     });
-
-
-
                 };
-
-
-            };
+             };
 
         };
 
     };
+}
 
-
-    //     setInterval(() => {
-        //         if (!assembledArray.value.length==0 && isRunning.value==true)
-        //            Inertia.post(route('assembly.store'),{'data':assembledArray.value,
-        //                                                     'autosave':true,
-        //                                                     'assembly_time':formatTime.value
-        //                                                 },{preserveScroll:true,preserveState:true}
-        //                                                 )
-
-        // }, 60000);
-
-    });
+onMounted(() => {
+    inputField.value.focus();
+    loadAssembly();
+});
 
 
     const manualScan=(item)=>{newItem.value=''; newItem.value=item;};
@@ -108,7 +82,6 @@ onMounted(() => {
 
             'order_qty': value.order_qty ,// Use the value with ref/ Extract 'age' key as value with ref
             'qty_base': value.qty_base ,// Use the value with ref/ Extract 'age' key as value with ref
-            // 'prepacks_total_quantity': value.prepacks_total_quantity ,// Use the value with ref/ Extract 'age' key as value with ref
             'barcode':value.barcode,
             'item_no':value.item_no,
             'item_description':value.item_description,
@@ -125,36 +98,29 @@ onMounted(() => {
 
     const assembledArray=ref([]);
 
-
+   const itemInAssembledArray=(line_no)=>{
+    const result=assembledArray.value.filter(item=>item.line_no===line_no)
+    return(result.length>0)
+   }
 
     watch( newItem,
-    debounce(
-    function () {
-        startTimer();
-        if (newItem.value.trim()!='' ){
-            scanError.value = '';
+    debounce( ()=> {
+                    startTimer();
+                    if (newItem.value.trim()!='' ){
+                        scanError.value = '';
+                        searchResult.value= searchByBarcodeOrItemNo((newItem.value.toUpperCase()).trim())
+                        if (searchResult.value!=0)
+                        {
+                                showModal.value=true
+                                updateScannedItem(searchResult.value)
 
-            searchResult.value= searchByBarcodeOrItemNo((newItem.value.toUpperCase()).trim())
-            if (searchResult.value!=0)
-            {
-                //  alert('hey')
-                //if (parseFloat(searchResult.value.order_qty)>parseFloat(searchResult.value.prepacks_total_quantity))
-                //{
-                    showModal.value=true
-                    console.log(searchResult.value)
-                    updateScannedItem(searchResult.value)
-
-
-
-                    //                            }
-                    //                          else scanError.value=`Maximum limit ${searchResult.value.order_qty} reached.`;
-
-                }
-                else scanError.value=`Item Not found!`;
-            }
-            newItem.value=''
-        }
-        ,300)
+                        }
+                            else scanError.value=`Item Not found!`;
+                        }
+                        newItem.value=''
+                    }
+                    ,30
+            )
 
         );
 
@@ -177,165 +143,96 @@ onMounted(() => {
         });
 
 
-        const form2=useForm({
-            item_no:'',
-            order_qty:0,
-            prepacks_total_quantity:0,
-            assembled_qty:0,
-            assembled_pcs:0,
-            qty_base:0,
-            item_description:'',
-            from_batch:'',
-            to_batch:'',
-            order_no:'',
-            line_no:'',
-            customer_spec:'',
 
+  const submitForm=()=>{
 
-        });
-
-        const ItemInAssembledArray=(item_no)=>{
-            const existingItemIndex= assembledArray.value.findIndex(item => item.item_no === item_no)
-            return(existingItemIndex!==-1)
-
-        }
-
-        const submitForm=()=>{
-            //push item into assembled array
-
-
-            //  if ((form2.order_qty-form2.prepacks_total_quantity)!=form.assembled_qty)
-            //  {
-                //        Swal.fire({
-                    //                                     title: 'The assembled qty is lower/higher than expected',
-                    //                                     text: "Are you sure you want to assemble non default qty?",
-                    //                                     icon: 'warning',
-                    //                                     showCancelButton: true,
-                    //                                     confirmButtonColor: '#3085d6',
-                    //                                     cancelButtonColor: '#d33',
-                    //                                     confirmButtonText: 'Ok'
-                    //                                     }).then((result) => {
-                        //                                         if (!result.isConfirmed) {return }
-                        //                     });
-
-                        //  }
-
-
-                        const existingItemIndex = assembledArray.value.findIndex(item => item.item_no === form.item_no);
-
-                        if (existingItemIndex !== -1)
-                        {
-                            assembledArray.value.splice(existingItemIndex)
-                        }
+                        //remove item
+                        assembledArray.value= assembledArray.value.filter(item=>item.line_no!==form.line_no);
+                        //add item
                         assembledArray.value.push({ 'item_no':form.item_no,
-                        'assembled_qty':form.assembled_qty,
-                        'assembled_pcs':form.assembled_pcs,
-                        'order_qty':form.order_qty,
-                        'prepacks_total_quantity':0,
-                        'customer_spec':form.customer_spec,
+                                                    'assembled_qty':form.assembled_qty,
+                                                    'assembled_pcs':form.assembled_pcs,
+                                                    'order_qty':form.order_qty,
+                                                    'prepacks_total_quantity':0,
+                                                    'customer_spec':form.customer_spec,
+                                                    'item_description':form.item_description,
+                                                    'barcode':form.barcode,
+                                                    'item_no':form.item_no,
+                                                    'order_no':form.order_no,
+                                                    'line_no':form.line_no,
+                                                    'from_batch':form.from_batch,
+                                                    'to_batch':form.to_batch
 
-                        //    'prepacks_total_quantity':form.prepacks_total_quantity,
-                        'item_description':form.item_description,
-                        'barcode':form.barcode,
-                        'item_no':form.item_no,
-                        'order_no':form.order_no,
-                        'line_no':form.line_no,
-                        // 'line_no':,
-                        'from_batch':form.from_batch,
-                        'to_batch':form.to_batch
-
-                    });
+                                                });
 
 
                     showModal.value=false
                     newItem.value = '';
                     inputField.value.focus();
                     form.reset();
-                    form2.reset();
-                }
-
-                const  cItem=ref({});
-
-                const updateScannedItem =(item)=>{
-                    cItem.value=item;
-                    // console.log(item)
-                    //update form
-                    form.item_no=item.item_no
-                    form.barcode=item.barcode
-                    form.order_qty=item.qty_base
-                    form.order_pcs=item.order_qty
-                    form.prepacks_total_quantity=item.prepacks_total_quantity
-                    form.assembled_qty=item.qty_base
-                    form.assembled_pcs=item.order_qty
-                    form.pick_no=props.pick_no
-                    form.item_description=item.item_description
-                    form.order_no=item.order_no
-                    form.line_no=item.line_no
-                    form.customer_spec=item.customer_spec
-                    form.batch_no=''
-
-
-                    ///hold the current item statically
-
-                    form2.item_no=item.item_no
-                    form2.barcode=item.barcode
-                    form2.order_qty=item.qty_base
-                    form2.order_pcs=item.order_qty
-                    form2.prepacks_total_quantity=item.prepacks_total_quantity
-                    form2.assembled_qty=item.order_qty
-                    form2.assembled_pcs=item.qty_base
-                    form2.pick_no=props.pick_no
-                    form2.item_description=item.item_description
-                    form2.order_no=item.order_no
-                    form2.line_no=item.line_no
-                    form2.customer_spec=item.customer_spec
-
-
 
                 }
+
+const  cItem=ref({});
+
+const updateScannedItem =(item)=>{
+                            cItem.value=item;
+                            form.item_no=item.item_no
+                            form.barcode=item.barcode
+                            form.order_qty=item.qty_base
+                            form.order_pcs=item.order_qty
+                            form.prepacks_total_quantity=item.prepacks_total_quantity
+                            form.assembled_qty=item.qty_base
+                            form.assembled_pcs=item.order_qty
+                            form.pick_no=props.pick_no
+                            form.item_description=item.item_description
+                            form.order_no=item.order_no
+                            form.line_no=item.line_no
+                            form.customer_spec=item.customer_spec
+                            form.batch_no=''
+
+                        }
 
 
 
 
 let allAssembled=true;
-                  let filteredAssembly=[];
-                const closeAssembly = () => {
+let filteredAssembly=[];
+const closeAssembly = () => {
                      if (assembledArray.value.length==0) {
                                         Swal.fire('Error','The assembly is empty','error')
                                     }
                     //check if all lines have been assembled, alert if partial assembly
-              else
-              {
-                  for (var i = props.orderLines.length - 1; i >= 0; i--)
-                         {
-                           filteredAssembly=assembledArray.value.filter(line=>line.line_no===props.orderLines[i].line_no)
-                           console.log(filteredAssembly)
-                           if (filteredAssembly.length==0)
-                           {
-                            allAssembled=false;
-                            break;
-                           }
-                         }//
-
-                         if (allAssembled)
-                           {
-
-
-                                Inertia.post(
-                                route('assembly.store'),
+                    else
+                    {
+                        for (var i = props.orderLines.length - 1; i >= 0; i--)
                                 {
-                                    'data': assembledArray.value,
-                                    'part':props.orderLines[0].part,
-                                    'autosave': false,
-                                    'assembly_time': formatTime.value,
-                                },
+                                    filteredAssembly=assembledArray.value.filter(line=>line.line_no===props.orderLines[i].line_no)
+                                    // console.log(filteredAssembly)
+                                if (filteredAssembly.length==0)
                                 {
-                                    onError: (error) => Swal.fire('Error', error.message, 'error')
+                                    allAssembled=false;
+                                    break;
                                 }
-                                );
+                                }//
+
+                                if (allAssembled)
+                                {
+                                        Inertia.post(
+                                        route('assembly.store'),
+                                                {
+                                                    'data': assembledArray.value,
+                                                    'part':props.orderLines[0].part,
+                                                    'autosave': false,
+                                                    'assembly_time': formatTime.value,
+                                                },
+                                                {
+                                                    onError: (error) => Swal.fire('Error', error.message, 'error')
+                                                }
+                                         );
 
 
-                            }
+                                }
 
                             else
                             {
@@ -366,21 +263,13 @@ let allAssembled=true;
 
                                             }})
 
-                            }
+                             }
                         }
-                        };
-
-
-
-
-
-                                let autosave=ref(false);
-
-                                const isRunning = ref(false);
-                                const startTime = ref(0);
-                                const currentTime = ref(0);
-
-                                const formatTime = computed(() => {
+                };
+const isRunning = ref(false);
+const startTime = ref(0);
+const currentTime = ref(0);
+const formatTime = computed(() => {
                                     const totalMilliseconds = currentTime.value;
                                     const milliseconds = totalMilliseconds % 1000;
                                     const totalSeconds = (totalMilliseconds - milliseconds) / 1000;
@@ -398,39 +287,36 @@ let allAssembled=true;
                                 });
 
 
-                                const startTimer = () => {
-                                    if (!isRunning.value) {
-                                        startTime.value = Date.now() - currentTime.value;
-                                        isRunning.value = true;
-                                    }
-                                };
+const startTimer = () => {
+    if (!isRunning.value) {
+        startTime.value = Date.now() - currentTime.value;
+        isRunning.value = true;
+    }
+};
 
-                                const stopTimer = () => {
-                                    if (isRunning.value) {
-                                        isRunning.value = false;
-                                    }
-                                };
-                                const resetTimer = () => {
-                                    if (!isRunning.value) {
-                                        currentTime.value = 0;
-                                    }
-                                };
+const stopTimer = () => {
+    if (isRunning.value) {
+        isRunning.value = false;
+    }
+};
+const resetTimer = () => {
+    if (!isRunning.value) {
+        currentTime.value = 0;
+    }
+};
 
-                                const timerInterval = setInterval(() => {
-                                    if (isRunning.value) {
-                                        currentTime.value = Date.now() - startTime.value;
-                                    }
-                                }, 100);
+const timerInterval = setInterval(() => {
+    if (isRunning.value) {
+        currentTime.value = Date.now() - startTime.value;
+    }
+}, 100);
 
-                                onUnmounted(() => {
-                                    clearInterval(timerInterval);
-                                });
-
-
+onUnmounted(() => {
+    clearInterval(timerInterval);
+});
 
 
-
-                            </script>
+ </script>
 
                             <template >
                                 <Head title="Orders"/>
@@ -524,7 +410,7 @@ let allAssembled=true;
                                                                                     v-for="line in orderLines" :key="line.item_description"
 
                                                                                     class="bg-white border-b dark:bg-gray-900 dark:border-gray-700 hover:bg-slate-400 hover:text-white ">
-                                                                                    <div v-if="!ItemInAssembledArray(line.item_no)" class="flex justify-between">
+                                                                                    <div v-if="!itemInAssembledArray(line.line_no)" class="flex justify-between">
                                                                                         <td class="px-3 py-2 text-xs">
                                                                                             {{ line.item_no }}
                                                                                         </td>
@@ -568,7 +454,7 @@ let allAssembled=true;
 
                                                                                 class="bg-white border-b dark:bg-gray-900 dark:border-gray-700 hover:bg-slate-400 hover:text-white ">
 
-                                                                                <div v-if="ItemInAssembledArray(line.item_no)" class="flex justify-between">
+                                                                                <div v-if="itemInAssembledArray(line.line_no)" class="flex justify-between">
 
                                                                                     <td class="px-3 py-2 text-xs">
                                                                                         {{ line.item_no }}
