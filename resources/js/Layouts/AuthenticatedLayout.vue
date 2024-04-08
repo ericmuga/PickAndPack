@@ -33,7 +33,7 @@
         </div>
             <div v-show="subMenuOpen['orders']">
                 <div class="py-2 pl-8 cursor-pointer"><Link :href="route('confirmations.index')" :active="route().current('confirmations.index')" class="block px-2 py-1 font-semibold text-white rounded hover:bg-gray-600 ">Registry</Link></div>
-                <div class="py-2 pl-8 cursor-pointer"><Link :href="route('orders.lines')" :active="route().current('orders.lines')" class="block px-2 py-1 font-semibold text-white rounded hover:bg-gray-600 ">Prepacks</Link></div>
+                <!-- <div class="py-2 pl-8 cursor-pointer"><Link :href="route('orders.lines')" :active="route().current('orders.lines')" class="block px-2 py-1 font-semibold text-white rounded hover:bg-gray-600 ">Prepacks</Link></div> -->
                 <div class="block w-full px-2 py-2 pl-8 font-semibold text-white rounded cursor-pointer hover:bg-gray-600">
                 <p  class="p-2 font-semibold tracking-wide rounded-md hover:cursor-pointer" @click="toggleAssignment()">Assignment</p>
                     <Accordion  v-show="showAssignment">
@@ -94,7 +94,7 @@
 
 
         <div v-show="subMenuOpen['reports']">
-          <div class="py-2 pl-8 cursor-pointer"><Link :href="route('linePrepacks.index')" :active="route().current('linePrepacks.index')">Prepacked Orders</Link></div>
+          <!-- <div class="py-2 pl-8 cursor-pointer"><Link :href="route('linePrepacks.index')" :active="route().current('linePrepacks.index')">Prepacked Orders</Link></div> -->
 
           <!-- <div class="py-2 pl-8 cursor-pointer">Submenu 2</div> -->
         </div>

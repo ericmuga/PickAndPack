@@ -46,8 +46,8 @@ const loadAssembly=()=>{
                 {
                     assembledArray.value.push({
                         'item_no':result.item_no,
-                        'assembled_qty':result.assembled_qty,
-                        'assembled_pcs':result.assembled_pcs,
+                        'assembled_qty':result.qty_base,
+                        'assembled_pcs':result.order_qty,
                         'order_qty':result.order_qty,
                         'item_description':result.item_description,
                         'barcode':result.barcode,
