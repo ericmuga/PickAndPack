@@ -85,7 +85,8 @@ let newItem=ref();
 
 
 function findHighestToVessel() {
-    let computedObject=groupedData.value
+
+    let computedObject=groupedArray.value
     // console.log(computedObject)
 
     if (Object.keys(computedObject).length === 0) {
@@ -152,8 +153,6 @@ const updateSelected=(item_no)=>{
     let highestToVessel=findHighestToVessel();
     let highestToVesselInfo =findHighestToVesselInfo();
     form.packing_vessel_id=findIdByCode(props.packingVessels.data,highestToVesselInfo.packing_vessel_code)
-    // console.log(highestToVessel)
-    // console.log(findIdByCode(props.packingVessels.data,highestToVesselInfo.packing_vessel_code));
 
     if (highestToVessel!=0)
     {
@@ -1073,30 +1072,28 @@ const getVesselCode =(id)=>{
                                 <Toolbar>
                                     <template #start>
                                         <div class="flex flex-col text-center ">
+                                                <div v-show="newArray.length>0" >
+                                                    <div class="p-2 m-1 text-black bg-orange-200 ">
 
+                                                         <div class="flex flex-col font-bold tracking-wide text-center">
+                                                                {{ session.data.order.order_no }}|
+                                                                {{ session.data.order.shp_name }}|
+                                                                {{ session.data.part }}
 
-                                            <!-- <Button
-                                                label="Pack Item"
-
-                                                icon="pi pi-plus"
-                                                class="max-w-sm"
-                                                severity="success"
-                                                :disabled="session.data.system_entry==0||newArray.length==0"
-                                                @click="showCreateModal()"
-                                                rounded
-                                                ></Button> -->
-
-                                                <div v-show="newArray.length>0">
-                                                    <div class="p-2 m-1 text-black bg-orange-200"> Pending List</div>
+                                                            </div>
+                                                            Pending List
+                                                            <span class="px-2 py-1 font-bold text-right text-black bg-yellow-400 rounded-full">{{ newArray.length }}</span>
+                                                    </div>
                                                     <input type="text" v-model="newItem"  ref="inputField" placeholder="Scan Item" class="m-2 rounded-lg bg-slate-300 text-md">
                                                     <p v-if="scanError" class="p-3 m-3 font-bold text-black bg-red-400 rounded">{{ scanError }}</p>
-                                                    <ul v-if="newArray.length>0">
-                                                        <li v-for="item in newArray"
+
+                                                    <ul v-if="newArray.length>0" class="grid grid-cols-3 text-left">
+                                                        <li v-for="(item,index) in newArray"
                                                                     v-show="newArray.length>0"
                                                                     :key="item.item_no"
                                                                      @click="updateSelected(item.item_no)"
                                                                      class="p-2 hover:cursor-pointer">
-                                                            {{ item.item_desc  }}
+                                                            {{(index+1)+'. '+ item.item_desc  }}
 
                                                         </li>
 
@@ -1108,22 +1105,10 @@ const getVesselCode =(id)=>{
                                             </div>
                                         </template>
 
-                                        <template #center>
 
-                                            <div class="flex flex-col font-bold tracking-wide text-center">
-                                                {{ session.data.order.order_no }}|
-                                                {{ session.data.order.shp_name }}|
-                                                {{ session.data.part }}
-
-                                            </div>
-
-                                        </template>
-
-                                        <template #end>
-                                        </template>
                                     </Toolbar>
                                     <div v-if="lines.length==0" class="w-full p-3 mt-2 text-center">
-                                        No Lines were found.
+                                        No Packed Lines were found.
                                     </div>
                                     <div class="relative overflow-x-auto shadow-md sm:rounded-lg" v-else>
                                         <div class="grid p-5 m-2 sm:grid-cols-1 md:grid-cols-2">
