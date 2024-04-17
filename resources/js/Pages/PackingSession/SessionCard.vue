@@ -111,7 +111,8 @@ function findHighestToVessel() {
 
 
 function findHighestToVesselInfo() {
-    let computedObject=groupedData.value
+    let computedObject=groupedArray.value
+
     if (Object.keys(computedObject).length === 0) {
         return { to_vessel: 0, packing_vessel_code: null };
     }
@@ -121,16 +122,18 @@ function findHighestToVesselInfo() {
     for (const key in computedObject) {
         if (computedObject.hasOwnProperty(key)) {
             const toVesselValue = computedObject[key]?.to_vessel;
+            // console.log(computedObject[key])
 
             if (
             highestToVesselInfo.to_vessel === null ||
             (toVesselValue !== undefined && toVesselValue > highestToVesselInfo.to_vessel)
             ) {
                 highestToVesselInfo.to_vessel = toVesselValue;
-                highestToVesselInfo.packing_vessel_code = computedObject[key]?.packing_vessel_code;
+                highestToVesselInfo.packing_vessel_code = computedObject[key]?.code;
             }
         }
     }
+    console.log(highestToVesselInfo)
 
     return highestToVesselInfo;
 }
@@ -152,6 +155,7 @@ const updateSelected=(item_no)=>{
 
     let highestToVessel=findHighestToVessel();
     let highestToVesselInfo =findHighestToVesselInfo();
+
     form.packing_vessel_id=findIdByCode(props.packingVessels.data,highestToVesselInfo.packing_vessel_code)
 
     if (highestToVessel!=0)
