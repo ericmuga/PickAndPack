@@ -558,10 +558,9 @@ const markPrinted=(range,vessel)=>{
 
 }
 
-const checkPrinted=(range,vessel)=>{
-    return printedVessels.value.filter(item=>item.range==range&&item.vessel==vessel).length>0
-}
-
+const checkPrinted = computed(() => (range, vessel) => {
+  return printedVessels.value.filter(item => item.range === range && item.vessel === vessel).length > 0;
+});
 
 function checkMatchingRanges(secondObject) {
     validateLimits()
