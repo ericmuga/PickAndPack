@@ -903,7 +903,7 @@ const getItemDescription=(itemNo)=> {
 }
 
 const getItemPackedQty=(itemNo)=> {
-    const filteredData = linesArray.value.filter(item => item.item_no ===itemNo);
+    const filteredData = newLines.value.filter(item => item.item_no ===itemNo);
     if (filteredData.length>0) return filteredData[0].qty; else return 0;
 
 }
