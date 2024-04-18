@@ -908,7 +908,7 @@ const getItemPackedQty=(itemNo)=> {
 
 }
 const getItemPackedWt=(itemNo)=> {
-    const filteredData = props.lines.filter(item => item.item_no ===itemNo);
+    const filteredData = newLines.value.filter(item => item.item_no ===itemNo);
     if (filteredData.length>0) return filteredData[0].weight; else return 0;
 
 }
