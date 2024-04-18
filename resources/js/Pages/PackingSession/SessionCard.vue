@@ -16,13 +16,12 @@ import { Link } from '@inertiajs/inertia-vue3';
 import Button from 'primevue/button';
 import { useSearchArray } from '@/Composables/useSearchArray';
 import debounce from 'lodash/debounce'
-import { SearchCircleIcon } from '@vue-hero-icons/solid';
+//import { SearchCircleIcon } from '@vue-hero-icons/solid';
 
 let printedArray=ref([]);
 const props=defineProps({
     OrderLines:Object,
     session:Object,
-    // lastVessel:String,
     packingVessels:Object,
     lines:Object,
     printedArray:Object,
@@ -51,24 +50,27 @@ function findMatchingObjects(array,targetValue) {
 }
 
 const matchingRangesError=()=>{
-    Swal.fire('Error!', 'The vessel range must not be within a closed vessel range!','error');
-    form.from_vessel='';
-    form.to_vessel='';
+    // Swal.fire('Error!', 'The vessel range must not be within a closed vessel range!','error');
+    // form.from_vessel='';
+    // form.to_vessel='';
 }
 
 const validateLimits=()=>{
 
 
 
-    // if (form.to_vessel<form.from_vessel)
-    // Swal.fire('Error!','The beginning range must be lower than the concluding range','error')
+    if (form.to_vessel<form.from_vessel){
+      //  Swal.fire('Error!','The beginning range must be lower than the concluding range','error')
+        form.to_vessel=form.from_vessel;
+    }
 
-    // let obj=findMatchingObjects(printedArray.value,form.from_vessel);
-    // // console.log(obj)
-    // if (obj.length>0)matchingRangesError();
 
-    // obj=findMatchingObjects(printedArray.value,form.to_vessel);
-    // if (obj.length>0)matchingRangesError();
+    let obj=findMatchingObjects(printedArray.value,form.from_vessel);
+    // console.log(obj)
+    if (obj.length>0)matchingRangesError();
+
+    obj=findMatchingObjects(printedArray.value,form.to_vessel);
+    if (obj.length>0)matchingRangesError();
 
 }
 
@@ -133,7 +135,7 @@ function findHighestToVesselInfo() {
             }
         }
     }
-    console.log(highestToVesselInfo)
+    // console.log(highestToVesselInfo)
 
     return highestToVesselInfo;
 }
@@ -149,6 +151,8 @@ function findIdByCode(array, code) {
 }
 
 const updateSelected=(item_no)=>{
+
+    // items.value=items.value.filter(item=>item.item_no!==item_no);
 
     form.to_vessel=''
     form.from_vessel=''
@@ -233,13 +237,13 @@ const closePacking=()=>{
  filteredPacking=[];
  allPacked=true
 //prevent empty packing
-     if (lines.value.length===0)
+     if (linesArray.value.length===0)
       Swal.fire('Error!','Empty Packing','error');
     else
 //warn if not all lines have been packed
        { for(var i=0; i<props.OrderLines.data.length;i++)
         {
-            filteredPacking=lines.value.filter(line=>line.line_no===props.OrderLines.data[i].line_no);
+            filteredPacking=linesArray.value.filter(line=>line.line_no===props.OrderLines.data[i].line_no);
             if (filteredPacking.length==0)
             {
                 allPacked=false;
@@ -265,7 +269,7 @@ const closePacking=()=>{
 
                         Inertia.post(
                                 route('packingSession.close'),
-                                { 'id': props.session.data.id ,'lines':lines.value},
+                                { 'id': props.session.data.id ,'lines':linesArray.value},
                                 {
                                     onSuccess: () => Swal.fire('Success!', 'Session Ended Successfully!', 'success'),
                                     onError: (error) => Swal.fire('Error', error.message, 'error')
@@ -278,7 +282,7 @@ const closePacking=()=>{
 
             Inertia.post(
                 route('packingSession.close'),
-                { 'id': props.session.data.id ,'lines':lines.value},
+                { 'id': props.session.data.id ,'lines':linesArray.value},
                 {
                     onSuccess: () => Swal.fire('Success!', 'Session Ended Successfully!', 'success'),
                     onError: (error) => Swal.fire('Error', error.message, 'error')
@@ -298,7 +302,7 @@ const closePacking=()=>{
 onMounted(() => {
     // console.log(attrs.auth.user)
 
-    lines.value=props.lines
+    linesArray.value=props.lines
     inputField.value.focus();
     calculateSum();
     printedArray.value=props.printedArray
@@ -315,7 +319,7 @@ onMounted(() => {
 const calculateSum = () => {
     const sumsMap = new Map();
 
-    lines.value.forEach((item, index) => {
+    linesArray.value.forEach((item, index) => {
 
 
         const key = `${item.packing_vessel_id}-${item.from_vessel}-${item.to_vessel}`;
@@ -333,7 +337,7 @@ const calculateSum = () => {
         sum.qty += parseFloat(item.qty);
 
         // Sum tare_weight only when the key changes
-        if (index === 0 || key !== `${lines.value[index - 1].packing_vessel_id}-${lines.value[index - 1].from_vessel}-${lines.value[index - 1].to_vessel}`) {
+        if (index === 0 || key !== `${linesArray.value[index - 1].packing_vessel_id}-${linesArray.value[index - 1].from_vessel}-${linesArray.value[index - 1].to_vessel}`) {
             sum.tare_weight += parseFloat(item.packing_vessel.tare_weight);
         }
     });
@@ -757,12 +761,12 @@ let lastVessel=ref(1);
 
 
 // const { lines} = toRefs(props);
-let lines=ref([]);
+let linesArray=ref([]);
 
 
 
 
-watch(() => lines.value, calculateSum());
+watch(() => linesArray.value, calculateSum(),{ deep: true });
 
 
 
@@ -771,7 +775,7 @@ const newArray = computed(() => {
     const cumulativeQty = {};
 
     // Iterate through additionalData to calculate cumulative quantities
-    lines.value.forEach((item) => {
+    linesArray.value.forEach((item) => {
         const itemNo = item.item_no;
         const qty = parseFloat(item.qty);
         cumulativeQty[itemNo] = (cumulativeQty[itemNo] || 0) + qty;
@@ -824,7 +828,6 @@ const getSelectedItem = (item_no) => {
         form.weight=selectedItem.value.qty_base-getItemPackedWt(item_no)
     }
 
-    //   console.log(selectedItem.value)
 };
 
 
@@ -843,7 +846,7 @@ const getItemDescription=(itemNo)=> {
 }
 
 const getItemPackedQty=(itemNo)=> {
-    const filteredData = lines.value.filter(item => item.item_no ===itemNo);
+    const filteredData = linesArray.value.filter(item => item.item_no ===itemNo);
     if (filteredData.length>0) return filteredData[0].qty; else return 0;
 
 }
@@ -903,7 +906,7 @@ const groupedItems = computed(() => {
 const groupedArray = ref([]);
 
 function groupAndSumWeight() {
-    groupedArray.value = lines.value.reduce((acc, obj) => {
+    groupedArray.value = linesArray.value.reduce((acc, obj) => {
         const key = `${obj.packing_vessel_id}_${obj.to_vessel}_${obj.from_vessel}`;
         acc[key] = acc[key] || { packing_vessel_id: obj.packing_vessel_id, to_vessel: obj.to_vessel, from_vessel: obj.from_vessel, total_weight: 0 };
         acc[key].total_weight += obj.weight;
@@ -937,11 +940,14 @@ const createOrUpdateSession = () => {
         return;
     }
 
-    validateLimits();
+    if (form.to_vessel<form.from_vessel){
+       Swal.fire('Error!','The beginning range must be lower than the concluding range','error')
+        // form.to_vessel=form.from_vessel;
+    }
 
 
         lastVessel.value = form.to_vessel;
-
+        items.value=items.value.filter(item=>item.item_no!==form.item_no)
         items.value.push({
             item_no:form.item_no,
             packing_vessel_id:form.packing_vessel_id,
@@ -953,7 +959,7 @@ const createOrUpdateSession = () => {
             order_no:props.session.data.order_no,
         });
 
-        lines.value=items.value;
+        linesArray.value=items.value;
 
         // reduce the quantity of that line in the main array, if its zero, hide
 
@@ -1034,14 +1040,11 @@ lookupAndAddProperties();
 
 
 
-const removeFromArray=(line)=>{
-    //check if carton printed.
+const removeFromArray=(item_no)=>{
+    // alert('here')
+    items.value=items.value.filter(item=>item.item_no!==item_no)
+    linesArray.value=linesArray.value.filter(item=>item.item_no!==item_no)
 
-
-
-
-    lines.value=lines.value.filter(l=>l.id!==line.id)
-    items.value=lines.value
 }
 
 const getVesselCode =(id)=>{
@@ -1111,7 +1114,7 @@ const getVesselCode =(id)=>{
 
 
                                     </Toolbar>
-                                    <div v-if="lines.length==0" class="w-full p-3 mt-2 text-center">
+                                    <div v-if="linesArray.length==0" class="w-full p-3 mt-2 text-center">
                                         No Packed Lines were found.
                                     </div>
                                     <div class="relative overflow-x-auto shadow-md sm:rounded-lg" v-else>
@@ -1155,7 +1158,7 @@ const getVesselCode =(id)=>{
 
 
                                                     <tbody>
-                                                        <tr v-for="line in lines" :key="line.id"
+                                                        <tr v-for="line in linesArray" :key="line.item_no"
                                                         class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
 
                                                         <td class="text-xs">
@@ -1187,15 +1190,14 @@ const getVesselCode =(id)=>{
 
                                                         <Button icon="pi pi-times" class="justify-end p-button-danger"
                                                         text rounded
-                                                        @click="removeFromArray(line)"
+                                                        @click="removeFromArray(line.item_no)"
                                                         />
-                                                        <!-- <Button
+                                                        <Button
                                                         icon="pi pi-pencil"
                                                         severity="info"
                                                         text
-                                                        @click="showUpdateModal(line)"
-                                                        /> -->
-
+                                                        @click="updateSelected(line.item_no)"
+                                                        />
                                                     </td>
                                                     <td v-else></td>
 
