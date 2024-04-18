@@ -152,7 +152,8 @@ function findIdByCode(array, code) {
 
 const updateSelected=(item_no)=>{
 
-    // items.value=items.value.filter(item=>item.item_no!==item_no);
+    items.value=items.value.filter(item=>item.item_no!==item_no);
+    linesArray.value=linesArray.value.filter(item=>item.item_no!==item_no);
 
     form.to_vessel=''
     form.from_vessel=''
