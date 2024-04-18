@@ -658,7 +658,12 @@ const generatePDF = (from=1,to=1,vessel='',passedWeight) =>
 
         })
         .then(response=>{
-            printedArray.value=response.data.data;
+            printedVessels.value = response.data.data.map(item => ({
+            vessel: item.vessel_type,
+            range: `${item.range_start}-${item.range_end}`
+        }));
+
+
 
 
         })
@@ -784,8 +789,8 @@ const generatePDF = (from=1,to=1,vessel='',passedWeight) =>
 
     groupAndSumWeight();
     lookupAndAddProperties();
-    console.log(linesArray.value)
-    linesArray.value-linesArray.value
+    // console.log(linesArray.value)
+    // linesArray.value-linesArray.value
 
     openModal();
 
