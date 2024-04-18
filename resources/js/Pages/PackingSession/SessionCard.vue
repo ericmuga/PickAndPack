@@ -278,7 +278,7 @@ const closePacking=()=>{
 
                         Inertia.post(
                                 route('packingSession.close'),
-                                { 'id': props.session.data.id ,'lines':linesArray.value},
+                                { 'id': props.session.data.id ,'lines':newLines.value},
                                 {
                                     onSuccess: () => Swal.fire('Success!', 'Session Ended Successfully!', 'success'),
                                     onError: (error) => Swal.fire('Error', error.message, 'error')
@@ -291,7 +291,7 @@ const closePacking=()=>{
 
             Inertia.post(
                 route('packingSession.close'),
-                { 'id': props.session.data.id ,'lines':linesArray.value},
+                { 'id': props.session.data.id ,'lines':newLines.value},
                 {
                     onSuccess: () => Swal.fire('Success!', 'Session Ended Successfully!', 'success'),
                     onError: (error) => Swal.fire('Error', error.message, 'error')
@@ -316,7 +316,20 @@ onMounted(() => {
             range: `${item.range_start}-${item.range_end}`
         }));
 
-    linesArray.value=props.lines
+   linesArray.value=props.lines
+
+    newLines.value=linesArray.value.map(item => ({
+                                    item_no: item.item_no,
+                                    packing_vessel_id: item.packing_vessel_id,
+                                    from_vessel: item.from_vessel,
+                                    to_vessel: item.to_vessel,
+                                    qty: item.qty,
+                                    weight: item.weight,
+                                    packing_session_id: props.session.data.id, // Assuming props.session.data contains the id
+                                    order_no: props.session.data.order_no // Assuming props.session.data contains the order_no
+                                }));
+
+
     inputField.value.focus();
     calculateSum();
     printedArray.value=props.printedArray
@@ -815,7 +828,7 @@ const newArray = computed(() => {
     const cumulativeQty = {};
 
     // Iterate through additionalData to calculate cumulative quantities
-    linesArray.value.forEach((item) => {
+    newLines.value.forEach((item) => {
         const itemNo = item.item_no;
         const qty = parseFloat(item.qty);
         cumulativeQty[itemNo] = (cumulativeQty[itemNo] || 0) + qty;
@@ -969,9 +982,9 @@ function lookupAndAddProperties() {
 }
 
 // Call the functions
+const newLines=ref([]);
 
-
-
+const nl=ref([]);
 
 
 const createOrUpdateSession = () => {
@@ -987,9 +1000,25 @@ const createOrUpdateSession = () => {
 
 
         lastVessel.value = form.to_vessel;
-        // items.value=items.value.filter(item=>item.item_no!==form.item_no)
+
+        items.value=linesArray.value.map(item => ({
+                                    item_no: item.item_no,
+                                    packing_vessel_id: item.packing_vessel_id,
+                                    from_vessel: item.from_vessel,
+                                    to_vessel: item.to_vessel,
+                                    qty: item.qty,
+                                    weight: item.weight,
+                                    packing_session_id: props.session.data.id, // Assuming props.session.data contains the id
+                                    order_no: props.session.data.order_no // Assuming props.session.data contains the order_no
+                                }));
+
+
+        items.value=items.value.filter(item=>item.item_no!==form.item_no)
+
+
         items.value.push({
                             item_no:form.item_no,
+                           // item_desc:getItemDescription(form.item_no),
                             packing_vessel_id:form.packing_vessel_id,
                             from_vessel:form.from_vessel,
                             to_vessel:form.to_vessel,
@@ -999,8 +1028,10 @@ const createOrUpdateSession = () => {
                             order_no:props.session.data.order_no,
                         });
 
-        linesArray.value=linesArray.value.filter(item=>item.item_no!=form.item_no);
-        linesArray.value=linesArray.push(items.value);
+        newLines.value=items.value;
+        // nl.value=newArray.value.filter(item=>item.item_no!==form.item_no);
+        // newArray.value=nl.value;
+
 
         // reduce the quantity of that line in the main array, if its zero, hide
 
@@ -1084,7 +1115,7 @@ lookupAndAddProperties();
 const removeFromArray=(item_no)=>{
     // alert('here')
     items.value=items.value.filter(item=>item.item_no!==item_no)
-    linesArray.value=linesArray.value.filter(item=>item.item_no!==item_no)
+    newLines.value=newLines.value.filter(item=>item.item_no!==item_no)
     groupAndSumWeight();
 lookupAndAddProperties();
 
@@ -1201,7 +1232,7 @@ const getVesselCode =(id)=>{
 
 
                                                     <tbody>
-                                                        <tr v-for="line in linesArray" :key="line.item_no"
+                                                        <tr v-for="line in newLines " :key="line.item_no"
                                                         class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
 
                                                         <td class="text-xs">
