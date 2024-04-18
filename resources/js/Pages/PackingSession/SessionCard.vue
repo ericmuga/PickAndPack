@@ -959,7 +959,7 @@ const groupedItems = computed(() => {
 const groupedArray = ref([]);
 
 function groupAndSumWeight() {
-    groupedArray.value = linesArray.value.reduce((acc, obj) => {
+    groupedArray.value = newLines.value.reduce((acc, obj) => {
         const key = `${obj.packing_vessel_id}_${obj.to_vessel}_${obj.from_vessel}`;
         acc[key] = acc[key] || { packing_vessel_id: obj.packing_vessel_id, to_vessel: obj.to_vessel, from_vessel: obj.from_vessel, total_weight: 0 };
         acc[key].total_weight += obj.weight;
