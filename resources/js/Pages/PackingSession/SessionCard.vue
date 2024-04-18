@@ -246,13 +246,13 @@ const closePacking=()=>{
  filteredPacking=[];
  allPacked=true
 //prevent empty packing
-     if (linesArray.value.length===0)
+     if (newLines.value.length===0)
       Swal.fire('Error!','Empty Packing','error');
     else
 //warn if not all lines have been packed
        { for(var i=0; i<props.OrderLines.data.length;i++)
         {
-            filteredPacking=linesArray.value.filter(line=>line.line_no===props.OrderLines.data[i].line_no);
+            filteredPacking=newLines.value.filter(line=>line.item_no===props.OrderLines.data[i].item_no);
             if (filteredPacking.length==0)
             {
                 allPacked=false;
