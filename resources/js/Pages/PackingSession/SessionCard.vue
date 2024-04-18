@@ -318,7 +318,7 @@ onMounted(() => {
 
    linesArray.value=props.lines
 
-    newLines.value=linesArray.value.map(item => ({
+    newLines.value=props.lines.map(item => ({
                                     item_no: item.item_no,
                                     packing_vessel_id: item.packing_vessel_id,
                                     from_vessel: item.from_vessel,
@@ -1032,7 +1032,17 @@ const createOrUpdateSession = () => {
                             order_no:props.session.data.order_no,
                         });
 
-        newLines.value=items.value;
+        newLines.value.push({
+                            item_no:form.item_no,
+                           // item_desc:getItemDescription(form.item_no),
+                            packing_vessel_id:form.packing_vessel_id,
+                            from_vessel:form.from_vessel,
+                            to_vessel:form.to_vessel,
+                            qty:form.qty,
+                            weight:form.weight,
+                            packing_session_id:props.session.data.id,
+                            order_no:props.session.data.order_no,
+                        });
         // nl.value=newArray.value.filter(item=>item.item_no!==form.item_no);
         // newArray.value=nl.value;
 
@@ -1043,7 +1053,7 @@ const createOrUpdateSession = () => {
 
         lastVessel.value = form.to_vessel;
         selectedItem.value = '';
-        printedArray.value = props.printedArray;
+        // printedArray.value = props.printedArray;
 
 groupAndSumWeight();
 lookupAndAddProperties();
@@ -1192,7 +1202,7 @@ const getVesselCode =(id)=>{
 
 
                                     </Toolbar>
-                                    <div v-if="linesArray.length==0" class="w-full p-3 mt-2 text-center">
+                                    <div v-if="newLines.length==0" class="w-full p-3 mt-2 text-center">
                                         No Packed Lines were found.
                                     </div>
                                     <div class="relative overflow-x-auto shadow-md sm:rounded-lg" v-else>
