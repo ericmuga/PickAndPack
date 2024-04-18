@@ -152,7 +152,15 @@ function findIdByCode(array, code) {
 
 const updateSelected=(item_no)=>{
 
-    items.value=items.value.filter(item=>item.item_no!==item_no);
+    // printedVessels.value = props.printedArray.map(item => ({
+    //         vessel: item.vessel_type,
+    //         range: `${item.range_start}-${item.range_end}`
+    //     }));
+
+    linesArray.value=props.lines
+
+    // items.value=items.value.filter(item=>item.item_no!==item_no);
+    // linesArray.value.push(items);
     linesArray.value=linesArray.value.filter(item=>item.item_no!==item_no);
 
     form.to_vessel=''
@@ -302,6 +310,11 @@ const closePacking=()=>{
 
 onMounted(() => {
     // console.log(attrs.auth.user)
+
+   printedVessels.value = props.printedArray.map(item => ({
+            vessel: item.vessel_type,
+            range: `${item.range_start}-${item.range_end}`
+        }));
 
     linesArray.value=props.lines
     inputField.value.focus();
@@ -516,6 +529,25 @@ const assembledArray=ref([]);
 
 const selectedFile=ref();
 
+const printedVessels=ref([])
+
+const markPrinted=(range,vessel)=>{
+   //push the from and to into an array
+//    printedVessels.value=printedVessels.value.forEach((item, index) => {
+//                                         if (item.range === range && item.vessel === vessel) {
+//                                             // Add the item to the filteredItems array if it matches the criteria
+//                                             filteredItems.push(item);
+//                                             // Remove the item from the printedVessels array using splice
+//                                             printedVessels.value.splice(index, 1);
+//                                         }
+//                                     });
+   printedVessels.value.push({range:range,vessel:vessel})
+
+}
+
+const checkPrinted=(range,vessel)=>{
+    return printedVessels.value.filter(item=>item.range==range&&item.vessel==vessel).length>0
+}
 
 
 function checkMatchingRanges(secondObject) {
@@ -535,6 +567,8 @@ const generatePDF = (from=1,to=1,vessel='',passedWeight) =>
 {
 
     // console.log()
+   markPrinted(from+"-"+to);
+
    let weight=(parseFloat(passedWeight)/(to-from+1)).toFixed(2);
 
     const doc = new jsPDF({
@@ -736,6 +770,11 @@ const generatePDF = (from=1,to=1,vessel='',passedWeight) =>
         lastVessel.value=response.data
     })
 
+    groupAndSumWeight();
+    lookupAndAddProperties();
+    console.log(linesArray.value)
+    linesArray.value-linesArray.value
+
     openModal();
 
 };
@@ -838,7 +877,7 @@ const getSelectedItem = (item_no) => {
 const getItemDescription=(itemNo)=> {
     // Filter the array based on matching from_vessel and to_vessel
     const filteredData = props.OrderLines.data.filter(item => item.item_no ===itemNo);
-    // console.log(filteredData)
+    console.log(filteredData)
 
     // Calculate the sum of packed_qty for the filtered items
     const desc= filteredData[0].item_desc
@@ -948,19 +987,20 @@ const createOrUpdateSession = () => {
 
 
         lastVessel.value = form.to_vessel;
-        items.value=items.value.filter(item=>item.item_no!==form.item_no)
+        // items.value=items.value.filter(item=>item.item_no!==form.item_no)
         items.value.push({
-            item_no:form.item_no,
-            packing_vessel_id:form.packing_vessel_id,
-            from_vessel:form.from_vessel,
-            to_vessel:form.to_vessel,
-            qty:form.qty,
-            weight:form.weight,
-            packing_session_id:props.session.data.id,
-            order_no:props.session.data.order_no,
-        });
+                            item_no:form.item_no,
+                            packing_vessel_id:form.packing_vessel_id,
+                            from_vessel:form.from_vessel,
+                            to_vessel:form.to_vessel,
+                            qty:form.qty,
+                            weight:form.weight,
+                            packing_session_id:props.session.data.id,
+                            order_no:props.session.data.order_no,
+                        });
 
-        linesArray.value=items.value;
+        linesArray.value=linesArray.value.filter(item=>item.item_no!=form.item_no);
+        linesArray.value=linesArray.push(items.value);
 
         // reduce the quantity of that line in the main array, if its zero, hide
 
@@ -1045,6 +1085,8 @@ const removeFromArray=(item_no)=>{
     // alert('here')
     items.value=items.value.filter(item=>item.item_no!==item_no)
     linesArray.value=linesArray.value.filter(item=>item.item_no!==item_no)
+    groupAndSumWeight();
+lookupAndAddProperties();
 
 }
 
@@ -1181,11 +1223,10 @@ const getVesselCode =(id)=>{
                                                         <td class="px-3 text-xs font-bold">
                                                             {{ line.to_vessel}}
                                                         </td>
-                                                        <td class="flex flex-row px-3 mr-5 text-xs"  v-if="((session.data.system_entry!=0)
-                                                        &&(!checkMatchingRanges({'from_vessel':line.from_vessel,'to_vessel':line.to_vessel})))
-                                                        ||(($page.props.auth.roles.includes('admin'))||(($page.props.auth.roles.includes('supervisor'))))
+                                                        <td class="flex flex-row px-3 mr-5 text-xs"
+                                                        v-if="!checkPrinted(line.from_vessel+'-'+line.to_vessel,getVesselCode(line.packing_vessel_id))"
 
-                                                        ">
+                                                        >
 
                                                         <!-- <Drop  :drop-route="route('packingSessionLine.destroy',{'id':line.id})" /> -->
 
@@ -1229,7 +1270,7 @@ const getVesselCode =(id)=>{
                                                     <!-- <td>{{ sum.tare_weight*(sum.to_vessel-sum.from_vessel+1) }}</td> -->
                                                     <td>{{ sum.gross_weight }}</td>
                                                     <td> <Button icon="pi pi-print" severity="success"
-                                                        :disabled="checkMatchingRanges(sum)"
+                                                        :disabled="checkPrinted(sum.from_vessel +'-'+sum.to_vessel,sum.code)"
                                                         @click="generatePDF(sum.from_vessel,sum.to_vessel,sum.code,sum.gross_weight)"
                                                         /> </td>
                                                     </tr>
@@ -1408,10 +1449,11 @@ const getVesselCode =(id)=>{
                             form.weight==''||
                             form.from_vessel==''||
                             form.to_vessel==''||
-                            form.processing||
-                            checkMatchingRanges({'from_vessel':form.from_vessel,'to_vessel':form.to_vessel})"
+                            form.processing"
+
 
                             />
+
                             <Button label="Cancel" severity="warning" icon="pi pi-cancel" @click="showModal=false"/>
                         </div>
 
