@@ -1343,20 +1343,12 @@ const getVesselCode =(id)=>{
                                     <template #center>
 
                                         <Button
-                                        v-if="session.data.system_entry==1"
-                                        label="End Packing"
-                                        severity="warning"
+                                      
+                                        label="Save"
+                                        severity="info"
                                         @click="closePacking()"
                                         />
 
-                                        <Link v-else :href="route('packingSession.index')">
-                                            <Button
-
-                                            label="Back"
-                                            severity="info"
-
-                                            />
-                                        </Link>
                                     </template>
                                 </Toolbar>
 

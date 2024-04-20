@@ -74,7 +74,7 @@ class PackingSessionController extends Controller
         // dd($request->lines);
         foreach ($request->lines as $line) {
 
-            PackingSessionLine::create($line);
+            PackingSessionLine::updateOrCreate($line);
 
         }
         $packingSession=PackingSession::find($request->id);

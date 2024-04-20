@@ -531,6 +531,7 @@ onUnmounted(() => {
                                                                                          icon="pi pi-pencil"
                                                                                          text
                                                                                          rounded
+                                                                                         style="height: 50%;"
 
                                                                                          @click="updateScannedItem(line)"
 
@@ -543,6 +544,7 @@ onUnmounted(() => {
                                                                                          icon="pi pi-times"
                                                                                             text
                                                                                             rounded
+                                                                                            style="height: 50%;"
 
                                                                                          @click="removeLine(line.line_no)"
 
@@ -565,7 +567,8 @@ onUnmounted(() => {
                                                                     <!-- <Pagination :links="orderLines.meta.links" /> -->
                                                                     <Button
                                                                     class="justify-end"
-                                                                    label="Close Assembly"
+                                                                    label="Save"
+                                                                    severity="warning"
                                                                     @click="closeAssembly()"
                                                                   />
 
