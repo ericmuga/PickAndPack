@@ -12,6 +12,7 @@ import Modal from '@/Components/Modal.vue';
 import debounce from 'lodash/debounce'
 import ProgressBar from 'primevue/progressbar';
 import { useSearchArray } from '@/Composables/useSearchArray';
+import { Link } from '@inertiajs/inertia-vue3';
 // import { includes } from 'lodash';
 // import {axios } from 'axios';
 
@@ -565,13 +566,24 @@ onUnmounted(() => {
                                                             <Toolbar>
                                                                 <template #center>
                                                                     <!-- <Pagination :links="orderLines.meta.links" /> -->
+                                                                    <div class="flex justify-center gap-4 ">
+
+
+                                                                <Link
+                                                                        :href="route('assembly.index')"
+
+                                                                        ><Button
+                                                                        icon="pi pi-backward"
+                                                                        label="Back"
+                                                                    /></Link>
+
                                                                     <Button
                                                                     class="justify-end"
                                                                     label="Save"
-                                                                    severity="warning"
+                                                                    severity="success"
                                                                     @click="closeAssembly()"
                                                                   />
-
+                                                                    </div>
                                                                 </template>
                                                             </Toolbar>
                                                         </div>

@@ -16,6 +16,7 @@ import { Link } from '@inertiajs/inertia-vue3';
 import Button from 'primevue/button';
 import { useSearchArray } from '@/Composables/useSearchArray';
 import debounce from 'lodash/debounce'
+// import { Link } from '@inertiajs/inertia-vue3';
 //import { SearchCircleIcon } from '@vue-hero-icons/solid';
 
 let printedArray=ref([]);
@@ -1167,15 +1168,16 @@ const getVesselCode =(id)=>{
                                 <Toolbar>
                                     <template #start>
                                         <div class="flex flex-col text-center ">
-                                                <div v-show="newArray.length>0" >
-                                                    <div class="p-2 m-1 text-black bg-orange-200 ">
-
-                                                         <div class="flex flex-col font-bold tracking-wide text-center">
+                                                 <div class="flex flex-col font-bold tracking-wide text-center">
                                                                 {{ session.data.order.order_no }}|
                                                                 {{ session.data.order.shp_name }}|
                                                                 {{ session.data.part }}
 
                                                             </div>
+                                                            <div v-show="newArray.length>0" >
+                                                    <div class="p-2 m-1 text-black bg-orange-200 ">
+
+
                                                             Pending List
                                                             <span class="px-2 py-1 font-bold text-right text-black bg-yellow-400 rounded-full">{{ newArray.length }}</span>
                                                     </div>
@@ -1313,7 +1315,7 @@ const getVesselCode =(id)=>{
                                                     <td>{{ sum.to_vessel-sum.from_vessel+1 }}</td>
                                                     <td>{{ sum.code }}</td>
                                                     <!-- <td>{{ sum.tare_weight*(sum.to_vessel-sum.from_vessel+1) }}</td> -->
-                                                    <td>{{ sum.gross_weight }}</td>
+                                                    <td>{{ parseFloat(sum.gross_weight).toFixed(2) }}</td>
                                                     <td> <Button icon="pi pi-print" severity="success"
                                                         :disabled="checkPrinted(sum.from_vessel +'-'+sum.to_vessel,sum.code)"
                                                         @click="generatePDF(sum.from_vessel,sum.to_vessel,sum.code,sum.gross_weight)"
@@ -1341,14 +1343,25 @@ const getVesselCode =(id)=>{
 
                                 <Toolbar>
                                     <template #center>
+                                    <div class="flex justify-center gap-4 ">
+
+
+                                         <Link
+                                            :href="route('packingSession.index')"
+
+                                        ><Button
+                                        icon="pi pi-backward"
+                                        label="Back"
+                                       /></Link>
+
 
                                         <Button
 
                                         label="Save"
-                                        severity="info"
+                                        severity="success"
                                         @click="closePacking()"
                                         />
-
+                                  </div>
                                     </template>
                                 </Toolbar>
 
