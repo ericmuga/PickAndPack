@@ -71,10 +71,10 @@ class PackingSessionController extends Controller
 
     public function closePacking(Request $request)
     {
-        // dd($request->lines);
+        PackingSessionLine::where('packing_session_id',$request->id)->delete();
         foreach ($request->lines as $line) {
 
-            PackingSessionLine::updateOrCreate($line);
+            PackingSessionLine::create($line);
 
         }
         $packingSession=PackingSession::find($request->id);
