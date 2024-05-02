@@ -6,6 +6,7 @@ use App\Http\Resources\VesselOrderResource;
 use App\Models\AssemblyLine;
 use App\Models\Order;
 use App\Models\PackingSessionLine;
+use App\Models\PackingVessel;
 use App\Models\User;
 use App\Models\Vessel;
 use App\Models\VesselLog;
@@ -97,8 +98,17 @@ class VesselController extends Controller
         //  dd($request->only('vessel_type','range_start','range_end'));
         Vessel::where($request->only('vessel_type','range_start','range_end','order_no'))->delete();
         // VesselLog::where()
-         $printed=Vessel::where('part',$request->part)->where('order_no',$request->order_no)->get();
 
+
+        //   $v=PackingVessel::firstWhere('code',$request->vessel_type);
+          PackingSessionLine::where('packing_session_id',$request->packing_session_id)
+                            ->where('order_no',$request->order_no)
+                            ->where('from_vessel',$request->range_start)
+                            ->where('to_vessel',$request->range_end)
+                            ->where('packing_vessel_id',$request->vessel_no)
+                            ->delete();
+
+       $printed=Vessel::where('part',$request->part)->where('order_no',$request->order_no)->get();
        return response()->json(['data'=>$printed]);
     }
 

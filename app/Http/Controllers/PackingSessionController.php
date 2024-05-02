@@ -83,6 +83,21 @@ class PackingSessionController extends Controller
         return redirect(route('packingSession.index'));
     }
 
+    public function closeSilent(Request $request)
+    {
+        PackingSessionLine::where('packing_session_id',$request->id)->delete();
+        foreach ($request->lines as $line) {
+
+            PackingSessionLine::create($line);
+
+        }
+        $packingSession=PackingSession::find($request->id);
+        $packingSession->system_entry=0;
+        $packingSession->save();
+        return response('',200);
+    }
+
+
 
 
     public function getOrderParts(Request $request )

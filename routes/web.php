@@ -89,7 +89,7 @@ Route::get('registry/download',[ConfirmationController::class, 'download'])->nam
       Route::resource('vehicles',VehicleController::class);
       Route::get('vehicleDownload',[VehicleController::class,'download'])->name('vehicles.download');
       Route::resource('vessels',VesselController::class);
-      Route::post('removeVessel',[VesselController::class,'remove'])->name('vessels.remove');
+      Route::post('removeVessel',[VesselController::class,'remove'])->name('vessels.void');
 
       Route::post('uploadVessel',[VesselController::class, 'upload'])->name('vessels.upload');
       Route::get('vesselDownload',[VesselController::class,'download'])->name('vessels.download');
@@ -123,6 +123,7 @@ Route::get('registry/download',[ConfirmationController::class, 'download'])->nam
         Route::resource('packingSession',PackingSessionController::class);
         Route::post('getLines/packingSessions',[PackingSessionController::class,'getLines'])->name('packingSession.getLines');
         Route::post('closePackingSession',[PackingSessionController::class,'closePacking'])->name('packingSession.close');
+        Route::post('closePackingSessionSilent',[PackingSessionController::class,'closeSilent'])->name('packingSession.closeSilent');
         Route::resource('packingVessel',PackingVesselController::class);
         Route::get('packingSessionExport', [PackingSessionController::class, 'export'])->name('packingSessions.export');
 

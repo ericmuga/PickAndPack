@@ -787,6 +787,9 @@ const generatePDF = (from=1,to=1,vessel='',passedWeight) =>
     .then((response)=>{
         lastVessel.value=response.data
     })
+    axios.post(route('packingSession.closeSilent'),
+                                { 'id': props.session.data.id ,'lines':newLines.value})
+
 
     groupAndSumWeight();
     lookupAndAddProperties();
@@ -895,7 +898,7 @@ const getSelectedItem = (item_no) => {
 const getItemDescription=(itemNo)=> {
     // Filter the array based on matching from_vessel and to_vessel
     const filteredData = props.OrderLines.data.filter(item => item.item_no ===itemNo);
-    console.log(filteredData)
+    // console.log(filteredData)
 
     // Calculate the sum of packed_qty for the filtered items
     const desc= filteredData[0].item_desc
@@ -1131,6 +1134,8 @@ const removeFromArray=(item_no)=>{
     // alert('here')
     items.value=items.value.filter(item=>item.item_no!==item_no)
     newLines.value=newLines.value.filter(item=>item.item_no!==item_no)
+
+
     groupAndSumWeight();
 lookupAndAddProperties();
 
@@ -1167,10 +1172,12 @@ const dropLabel=(vessel_code,from,to)=>{
                 confirmButtonText: 'Yes, delete it!'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                                             console.log(getVesselId(vessel_code));
+                                            //  console.log(getVesselId(vessel_code));
                                             //  console.log()
-                                             newLines.value= removeObjects(newLines.value,getVesselId(vessel_code),from,to)
+                                             newLines.value= newLines.value.filter(item=>!(item.packing_vessel_id==getVesselId(vessel_code)&&item.from_vessel==from&&item.to_vessel==to))
                                              items.value=removeObjects(items.value,getVesselId(vessel_code),from,to)
+                                             linesArray.value=removeObjects(linesArray.value,getVesselId(vessel_code),from,to)
+                                            //  console.log(linesArray.value)
 
 
                                                   // alert(form.vessel)
@@ -1182,6 +1189,7 @@ const dropLabel=(vessel_code,from,to)=>{
                                                                     'vessel_no':getVesselId(vessel_code),
                                                                     'range_start':from,
                                                                     'range_end':to,
+                                                                    'packing_session_id':props.session.data.id,
 
                                                                 })
                                                     .then(response=>{
@@ -1205,8 +1213,8 @@ const dropLabel=(vessel_code,from,to)=>{
     //remove lines from carton
 }
 
-const isAdmin=()=>props.roles.includes('admin')
-
+const isAdmin=()=>props.roles.includes("admin")
+// console.log(isAdmin())
     </script>
 
 
@@ -1344,7 +1352,7 @@ const isAdmin=()=>props.roles.includes('admin')
                                                         <Button icon="pi pi-times" class="justify-end p-button-danger"
                                                         text rounded
                                                         @click="removeFromArray(line.item_no)"
-                                                        :disabled="isAdmin()"
+
                                                         />
                                                         <Button
                                                         icon="pi pi-pencil"
@@ -1365,14 +1373,14 @@ const isAdmin=()=>props.roles.includes('admin')
                                         <!-- {{ groupedArray }} -->
                                         <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                                             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                                <tr class="">
+                                                <tr class="text-center">
                                                     <th>Vessel Range</th>
                                                     <th>Vessel Count</th>
                                                     <th>Vessel</th>
                                                     <!-- <th>Tare Weight</th> -->
                                                     <th>Weight</th>
                                                     <th>Label</th>
-                                                    <th>Empty?</th>
+                                                    <th>Remove?</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -1391,7 +1399,7 @@ const isAdmin=()=>props.roles.includes('admin')
                                                         <Button
                                                          severity="danger"
                                                          icon="pi pi-times"
-                                                         :disabled="isAdmin()"
+                                                         :disabled="!isAdmin()"
                                                          @click="dropLabel(sum.code,sum.from_vessel,sum.to_vessel)"
                                                         />
                                                     </td>
