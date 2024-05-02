@@ -176,7 +176,7 @@ const updateSelected=(item_no)=>{
     {
         let obj=findMatchingObjects(printedArray.value,highestToVessel)
 
-        console.log(obj)
+        // console.log(obj)
 
         if (obj.length>0)
         {
@@ -1140,8 +1140,72 @@ const getVesselCode =(id)=>{
     // console.log(id)
     return props.packingVessels.data.filter(v=>v.id==id)[0].code
 }
+const getVesselId=(code)=>{
+    return props.packingVessels.data.filter(v=>v.code==code)[0].id
+}
+
+ function removeObjects(array, packing_vessel_id, from_vessel, to_vessel) {
+                                  return array.filter(obj => {
+                                                return !(obj.packing_vessel_id === packing_vessel_id && obj.from_vessel === from_vessel && obj.to_vessel === to_vessel);
+                                            });
+                                        }
 
 
+const dropLabel=(vessel_code,from,to)=>{
+
+    //remove all items from db
+
+
+
+    Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                                             console.log(getVesselId(vessel_code));
+                                            //  console.log()
+                                             newLines.value= removeObjects(newLines.value,getVesselId(vessel_code),from,to)
+                                             items.value=removeObjects(items.value,getVesselId(vessel_code),from,to)
+
+
+                                                  // alert(form.vessel)
+                                                    axios.post(route('vessels.remove'),
+                                                                {
+                                                                    'order_no':props.session.data.order_no,
+                                                                    'part':props.session.data.part,
+                                                                    'vessel_type':vessel_code,
+                                                                    'vessel_no':getVesselId(vessel_code),
+                                                                    'range_start':from,
+                                                                    'range_end':to,
+
+                                                                })
+                                                    .then(response=>{
+                                                        printedVessels.value = response.data.data.map(item => ({
+                                                        vessel: item.vessel_type,
+                                                        range: `${item.range_start}-${item.range_end}`
+                                                    }));
+
+
+                                              })
+                                              groupAndSumWeight();
+                                              lookupAndAddProperties();
+                                              Swal.fire('Success','Vessel deleted successfully','success')
+
+                                            }
+
+
+            })
+
+
+    //remove lines from carton
+}
+
+const isAdmin=()=>props.roles.includes('admin')
 
     </script>
 
@@ -1280,6 +1344,7 @@ const getVesselCode =(id)=>{
                                                         <Button icon="pi pi-times" class="justify-end p-button-danger"
                                                         text rounded
                                                         @click="removeFromArray(line.item_no)"
+                                                        :disabled="isAdmin()"
                                                         />
                                                         <Button
                                                         icon="pi pi-pencil"
@@ -1307,6 +1372,7 @@ const getVesselCode =(id)=>{
                                                     <!-- <th>Tare Weight</th> -->
                                                     <th>Weight</th>
                                                     <th>Label</th>
+                                                    <th>Empty?</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -1319,7 +1385,16 @@ const getVesselCode =(id)=>{
                                                     <td> <Button icon="pi pi-print" severity="success"
                                                         :disabled="checkPrinted(sum.from_vessel +'-'+sum.to_vessel,sum.code)"
                                                         @click="generatePDF(sum.from_vessel,sum.to_vessel,sum.code,sum.gross_weight)"
-                                                        /> </td>
+                                                        />
+                                                    </td>
+                                                    <td>
+                                                        <Button
+                                                         severity="danger"
+                                                         icon="pi pi-times"
+                                                         :disabled="isAdmin()"
+                                                         @click="dropLabel(sum.code,sum.from_vessel,sum.to_vessel)"
+                                                        />
+                                                    </td>
                                                     </tr>
                                                 </tbody>
                                                 <!-- Table footer with totals -->

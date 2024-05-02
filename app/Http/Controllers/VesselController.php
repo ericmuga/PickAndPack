@@ -92,6 +92,15 @@ class VesselController extends Controller
 
     }
 
+    public function remove(Request $request)
+    {
+        //  dd($request->only('vessel_type','range_start','range_end'));
+        Vessel::where($request->only('vessel_type','range_start','range_end','order_no'))->delete();
+        // VesselLog::where()
+         $printed=Vessel::where('part',$request->part)->where('order_no',$request->order_no)->get();
+
+       return response()->json(['data'=>$printed]);
+    }
 
     public function upload(Request $request)
     {

@@ -89,7 +89,7 @@ Route::get('registry/download',[ConfirmationController::class, 'download'])->nam
       Route::resource('vehicles',VehicleController::class);
       Route::get('vehicleDownload',[VehicleController::class,'download'])->name('vehicles.download');
       Route::resource('vessels',VesselController::class);
-      Route::post('voidVessel',[VesselController::class,'voidVessel'])->name('vessels.void');
+      Route::post('removeVessel',[VesselController::class,'remove'])->name('vessels.remove');
 
       Route::post('uploadVessel',[VesselController::class, 'upload'])->name('vessels.upload');
       Route::get('vesselDownload',[VesselController::class,'download'])->name('vessels.download');
