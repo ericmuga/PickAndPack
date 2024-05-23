@@ -43,12 +43,13 @@ const loadAssembly=()=>{
                                                             ['order_no', props.orderLines[i].assemblies[j].order_no]
 
                                                         ]);
-                if (result.value!=0)
+                if (result!=0)
                 {
+                    // console.log(result)
                     assembledArray.value.push({
                         'item_no':result.item_no,
-                        'assembled_qty':result.qty_base,
-                        'assembled_pcs':result.order_qty,
+                        'assembled_qty':props.orderLines[i].assemblies[j].ass_qty,
+                        'assembled_pcs':props.orderLines[i].assemblies[j].ass_pcs,
                         'order_qty':result.order_qty,
                         'item_description':result.item_description,
                         'barcode':result.barcode,
@@ -223,11 +224,12 @@ const removeLine=(line_no)=>{
 const  cItem=ref({});
 
 const updateScannedItem =(item)=>{
-    console.log(item)
-                            cItem.value=item;
+    // console.log(item)
+                      cItem.value=props.orderLines.filter(j=>j.item_no===item.item_no)[0]
+                       console.log(cItem.value)
                             form.item_no=item.item_no
                             form.barcode=item.barcode
-                            form.order_qty=item.qty_base
+                            form.order_qty=cItem.qty_base
                             form.order_pcs=item.order_qty
                             form.prepacks_total_quantity=item.prepacks_total_quantity
                                 form.assembled_qty=item.qty_base?parseFloat(item.qty_base):item.assembled_qty
@@ -255,6 +257,8 @@ let remainingArray=ref([]);
 
 let filteredAssembly=[];
 const closeAssembly = () => {
+
+    console.log(assembledArray.value)
                      if (assembledArray.value.length==0) {
                                         Swal.fire('Error','The assembly is empty','error')
                                     }

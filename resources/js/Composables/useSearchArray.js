@@ -53,7 +53,7 @@ export function useSearchArray(initialArray) {
     const result = array.value.find((item) => {
       return item.barcode === input || item.item_no === input || item.barcode.slice(0, 12) ===input;
     });
-
+    //  console.log(result)
     if (result) {
       return { ...result };
     } else {
