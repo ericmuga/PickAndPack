@@ -65,6 +65,7 @@ const stationOrders=()=>{
 
 const preAssignDate=()=> {
       const currentDate = new Date();
+      currentDate.setDate(currentDate.getDate() + 1);
       const year = currentDate.getFullYear();
       let month = currentDate.getMonth() + 1;
       month = month < 10 ? '0' + month : month;
