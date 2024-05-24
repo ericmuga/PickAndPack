@@ -42,7 +42,7 @@ class AssignmentController extends Controller
 
     public function create(Request $request)
     {
-      $orders =Cache::remember('pending_assignment', 15 * 60, function () {return
+      $orders =//Cache::remember('pending_assignment', 5 * 60, function () {return
                                 DB::table('pending_assignment')
                                     ->select('order_no',
                                             'shp_date',
@@ -63,17 +63,22 @@ class AssignmentController extends Controller
                                             'D_Assignment_Count')
                                     ->where('shp_date', '>=', now()->toDateString())
                                     ->get();
-                            });
+                         //   });
 
 
       $orders = $this->filterOrders($request,$orders) ->values();
 
-      $assignments=Cache::remember('assignments', 15 * 60, function () use($orders) {return
-                            $this->generateAssignmentsArray($orders);
-                        });
+    //   $assignments=Cache::remember('assignments', 5 * 60, function () use($orders) {return
+    //                         $this->generateAssignmentsArray($orders);
+    //                     });
+
+      $assignments=$this->generateAssignmentsArray($orders);
+
       $station=$request->station;
       $flag=$request->flag?:'';
-      $assemblers=Cache::remember('assemblers', 15 * 60, function () {return DB::table('users')->select('name','id')->orderBy('name')->get();});
+    //   $assemblers=Cache::remember('assemblers', 15 * 60, function () {return DB::table('users')->select('name','id')->orderBy('name')->get();});
+      $assemblers=DB::table('users')->select('name','id')->orderBy('name')->get();
+
       return inertia('Assignment/Create',compact('orders' ,'assemblers','assignments','station','flag'));
 
     }
