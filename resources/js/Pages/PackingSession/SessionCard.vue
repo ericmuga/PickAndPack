@@ -16,10 +16,123 @@ import { Link } from '@inertiajs/inertia-vue3';
 import Button from 'primevue/button';
 import { useSearchArray } from '@/Composables/useSearchArray';
 import debounce from 'lodash/debounce'
-// import { Link } from '@inertiajs/inertia-vue3';
-//import { SearchCircleIcon } from '@vue-hero-icons/solid';
+import {resolveValue} from '@/Composables/usePackingSession';
 
+
+/////////////// variable declarations /////////////////////////////
+const calculatedSum=ref([]);
+const printedVessels=ref([])
+let linesArray=ref([]);
+const newLines=ref([]);
 let printedArray=ref([]);
+
+//////////////////////////end of declarations //////////////
+
+///////////////////computed props ////////////////////////////////////
+
+const checkPrinted = computed(() => (range, vessel) => {
+  return printedVessels.value.filter(item => item.range === range && item.vessel === vessel).length > 0;
+});
+
+
+
+//////////////////////////end of computed props/////////////////////////
+
+
+
+const markPrinted=(range,vessel)=>{
+    printedVessels.value.push({range:range,vessel:vessel})
+   //push to backend?
+}
+
+
+const calculateSum = () => {
+    const sumsMap = new Map();
+
+    linesArray.value.forEach((item, index) => {
+
+
+        const key = `${item.packing_vessel_id}-${item.from_vessel}-${item.to_vessel}`;
+
+        if (!sumsMap.has(key)) {
+            sumsMap.set(key, {
+                weight: 0,
+                tare_weight: 0,
+                qty: 0,
+            });
+        }
+
+        const sum = sumsMap.get(key);
+        sum.weight += parseFloat(item.weight);
+        sum.qty += parseFloat(item.qty);
+
+        // Sum tare_weight only when the key changes
+        if (index === 0 || key !== `${linesArray.value[index - 1].packing_vessel_id}-${linesArray.value[index - 1].from_vessel}-${linesArray.value[index - 1].to_vessel}`) {
+            sum.tare_weight += parseFloat(item.packing_vessel.tare_weight);
+        }
+    });
+
+    const result = Array.from(sumsMap, ([key, sum]) => ({
+                                                            packing_vessel_id: key.split('-')[0],
+                                                            from_vessel: key.split('-')[1],
+                                                            to_vessel: key.split('-')[2],
+                                                            weight: sum.weight,
+                                                            tare_weight: sum.tare_weight,
+                                                            qty: sum.qty,
+                                                        }));
+
+    calculatedSum.value = result;
+};
+
+
+//////////////watches//////////////////////////////
+
+watch(() => linesArray.value, calculateSum(),{ deep: true });
+
+
+// Call the functions
+
+
+
+
+onMounted(() => {
+
+   printedVessels.value = props.printedArray.map(item => ({
+            vessel: item.vessel_type,
+            range: `${item.range_start}-${item.range_end}`
+        }));
+
+   linesArray.value=props.lines
+
+    newLines.value=props.lines.map(item => ({
+                                    item_no: item.item_no,
+                                    packing_vessel_id: item.packing_vessel_id,
+                                    from_vessel: item.from_vessel,
+                                    to_vessel: item.to_vessel,
+                                    qty: item.qty,
+                                    weight: item.weight,
+                                    packing_session_id: props.session.data.id, // Assuming props.session.data contains the id
+                                    order_no: props.session.data.order_no // Assuming props.session.data contains the order_no
+                                }));
+
+
+    inputField.value.focus();
+    calculateSum();
+
+    printedArray.value=props.printedArray
+
+    axios.get(`getLastVessel/${props.session.data.id}`)
+         .then((response)=>{
+             lastVessel.value=response.data
+         })
+    groupAndSumWeight();
+    lookupAndAddProperties();
+});
+
+
+
+
+
 const props=defineProps({
     OrderLines:Object,
     session:Object,
@@ -28,20 +141,11 @@ const props=defineProps({
     printedArray:Object,
     roles:Object,
 });
-const calculatedSum=ref([]);
 
-function resolveDescriptionById(id) {
-    const item = props.packingVessels.data.find(obj => obj.id === id);
 
-    if (item) {
-        return item.description;
-    } else {
-        return "Description not found"; // Or you can return null, undefined, or any other default value.
-    }
-}
 
 function findMatchingObjects(array,targetValue) {
-    let vesselType=resolveDescriptionById(form.packing_vessel_id)
+    let vesselType=resolveValue(props.packingVessels.data,id,form.packing_vessel_id,description)
     const matchingObjects = array.filter(obj =>
     obj.vessel_type == vesselType &&
     (obj.range_start == targetValue || obj.range_end == targetValue)
@@ -50,30 +154,8 @@ function findMatchingObjects(array,targetValue) {
     return matchingObjects;
 }
 
-const matchingRangesError=()=>{
-    // Swal.fire('Error!', 'The vessel range must not be within a closed vessel range!','error');
-    // form.from_vessel='';
-    // form.to_vessel='';
-}
-
-const validateLimits=()=>{
 
 
-
-    if (form.to_vessel<form.from_vessel){
-      //  Swal.fire('Error!','The beginning range must be lower than the concluding range','error')
-        form.to_vessel=form.from_vessel;
-    }
-
-
-    let obj=findMatchingObjects(printedArray.value,form.from_vessel);
-    // console.log(obj)
-    if (obj.length>0)matchingRangesError();
-
-    obj=findMatchingObjects(printedArray.value,form.to_vessel);
-    if (obj.length>0)matchingRangesError();
-
-}
 
 const {searchByBarcodeOrItemNo,searchByMultipleKeyValues } = useSearchArray(props.OrderLines.data)
 let scanError = ref('');
@@ -309,78 +391,10 @@ const closePacking=()=>{
 
 
 
-onMounted(() => {
-    // console.log(attrs.auth.user)
-
-   printedVessels.value = props.printedArray.map(item => ({
-            vessel: item.vessel_type,
-            range: `${item.range_start}-${item.range_end}`
-        }));
-
-   linesArray.value=props.lines
-
-    newLines.value=props.lines.map(item => ({
-                                    item_no: item.item_no,
-                                    packing_vessel_id: item.packing_vessel_id,
-                                    from_vessel: item.from_vessel,
-                                    to_vessel: item.to_vessel,
-                                    qty: item.qty,
-                                    weight: item.weight,
-                                    packing_session_id: props.session.data.id, // Assuming props.session.data contains the id
-                                    order_no: props.session.data.order_no // Assuming props.session.data contains the order_no
-                                }));
 
 
-    inputField.value.focus();
-    calculateSum();
-    printedArray.value=props.printedArray
-
-    axios.get(`getLastVessel/${props.session.data.id}`)
-    .then((response)=>{
-        lastVessel.value=response.data
-    })
-    groupAndSumWeight();
-    lookupAndAddProperties();
-});
 
 
-const calculateSum = () => {
-    const sumsMap = new Map();
-
-    linesArray.value.forEach((item, index) => {
-
-
-        const key = `${item.packing_vessel_id}-${item.from_vessel}-${item.to_vessel}`;
-
-        if (!sumsMap.has(key)) {
-            sumsMap.set(key, {
-                weight: 0,
-                tare_weight: 0,
-                qty: 0,
-            });
-        }
-
-        const sum = sumsMap.get(key);
-        sum.weight += parseFloat(item.weight);
-        sum.qty += parseFloat(item.qty);
-
-        // Sum tare_weight only when the key changes
-        if (index === 0 || key !== `${linesArray.value[index - 1].packing_vessel_id}-${linesArray.value[index - 1].from_vessel}-${linesArray.value[index - 1].to_vessel}`) {
-            sum.tare_weight += parseFloat(item.packing_vessel.tare_weight);
-        }
-    });
-
-    const result = Array.from(sumsMap, ([key, sum]) => ({
-                                                            packing_vessel_id: key.split('-')[0],
-                                                            from_vessel: key.split('-')[1],
-                                                            to_vessel: key.split('-')[2],
-                                                            weight: sum.weight,
-                                                            tare_weight: sum.tare_weight,
-                                                            qty: sum.qty,
-                                                        }));
-
-    calculatedSum.value = result;
-};
 
 
 const calculateTotals = computed(() => {
@@ -543,28 +557,10 @@ const assembledArray=ref([]);
 
 const selectedFile=ref();
 
-const printedVessels=ref([])
 
-const markPrinted=(range,vessel)=>{
-   //push the from and to into an array
-//    printedVessels.value=printedVessels.value.forEach((item, index) => {
-//                                         if (item.range === range && item.vessel === vessel) {
-//                                             // Add the item to the filteredItems array if it matches the criteria
-//                                             filteredItems.push(item);
-//                                             // Remove the item from the printedVessels array using splice
-//                                             printedVessels.value.splice(index, 1);
-//                                         }
-//                                     });
-   printedVessels.value.push({range:range,vessel:vessel})
-
-}
-
-const checkPrinted = computed(() => (range, vessel) => {
-  return printedVessels.value.filter(item => item.range === range && item.vessel === vessel).length > 0;
-});
 
 function checkMatchingRanges(secondObject) {
-    validateLimits()
+
     let firstArray=printedArray.value;
     // console.log(Array.isArray(firstArray))
     if (Array.isArray(firstArray) && firstArray.length > 0) {
@@ -793,9 +789,6 @@ const generatePDF = (from=1,to=1,vessel='',passedWeight) =>
 
     groupAndSumWeight();
     lookupAndAddProperties();
-    // console.log(linesArray.value)
-    // linesArray.value-linesArray.value
-
     openModal();
 
 };
@@ -822,13 +815,6 @@ let lastVessel=ref(1);
 
 
 // const { lines} = toRefs(props);
-let linesArray=ref([]);
-
-
-
-
-watch(() => linesArray.value, calculateSum(),{ deep: true });
-
 
 
 const newArray = computed(() => {
@@ -989,13 +975,16 @@ function lookupAndAddProperties() {
 
 }
 
-// Call the functions
-const newLines=ref([]);
 
 const nl=ref([]);
 
 
 const createOrUpdateSession = () => {
+
+    //validate limits
+
+
+
     if (form.packing_vessel_id == '') {
         Swal.fire('Error!', 'Please select a vessel', 'error');
         return;
@@ -1513,17 +1502,7 @@ const isAdmin=()=>props.roles.includes("admin")
                                     <label for="weight">Weight</label>
                                 </span>
 
-                                <!-- <span class="mt-4 p-float-label">
 
-
-                                    <InputText
-                                    placeholder="Weight Calculator"
-                                    v-model="calc"
-                                    @change="evaluateExpression()"
-
-                                    />
-                                    <label for="Weight Calculator">Weight Calculator</label>
-                                </span> -->
                             </div>
                             <div>
                                 <div class="flex flex-row justify-between gap-3 my-1 ">
@@ -1535,7 +1514,6 @@ const isAdmin=()=>props.roles.includes("admin")
                                         option-label="code"
                                         option-value="id"
                                         placeholder="Select Vessel"
-                                        @change="validateLimits()"
                                         />
                                         <label for="Vessel">Vessel</label>
                                     </span>
@@ -1547,7 +1525,6 @@ const isAdmin=()=>props.roles.includes("admin")
                                         <InputText
                                         :disabled="form.packing_vessel_id==''"
                                         v-model="form.from_vessel"
-                                        @change="validateLimits()"
                                         />
                                         <label for="From Vessel">From Vessel</label>
                                     </span>
@@ -1559,7 +1536,6 @@ const isAdmin=()=>props.roles.includes("admin")
                                         :disabled="form.packing_vessel_id==''"
                                         placeholder="To Vessel"
                                         v-model="form.to_vessel"
-                                        @change="validateLimits()"
 
                                         />
                                         <label for="To Vessel">To Vessel</label>
