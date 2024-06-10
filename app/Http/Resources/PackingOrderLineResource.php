@@ -31,6 +31,7 @@ class PackingOrderLineResource extends JsonResource
             'ass_qty'=>AssemblyLine::where('order_no',$this->order_no)->where('line_no',$this->line_no)->first()?->ass_qty,
             'ass_pcs'=>AssemblyLine::where('order_no',$this->order_no)->where('line_no',$this->line_no)->first()?->ass_pcs,
             'qty_base'=>$this->qty_base,
+            'company_flag' => $this->order->company_flag,
 
         ];
     }

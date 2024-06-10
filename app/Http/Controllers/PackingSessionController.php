@@ -166,6 +166,7 @@ class PackingSessionController extends Controller
 
         $OrderLines=PackingOrderLineResource::collection(Line::where('order_no',$session->order_no)
                                                              ->where('part',$session->part)
+
                                                              ->get()
                                                         );
 

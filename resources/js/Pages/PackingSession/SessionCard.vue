@@ -145,7 +145,7 @@ const props=defineProps({
 
 
 function findMatchingObjects(array,targetValue) {
-    let vesselType=resolveValue(props.packingVessels.data,id,form.packing_vessel_id,description)
+    let vesselType=resolveValue(props.packingVessels.data,'id',form.packing_vessel_id,'description')
     const matchingObjects = array.filter(obj =>
     obj.vessel_type == vesselType &&
     (obj.range_start == targetValue || obj.range_end == targetValue)
@@ -674,24 +674,16 @@ const generatePDF = (from=1,to=1,vessel='',passedWeight) =>
         //    console.log(error)
     })
 
-    ///////////////////// buffer lines in and array ////////////////////
-
     const qrCodeText=props.session.data.order_no+'_'+props.session.data.part+'_'+pageNum;
-
     const qrCode = new QRCode(0, 'H');
     qrCode.addData(qrCodeText);
     qrCode.make();
     const qrCodeDataUrl = qrCode.createDataURL(4);
-    //12 chars is 10
 
     if (props.session.data.order.shp_name.length<=12)
-
-
-    doc.setFontSize(12);
+      doc.setFontSize(12);
     else
-
-
-    doc.setFont("helvetica", "bold");
+      doc.setFont("helvetica", "bold");
     let g=0;
 
     //  if (props.orderLines.data[0].order.shp_name.length>)
@@ -738,7 +730,7 @@ const generatePDF = (from=1,to=1,vessel='',passedWeight) =>
 
             for (var i = 0; i < lines2.length; i++)
             {
-                doc.text(lines2[i] ,center(lines2[i]), 1+(g+9+f)*lineHeight)
+                doc.text(lines2[i] ,center(lines2[i]), 1+(g+8+f)*lineHeight)
                 f++;
             }
 
@@ -746,7 +738,9 @@ const generatePDF = (from=1,to=1,vessel='',passedWeight) =>
         }
         else
 
-        doc.text(props.session.data.order.sp_search_name, center(props.session.data.order.sp_search_name),1+ (g+10)*lineHeight);
+        doc.text(props.session.data.order.sp_search_name, center(props.session.data.order.sp_search_name),1+ (g+9)*lineHeight);
+        doc.text(props.OrderLines.data[0].company_flag, center(props.OrderLines.data[0].company_flag),1+ (g+10)*lineHeight);
+        doc.text('______________________', center('______________________'),1+ (g+11)*lineHeight);
         // const pageContent = ;
     }
 
@@ -855,10 +849,12 @@ const form= useForm({
 
 
 watch(form.qty , () => {
-    alert('here')
+    // alert('here')
     autoFillWeight(form.item_no)
 })
 
+
+const validateFromVessel=()=>{form.to_vessel=form.from_vessel};
 
 const calculateWeight=()=>{
 
@@ -1227,7 +1223,7 @@ const isAdmin=()=>props.roles.includes("admin")
 
                             <div>
                                 <Toolbar>
-                                    <template #start>
+                                    <template #center>
                                         <div class="flex flex-col text-center ">
                                                  <div class="flex flex-col font-bold tracking-wide text-center">
                                                                 {{ session.data.order.order_no }}|
@@ -1525,6 +1521,7 @@ const isAdmin=()=>props.roles.includes("admin")
                                         <InputText
                                         :disabled="form.packing_vessel_id==''"
                                         v-model="form.from_vessel"
+                                        @change="validateFromVessel()"
                                         />
                                         <label for="From Vessel">From Vessel</label>
                                     </span>
