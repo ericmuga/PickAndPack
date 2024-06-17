@@ -4,32 +4,45 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
 import Toolbar from 'primevue/toolbar';
 import debounce from 'lodash/debounce';
-import {watch, ref,onMounted} from 'vue';
+import {watch, ref,onMounted,computed} from 'vue';
 
 import { Inertia } from '@inertiajs/inertia';
-import Calendar from 'primevue/calendar';
-
+ import Modal from '@/Components/Modal.vue';
+import axios from 'axios';
+import Swal from 'sweetalert2';
+// import { pipe } from 'gsap-trial/all';
 const search=ref('')
 const inputField=ref(null);
-
+const showModal=ref(false);
 
 const props=defineProps({
     orders:Object})
 
-
+const pickArray= ref([]);
 
 const ordersArray=ref([]);
+const addToPick=(order_no)=>{
+    pickArray.value=pickArray.value.filter(item=>item!==order_no)
+    pickArray.value.push(order_no)
+}
 
 
-
-
+const lineFetch=ref(false);
 onMounted(()=>{
     inputField.value.focus();
 
-    const filteredOrders = props.orders.filter(order => order.Complete==0);
 
-ordersArray.value.push(...filteredOrders);
+     const filteredOrders = props.orders.filter(order => order.Complete==0);
+
+            ordersArray.value.push(...filteredOrders);
         });
+
+    const hasA = computed(() => ordersArray.value.some(order => order.A_Assignment_Count === "1"));
+    const hasB = computed(() => ordersArray.value.some(order => order.B_Assignment_Count === "1"));
+    const hasC = computed(() => ordersArray.value.some(order => order.C_Assignment_Count === "1"));
+    const hasD = computed(() => ordersArray.value.some(order => order.D_Assignment_Count === "1"));
+
+
 
 
 
@@ -59,11 +72,65 @@ const confirmPack=(order_no,part)=>{
       if (Lines>AssLines) return 'info';
       if ((Lines==AssLines)) return 'success'
     }
+
+    const orderParts=ref([]);
+    const currentPart=ref();
+   const showPickModal = (part) =>
+   {
+        pickLines.value=[];
+        pickArray.value=[];
+        orderParts.value = ordersArray.value.filter(order => order[`${part}_Assignment_Count`] === '1');
+        showModal.value = true;
+        currentPart.value=part;
+
+   };
+
+   const pickLines=ref([])
+
+
+   const fetchLines=()=>{
+    lineFetch.value=true;
+    axios.post(route('fetchPickLines',{ pickOrders:pickArray.value,part:currentPart.value}))
+         .then(res=>{
+            //push to pickLies
+              pickLines.value.push(...res.data)
+
+        })
+        .catch(error=>{
+            Swal.fire('Error',`An error occurred when retrieving the item lines: ${error.message}`,'error')
+
+        })
+              lineFetch.value=false;
+
+   }
+
+const groupedByItem = computed(() => {
+  return pickLines.value.reduce((acc, item) => {
+    if (acc[item.item_no]) {
+      acc[item.item_no].quantity += parseFloat(item.order_qty);
+    } else {
+      acc[item.item_no] = {
+        description: item.item_description,
+        quantity: parseFloat(item.order_qty)
+      };
+    }
+    return acc;
+  }, {});
+});
+
+const orderCount = computed(() => {
+  const orderNumbers = new Set(pickLines.value.map(item => item.order_no));
+  return orderNumbers.size;
+});
+
+
+
+
 </script>
 
 
 <template>
-    <Head title="Pack"/>
+    <Head title="Assembly"/>
 
     <AuthenticatedLayout>
         <template #header>
@@ -84,13 +151,39 @@ const confirmPack=(order_no,part)=>{
 
                                 </template>
                                 <template #center>
-                                    <div>
+                                    <div class="text-center">
                                         <!-- <Pagination :links="orderLines.meta.links" /> -->
+                                         <div class="flex flex-row items-center gap-2 p-1 text-center ">
+
+                                        <Button
+                                         label="Pick A"
+                                         @click="showPickModal('A')"
+                                         v-show="hasA"
+                                        />
+
+                                        <Button
+                                         label="Pick B"
+                                         @click="showPickModal('B')"
+                                         v-show="hasB"
+                                        />
+
+                                        <Button
+                                         label="Pick C"
+                                         @click="showPickModal('C')"
+                                         v-show="hasC"
+                                        />
+                                        <Button
+                                         label="Pick D"
+                                         @click="showPickModal('D')"
+                                         v-show="hasD"
+                                        />
+                                        </div>
                                         <input  type="text" v-model="search"
                                                 ref="inputField"
                                                 placeholder="Search Order"
                                                 class="m-2 text-center rounded-lg bg-slate-300 text-md"
-                                        >
+                                        />
+
 
 
                                         <!-- <SearchBox :model="route('order.pack')" /> -->
@@ -190,8 +283,7 @@ const confirmPack=(order_no,part)=>{
                                                         v-show="order.B_Assignment_Count>0"
                                                         :icon="order.B_Assignment_Count>=B_Assembly_Count?'pi pi-check':'pi pi-cart-plus'"
                                                         :severity=colorPicker(order.B_Lines,order.B_AssLine)
-
-                                                        rounded
+                                                         rounded
                                                         :label="pack"
                                                         @click="confirmPack(order.order_no,'B')"
                                                         />
@@ -257,5 +349,49 @@ const confirmPack=(order_no,part)=>{
         </div>
     </div>
 </div>
+
 </AuthenticatedLayout>
+
+    <Modal :show="showModal" @close="showModal=false" >
+
+        <div class="p-5 ">
+
+            <ul>
+                <li v-for="order in orderParts" :key="order.order_no" class="flex flex-row justify-between py-3 hover:bg-slate-300"
+                >
+                    {{ order.order_no +'|'+ order.shp_name }}
+                    <input type="checkbox" :value="order.order_no" v-model="pickArray" />
+                </li>
+
+
+                <div class="w-full text-center">
+                    <Button @click="fetchLines()"
+                            severity="warning"
+                            v-show="pickLines.length==0"
+                            :disabled="lineFetch||pickArray.length==0"
+                            label="Create Pick"
+                            /></div>
+                 <hr class="w-full p-3"/>
+                  <h2 class="w-full p-3 font-bold text-center" v-show="pickLines.length>0">Pick-{{currentPart}}</h2>
+                    <div v-for="(item, itemNo) in groupedByItem" :key="itemNo" class="flex flex-row justify-between w-full ">
+                           <div class="justify-start">{{ itemNo }} - {{ item.description }}</div>
+                           <div class="justify-end font-bold">{{ item.quantity }}</div>
+                    </div>
+
+                    <h2 class="w-full p-3 font-bold text-center" v-show="pickLines.length>0">
+                        Order Count:{{ orderCount }}
+                        {{ pickArray }}
+
+                    </h2>
+                    <div class="p-3 text-center">
+                        <Button severity="success" v-show="pickLines.length>0" label="Confirm" icon="pi pi-print"/>
+                    </div>
+
+
+            </ul>
+
+        </div>
+
+
+    </Modal>
 </template>

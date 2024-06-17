@@ -16,6 +16,19 @@ class AssemblyController extends Controller
 
     //this will show all orders pending assembly
 
+    public function fetchPickLines (Request $request){
+
+        return response()->json( DB::table('lines')
+                                ->whereIn('order_no',$request->pickOrders)
+                                ->where('part',$request->part)
+                                ->select('item_no','item_description','order_qty','order_no')
+                                ->orderBy('item_description')
+                                ->get(),
+                                200,
+                                []
+                                );
+    }
+
     public function index(Request $request)
     {
 
