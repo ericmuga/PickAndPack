@@ -42,6 +42,11 @@ use Compoships;
             return $this->hasMany(LinePrepack::class,['order_no','line_no'],['order_no','line_no']);
     }
 
+    // public function pick()
+    // {
+    //     return $this->belongsTo(Pick::class);
+    // }
+
     public function packing()
     {
         return $this->hasMany(Packing::class,['order_no','line_no'],['order_no','line_no']);
