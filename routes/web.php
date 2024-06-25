@@ -113,6 +113,7 @@ Route::get('registry/download',[ConfirmationController::class, 'download'])->nam
         Route::post('removeAssembly',[AssemblyController::class,'remove'])->name('assembly.remove');
         Route::get('assemble/order', [AssemblyController::class, 'assembleOrder'])->name('assemble.order');
         Route::post('fetchPickLines',[AssemblyController::class, 'fetchPickLines'])->name('fetchPickLines');
+        Route::post('createPick',[AssemblyController::class, 'createPick'])->name('createPick');
 
          /////////////packing Routes///////////////////
 

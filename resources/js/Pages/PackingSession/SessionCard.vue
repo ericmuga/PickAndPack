@@ -325,76 +325,65 @@ function () {
 
 let filteredPacking=[];
 let allPacked=true
-const closePacking=()=>{
- filteredPacking=[];
- allPacked=true
-//prevent empty packing
-     if (newLines.value.length===0)
-      Swal.fire('Error!','Empty Packing','error');
-    else
-//warn if not all lines have been packed
-       { for(var i=0; i<props.OrderLines.data.length;i++)
+const closePacking=()=>
+{
+        filteredPacking=[];
+        allPacked=true
+        //prevent empty packing
+        if (newLines.value.length===0)
+            Swal.fire('Error!','Empty Packing','error');
+            else
         {
-            filteredPacking=newLines.value.filter(line=>line.item_no===props.OrderLines.data[i].item_no);
-            if (filteredPacking.length==0)
-            {
-                allPacked=false;
-                break;
-            }
-
-        }
-
-        if (!allPacked)
-        {
-            //give warning
-            Swal.fire({
-                title: 'Partial Packing?',
-                text: "One or more lines has not been packed. Confirm Partial Packing?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Confirm!'
-                }).
-                then((result) => {
-                    if (result.isConfirmed) {
-
-                        Inertia.post(
-                                route('packingSession.close'),
-                                { 'id': props.session.data.id ,'lines':newLines.value},
-                                {
-                                    onSuccess: () => Swal.fire('Success!', 'Session Ended Successfully!', 'success'),
-                                    onError: (error) => Swal.fire('Error', error.message, 'error')
-                                }
-                            );
-
-                    }})
-        }
-        else
-
-            Inertia.post(
-                route('packingSession.close'),
-                { 'id': props.session.data.id ,'lines':newLines.value},
+            for(var i=0; i<props.OrderLines.data.length;i++)
                 {
-                    onSuccess: () => Swal.fire('Success!', 'Session Ended Successfully!', 'success'),
-                    onError: (error) => Swal.fire('Error', error.message, 'error')
+                    filteredPacking=newLines.value.filter(line=>line.item_no===props.OrderLines.data[i].item_no);
+                    if (filteredPacking.length==0)
+                    {
+                        allPacked=false;
+                        break;
+                    }
+
                 }
-            );
 
-    }
+                if (!allPacked)
+                {
+                    //give warning
+                    Swal.fire({
+                        title: 'Partial Packing?',
+                        text: "One or more lines has not been packed. Confirm Partial Packing?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Confirm!'
+                        }).
+                        then((result) => {
+                            if (result.isConfirmed) {
+
+                                Inertia.post(
+                                        route('packingSession.close'),
+                                        { 'id': props.session.data.id ,'lines':newLines.value},
+                                        {
+                                            onSuccess: () => Swal.fire('Success!', 'Session Ended Successfully!', 'success'),
+                                            onError: (error) => Swal.fire('Error', error.message, 'error')
+                                        }
+                                    );
+
+                            }})
+                }
+                else
+
+                    Inertia.post(
+                        route('packingSession.close'),
+                        { 'id': props.session.data.id ,'lines':newLines.value},
+                        {
+                            onSuccess: () => Swal.fire('Success!', 'Session Ended Successfully!', 'success'),
+                            onError: (error) => Swal.fire('Error', error.message, 'error')
+                        }
+                    );
+
+            }
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 const calculateTotals = computed(() => {
@@ -418,18 +407,7 @@ const calculateTotals = computed(() => {
 let calc= ref('')
 
 
-const evaluateExpression = () => {
-    try {
-        // Use eval to evaluate the mathematical expression
-        form.weight = eval(calc.value);
 
-        // Optionally, you can clear the input after evaluation
-        calc.value = '';
-    } catch (error) {
-        console.error('Error evaluating expression:', error);
-        // Handle invalid expressions or errors
-    }
-};
 
 
 const dataURIsToBlobs = (dataURIs) => {
@@ -965,7 +943,7 @@ function lookupAndAddProperties() {
             // console.log(groupedArray.value[key])
         const { packing_vessel_id, to_vessel, from_vessel, total_weight } = groupedArray.value[key];
         const vessel = props.packingVessels.data.find(v => v.id == packing_vessel_id);
-        const gross_weight = eval(parseFloat(total_weight) + ((parseFloat(to_vessel) - parseFloat(from_vessel) + 1) * parseFloat(vessel.tare_weight)));
+        const gross_weight = parseFloat(total_weight) + ((parseFloat(to_vessel) - parseFloat(from_vessel) + 1) * parseFloat(vessel.tare_weight));
         groupedArray.value[key].code = vessel.code;
         groupedArray.value[key].gross_weight = gross_weight;}
 
@@ -1052,66 +1030,66 @@ lookupAndAddProperties();
 
 
 
-        let mode= { state: 'Create' };
+let mode= { state: 'Create' };
 
 
 
-        let showModal=ref(false);
+let showModal=ref(false);
 
 
-        const showCreateModal=()=>{
-            //   selectedItem.value=null
-            mode.state='Create'
-            form.reset();
-            // // form.from_vessel=lastVessel.value
-            // form.to_vessel=lastVessel.value
-            showModal.value=true
+const showCreateModal=()=>{
+    //   selectedItem.value=null
+    mode.state='Create'
+    form.reset();
+    // // form.from_vessel=lastVessel.value
+    // form.to_vessel=lastVessel.value
+    showModal.value=true
 
 
+}
+
+const showUpdateModal=(line)=>{
+
+    mode.state='Update'
+    form.vessel=line.vessel
+    form.item_no=line.item_no
+    form.from_vessel=line.from_vessel
+    form.to_vessel=line.to_vessel
+    form.qty=line.qty
+    form.weight=line.weight
+    form.order_no=line.order_no
+    form.part=line.part
+    form.packing_session_id=props.session.data.id
+    form.id=line.id
+    showModal.value=true
+
+}
+
+
+
+
+const groupedData = computed(() => {
+    return props.lines.reduce((result, currentItem) => {
+        const key = `${currentItem.from_vessel}-${currentItem.to_vessel}-${currentItem.packing_vessel.code}-${currentItem.packing_vessel.tare_weight}`;
+
+        if (!result[key]) {
+            result[key] = {
+                from_vessel: currentItem.from_vessel,
+                to_vessel: currentItem.to_vessel,
+                packing_vessel_code: currentItem.packing_vessel.code,
+                tare_weight: currentItem.packing_vessel.tare_weight,
+                total_weight: 0
+            };
         }
 
-        const showUpdateModal=(line)=>{
+        result[key].total_weight += parseFloat(currentItem.weight);
 
-            mode.state='Update'
-            form.vessel=line.vessel
-            form.item_no=line.item_no
-            form.from_vessel=line.from_vessel
-            form.to_vessel=line.to_vessel
-            form.qty=line.qty
-            form.weight=line.weight
-            form.order_no=line.order_no
-            form.part=line.part
-            form.packing_session_id=props.session.data.id
-            form.id=line.id
-            showModal.value=true
-
-        }
+        return result;
+    }, {});
+});
 
 
-
-
-        const groupedData = computed(() => {
-            return props.lines.reduce((result, currentItem) => {
-                const key = `${currentItem.from_vessel}-${currentItem.to_vessel}-${currentItem.packing_vessel.code}-${currentItem.packing_vessel.tare_weight}`;
-
-                if (!result[key]) {
-                    result[key] = {
-                        from_vessel: currentItem.from_vessel,
-                        to_vessel: currentItem.to_vessel,
-                        packing_vessel_code: currentItem.packing_vessel.code,
-                        tare_weight: currentItem.packing_vessel.tare_weight,
-                        total_weight: 0
-                    };
-                }
-
-                result[key].total_weight += parseFloat(currentItem.weight);
-
-                return result;
-            }, {});
-        });
-
-
-        const resultArray=computed(()=>Object.values(groupedData));
+const resultArray=computed(()=>Object.values(groupedData));
 
 
 
@@ -1199,7 +1177,7 @@ const dropLabel=(vessel_code,from,to)=>{
 }
 
 const isAdmin=()=>props.roles.includes("admin")
-// console.log(isAdmin())
+
     </script>
 
 

@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Resources\{AssemblyOrderResource,LineResource};
-use App\Models\{Assembly, Order,Line,AssemblySession,AssemblyLine, Assignment, AssignmentLine};
+use App\Models\{Assembly, Order,Line,AssemblySession,AssemblyLine, Assignment, AssignmentLine, Pick};
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Services\MyServices;
+use Illuminate\Http\Client\ResponseSequence;
 use Illuminate\Support\Facades\Auth;
 
 class AssemblyController extends Controller
@@ -27,6 +28,17 @@ class AssemblyController extends Controller
                                 200,
                                 []
                                 );
+    }
+
+    public function createPick(Request $request)
+    {
+      $pick=Pick::create(['user_id'=>$request->user()->id]);
+           Line::where('part',$request->part)
+                ->whereIn('order_now',$request->pickOrders)
+                ->update(['pick_id',$pick->id])
+                ->get();
+     return response()->json(['pick_id'=>$pick->id],200,[]);
+
     }
 
     public function index(Request $request)
@@ -63,8 +75,14 @@ class AssemblyController extends Controller
                                     ->where('assignee_id', '=', $request->user()->id)
                                     ->get();
 
+            $picks=Line::whereIn('order_no',$orders->pluck('order_no'))
+                        ->whereNotNull('pick_id')
+                        ->select('order_no','part')
+                        ->groupBy('order_no','part')
+                        ->get();
+
     //    dd($orders);
-             return inertia('Orders/Assemble',['orders'=>$orders]);
+             return inertia('Orders/Assemble',compact('orders','picks'));
 
       }
 

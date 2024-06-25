@@ -16,7 +16,9 @@ const inputField=ref(null);
 const showModal=ref(false);
 
 const props=defineProps({
-    orders:Object})
+    orders:Object,
+    picks:Object,
+})
 
 const pickArray= ref([]);
 
@@ -26,8 +28,15 @@ const addToPick=(order_no)=>{
     pickArray.value.push(order_no)
 }
 
+watch(pickArray, async ()=>{
+ await fetchLines()
+
+},{deep:true});
+
 
 const lineFetch=ref(false);
+const ordersInPicks=ref([]);
+
 onMounted(()=>{
     inputField.value.focus();
 
@@ -35,12 +44,13 @@ onMounted(()=>{
      const filteredOrders = props.orders.filter(order => order.Complete==0);
 
             ordersArray.value.push(...filteredOrders);
+     ordersInPicks.value=props.picks
         });
 
-    const hasA = computed(() => ordersArray.value.some(order => order.A_Assignment_Count === "1"));
-    const hasB = computed(() => ordersArray.value.some(order => order.B_Assignment_Count === "1"));
-    const hasC = computed(() => ordersArray.value.some(order => order.C_Assignment_Count === "1"));
-    const hasD = computed(() => ordersArray.value.some(order => order.D_Assignment_Count === "1"));
+const hasA = computed(() => ordersArray.value.some(order => order.A_Assignment_Count === "1"));
+const hasB = computed(() => ordersArray.value.some(order => order.B_Assignment_Count === "1"));
+const hasC = computed(() => ordersArray.value.some(order => order.C_Assignment_Count === "1"));
+const hasD = computed(() => ordersArray.value.some(order => order.D_Assignment_Count === "1"));
 
 
 
@@ -75,11 +85,25 @@ const confirmPack=(order_no,part)=>{
 
     const orderParts=ref([]);
     const currentPart=ref();
+
+   const combinationExists=(order_no, part, array)=> {
+        return array.some(item => item.order_no === order_no && item.part === part);
+        }
+
    const showPickModal = (part) =>
    {
         pickLines.value=[];
         pickArray.value=[];
-        orderParts.value = ordersArray.value.filter(order => order[`${part}_Assignment_Count`] === '1');
+        orderParts.value = ordersArray.value.filter(order => !combinationExists(order.order_no, part, ordersInPicks.value))
+                                            .filter(order => order[`${part}_Assignment_Count`] === '1')
+                                            .reduce((acc, obj) => {
+                                                const key = obj.sp_name;
+                                                if (!acc[key]) {
+                                                    acc[key] = [];
+                                                }
+                                                acc[key].push(obj);
+                                                return acc;
+                                                }, {});
         showModal.value = true;
         currentPart.value=part;
 
@@ -88,12 +112,27 @@ const confirmPack=(order_no,part)=>{
    const pickLines=ref([])
 
 
-   const fetchLines=()=>{
-    lineFetch.value=true;
-    axios.post(route('fetchPickLines',{ pickOrders:pickArray.value,part:currentPart.value}))
+ const fetchLines = async () => {
+  // Show the loading alert
+  Swal.fire({
+    title: 'Loading',
+    text: 'Please wait...',
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    allowEnterKey: false,
+    didOpen: () => {
+      Swal.showLoading()
+    }
+  })
+
+  try {
+    // Make the GET request
+    if (pickArray.value.length>0)
+    {
+         axios.post(route('fetchPickLines',{ pickOrders:pickArray.value,part:currentPart.value}))
          .then(res=>{
             //push to pickLies
-              pickLines.value.push(...res.data)
+              pickLines.value=res.data
 
         })
         .catch(error=>{
@@ -101,8 +140,51 @@ const confirmPack=(order_no,part)=>{
 
         })
               lineFetch.value=false;
+    }
+    else{
+        pickLines.value=[];
+    }
+    lineFetch.value=true;
 
-   }
+
+    Swal.close()
+  } catch (error) {
+    // Close the loading alert
+    Swal.close()
+
+    // Handle the error
+    console.error(error)
+    Swal.fire({
+      title: 'Error',
+      text: 'There was an error with the request.',
+      icon: 'error',
+    })
+  }
+}
+
+
+//    const fetchLines=()=>{
+
+//     if (pickArray.value.length>0)
+//     {
+//          axios.post(route('fetchPickLines',{ pickOrders:pickArray.value,part:currentPart.value}))
+//          .then(res=>{
+//             //push to pickLies
+//               pickLines.value=res.data
+
+//         })
+//         .catch(error=>{
+//             Swal.fire('Error',`An error occurred when retrieving the item lines: ${error.message}`,'error')
+
+//         })
+//               lineFetch.value=false;
+//     }
+//     else{
+//         pickLines.value=[];
+//     }
+// lineFetch.value=true;
+
+//    }
 
 const groupedByItem = computed(() => {
   return pickLines.value.reduce((acc, item) => {
@@ -124,6 +206,25 @@ const orderCount = computed(() => {
 });
 
 
+const confirmPick= async () =>{
+
+     await axios.post(route('createPick'),{pickOrders:pickArray.value,part:currentPart.value})
+                .then(res=>{
+                        //redirect to pick assembly
+                        Swal.fire('Success!',`Pick : ${res.data.pick_id} created successfully`,'success');
+                         for(order in orderParts)
+                         {
+                            ordersInPicks.value.push({order_no:order,part:currentPart});
+                         }
+                     })
+
+}
+
+const checkOrderInPicks=(order_no,part)=>{
+    const exists=ordersInPicks.value.filter(item=>item.order_no==order_no && item.part==part)
+    if (exists && exists.length>0) return true;
+    return false;
+}
 
 
 </script>
@@ -271,6 +372,7 @@ const orderCount = computed(() => {
                                                         rounded
                                                         :label="pack"
                                                         @click="confirmPack(order.order_no,'A')"
+                                                        :disabled="checkOrderInPicks(order.order_no,'A')"
                                                         />
 
                                                     </td>
@@ -286,6 +388,7 @@ const orderCount = computed(() => {
                                                          rounded
                                                         :label="pack"
                                                         @click="confirmPack(order.order_no,'B')"
+                                                        :disabled="checkOrderInPicks(order.order_no,'B')"
                                                         />
 
                                                     </td>
@@ -302,6 +405,7 @@ const orderCount = computed(() => {
                                                         rounded
                                                         :label="pack"
                                                         @click="confirmPack(order.order_no,'C')"
+                                                        :disabled="checkOrderInPicks(order.order_no,'C')"
                                                         />
 
                                                     </td>
@@ -318,6 +422,7 @@ const orderCount = computed(() => {
                                                         rounded
                                                         :label="pack"
                                                         @click="confirmPack(order.order_no,'D')"
+                                                        :disabled="checkOrderInPicks(order.order_no,'A')"
                                                         />
 
                                                     </td>
@@ -356,21 +461,31 @@ const orderCount = computed(() => {
 
         <div class="p-5 ">
 
-            <ul>
-                <li v-for="order in orderParts" :key="order.order_no" class="flex flex-row justify-between py-3 hover:bg-slate-300"
+            <!-- <ul> -->
+                <!-- <li v-for="order in orderParts" :key="order.order_no" class="flex flex-row justify-between py-3 hover:bg-slate-300"
                 >
                     {{ order.order_no +'|'+ order.shp_name }}
                     <input type="checkbox" :value="order.order_no" v-model="pickArray" />
-                </li>
-
-
-                <div class="w-full text-center">
-                    <Button @click="fetchLines()"
+                </li> -->
+                 <div style="height:350px" class="overflow-y-auto">
+                    <div v-for="(orders, spName) in orderParts" :key="spName" >
+                        <h2 class="p-1 font-bold rounded-md bg-slate-300">{{ spName }}:</h2>
+                        <div v-for="order in orders" :key="order.order_no" class="flex flex-row justify-between p-1 py-3 order hover:bg-slate-300 " >
+                                   {{ order.order_no +'|'+ order.shp_name }}
+                            <input type="checkbox" :value="order.order_no" v-model="pickArray" />
+                        </div>
+                        <hr>
+                  </div>
+                 </div>
+                    <!-- <div class="w-full text-center">
+                    <Button @click="confirmPick()"
                             severity="warning"
                             v-show="pickLines.length==0"
                             :disabled="lineFetch||pickArray.length==0"
                             label="Create Pick"
-                            /></div>
+                            />
+                  </div> -->
+                  <div style="height:350px" class="overflow-y-auto">
                  <hr class="w-full p-3"/>
                   <h2 class="w-full p-3 font-bold text-center" v-show="pickLines.length>0">Pick-{{currentPart}}</h2>
                     <div v-for="(item, itemNo) in groupedByItem" :key="itemNo" class="flex flex-row justify-between w-full ">
@@ -380,15 +495,19 @@ const orderCount = computed(() => {
 
                     <h2 class="w-full p-3 font-bold text-center" v-show="pickLines.length>0">
                         Order Count:{{ orderCount }}
-                        {{ pickArray }}
+                        <ul>
+                            <li v-for="line in pickArray">
+                                {{ line }}
+                            </li>
+                        </ul>
 
                     </h2>
                     <div class="p-3 text-center">
-                        <Button severity="success" v-show="pickLines.length>0" label="Confirm" icon="pi pi-print"/>
+                        <Button severity="success" v-show="pickLines.length>0" label="Confirm" @click="confirmPick()" icon="pi pi-print"/>
                     </div>
+              </div>
 
-
-            </ul>
+            <!-- </ul> -->
 
         </div>
 
