@@ -12,50 +12,29 @@ import {watch, ref,onMounted} from 'vue';
 import Swal from 'sweetalert2'
 import Pagination from '@/Components/Pagination.vue';
 import SearchBox from '@/Components/SearchBox.vue'
+import { Link } from '@inertiajs/inertia-vue3';
 
 const props=defineProps({
                             picks:Object,
-                            previous:String,
-                            lines:Object,
+                            // previous:String,
+                            // lines:Object,
                         })
+const picksArray=ref([]);
+ onMounted(()=>{
+  picksArray.value =props.picks
+})
+const newItem=ref('');
 
- const confirmPack=(pick_no)=>{
-Inertia.get(route('picks.show',{'pick':pick_no}))
+watch(newItem,debounce(()=>{
 
-// Swal.fire({
-//                                     title: 'Are you sure?',
-//                                     text: "Assembled orders may not be undone!",
-//                                     icon: 'warning',
-//                                     showCancelButton: true,
-//                                     confirmButtonColor: '#3085d6',
-//                                     cancelButtonColor: '#d33',
-//                                     confirmButtonText: 'Confirm Assembly!'
-//                                     }).then((result) => {
-//                                         if (result.isConfirmed) {
-//                                                                        Inertia.get(route('picks.show',{'pick':pick_no}))
+    if (!newItem.value=='') {
+            picksArray.value=picksArray.value.filter(pick =>pick.id==newItem.value)
+    }
+    else{
+        picksArray.value =props.picks
+    }
 
-//                                                         }
-//                     })
-}
-
-const inputField=ref(null);
-onMounted(() => {
-    inputField.value.focus();
-});
-
-let newItem=ref('');
-watch( newItem,
-debounce( ()=>{ if (newItem.value!='')
-                   Inertia.get(route('picks.index'),{'search':newItem.value})
-                else{
-                     // if the value is empty
-                }
-
-
-
-              }
-        )
-,500);
+},500))
 
 </script>
 
@@ -65,7 +44,7 @@ debounce( ()=>{ if (newItem.value!='')
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">Assemble Pick List</h2>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">Pick List</h2>
         </template>
 
         <div class="py-6">
@@ -87,9 +66,9 @@ debounce( ()=>{ if (newItem.value!='')
                                         <input type="text" v-model="newItem"  ref="inputField"
                                          placeholder="Scan Your Pick"
                                         class="m-2 rounded-lg bg-slate-300 text-md">
-                                        <Pagination :links="picks.links" />
 
-                                    <div v-if="picks.data.length==0" class="text-center">
+
+                                    <div v-if="picks.length==0" class="text-center">
                                         No Picks were found
                                     </div>
                                     </div>
@@ -118,12 +97,15 @@ debounce( ()=>{ if (newItem.value!='')
                                             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
-                                                    <tr class="bg-slate-300">
+                                                    <tr class="bg-slate-300 text-center">
                                                         <!-- <th scope="col" class="px-6 py-3">
                                                             Barcode
                                                         </th> -->
                                                         <th scope="col" class="px-6 py-3">
                                                             Pick No.
+                                                        </th>
+                                                        <th>
+                                                            Status
                                                         </th>
                                                         <th>
                                                             Actions
@@ -133,23 +115,31 @@ debounce( ()=>{ if (newItem.value!='')
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr v-for="pick in picks.data" :key="pick.pick_no"
-                                                    class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
+                                                    <tr v-for="pick in picksArray" :key="id"
+                                                    class="bg-white border-b dark:bg-gray-900 dark:border-gray-700 text-center">
 
                                                     <td class="px-3 py-2 text-xs">
-                                                        {{ pick.pick_no }}
+                                                        {{ pick.id }}
+                                                    </td>
+                                                    <td class="px-3 py-2 text-xs">
+                                                        {{ pick.status }}
                                                     </td>
 
                                                      <td class="px-3 py-2 text-xs">
+                                                   <Link
+                                                    :href="route('picks.show',{id:pick.id})"
 
+                                                   >
                                                         <Button
 
                                                          icon="pi pi-cart-plus"
                                                          severity="warning"
                                                          rounded
+                                                         :badge="pick.lines_count"
 
-                                                         @click="confirmPack(pick.pick_no)"
                                                          />
+                                                  </Link>
+
 
                                                     </td>
 
@@ -159,14 +149,14 @@ debounce( ()=>{ if (newItem.value!='')
                             </tbody>
                         </table>
                     </div>
-                                            </div>
-                                            <div class="relative col-span-2 overflow-x-auto shadow-md sm:rounded-lg">
+                    </div>
+                    <div class="relative col-span-2 overflow-x-auto shadow-md sm:rounded-lg">
 
 
 
 
-                                             </div>
-                                        </div>
+                        </div>
+                </div>
 
 
 

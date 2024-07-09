@@ -10,6 +10,7 @@ import { Inertia } from '@inertiajs/inertia';
  import Modal from '@/Components/Modal.vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { Link } from '@inertiajs/inertia-vue3';
 // import { pipe } from 'gsap-trial/all';
 const search=ref('')
 const inputField=ref(null);
@@ -210,13 +211,18 @@ const confirmPick= async () =>{
 
      await axios.post(route('createPick'),{pickOrders:pickArray.value,part:currentPart.value})
                 .then(res=>{
-                        //redirect to pick assembly
+                    //    console.log(res)
                         Swal.fire('Success!',`Pick : ${res.data.pick_id} created successfully`,'success');
-                         for(order in orderParts)
+                         for(order in pickArray.value)
                          {
-                            ordersInPicks.value.push({order_no:order,part:currentPart});
+                            ordersInPicks.value.push({order_no:order,part:currentPart.value});
                          }
+                         pickArray.value=[];
+
                      })
+                .catch(error=>{
+                    Swal.fire(`The action aborted with error: ${error}`)
+                })
 
 }
 
@@ -249,9 +255,24 @@ const checkOrderInPicks=(order_no,part)=>{
                         <div>
                             <Toolbar>
                                 <template #start>
+                                    <Link
+                                       :href="route('picks.index')"
+
+                                       class="block px-2 py-1 font-semibold text-black "
+                                    >
+                                    <Button
+                                            label="Picks"
+                                            severity="success"
+                                            icon="pi pi-slack"
+                                        />
+                                </Link>
+
+
+
 
                                 </template>
                                 <template #center>
+
                                     <div class="text-center">
                                         <!-- <Pagination :links="orderLines.meta.links" /> -->
                                          <div class="flex flex-row items-center gap-2 p-1 text-center ">
@@ -422,7 +443,7 @@ const checkOrderInPicks=(order_no,part)=>{
                                                         rounded
                                                         :label="pack"
                                                         @click="confirmPack(order.order_no,'D')"
-                                                        :disabled="checkOrderInPicks(order.order_no,'A')"
+                                                        :disabled="checkOrderInPicks(order.order_no,'D')"
                                                         />
 
                                                     </td>

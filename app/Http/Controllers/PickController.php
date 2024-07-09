@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-use App\Models\{Pick, Order, Line, LinePrepack, PickOrder,AssemblyLine};
+use App\Models\{Pick, Order, Line, LinePrepack, PickOrder,AssemblyLine,AssignmentLine,AssemblySession};
 use App\Http\Resources\{LineResource};
 use Illuminate\Pagination\Paginator;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Maatwebsite\Excel\Concerns\ToArray;
+// use App\Services\MyServices;
 
 class PickController extends Controller
 {
@@ -22,68 +23,29 @@ class PickController extends Controller
 
         //display all picks for the day
 
-        $orders=Order::shipCurrent()->select('order_no')->get();
-
-        $picks = Pick::select('pick_no', 'part')
-            //    ->current()
-                    ->when(
-                        $request->has('search') && $request->search != '',
-                        fn ($q) => $q->where('pick_no', 'LIKE', '%' . $request->search)
-                            ->orWhereHas('pick_orders', fn ($q) => $q->where('serial_no', 'LIKE', '%' . $request->search)
-
-                            )
-                    )
+         $picks =Pick::select('id','status')->where('user_id',$request->user()->id)
+                    ->latest()
+                    ->orderByDesc('status')
+                    ->withCount(['lines'])
+                    ->get();
 
 
-            ->paginate(15);
 
 
-        $previous = ($request->has('search')) ? $request->search : '';
 
-
-        return inertia('Picks/List', compact('picks', 'previous'));
+        return inertia('Picks/List', compact('picks'));
     }
 
-    public function show(Request $request)
+    public function show(Pick $pick)
     {
-        // this will show a pick with its orders lines
-           $orders=PickOrder::select('order_no')->where('pick_no',$request->pick)->get();
-          // $sp=Order::select('sp_code','sp_name')
-            $orderLines = DB::table('lines')
-                            ->selectRaw('lines.item_description,
-                                         lines.item_no,lines.barcode ,
-                                         sum(lines.order_qty) as total_order_qty,
-                                         sum(line_prepacks.total_quantity) as prepacked_qty,
-                                         orders.sp_code,
-                                         orders.sp_name,
-                                         orders.route_code,
-                                         orders.sector
-                                         ')
-                            ->leftJoin('line_prepacks',fn($q)=>$q->on('line_prepacks.line_no','lines.line_no')->on('line_prepacks.order_no','lines.order_no'))
-                            ->join('orders','orders.order_no','lines.order_no')
-                            ->whereIn('lines.order_no',$orders)
-                            ->where('part',substr($request->pick,2,1))
-                            ->groupBy('lines.item_description','lines.barcode','lines.item_no','orders.sp_code',
-                                         'orders.sp_name',
-                                         'orders.route_code',
-                                         'orders.sector')
-                            ->get();
 
-        $orderLines = $orderLines->map(function ($item) {
-            $item->prepacked_qty = $item->prepacked_qty ?? 0;
-            $item->total_order_qty = strval($item->total_order_qty) ?? 0;
+        $lines=DB::table('lines')
+                ->select('item_description','customer_spec','barcode','item_no','pick_id',DB::raw('SUM(order_qty) as group_qty'))
+                ->where('pick_id',$pick->id)
+                ->groupBy('item_description','customer_spec','item_no','barcode','pick_id')
+                ->get();
 
-            return $item;
-        });
-
-        // dd($orderLines);
-
- return inertia('Picks/PartPackLines', [
-                    'orderLines' => $orderLines,
-                    'pick_no'=>$request->pick,
-                ]);
-
-
+        return inertia('Picks/PartPackLines',compact('pick','lines'));
     }
 
     private function getPrepacks($orderNos,$line)
@@ -96,47 +58,99 @@ class PickController extends Controller
 
     public function store(Request $request)
     {
-    $selectedOrders=DB::table('PickOrders')
-                        ->select('order_no')
-                        ->where('pick_no',$request->pick_no)->get()->pluck('order_no');
-    $lines= DB::table('lines')
-                ->select('order_no','item_no','line_no','order_qty')
-                ->whereIn('order_no',$selectedOrders)
-                ->where('part',substr($request->pick_no,2,1))
-                ->get();
-                // dd($lines->pluck('item_no'));
-                // dd(substr($request->pick_no,2,1));
-     foreach($request->data as $item)
-      {
 
-          $itemLines=collect([]);
+        // dd($request->all());
 
-            foreach($lines as $l)
+         $user=$request->user()->id;
+         $firstLine=Line::firstWhere('pick_id',$request->pick_id);
+         $ass_id=AssignmentLine::where('order_no',$firstLine->order_no)
+                                ->where('part',$firstLine->part)
+                                ->first()->assignment_id;
+         $orders=Line::select('order_no','part')->where('pick_id',$request->pick_id)->groupBy('order_no','part')->get();
+         foreach($orders as $order)
             {
-               if ($l->item_no==$item['item_no'])
-                $itemLines->push($l);
+                 $session=AssemblySession::updateOrCreate([
+                                                            'order_no'=>$order['order_no'],
+                                                            'part'=>$order['part'],
+                                                            'system_entry'=>true,
+                                                            ],
+                                                            [
+                                                            'user_id'=>$user,
+                                                            'assignment_id'=>$ass_id,
+                                                            'assembly_time'=>'00:00:00'
+                                                            ]
 
-            };
-
-           $counter=floatval($item['assembled_qty']);
-            foreach($itemLines as $line)
-            {
-
-                if($line->order_qty-$counter>0)
-                {
-                    AssemblyLine::updateOrCreate([
-                                                    'order_no'=>$line->order_no,
-                                                    'line_no'=>$line->line_no,
-                                                    'user_id'=>$request->user()->id,
-                                                    'ass_qty'=>($line->order_qty<$counter)?$counter:$line->order_qty
-                                                ]);
-                    $counter-=$line->order_qty;
-                }
+                                                        );
 
             }
-     }
-      return redirect(route('picks.index'));
-    }
+           $lines=Line::where('pick_id',$request->pick_id)
+                       ->select('line_no','order_no','order_qty','qty_base')
+                       ->get();
+
+           foreach($lines as $line)
+           {
+             AssemblyLine::where('line_no',$line['line_no'])->where('order_no',$line['order_no'])->delete();
+           }
+
+            foreach($request->data as  $dataLine)
+            {
+
+                $lines=Line::where('pick_id',$request->pick_id)
+                           ->where('item_no',$dataLine['item_no'])
+                           ->select('line_no','order_no','order_qty','qty_base')
+                           ->get();
+
+
+               $assembledQty=floatval($dataLine['assembled_qty']);
+               $assembledPcs=floatval($dataLine['assembled_pcs']);
+
+               foreach($lines as $orderLine)
+               {
+                 if ($assembledQty>0)
+                 {
+                    $qty_to_assemble=0;
+                    if(floatval($orderLine['qty_base'])<=$assembledQty)
+                    {
+                        $qty_to_assemble=floatval($orderLine['qty_base']);
+                    }
+                    else $qty_to_assemble=$assembledQty;
+
+                    $pcs_to_assemble=0;
+                    if(floatval($orderLine['order_qty'])<=$assembledPcs)
+                    {
+                        $pcs_to_assemble=floatval($orderLine['order_qty']);
+                    }
+                    else $pcs_to_assemble=$assembledPcs;
+
+                    if ($qty_to_assemble>0)
+                     {
+                        AssemblyLine::create([
+                                        'order_no'=>$orderLine['order_no'],
+                                        'line_no'=>$orderLine['line_no'],
+                                        'from_batch'=>$dataLine['from_batch'],
+                                        'to_batch'=>$dataLine['to_batch'],
+                                        'assembly_session_id'=>$session->id,
+                                        'user_id'=>$user,
+                                        'ass_qty'=>$qty_to_assemble,
+                                        'ass_pcs'=>$pcs_to_assemble,
+                                    ]);
+                        $assembledQty-=$qty_to_assemble;
+                        $assembledPcs-=$pcs_to_assemble;
+
+                     }
+                     else break;
+
+                 }
+                }
+
+
+            }
+
+
+
+
+        return redirect(route('assembly.index'));
+        }
 
 
 }

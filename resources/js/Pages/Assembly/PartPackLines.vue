@@ -258,7 +258,7 @@ let remainingArray=ref([]);
 let filteredAssembly=[];
 const closeAssembly = () => {
 
-    console.log(assembledArray.value)
+    // console.log(assembledArray.value)
                      if (assembledArray.value.length==0) {
                                         Swal.fire('Error','The assembly is empty','error')
                                     }

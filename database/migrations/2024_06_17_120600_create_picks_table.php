@@ -34,7 +34,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('picks');
-        Schema::table('lines', function (Blueprint $table){
+        Schema::table('lines', function (Blueprint $table)
+        {
             // $table->dropIndex('picks');
             $table->dropColumn('pick_id');
         });

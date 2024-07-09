@@ -13,11 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AssemblyController extends Controller
 {
-
-
-    //this will show all orders pending assembly
-
-    public function fetchPickLines (Request $request){
+   public function fetchPickLines (Request $request){
 
         return response()->json( DB::table('lines')
                                 ->whereIn('order_no',$request->pickOrders)
@@ -32,11 +28,16 @@ class AssemblyController extends Controller
 
     public function createPick(Request $request)
     {
+    //dd($request->all());
+    // info($request->all());
       $pick=Pick::create(['user_id'=>$request->user()->id]);
-           Line::where('part',$request->part)
-                ->whereIn('order_now',$request->pickOrders)
-                ->update(['pick_id',$pick->id])
-                ->get();
+          DB::table('lines')
+            ->where('part', $request->part)
+            ->whereIn('order_no', $request->pickOrders)
+            ->update(['pick_id' => $pick->id]);
+
+
+        // info($pick);
      return response()->json(['pick_id'=>$pick->id],200,[]);
 
     }
@@ -118,19 +119,11 @@ class AssemblyController extends Controller
 
 public function store(Request $request)
 {
-
-    //get assignment
    $user=Auth::user()->id;
-
-
-
-
-    $ass_id=AssignmentLine::where('order_no',$request->data[0]['order_no'])
+   $ass_id=AssignmentLine::where('order_no',$request->data[0]['order_no'])
                           ->where('part',$request->part)
                           ->first()->assignment_id;
-
-
-     $session=AssemblySession::updateOrCreate([
+    $session=AssemblySession::updateOrCreate([
                                                     'order_no'=>$request->data[0]['order_no'],
                                                     'part'=>$request->part,
                                                     'system_entry'=>$request->autosave,
@@ -142,12 +135,8 @@ public function store(Request $request)
                                                     ]
 
                                                 );
-
-    //create assembly lines
     foreach($request->data as $line)
     {
-         // dd($line);
-
         DB::table('assembly_lines')
           ->where('line_no',$line['line_no'])
           ->where('order_no',$line['order_no'])
@@ -163,19 +152,18 @@ public function store(Request $request)
                                 'ass_qty'=>MyServices::zeroIfNullOrBlank('assembled_qty',$line,0),
                                 'ass_pcs'=>intVal(MyServices::zeroIfNullOrBlank('assembled_pcs',$line,0)),
                               ]);
-         }
-
-     if (!$request->autosave)
+    }
+    if (!$request->autosave)
       return redirect(route('assembly.index'));
     else
       return response('',200,[]);
 
   }
 
-  public function remove(Request $request) {
+  public function remove(Request $request)
+  {
 
-    //   dd($request->all());
-        DB::table('assembly_lines')
+    DB::table('assembly_lines')
           ->where('line_no',$request->line_no)
           ->where('order_no',$request->order_no)
           ->delete();

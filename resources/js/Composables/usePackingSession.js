@@ -1,11 +1,11 @@
-export const resolveValue = (array, key, resolveKey) => {
+export const resolveValue = (array, key,value, resolveKey) => {
     // Check if the input is a valid array
     if (!Array.isArray(array)) {
         return null;
     }
 
     // Find the item with the specified key
-    const item = array.find(obj => obj[key] !== undefined && obj[key] === key);
+    const item = array.find(obj => obj[key] !== undefined && obj[key] === value);
 
     // Return the resolved value or a default message
     if (item && item[resolveKey] !== undefined) {
