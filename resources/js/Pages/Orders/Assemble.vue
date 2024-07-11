@@ -213,10 +213,9 @@ const confirmPick= async () =>{
                 .then(res=>{
                     //    console.log(res)
                         Swal.fire('Success!',`Pick : ${res.data.pick_id} created successfully`,'success');
-                         for(order in pickArray.value)
-                         {
-                            ordersInPicks.value.push({order_no:order,part:currentPart.value});
-                         }
+                          for (const order of pickArray.value) {
+                                ordersInPicks.value.push({ order_no: order, part: currentPart.value });
+                            }
                          pickArray.value=[];
 
                      })

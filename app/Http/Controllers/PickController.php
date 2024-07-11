@@ -72,7 +72,7 @@ class PickController extends Controller
                  $session=AssemblySession::updateOrCreate([
                                                             'order_no'=>$order['order_no'],
                                                             'part'=>$order['part'],
-                                                            'system_entry'=>true,
+                                                            'system_entry'=>false,
                                                             ],
                                                             [
                                                             'user_id'=>$user,
