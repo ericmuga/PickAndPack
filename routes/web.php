@@ -60,6 +60,13 @@ use App\Models\{Line,LinePrepack, LoadingSession, Order, PackingSession, Permiss
 Route::get('/makeApiCall', [ApiController::class, 'makeCall'])->name('makeCall');
 
 Route::middleware('auth')->group(function () {
+
+Route::get('/orders/unbatched', [ConfirmationController::class, 'unbatched'])->name('orders.unbatched');
+Route::post('/orders/create-batch', [ConfirmationController::class, 'createBatch'])->name('orders.createBatch');
+Route::get('/orders/batches', [ConfirmationController::class, 'viewBatches'])->name('orders.batches');
+
+
+
 Route::get('registry/download',[ConfirmationController::class, 'download'])->name('registry.download');
 
 ///////////////////////////////ACL routes/////////////////////////////////

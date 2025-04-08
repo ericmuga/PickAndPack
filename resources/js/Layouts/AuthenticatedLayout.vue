@@ -34,7 +34,20 @@
             <div v-show="subMenuOpen['orders']">
                 <div class="py-2 pl-8 cursor-pointer"><Link :href="route('confirmations.index')" :active="route().current('confirmations.index')" class="block px-2 py-1 font-semibold text-white rounded hover:bg-gray-600 ">Registry</Link></div>
                 <!-- <div class="py-2 pl-8 cursor-pointer"><Link :href="route('orders.lines')" :active="route().current('orders.lines')" class="block px-2 py-1 font-semibold text-white rounded hover:bg-gray-600 ">Prepacks</Link></div> -->
-                <div class="block w-full px-2 py-2 pl-8 font-semibold text-white rounded cursor-pointer hover:bg-gray-600">
+                <!-- 👇 Add this: Unbatched Orders link -->
+                <div class="py-2 pl-8 cursor-pointer">
+                    <Link :href="route('orders.unbatched')" :active="route().current('orders.unbatched')" class="block px-2 py-1 font-semibold text-white rounded hover:bg-gray-600">
+                    Create Batch
+                    </Link>
+                </div>
+
+                <!-- 👇 Add this: View Batches link -->
+                <div class="py-2 pl-8 cursor-pointer">
+                    <Link :href="route('orders.batches')" :active="route().current('orders.batches')" class="block px-2 py-1 font-semibold text-white rounded hover:bg-gray-600">
+                    View Batches
+                    </Link>
+                </div>
+                                <div class="block w-full px-2 py-2 pl-8 font-semibold text-white rounded cursor-pointer hover:bg-gray-600">
                 <p  class="p-2 font-semibold tracking-wide rounded-md hover:cursor-pointer" @click="toggleAssignment()">Assignment</p>
                     <Accordion  v-show="showAssignment">
 
