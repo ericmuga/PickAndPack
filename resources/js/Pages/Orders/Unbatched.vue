@@ -43,7 +43,7 @@ const createBatch = () => {
       <!-- Ship Date Filter -->
       <div class="w-full mb-6 md:w-1/2">
         <label class="block mb-2 font-semibold">Filter by Ship Date:</label>
-        <Calendar v-model="shpDate" dateFormat="yy-mm-dd" showIcon class="w-full" />
+        <Calendar v-model="form.shpDate" dateFormat="yy-mm-dd" showIcon class="w-full" />
       </div>
 
       <!-- SP Code Selection -->
@@ -61,7 +61,7 @@ const createBatch = () => {
       </div>
 
       <Button
-        label="Create Batch"
+        label="Create Consolidated Pick"
         icon="pi pi-check"
         class="px-4 py-2 mb-8 text-white bg-blue-600 rounded"
         @click="createBatch"

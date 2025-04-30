@@ -77,6 +77,7 @@ $batchId = DB::table('batches')->insertGetId([
     // Mark orders as batched
     DB::table('orders')
         ->whereIn('sp_code', $spCodes)
+        ->whereDate('shp_date', '=',$request->input('shp_date'))
         ->whereNull('batch_number')
         ->update(['batch_number' => $batchId]);
 
@@ -126,6 +127,9 @@ $this->viewBatches();
 
 public function viewBatches()
 {
+
+
+
     $batches = DB::table('batched_orders')
         ->select(
             'batch_number',
