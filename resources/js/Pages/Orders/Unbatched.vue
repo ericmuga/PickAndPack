@@ -20,20 +20,30 @@ const spOptions = ref(
   }))
 )
 
+const partOptions = 'A, B, C, D'.split(', ').map(part => ({
+  label: part,
+  value: part,
+}))
+
 const selectedSPCodes = ref([])
+const selectedPart = ref('')
+const selectedShipDate = ref('')
 
 const form = useForm({
   sp_codes: [],
-    shp_date: '',
+  shp_date: '',
+  selected_part: '',
 })
 
 const createBatch = () => {
   form.sp_codes = selectedSPCodes.value
+  form.selected_part = selectedPart.value
+  form.shp_date = form.shp_date // If using Calendar v-model="form.shp_date", this line is optional
+  console.log('Creating batch with:', form)
   form.post('/orders/create-batch')
 }
+  
 </script>
-
-
 
 <template>
   <div class="p-6">
@@ -43,7 +53,8 @@ const createBatch = () => {
       <!-- Ship Date Filter -->
       <div class="w-full mb-6 md:w-1/2">
         <label class="block mb-2 font-semibold">Filter by Ship Date:</label>
-        <Calendar v-model="form.shpDate" dateFormat="yy-mm-dd" showIcon class="w-full" />
+        <!-- <Calendar v-model="form.shp_date" dateFormat="yy-mm-dd" showIcon class="w-full" /> -->
+         <input type="date" v-model="form.shp_date" class="w-full p-2 border rounded" placeholder="YYYY-MM-DD" />
       </div>
 
       <!-- SP Code Selection -->
@@ -55,6 +66,19 @@ const createBatch = () => {
           optionLabel="label"
           optionValue="value"
           placeholder="Choose SP Codes"
+          display="chip"
+          class="w-full"
+        />
+      </div>
+
+      <div class="w-full mb-6 md:w-1/2">
+        <label class="block mb-2 font-semibold">Select Part:</label>
+        <MultiSelect
+          v-model="selectedPart"
+          :options="partOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Choose Part"
           display="chip"
           class="w-full"
         />
