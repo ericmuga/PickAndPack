@@ -330,7 +330,7 @@ public function download(Request $request)
                     ->where('shp_date', '>=', now()->toDateString())
                     ->orderByDesc('ending_date')
                     ->orderByDesc('ending_time')
-                    ->limit(20)
+                    //->limit(20)
                     ->get();
 
     return inertia('Orders/List', [
