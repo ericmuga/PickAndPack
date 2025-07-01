@@ -89,9 +89,11 @@ const exportToPDF = () => {
   const doc = new jsPDF();
   doc.text(`Pick# ${selectedBatch.value} - Part ${selectedPart.value}`, 14, 10);
   doc.text(`SP Code: ${selectedBatchInfo.value.sp_code} - ${selectedBatchInfo.value.sp_name}`, 14, 18);
-
+  doc.text(`Shipment Date: ${selectedShpDate.value || 'All'}`, 14, 26);
+  // Insert a blank line for spacing in the PDF
+  // doc.text(' ', 14, 34);
   autoTable(doc, {
-    startY: 26,
+    startY: 28,
     head: [['Item No', 'Description', 'Quantity']],
     body: groupedItems.value.map(row => [
       row.item_no,
