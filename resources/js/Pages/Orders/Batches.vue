@@ -10,15 +10,32 @@ const props = defineProps({
 
 const selectedBatch = ref('');
 const selectedPart = ref('');
+const selectedShpDate = ref('');
 
-// Unique batch numbers
+// Unique shipment dates
+const shipmentDates = computed(() => {
+  const seen = new Set();
+  return props.batches
+    .filter(batch => {
+      if (seen.has(batch.shp_date)) return false;
+      seen.add(batch.shp_date);
+      return true;
+    })
+    .map(batch => batch.shp_date)
+    .sort();
+});
+
+// Unique batch numbers (filtered by selected ship date)
 const batchOptions = computed(() => {
   const seen = new Set();
   return props.batches
     .filter(batch => {
-      if (seen.has(batch.batch_number)) return false;
-      seen.add(batch.batch_number);
-      return true;
+      if (!selectedShpDate.value || batch.shp_date === selectedShpDate.value) {
+        if (seen.has(batch.batch_number)) return false;
+        seen.add(batch.batch_number);
+        return true;
+      }
+      return false;
     })
     .map(batch => ({
       value: batch.batch_number,
@@ -34,7 +51,10 @@ const selectedBatchInfo = computed(() => {
 const parts = computed(() => {
   return [...new Set(
     props.batches
-      .filter(b => b.batch_number === selectedBatch.value)
+      .filter(b => 
+        b.batch_number === selectedBatch.value &&
+        (!selectedShpDate.value || b.shp_date === selectedShpDate.value)
+      )
       .map(b => b.part)
   )];
 });
@@ -43,7 +63,8 @@ const parts = computed(() => {
 const groupedItems = computed(() => {
   const filtered = props.batches.filter(row =>
     row.batch_number === selectedBatch.value &&
-    row.part === selectedPart.value
+    row.part === selectedPart.value &&
+    (!selectedShpDate.value || row.shp_date === selectedShpDate.value)
   );
 
   const grouped = {};
@@ -89,7 +110,21 @@ const exportToPDF = () => {
     <h1 class="mb-4 text-2xl font-bold">Consolidated Picks</h1>
 
     <!-- Select Form -->
-    <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-3">
+    <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-4">
+      <div>
+        <label class="block text-sm font-medium">Shipment Date</label>
+        <select v-model="selectedShpDate" class="w-full px-2 py-1 border rounded">
+          <option value="" disabled>Select Date</option>
+          <option
+        v-for="date in shipmentDates"
+        :key="date"
+        :value="date"
+          >
+        {{ date }}
+          </option>
+        </select>
+      </div>
+
       <div>
         <label class="block text-sm font-medium">Consolidated Pick</label>
         <select v-model="selectedBatch" class="w-full px-2 py-1 border rounded">
@@ -123,6 +158,7 @@ const exportToPDF = () => {
     <table class="w-full text-sm border table-auto" v-if="groupedItems.length">
       <thead class="bg-gray-100">
         <tr>
+          <th class="px-2 py-1 border">Shipment Date</th>
           <th class="px-2 py-1 border">Item No</th>
           <th class="px-2 py-1 border">Description</th>
           <th class="px-2 py-1 border">Total Qty</th>
@@ -130,6 +166,7 @@ const exportToPDF = () => {
       </thead>
       <tbody>
         <tr v-for="row in groupedItems" :key="row.item_no">
+          <td class="px-2 py-1 border">{{ row.shp_date }}</td>
           <td class="px-2 py-1 border">{{ row.item_no }}</td>
           <td class="px-2 py-1 border">{{ row.item_description }}</td>
           <td class="px-2 py-1 border">{{ toFloat(row.total_qty) }}</td>

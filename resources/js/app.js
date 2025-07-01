@@ -23,10 +23,12 @@ import Tooltip from 'primevue/tooltip';
 import Checkbox from 'primevue/checkbox';
 import ConfirmPopup from 'primevue/confirmpopup';
 import ConfirmationService from 'primevue/confirmationservice';
+import ToastService from 'primevue/toastservice';
 import Calendar from 'primevue/calendar';
 import Dropdown from 'primevue/dropdown';
 import Password from 'primevue/password';
 import Badge from 'primevue/badge';
+import Toast from 'primevue/toast';
 
 import SearchBox from '@/Components/SearchBox.vue'
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'PickAndPack';
@@ -39,6 +41,7 @@ createInertiaApp({
             .use(ZiggyVue, Ziggy)
             .use(PrimeVue)
             .use(ConfirmationService)
+            .use(ToastService)
             .use(createPinia())
             .component('ToolBar',Toolbar)
             .component('Checkbox',Checkbox)
@@ -53,6 +56,7 @@ createInertiaApp({
             .component('Calendar',Calendar)
             .component('Password',Password)
             .component('Badge',Badge)
+            .component('Toast',Toast)
             // .component('Link',Link)
             .mount(el);
     },

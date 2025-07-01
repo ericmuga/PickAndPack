@@ -1,14 +1,39 @@
 <script setup>
-import { ref } from 'vue'
-import { useForm } from '@inertiajs/inertia-vue3'
+import { ref, onMounted } from 'vue'
+import { useForm, usePage } from '@inertiajs/inertia-vue3'
 import MultiSelect from 'primevue/multiselect'
 import Button from 'primevue/button'
+import Toast from 'primevue/toast'
+import { useToast } from 'primevue/usetoast'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 
 const props = defineProps({
   orders: Array,
 })
 
+const toast = useToast()
+const isLoading = ref(false)
+const page = usePage()
+
+// Show flash messages
+onMounted(() => {
+  if (page.props.value.flash?.success) {
+    toast.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: page.props.value.flash.success,
+      life: 5000
+    })
+  }
+  if (page.props.value.flash?.error) {
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: page.props.value.flash.error,
+      life: 5000
+    })
+  }
+})
 
 // Create unique SP Code + Name options
 const spOptions = ref(
@@ -35,12 +60,55 @@ const form = useForm({
   selected_part: '',
 })
 
-const createBatch = () => {
+const createBatch = async () => {
+  if (selectedSPCodes.value.length === 0) {
+    toast.add({
+      severity: 'warn',
+      summary: 'Warning',
+      detail: 'Please select at least one SP Code',
+      life: 3000
+    })
+    return
+  }
+
+  if (selectedPart.value.length === 0) {
+    toast.add({
+      severity: 'warn',
+      summary: 'Warning',
+      detail: 'Please select at least one Part',
+      life: 3000
+    })
+    return
+  }
+
+  isLoading.value = true
+  
   form.sp_codes = selectedSPCodes.value
   form.selected_part = selectedPart.value
-  form.shp_date = form.shp_date // If using Calendar v-model="form.shp_date", this line is optional
+  form.shp_date = form.shp_date
+  
   console.log('Creating batch with:', form)
-  form.post('/orders/create-batch')
+  
+  form.post('/orders/create-batch', {
+    onSuccess: () => {
+      // Reset form
+      selectedSPCodes.value = []
+      selectedPart.value = ''
+      form.reset()
+    },
+    onError: (errors) => {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to create batch. Please check your inputs and try again.',
+        life: 5000
+      })
+      console.error('Batch creation failed:', errors)
+    },
+    onFinish: () => {
+      isLoading.value = false
+    }
+  })
 }
   
 </script>
@@ -48,6 +116,8 @@ const createBatch = () => {
 <template>
   <div class="p-6">
     <AuthenticatedLayout>
+      <Toast />
+      
       <h1 class="mb-4 text-2xl font-bold">Unbatched Orders</h1>
 
       <!-- Ship Date Filter -->
@@ -68,6 +138,7 @@ const createBatch = () => {
           placeholder="Choose SP Codes"
           display="chip"
           class="w-full"
+          :disabled="isLoading"
         />
       </div>
 
@@ -81,13 +152,16 @@ const createBatch = () => {
           placeholder="Choose Part"
           display="chip"
           class="w-full"
+          :disabled="isLoading"
         />
       </div>
 
       <Button
-        label="Create Consolidated Pick"
-        icon="pi pi-check"
+        :label="isLoading ? 'Creating Batch...' : 'Create Consolidated Pick'"
+        :icon="isLoading ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
         class="px-4 py-2 mb-8 text-white bg-blue-600 rounded"
+        :class="{ 'opacity-75 cursor-not-allowed': isLoading }"
+        :disabled="isLoading"
         @click="createBatch"
       />
 

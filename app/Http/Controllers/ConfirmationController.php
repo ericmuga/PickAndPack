@@ -244,8 +244,7 @@ public function createBatch(Request $request)
         throw $e;
     }
 
-    $this->viewBatches();
-    //return redirect()->back()->with('success', 'Batch created successfully!');
+    return redirect()->back()->with('success', "Batch #{$batchId} created successfully! Updated {$lines} lines.");
 }
 
 
