@@ -98,9 +98,11 @@ public function createBatch(Request $request)
 
     try {
         // Debug: Log the actual values being used
-        $partValue = $request->input('selected_part')[0] ?? $request->input('part');
+        $partValues = $request->input('selected_part', [$request->input('part')]);
+        // Remove any null values and ensure we have an array
+        $partValues = array_filter((array)$partValues);
         $shpDateValue = $request->input('shp_date');
-        info('Debug - Part value: ' . json_encode($partValue));
+        info('Debug - Part values: ' . json_encode($partValues));
         info('Debug - SP Codes: ' . json_encode($spCodes));
         info('Debug - Ship Date: ' . json_encode($shpDateValue));
         
@@ -114,7 +116,7 @@ public function createBatch(Request $request)
         
         // Then check what lines match
         $matchingLines = DB::table('lines')
-            ->where('part', $partValue)
+            ->whereIn('part', $partValues)
             ->whereIn('order_no', function ($query) use ($spCodes, $shpDateValue) {
                 $query->select('order_no')
                     ->from('orders')
@@ -126,7 +128,7 @@ public function createBatch(Request $request)
         
         //update lines with batch_number
         $lines = DB::table('lines')
-            ->where('part', $partValue)
+            ->whereIn('part', $partValues)
             ->whereIn('order_no', function ($query) use ($spCodes, $shpDateValue) {
                 $query->select('order_no')
                     ->from('orders')
@@ -143,7 +145,7 @@ public function createBatch(Request $request)
     try {
         // Get all affected order_nos from the lines that were just updated
         $affectedOrderNos = DB::table('lines')
-            ->where('part', $partValue)
+            ->whereIn('part', $partValues)
             ->whereIn('order_no', function ($query) use ($spCodes, $shpDateValue) {
                 $query->select('order_no')
                     ->from('orders')
